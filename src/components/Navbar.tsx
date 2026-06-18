@@ -61,11 +61,10 @@ export default function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full backdrop-blur-xl backdrop-saturate-150 transition-all duration-500 ${
-        scrolled
+      className={`sticky top-0 z-50 w-full backdrop-blur-xl backdrop-saturate-150 transition-all duration-500 ${scrolled
           ? "border-b border-white/10 bg-[#07070b]/80 shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
           : "border-b border-white/5 bg-[#07070b]/40"
-      }`}
+        }`}
     >
       {/* signature hairline glow */}
       <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
@@ -129,10 +128,10 @@ export default function Navbar() {
         {/* CTA + Hamburger */}
         <div className="flex items-center gap-3">
           <motion.a
-            href="/contact"
+            href="/contact#contact-form"
             whileHover={shouldReduceMotion ? undefined : { scale: 1.035 }}
             whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-            className="relative hidden overflow-hidden rounded-full bg-gradient-to-r from-blue-500 to-violet-600 px-5 py-2.5 text-[0.85rem] font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)_inset,0_8px_24px_-8px_rgba(99,102,241,0.65)] transition-shadow duration-300 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.12)_inset,0_10px_30px_-6px_rgba(124,58,237,0.75)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#07070b] lg:inline-flex"
+            className="relative hidden overflow-hidden rounded-full bg-gradient-to-r from-blue-500 to-violet-600 px-5 py-2.5 text-[0.85rem] font-semibold text-white lg:inline-flex"
           >
             Book Consultation
           </motion.a>

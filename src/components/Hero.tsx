@@ -270,7 +270,7 @@ function Hero() {
             className="mt-10 flex w-full flex-col items-center gap-4 sm:w-auto sm:flex-row"
           >
             <motion.a
-              href="#consultation"
+              href="/contact#contact-form"
               whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
               className="group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-full px-8 py-4 text-sm font-semibold text-white shadow-[0_0_40px_-10px_rgba(124,58,237,0.7)] transition-shadow duration-300 hover:shadow-[0_0_55px_-8px_rgba(0,212,255,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] sm:w-auto"
