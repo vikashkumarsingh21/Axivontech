@@ -33,21 +33,23 @@ const contactCards: ContactCard[] = [
         cta: "Chat Now →",
     },
     {
-        icon: MapPin,
-        title: "Location",
-        value: "Muzaffarpur, Bihar, India",
-        description: "Serving clients across India and worldwide.",
-        href: "https://maps.google.com/?q=Muzaffarpur,Bihar,India",
-        ariaLabel: "View our location, Muzaffarpur, Bihar, India, on the map",
-    },
-    {
-        icon: Clock3,
-        title: "Response Time",
-        value: "Within 24 Hours",
-        description: "Fast and professional communication.",
-        href: "#contact-form",
-        ariaLabel: "Our typical response time is within 24 hours",
-    },
+    icon: MapPin,
+    title: "Location",
+    value: "Muzaffarpur, Bihar, India",
+    description: "Serving clients across India and worldwide.",
+    href: "https://maps.google.com/?q=Muzaffarpur,Bihar,India",
+    ariaLabel: "View our location, Muzaffarpur, Bihar, India, on the map",
+    cta: "View Map →",
+},
+{
+    icon: Clock3,
+    title: "Response Time",
+    value: "Within 24 Hours",
+    description: "Fast and professional communication.",
+    href: "#contact-form",
+    ariaLabel: "Our typical response time is within 24 hours",
+    cta: "Contact Us →",
+},
 ];
 
 const sectionVariants: Variants = {
