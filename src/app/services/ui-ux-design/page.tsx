@@ -1,5 +1,91 @@
-import ComingSoon from "@/components/ComingSoon";
+import type { Metadata } from "next";
 
-export default function PortfolioPage() {
-  return <ComingSoon title="Portfolio" />;
+import { getServiceBySlug } from "@/data/services";
+
+import ServiceHero from "@/components/service-pages/ServiceHero";
+import ServiceBenefits from "@/components/service-pages/ServiceBenefits";
+import ServiceProcess from "@/components/service-pages/ServiceProcess";
+import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
+import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
+import CTA from "@/components/CTA";
+
+const service = getServiceBySlug("ui-ux-design");
+
+if (!service) {
+  throw new Error("UI/UX Design service not found");
+}
+
+export const metadata: Metadata = {
+  title: service.metaTitle,
+  description: service.metaDescription,
+
+  keywords: [
+    "UI UX Design",
+    "User Interface Design",
+    "User Experience Design",
+    "Website UI Design",
+    "Mobile App UI Design",
+    "Figma Design",
+    "Product Design",
+    "Wireframing",
+    "Prototype Design",
+    "UX Research",
+    "Modern UI Design",
+    "UI UX Design Agency India",
+    "Axivon Technologies",
+  ],
+
+  openGraph: {
+    title: service.metaTitle,
+    description: service.metaDescription,
+    url: "https://axivontech.in/services/ui-ux-design",
+    siteName: "Axivon Technologies",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: service.metaTitle,
+    description: service.metaDescription,
+  },
+
+  alternates: {
+    canonical: "https://axivontech.in/services/ui-ux-design",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+};
+
+export default function UIUXDesignPage() {
+  return (
+    <main className="overflow-hidden bg-[#050816]">
+      {/* Hero Section */}
+      <ServiceHero service={service} />
+
+      {/* Benefits Section */}
+      <ServiceBenefits service={service} />
+
+      {/* Process Section */}
+      <ServiceProcess service={service} />
+
+      {/* Technology Stack */}
+      <ServiceTechStack service={service} />
+
+      {/* FAQ Section */}
+      <ServiceFAQ service={service} />
+
+      {/* Call To Action */}
+      <CTA />
+    </main>
+  );
 }

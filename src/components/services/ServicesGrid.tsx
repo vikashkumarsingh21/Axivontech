@@ -80,7 +80,7 @@ const SERVICES: Service[] = [
     gradient: "from-[#7C3AED] to-[#2563EB]",
     glow: "#7C3AED",
     glowRgba: "rgba(124,58,237,0.4)",
-    href: "/services/mobile-apps",
+    href: "/services/mobile-app-development",
   },
   {
     id: 3,
@@ -104,7 +104,7 @@ const SERVICES: Service[] = [
     gradient: "from-[#2563EB] to-[#7C3AED]",
     glow: "#2563EB",
     glowRgba: "rgba(37,99,235,0.4)",
-    href: "/services/seo",
+    href: "services/seo-services",
   },
   {
     id: 5,
@@ -152,20 +152,20 @@ const SERVICES: Service[] = [
     gradient: "from-[#7C3AED] to-[#2563EB]",
     glow: "#7C3AED",
     glowRgba: "rgba(124,58,237,0.4)",
-    href: "/services/custom-software",
+    href: "services/custom-software-development",
   },
-  {
-    id: 9,
-    title: "Startup MVP Development",
-    description:
-      "Rapid product launches that validate your vision, attract investors, and reach market fast.",
-    Icon: Rocket,
-    features: ["Product Strategy", "MVP Launch", "Startup Consulting", "Rapid Development"],
-    gradient: "from-[#00D4FF] to-[#7C3AED]",
-    glow: "#00D4FF",
-    glowRgba: "rgba(0,212,255,0.4)",
-    href: "/services/mvp-development",
-  },
+  // {
+  //   id: 9,
+  //   title: "Startup MVP Development",
+  //   description:
+  //     "Rapid product launches that validate your vision, attract investors, and reach market fast.",
+  //   Icon: Rocket,
+  //   features: ["Product Strategy", "MVP Launch", "Startup Consulting", "Rapid Development"],
+  //   gradient: "from-[#00D4FF] to-[#7C3AED]",
+  //   glow: "#00D4FF",
+  //   glowRgba: "rgba(0,212,255,0.4)",
+  //   href: "/services/mvp-development",
+  // },
 ];
 
 // ─── Border Beam ──────────────────────────────────────────────────────────────

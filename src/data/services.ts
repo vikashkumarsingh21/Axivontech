@@ -148,7 +148,7 @@ export const servicesData: ServiceData[] = [
       { name: "Stripe" },
       { name: "Contentful" },
     ],
-    faq: [
+    faqs: [
       {
         question: "How long does a typical web development project take?",
         answer:
@@ -273,7 +273,7 @@ export const servicesData: ServiceData[] = [
       { name: "Detox" },
       { name: "Sentry" },
     ],
-    faq: [
+    faqs: [
       {
         question: "Should I build native or cross-platform?",
         answer:
@@ -398,7 +398,7 @@ export const servicesData: ServiceData[] = [
       { name: "AWS SageMaker" },
       { name: "Vertex AI" },
     ],
-    faq: [
+    faqs: [
       {
         question: "Do we need a large dataset to start with AI?",
         answer:
@@ -523,7 +523,7 @@ export const servicesData: ServiceData[] = [
       { name: "Prometheus" },
       { name: "Vault by HashiCorp" },
     ],
-    faq: [
+    faqs: [
       {
         question: "Which cloud provider do you recommend?",
         answer:
@@ -646,7 +646,7 @@ export const servicesData: ServiceData[] = [
       { name: "PageSpeed Insights" },
       { name: "Clearscope" },
     ],
-    faq: [
+    faqs: [
       {
         question: "How long does it take to see SEO results?",
         answer:
@@ -770,7 +770,7 @@ export const servicesData: ServiceData[] = [
       { name: "Zapier" },
       { name: "Segment" },
     ],
-    faq: [
+    faqs: [
       {
         question: "What budget do I need to get started with paid advertising?",
         answer:
@@ -893,7 +893,7 @@ export const servicesData: ServiceData[] = [
       { name: "Radix UI" },
       { name: "Adobe Illustrator" },
     ],
-    faq: [
+    faqs: [
       {
         question: "Do you offer UX research separately from visual design?",
         answer:
@@ -1018,7 +1018,7 @@ export const servicesData: ServiceData[] = [
       { name: "Kubernetes" },
       { name: "Terraform" },
     ],
-    faq: [
+    faqs: [
       {
         question: "When does custom software make sense over buying off-the-shelf?",
         answer:
