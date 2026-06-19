@@ -275,7 +275,7 @@ function BentoCard({ category, index }: { category: CategoryEntry; index: number
       initial={reduceMotion ? false : { opacity: 0, y: 36 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, delay: index * 0.12, ease: EASE_PREMIUM }}
+      transition={{ duration: 0.6, delay: index * 0.12, ease: "easeOut" }}
       whileHover={reduceMotion ? undefined : { y: -6 }}
       style={{
         rotateX: reduceMotion ? 0 : springRotateX,
@@ -437,7 +437,7 @@ function TechHub() {
         initial={reduceMotion ? false : { scale: 0.8, opacity: 0 }}
         whileInView={{ scale: 1, opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.8, ease: EASE_PREMIUM }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative z-10 flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] p-[2px] shadow-[0_0_80px_-12px_rgba(124,58,237,0.75)] sm:h-40 sm:w-40"
       >
         <div className="flex h-full w-full animate-[pulse-glow_3s_ease-in-out_infinite] flex-col items-center justify-center gap-1 rounded-full bg-[#050816] text-center">
