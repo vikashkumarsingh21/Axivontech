@@ -9,11 +9,7 @@ import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
 import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
 import CTA from "@/components/CTA";
 
-const service = getServiceBySlug("ai-solutions");
-
-if (!service) {
-  throw new Error("AI Solutions service not found");
-}
+const service = getServiceBySlug("ai-solutions")!;
 
 export const metadata: Metadata = {
   title: service.metaTitle,

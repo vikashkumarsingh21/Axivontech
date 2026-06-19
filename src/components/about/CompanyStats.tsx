@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useInView, useReducedMotion, useMotionValue, useSpring } from "framer-motion";
 import { Briefcase, Cpu, Clock3, HeartHandshake } from "lucide-react";
+import type { TargetAndTransition } from "framer-motion";
+const EASE_PREMIUM = [0.22, 1, 0.36, 1] as const;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -274,29 +276,32 @@ function StatCard({
   sectionStarted: boolean;
   reduced: boolean;
 }) {
-  const cardVariants = {
-    hidden: { opacity: 0, y: 48, scale: 0.94 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        duration: 0.65,
-        delay: index * 0.13,
-        ease: [0.22, 1, 0.36, 1],
-      },
+  const EASE_PREMIUM = [0.22, 1, 0.36, 1] as const;
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 48, scale: 0.94 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.65,
+      delay: index * 0.13,
+      ease: EASE_PREMIUM,
     },
-  };
+  },
+};
 
-  const hoverVariants = reduced
-    ? {}
-    : {
-        scale: 1.03,
-        rotateX: 3,
-        rotateY: -3,
-        transition: { duration: 0.3, ease: "easeOut" },
-      };
-
+ const hoverVariants: TargetAndTransition | undefined = reduced
+  ? undefined
+  : {
+      scale: 1.03,
+      rotateX: 3,
+      rotateY: -3,
+      transition: {
+        duration: 0.3,
+      },
+    };
   return (
     <motion.article
       variants={reduced ? undefined : cardVariants}
@@ -436,7 +441,7 @@ function SectionHeader({ started, reduced }: { started: boolean; reduced: boolea
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.7, delay: i * 0.12, ease: EASE_PREMIUM, },
     }),
   };
 

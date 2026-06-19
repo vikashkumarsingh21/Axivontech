@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  type Variants,
+} from "framer-motion";const EASE_NAV = [0.22, 1, 0.36, 1] as const;
 
 interface NavLink {
   label: string;
@@ -32,7 +37,7 @@ const linkListVariants: Variants = {
 
 const linkItemVariants: Variants = {
   closed: { opacity: 0, x: -16 },
-  open: { opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } },
+  open: { opacity: 1, x: 0, transition: { duration: 0.3, ease: EASE_NAV } },
 };
 
 export default function Navbar() {

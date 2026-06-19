@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { Mail, MessageCircle, MapPin, Clock3, type LucideIcon } from "lucide-react";
+const EASE_CONTACT = [0.22, 1, 0.36, 1] as const;
 
 interface ContactCard {
     icon: LucideIcon;
@@ -52,16 +53,16 @@ const contactCards: ContactCard[] = [
 },
 ];
 
-const sectionVariants: Variants = {
+const sectionVariants = {
     hidden: { opacity: 0, y: 40 },
     visible: {
         opacity: 1,
         y: 0,
-        transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+        transition: { duration: 0.7,  ease: EASE_CONTACT },
     },
 };
 
-const containerVariants: Variants = {
+const containerVariants = {
     hidden: {},
     visible: {
         transition: {
@@ -71,13 +72,13 @@ const containerVariants: Variants = {
     },
 };
 
-const cardVariants: Variants = {
+const cardVariants = {
     hidden: { opacity: 0, y: 32, scale: 0.96 },
     visible: {
         opacity: 1,
         y: 0,
         scale: 1,
-        transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+        transition: { duration: 0.6,  ease: EASE_CONTACT },
     },
 };
 

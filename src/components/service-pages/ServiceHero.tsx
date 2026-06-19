@@ -18,6 +18,9 @@ import {
   Activity,
 } from "lucide-react";
 import type { ServiceData } from "@/data/services";
+import type { Variants } from "framer-motion";
+
+const EASE_PREMIUM = [0.25, 0.46, 0.45, 0.94] as const;
 
 // ─── Icon Map ──────────────────────────────────────────────────────────────────
 
@@ -51,7 +54,7 @@ interface Particle {
 
 // ─── Stagger Variants ─────────────────────────────────────────────────────────
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -59,24 +62,24 @@ const containerVariants = {
   },
 };
 
-const fadeUpVariants = {
+const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 32, filter: "blur(8px)" },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.7, ease: EASE_PREMIUM },
   },
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, x: 48, scale: 0.94, filter: "blur(12px)" },
   visible: {
     opacity: 1,
     x: 0,
     scale: 1,
     filter: "blur(0px)",
-    transition: { duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.3 },
+    transition: { duration: 0.9, ease: EASE_PREMIUM, delay: 0.3 },
   },
 };
 
@@ -544,29 +547,30 @@ function MagneticButton({
     <motion.a
       ref={btnRef}
       href={href}
-      style={{ x: springX, y: springY }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       whileHover={{ scale: 1.04 }}
       whileTap={{ scale: 0.97 }}
-      className={`relative inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-semibold text-sm transition-shadow duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] ${
-        variant === "primary"
+      className={`relative inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-semibold text-sm transition-shadow duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] ${variant === "primary"
           ? "text-white"
           : "text-white/80 hover:text-white"
-      } ${className}`}
-      style={
-        variant === "primary"
+        } ${className}`}
+      style={{
+        x: springX,
+        y: springY,
+        ...(variant === "primary"
           ? {
-              background:
-                "linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)",
-              boxShadow: "0 0 0 1px rgba(37,99,235,0.4), 0 8px 24px rgba(37,99,235,0.35)",
-            }
+            background:
+              "linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)",
+            boxShadow:
+              "0 0 0 1px rgba(37,99,235,0.4), 0 8px 24px rgba(37,99,235,0.35)",
+          }
           : {
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              backdropFilter: "blur(12px)",
-            }
-      }
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            backdropFilter: "blur(12px)",
+          }),
+      }}
     >
       {variant === "primary" && (
         <motion.div
@@ -755,10 +759,9 @@ export default function ServiceHero({ service }: ServiceHeroProps) {
                 {["2563EB", "7C3AED", "00D4FF", "2563EB"].map((color, i) => (
                   <div
                     key={i}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ring-2"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ring-2 ring-[#050816]"
                     style={{
                       background: `linear-gradient(135deg, #${color} 0%, #050816 150%)`,
-                      ringColor: "#050816",
                       border: "2px solid #050816",
                     }}
                   >

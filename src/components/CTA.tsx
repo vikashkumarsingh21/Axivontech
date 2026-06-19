@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, Clock, Mail, MessageCircle, Rocket } from "lucide-react";
+const EASE_PREMIUM = [0.22, 1, 0.36, 1] as const;
 
 const WHATSAPP_LINK = "https://wa.me/919473263768";
 const CONSULTATION_LINK = "/contact#contact-form";
@@ -38,7 +39,7 @@ export default function CTA() {
         initial={{ opacity: 0, y: 32 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.7, ease: EASE_PREMIUM }}
         className="relative mx-auto max-w-4xl"
       >
         {/* Pulsing glow */}

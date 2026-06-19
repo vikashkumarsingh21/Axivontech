@@ -27,6 +27,7 @@ import {
   Rocket,
   TrendingUp,
 } from "lucide-react";
+const EASE_PROCESS = [0.22, 1, 0.36, 1] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -458,7 +459,7 @@ const StepCard = memo(function StepCard({
       : { opacity: 0, x: -28, scale: 0.94 },
     visible: {
       opacity: 1, y: 0, x: 0, scale: 1,
-      transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.6, delay,  ease: EASE_PROCESS },
     },
   };
 
@@ -615,7 +616,7 @@ const SectionHeader = memo(function SectionHeader({
     hidden: { opacity: 0, y: 26, filter: "blur(7px)" },
     visible: {
       opacity: 1, y: 0, filter: "blur(0px)",
-      transition: { duration: 0.72, delay: i * 0.13, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.72, delay: i * 0.13,  ease: EASE_PROCESS },
     },
   });
 

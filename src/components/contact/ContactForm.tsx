@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Loader2,
@@ -12,6 +12,7 @@ import {
   MessageCircle,
   Clock3,
 } from "lucide-react";
+const EASE_CONTACT = [0.22, 1, 0.36, 1] as const;
 
 interface FormData {
   fullName: string;
@@ -91,40 +92,40 @@ function validate(data: FormData): FormErrors {
   return errors;
 }
 
-const sectionVariants: Variants = {
+const sectionVariants = {
   hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, ease: EASE_CONTACT },
   },
 };
 
-const gridVariants: Variants = {
+const gridVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.15 } },
 };
 
-const columnVariants: Variants = {
+const columnVariants = {
   hidden: { opacity: 0, y: 32 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: EASE_CONTACT },
   },
 };
 
-const fieldGroupVariants: Variants = {
+const fieldGroupVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
 };
 
-const fieldVariants: Variants = {
+const fieldVariants = {
   hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: EASE_CONTACT },
   },
 };
 
@@ -279,7 +280,7 @@ export default function ContactForm() {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{ duration: 0.4, ease: EASE_CONTACT }}
                       className="flex flex-col items-center justify-center gap-4 py-16 text-center"
                     >
                       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400 shadow-lg shadow-purple-500/30">

@@ -9,6 +9,7 @@ import {
   useInView,
 } from "framer-motion";
 import { Plus, MessageCircle, CalendarCheck, Sparkles } from "lucide-react";
+const EASE_FAQ = [0.16, 1, 0.3, 1] as const;
 
 /**
  * ServiceFAQ.tsx
@@ -53,7 +54,7 @@ const headerVariants = {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const },
+    transition: { duration: 0.7, ease: EASE_FAQ },
   },
 };
 
@@ -70,7 +71,7 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as const },
+    transition: { duration: 0.55, ease: EASE_FAQ },
   },
 };
 
@@ -295,7 +296,7 @@ function FAQCard({ item, index, isOpen, onToggle }: FAQCardProps) {
                 ? "rgba(0,212,255,0.16)"
                 : "rgba(255,255,255,0.06)",
             }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.35, ease: EASE_FAQ  }}
             className="flex h-8 w-8 flex-none items-center justify-center rounded-full border border-white/10"
           >
             <Plus
@@ -316,7 +317,7 @@ function FAQCard({ item, index, isOpen, onToggle }: FAQCardProps) {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.38, ease: EASE_FAQ  }}
               className="overflow-hidden"
             >
               <div className="px-6 pb-6 pl-[3.1rem] pr-7 sm:pl-[3.4rem]">
@@ -354,7 +355,7 @@ function CTAStrip({
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.6, ease: EASE_FAQ  }}
       className="relative mt-16 overflow-hidden rounded-3xl border border-white/10 px-6 py-10 text-center sm:px-12 sm:py-14"
     >
       {/* glassmorphism + gradient overlay */}

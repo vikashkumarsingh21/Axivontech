@@ -24,6 +24,7 @@ import {
   Headphones,
   Sparkles,
 } from "lucide-react";
+const EASE_FAQ = [0.22, 1, 0.36, 1] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -229,7 +230,7 @@ const FAQAccordionItem = memo(function FAQAccordionItem({
           ? {
               opacity: 1,
               x: 0,
-              transition: { duration: 0.58, delay, ease: [0.22, 1, 0.36, 1] },
+              transition: { duration: 0.58, delay, ease: EASE_FAQ },
             }
           : { opacity: 0, x: 30 }
       }
@@ -322,7 +323,7 @@ const FAQAccordionItem = memo(function FAQAccordionItem({
                 ? { rotate: 180, scale: 1.1 }
                 : { rotate: 0, scale: 1 }
             }
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.35, ease: EASE_FAQ }}
             aria-hidden="true"
           >
             {isOpen ? (
@@ -345,7 +346,7 @@ const FAQAccordionItem = memo(function FAQAccordionItem({
                 height: "auto",
                 opacity: 1,
                 transition: {
-                  height: { duration: reduced ? 0 : 0.38, ease: [0.22, 1, 0.36, 1] },
+                  height: { duration: reduced ? 0 : 0.38, ease: EASE_FAQ },
                   opacity: { duration: reduced ? 0 : 0.28, delay: 0.08 },
                 },
               }}
@@ -353,7 +354,7 @@ const FAQAccordionItem = memo(function FAQAccordionItem({
                 height: 0,
                 opacity: 0,
                 transition: {
-                  height: { duration: reduced ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] },
+                  height: { duration: reduced ? 0 : 0.3, ease: EASE_FAQ },
                   opacity: { duration: reduced ? 0 : 0.18 },
                 },
               }}
@@ -393,7 +394,7 @@ const LeftPanel = memo(function LeftPanel({
       opacity: 1,
       x: 0,
       filter: "blur(0px)",
-      transition: { duration: 0.7, delay: i * 0.13, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.7, delay: i * 0.13, ease: EASE_FAQ },
     },
   });
 
@@ -470,7 +471,7 @@ const LeftPanel = memo(function LeftPanel({
                     transition: {
                       delay: 0.55 + i * 0.09,
                       duration: 0.45,
-                      ease: [0.22, 1, 0.36, 1],
+                      ease: EASE_FAQ,
                     },
                   }
                 : { opacity: 0, x: -16 }

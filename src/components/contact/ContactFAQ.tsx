@@ -1,8 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { AnimatePresence, motion, Variants } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { HelpCircle, Minus, Plus } from "lucide-react";
+const EASE_FAQ = [0.22, 1, 0.36, 1] as const;
+const EASE_ACCORDION = [0.04, 0.62, 0.23, 0.98] as const;
 
 interface FAQItem {
   question: string;
@@ -52,7 +54,7 @@ const FAQ_DATA: FAQItem[] = [
   },
 ];
 
-const containerVariants: Variants = {
+const containerVariants = {
   hidden: {},
   visible: {
     transition: {
@@ -62,12 +64,12 @@ const containerVariants: Variants = {
   },
 };
 
-const itemVariants: Variants = {
+const itemVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: EASE_FAQ },
   },
 };
 
@@ -175,7 +177,7 @@ function AccordionRow({
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{
-                  height: { duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] },
+                  height: { duration: 0.4, ease: EASE_ACCORDION },
                   opacity: { duration: 0.3, ease: "easeInOut" },
                 }}
                 style={{ overflow: "hidden" }}
@@ -253,7 +255,7 @@ export default function ContactFAQ() {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, ease: EASE_FAQ }}
           className="mb-14 text-center sm:mb-16"
         >
           <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#00D4FF] backdrop-blur-md">

@@ -30,6 +30,8 @@ import {
   Check,
 } from "lucide-react";
 
+const EASE_SERVICES = [0.22, 1, 0.36, 1] as const;
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Service {
@@ -231,7 +233,7 @@ const ServiceCard = memo(function ServiceCard({
       transition: {
         duration: 0.65,
         delay: (index % 3) * 0.1 + Math.floor(index / 3) * 0.12,
-        ease: [0.22, 1, 0.36, 1],
+        ease: EASE_SERVICES,
       },
     },
   };
@@ -367,7 +369,7 @@ const SectionHeader = memo(function SectionHeader({
     hidden: { opacity: 0, y: 28, filter: "blur(6px)" },
     visible: {
       opacity: 1, y: 0, filter: "blur(0px)",
-      transition: { duration: 0.7, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.7, delay: i * 0.12, ease: EASE_SERVICES },
     },
   });
 

@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import React, { useRef } from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
+
 import {
   Sparkles,
   Building2,
@@ -16,6 +17,7 @@ import {
   ArrowRight,
   type LucideIcon,
 } from "lucide-react";
+const EASE_STORY = [0.22, 1, 0.36, 1] as const;
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                      */
@@ -121,31 +123,31 @@ const GLASS =
 /*  Animation variants                                                        */
 /* -------------------------------------------------------------------------- */
 
-const containerStagger: Variants = {
+const containerStagger = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } },
 };
 
-const fadeUp: Variants = {
+const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, ease: EASE_STORY },
   },
 };
 
-const timelineListVariants: Variants = {
+const timelineListVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.18, delayChildren: 0.2 } },
 };
 
-const timelineItemVariants: Variants = {
+const timelineItemVariants = {
   hidden: { opacity: 0, x: 30 },
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: EASE_STORY },
   },
 };
 
@@ -154,15 +156,19 @@ const nodeVariants: Variants = {
   visible: {
     scale: 1,
     opacity: 1,
-    transition: { type: "spring", stiffness: 260, damping: 18 },
+    transition: {
+  type: "spring" as const,
+  stiffness: 260,
+  damping: 18,
+},
   },
 };
 
-const lineVariants: Variants = {
+const lineVariants = {
   hidden: { scaleY: 0 },
   visible: {
     scaleY: 1,
-    transition: { duration: 1.4, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 1.4, ease: EASE_STORY },
   },
 };
 

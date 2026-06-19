@@ -34,6 +34,9 @@ import {
 } from "lucide-react";
 import type { ServiceData } from "@/data/services";
 
+const EASE_PREMIUM = [0.22, 1, 0.36, 1] as const;
+import type { Variants } from "framer-motion";
+
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 export interface ServiceBenefitsProps {
@@ -111,11 +114,11 @@ const fadeUpVariants = {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.65, ease: EASE_PREMIUM },
   },
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 40, scale: 0.96, filter: "blur(10px)" },
   visible: (i: number) => ({
     opacity: 1,
@@ -125,7 +128,7 @@ const cardVariants = {
     transition: {
       duration: 0.7,
       delay: i * 0.09,
-      ease: [0.22, 1, 0.36, 1],
+      ease: EASE_PREMIUM,
     },
   }),
 };
@@ -306,7 +309,7 @@ function SignalLine({ inView, hovered }: { inView: boolean; hovered: boolean }) 
         }}
         initial={{ scaleX: 0 }}
         animate={{ scaleX: inView ? 1 : 0 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+        transition={{ duration: 0.9, ease: EASE_PREMIUM, delay: 0.2 }}
       />
       {hovered && (
         <motion.div
@@ -574,7 +577,7 @@ function AnimatedStat({
         style={{ color }}
         initial={{ opacity: 0, scale: 0.85 }}
         animate={isInView ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.6, ease: EASE_PREMIUM }}
       >
         {!prefersReducedMotion && (
           <motion.span
@@ -627,7 +630,7 @@ function StatsPanel({ prefersReducedMotion }: { prefersReducedMotion: boolean })
       ref={ref}
       initial={{ opacity: 0, y: 32 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.75, ease: EASE_PREMIUM }}
       className="relative mt-16 rounded-2xl overflow-hidden"
       style={{
         background: "rgba(255,255,255,0.025)",
@@ -722,7 +725,7 @@ function TrustBadges({ prefersReducedMotion }: { prefersReducedMotion: boolean }
               opacity: 1,
               scale: 1,
               y: 0,
-              transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+              transition: { duration: 0.45, ease: EASE_PREMIUM },
             },
           }}
           whileHover={prefersReducedMotion ? {} : { scale: 1.04, y: -2 }}

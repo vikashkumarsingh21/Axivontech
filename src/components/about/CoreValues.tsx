@@ -7,7 +7,6 @@ import {
   useReducedMotion,
   useSpring,
   useTransform,
-  type Variants,
 } from "framer-motion";
 import {
   Gem,
@@ -17,7 +16,7 @@ import {
   HeartHandshake,
   type LucideIcon,
 } from "lucide-react";
-
+const EASE_VALUES = [0.22, 1, 0.36, 1] as const;
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                      */
 /* -------------------------------------------------------------------------- */
@@ -110,32 +109,32 @@ const NOISE_TEXTURE =
 /*  Animation variants                                                        */
 /* -------------------------------------------------------------------------- */
 
-const containerStagger: Variants = {
+const containerStagger = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } },
 };
 
-const fadeUp: Variants = {
+const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, ease: EASE_VALUES },
   },
 };
 
-const cardGridStagger: Variants = {
+const cardGridStagger = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
 };
 
-const cardVariants: Variants = {
+const cardVariants = {
   hidden: { opacity: 0, y: 40, scale: 0.96 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, ease: EASE_VALUES },
   },
 };
 

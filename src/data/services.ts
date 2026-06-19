@@ -48,7 +48,7 @@ export interface ServiceData {
   benefits: ServiceBenefit[];
   process: ServiceProcess[];
   technologies: ServiceTechnology[];
-  faq: ServiceFAQ[];
+  faqs: ServiceFAQ[];
   cta: ServiceCTA;
 }
 
@@ -1058,8 +1058,16 @@ export const servicesData: ServiceData[] = [
 // ─────────────────────────────────────────────
 
 /** Returns a single service by slug, or undefined if not found. */
-export function getServiceBySlug(slug: ServiceSlug): ServiceData | undefined {
-  return servicesData.find((service) => service.slug === slug);
+export function getServiceBySlug(slug: ServiceSlug): ServiceData {
+  const service = servicesData.find(
+    (service) => service.slug === slug
+  );
+
+  if (!service) {
+    throw new Error(`Service not found: ${slug}`);
+  }
+
+  return service;
 }
 
 /** Returns all service slugs — useful for generateStaticParams in Next.js. */

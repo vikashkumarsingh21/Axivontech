@@ -9,9 +9,9 @@ import {
   useSpring,
   useTransform,
   useReducedMotion,
-  type Variants,
 } from "framer-motion";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+const EASE_HERO = [0.16, 1, 0.3, 1] as const;
 
 /**
  * Fonts
@@ -101,29 +101,29 @@ function ArrowIcon({ className }: { className?: string }) {
 
 /** ---------- Animation variants ---------- */
 
-const containerVariants: Variants = {
+const containerVariants = {
   hidden: {},
   visible: {
     transition: { staggerChildren: 0.12, delayChildren: 0.15 },
   },
 };
 
-const itemVariants: Variants = {
+const itemVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.7, ease: EASE_HERO },
   },
 };
 
-const panelVariants: Variants = {
+const panelVariants = {
   hidden: { opacity: 0, y: 32, scale: 0.96 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.4 },
+    transition: { duration: 0.8, ease: EASE_HERO, delay: 0.4 },
   },
 };
 

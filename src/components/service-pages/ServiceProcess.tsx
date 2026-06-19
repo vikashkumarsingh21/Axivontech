@@ -35,6 +35,9 @@ import {
   ArrowRight,
 } from "lucide-react";
 import type { ServiceData } from "@/data/services";
+import type { Variants } from "framer-motion";
+
+const EASE_PREMIUM = [0.22, 1, 0.36, 1] as const;
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -102,11 +105,11 @@ function getDynamicDescription(title: string): string {
 
 // ─── Animation Variants ────────────────────────────────────────────────────────
 
-const fadeUpVariants = {
+const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 28, filter: "blur(8px)" },
   visible: {
     opacity: 1, y: 0, filter: "blur(0px)",
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, ease: EASE_PREMIUM },
   },
 };
 
@@ -369,7 +372,7 @@ function StepCard({
       ref={cardRef}
       initial={{ opacity: 0, x: reduced ? 0 : slideDir * 48, filter: "blur(10px)" }}
       animate={isInView ? { opacity: 1, x: 0, filter: "blur(0px)" } : {}}
-      transition={{ duration: 0.75, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.75, delay: 0.1, ease: EASE_PREMIUM }}
       style={reduced ? {} : { rotateX, rotateY, transformStyle: "preserve-3d", perspective: 900 }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
@@ -511,7 +514,7 @@ function StepCard({
             }}
             initial={{ scaleX: 0 }}
             animate={isInView ? { scaleX: 1 } : {}}
-            transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.9, delay: 0.3, ease: EASE_PREMIUM }}
           />
         </div>
         <div className="h-4" />
@@ -644,7 +647,7 @@ function ProcessSummaryPanel({ reduced }: { reduced: boolean }) {
       ref={ref}
       initial={{ opacity: 0, y: 32 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.75, ease: EASE_PREMIUM }}
       className="relative mt-20 rounded-2xl overflow-hidden"
       style={{
         background: "rgba(255,255,255,0.025)",
@@ -692,7 +695,7 @@ function ProcessSummaryPanel({ reduced }: { reduced: boolean }) {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.85 }}
                   animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                  transition={{ duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.5, delay: i * 0.1, ease: EASE_PREMIUM }}
                   className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
                   style={{
                     background: `${accent.primary}12`,

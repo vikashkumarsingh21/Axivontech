@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   Calendar,
@@ -13,6 +13,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
+const EASE_ABOUT = [0.22, 1, 0.36, 1] as const;
 
 interface StatItem {
   label: string;
@@ -39,7 +40,7 @@ const CHECKLIST: ChecklistItem[] = [
 
 const TECH_STACK: string[] = ["Next.js", "React", "Node.js", "AI"];
 
-const containerVariants: Variants = {
+const containerVariants = {
   hidden: {},
   visible: {
     transition: {
@@ -49,12 +50,15 @@ const containerVariants: Variants = {
   },
 };
 
-const itemVariants: Variants = {
+const itemVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: {
+      duration: 0.6,
+      ease: EASE_ABOUT,
+    },
   },
 };
 
@@ -204,7 +208,7 @@ export default function AboutHero() {
           initial={{ opacity: 0, y: 48, scale: 0.94 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, ease: EASE_ABOUT }}
           className="relative mx-auto w-full max-w-md"
         >
           {/* Floating glow behind card */}

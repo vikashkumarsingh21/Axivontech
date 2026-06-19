@@ -31,6 +31,8 @@ import {
   Headphones,
 } from "lucide-react";
 
+const EASE_PRICING = [0.22, 1, 0.36, 1] as const;
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface PricingCard {
@@ -264,7 +266,7 @@ const PricingCard = memo(function PricingCard({
       initial={reduced ? undefined : { opacity: 0, y: 48, scale: 0.93 }}
       animate={
         visible
-          ? { opacity: 1, y: 0, scale: 1, transition: { duration: 0.62, delay, ease: [0.22, 1, 0.36, 1] } }
+          ? { opacity: 1, y: 0, scale: 1, transition: { duration: 0.62, delay, ease: EASE_PRICING } }
           : { opacity: 0, y: 48, scale: 0.93 }
       }
       style={
@@ -294,7 +296,7 @@ const PricingCard = memo(function PricingCard({
           <motion.div
             initial={{ opacity: 0, y: -8, scale: 0.85 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: delay + 0.25, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ delay: delay + 0.25, duration: 0.4, ease: EASE_PRICING }}
             className="absolute -top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase"
             style={{
               background: "linear-gradient(90deg, #00D4FF, #7C3AED)",
@@ -472,7 +474,7 @@ const TrustBar = memo(function TrustBar({
       initial={reduced ? undefined : { opacity: 0, y: 24 }}
       animate={
         visible
-          ? { opacity: 1, y: 0, transition: { duration: 0.7, delay: 0.9, ease: [0.22, 1, 0.36, 1] } }
+          ? { opacity: 1, y: 0, transition: { duration: 0.7, delay: 0.9, ease: EASE_PRICING } }
           : { opacity: 0, y: 24 }
       }
       className="flex flex-wrap items-center justify-center gap-3 mt-14"
@@ -485,7 +487,7 @@ const TrustBar = memo(function TrustBar({
           initial={reduced ? undefined : { opacity: 0, scale: 0.88 }}
           animate={
             visible
-              ? { opacity: 1, scale: 1, transition: { delay: 1.0 + i * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] } }
+              ? { opacity: 1, scale: 1, transition: { delay: 1.0 + i * 0.08, duration: 0.45, ease: EASE_PRICING } }
               : { opacity: 0, scale: 0.88 }
           }
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm"
@@ -515,7 +517,7 @@ const BottomCTA = memo(function BottomCTA({
       initial={reduced ? undefined : { opacity: 0, y: 20 }}
       animate={
         visible
-          ? { opacity: 1, y: 0, transition: { duration: 0.7, delay: 1.15, ease: [0.22, 1, 0.36, 1] } }
+          ? { opacity: 1, y: 0, transition: { duration: 0.7, delay: 1.15, ease: EASE_PRICING } }
           : { opacity: 0, y: 20 }
       }
       className="flex justify-center mt-10"
@@ -571,7 +573,7 @@ const SectionHeader = memo(function SectionHeader({
     hidden: { opacity: 0, y: 26, filter: "blur(7px)" },
     visible: {
       opacity: 1, y: 0, filter: "blur(0px)",
-      transition: { duration: 0.72, delay: i * 0.13, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.72, delay: i * 0.13, ease: EASE_PRICING },
     },
   });
 

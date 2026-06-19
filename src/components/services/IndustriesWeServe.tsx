@@ -26,6 +26,7 @@ import {
   Truck,
   Rocket,
 } from "lucide-react";
+const EASE_INDUSTRY = [0.22, 1, 0.36, 1] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -309,7 +310,7 @@ const IndustryCard = memo(function IndustryCard({
     hidden: { opacity: 0, y: 44, scale: 0.93 },
     visible: {
       opacity: 1, y: 0, scale: 1,
-      transition: { duration: 0.62, delay, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.62, delay, ease: EASE_INDUSTRY },
     },
   };
 
@@ -534,7 +535,7 @@ const SectionHeader = memo(function SectionHeader({
     hidden: { opacity: 0, y: 26, filter: "blur(7px)" },
     visible: {
       opacity: 1, y: 0, filter: "blur(0px)",
-      transition: { duration: 0.72, delay: i * 0.13, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.72, delay: i * 0.13, ease: EASE_INDUSTRY },
     },
   });
 

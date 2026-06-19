@@ -1,4 +1,5 @@
 "use client";
+import { type Variants } from "framer-motion";
 
 import {
   useEffect,
@@ -54,14 +55,14 @@ interface Particle {
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const SERVICES: ServiceCard[] = [
-  { id: 1,  label: "Web Development",    Icon: Globe,       color: "#2563EB", glow: "rgba(37,99,235,0.5)",   angleDeg: 0,    orbitRadius: 200 },
-  { id: 2,  label: "Mobile Apps",        Icon: Smartphone,  color: "#7C3AED", glow: "rgba(124,58,237,0.5)",  angleDeg: 45,   orbitRadius: 200 },
-  { id: 3,  label: "AI Solutions",       Icon: Bot,         color: "#00D4FF", glow: "rgba(0,212,255,0.5)",   angleDeg: 90,   orbitRadius: 200 },
-  { id: 4,  label: "SEO Services",       Icon: TrendingUp,  color: "#2563EB", glow: "rgba(37,99,235,0.5)",   angleDeg: 135,  orbitRadius: 200 },
-  { id: 5,  label: "Digital Marketing",  Icon: Megaphone,   color: "#7C3AED", glow: "rgba(124,58,237,0.5)",  angleDeg: 180,  orbitRadius: 200 },
-  { id: 6,  label: "UI/UX Design",       Icon: Palette,     color: "#00D4FF", glow: "rgba(0,212,255,0.5)",   angleDeg: 225,  orbitRadius: 200 },
-  { id: 7,  label: "Cloud Solutions",    Icon: Cloud,       color: "#2563EB", glow: "rgba(37,99,235,0.5)",   angleDeg: 270,  orbitRadius: 200 },
-  { id: 8,  label: "Custom Software",    Icon: Settings2,   color: "#7C3AED", glow: "rgba(124,58,237,0.5)",  angleDeg: 315,  orbitRadius: 200 },
+  { id: 1, label: "Web Development", Icon: Globe, color: "#2563EB", glow: "rgba(37,99,235,0.5)", angleDeg: 0, orbitRadius: 200 },
+  { id: 2, label: "Mobile Apps", Icon: Smartphone, color: "#7C3AED", glow: "rgba(124,58,237,0.5)", angleDeg: 45, orbitRadius: 200 },
+  { id: 3, label: "AI Solutions", Icon: Bot, color: "#00D4FF", glow: "rgba(0,212,255,0.5)", angleDeg: 90, orbitRadius: 200 },
+  { id: 4, label: "SEO Services", Icon: TrendingUp, color: "#2563EB", glow: "rgba(37,99,235,0.5)", angleDeg: 135, orbitRadius: 200 },
+  { id: 5, label: "Digital Marketing", Icon: Megaphone, color: "#7C3AED", glow: "rgba(124,58,237,0.5)", angleDeg: 180, orbitRadius: 200 },
+  { id: 6, label: "UI/UX Design", Icon: Palette, color: "#00D4FF", glow: "rgba(0,212,255,0.5)", angleDeg: 225, orbitRadius: 200 },
+  { id: 7, label: "Cloud Solutions", Icon: Cloud, color: "#2563EB", glow: "rgba(37,99,235,0.5)", angleDeg: 270, orbitRadius: 200 },
+  { id: 8, label: "Custom Software", Icon: Settings2, color: "#7C3AED", glow: "rgba(124,58,237,0.5)", angleDeg: 315, orbitRadius: 200 },
 ];
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
@@ -130,8 +131,10 @@ function BackgroundBlobs({ reduced }: { reduced: boolean }) {
 // ─── Particles ────────────────────────────────────────────────────────────────
 
 function Particles({ reduced }: { reduced: boolean }) {
-  const particles = useMemo<Particle[]>(() =>
-    Array.from({ length: 28 }, (_, i) => ({
+  const [particles, setParticles] = useState<Particle[]>([]);
+
+  useEffect(() => {
+    const generated = Array.from({ length: 28 }, (_, i) => ({
       id: i,
       cx: Math.random() * 100,
       cy: Math.random() * 100,
@@ -139,26 +142,42 @@ function Particles({ reduced }: { reduced: boolean }) {
       dur: Math.random() * 14 + 8,
       delay: Math.random() * 8,
       color: ["#2563EB", "#7C3AED", "#00D4FF"][i % 3],
-    })), []
-  );
+    }));
+
+    setParticles(generated);
+  }, []);
 
   if (reduced) return null;
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+    >
       {particles.map((p) => (
         <motion.div
           key={p.id}
           className="absolute rounded-full"
           style={{
-            left: `${p.cx}%`, top: `${p.cy}%`,
-            width: p.r * 2, height: p.r * 2,
+            left: `${p.cx}%`,
+            top: `${p.cy}%`,
+            width: p.r * 2,
+            height: p.r * 2,
             background: p.color,
             opacity: 0.18,
             boxShadow: `0 0 ${p.r * 4}px ${p.color}`,
           }}
-          animate={{ y: [0, -28, 0], x: [0, Math.sin(p.id) * 12, 0], opacity: [0.12, 0.28, 0.12] }}
-          transition={{ duration: p.dur, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
+          animate={{
+            y: [0, -28, 0],
+            x: [0, Math.sin(p.id) * 12, 0],
+            opacity: [0.12, 0.28, 0.12],
+          }}
+          transition={{
+            duration: p.dur,
+            delay: p.delay,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
         />
       ))}
     </div>
@@ -261,7 +280,11 @@ function OrbitDashboard({ reduced }: { reduced: boolean }) {
             }}
             initial={reduced ? {} : { opacity: 0, scale: 0.6 }}
             animate={reduced ? {} : { opacity: 1, scale: 1 }}
-            transition={{ delay: 0.8 + i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            transition={{
+              delay: 0.8 + i * 0.08,
+              duration: 0.5,
+              ease: "easeOut"
+            }}
             whileHover={reduced ? {} : { scale: 1.18, zIndex: 10 }}
             onHoverStart={() => setHovered(svc.id)}
             onHoverEnd={() => setHovered(null)}
@@ -326,7 +349,11 @@ function OrbitDashboard({ reduced }: { reduced: boolean }) {
         }}
         initial={reduced ? {} : { scale: 0.7, opacity: 0 }}
         animate={reduced ? {} : { scale: 1, opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        transition={{
+  delay: 0.5,
+  duration: 0.7,
+  ease: [0.22, 1, 0.36, 1],
+}}
         aria-label="Axivon Services center hub"
       >
         {/* Pulsing rings */}
@@ -429,13 +456,23 @@ function CTAButtons({ reduced }: { reduced: boolean }) {
 // ─── Left Content ─────────────────────────────────────────────────────────────
 
 function HeroContent({ reduced }: { reduced: boolean }) {
-  const stagger = (i: number) => ({
-    hidden: { opacity: 0, y: 28, filter: "blur(8px)" },
-    visible: {
-      opacity: 1, y: 0, filter: "blur(0px)",
-      transition: { duration: 0.75, delay: i * 0.14, ease: [0.22, 1, 0.36, 1] },
+  const stagger = (i: number): Variants => ({
+  hidden: {
+    opacity: 0,
+    y: 28,
+    filter: "blur(8px)",
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.75,
+      delay: i * 0.14,
+      ease: [0.22, 1, 0.36, 1],
     },
-  });
+  },
+});
 
   return (
     <motion.div
@@ -562,7 +599,11 @@ export default function ServicesHero() {
               className="w-full lg:w-1/2 flex items-center justify-center"
               initial={reduced ? undefined : { opacity: 0, x: 40 }}
               animate={reduced ? undefined : { opacity: 1, x: 0 }}
-              transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              transition={{
+  duration: 0.9,
+  delay: 0.3,
+   ease: [0.22, 1, 0.36, 1],
+}}
             >
               {/* Dashboard container with outer glow */}
               <div

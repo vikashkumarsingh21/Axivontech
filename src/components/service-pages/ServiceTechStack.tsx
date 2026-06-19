@@ -38,6 +38,9 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import type { ServiceData } from "@/data/services";
+import type { Variants } from "framer-motion";
+
+const EASE_PREMIUM = [0.22, 1, 0.36, 1] as const;
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -177,15 +180,15 @@ const fadeUpVariants = {
   hidden: { opacity: 0, y: 28, filter: "blur(8px)" },
   visible: {
     opacity: 1, y: 0, filter: "blur(0px)",
-    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.65, ease: EASE_PREMIUM },
   },
 };
 
-const cardReveal = {
+const cardReveal: Variants = {
   hidden: { opacity: 0, y: 32, scale: 0.94, filter: "blur(8px)" },
   visible: (i: number) => ({
     opacity: 1, y: 0, scale: 1, filter: "blur(0px)",
-    transition: { duration: 0.6, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, delay: i * 0.07, ease: EASE_PREMIUM },
   }),
 };
 
@@ -658,7 +661,7 @@ function TechCard({ tech, index, reduced }: { tech: TechItem; index: number; red
             }}
             initial={{ scaleX: 0 }}
             animate={isInView ? { scaleX: 1 } : {}}
-            transition={{ duration: 0.8, delay: index * 0.04 + 0.2, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.8, delay: index * 0.04 + 0.2, ease: EASE_PREMIUM }}
             aria-hidden
           />
         </div>
@@ -705,7 +708,7 @@ function BottomPanel({ reduced }: { reduced: boolean }) {
       ref={ref}
       initial={{ opacity: 0, y: 32 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.75,  ease: EASE_PREMIUM }}
       className="relative mt-20 rounded-2xl overflow-hidden"
       style={{
         background: "rgba(255,255,255,0.024)",
@@ -749,7 +752,7 @@ function BottomPanel({ reduced }: { reduced: boolean }) {
                 key={pillar.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.5, delay: i * 0.1, ease: EASE_PREMIUM }}
                 className="flex flex-col gap-3"
               >
                 <div
