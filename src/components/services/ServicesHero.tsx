@@ -582,7 +582,7 @@ export default function ServicesHero() {
         aria-label="Axivon Technologies Services Hero"
       >
         {/* Background layers */}
-        <BackgroundBlobs reduced={reduced} />
+        <BackgroundBlobs reduced={reduced} />hogaya h bhai abb bato next kiy karu to mera service page sayad compolte hogay ah na ye bata sakta ho kiya tum mujha 
         <Particles reduced={reduced} />
 
         {/* Content wrapper */}
