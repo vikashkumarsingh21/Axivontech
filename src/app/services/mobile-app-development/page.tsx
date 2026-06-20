@@ -8,6 +8,7 @@ import ServiceProcess from "@/components/service-pages/ServiceProcess";
 import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
 import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
 import CTA from "@/components/CTA";
+import ServiceSchema from "@/components/seo/ServiceSchema";
 
 const service = getServiceBySlug("mobile-app-development");
 
@@ -23,6 +24,13 @@ export const metadata: Metadata = {
 export default function MobileAppDevelopmentPage() {
   return (
     <main className="overflow-hidden bg-[#050816]">
+
+      <ServiceSchema
+        name={service.title}
+        description={service.metaDescription}
+        url="https://axivontech.in/services/mobile-app-development"
+      />
+
       <ServiceHero service={service} />
       <ServiceBenefits service={service} />
       <ServiceProcess service={service} />

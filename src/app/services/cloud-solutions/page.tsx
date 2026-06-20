@@ -8,6 +8,7 @@ import ServiceProcess from "@/components/service-pages/ServiceProcess";
 import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
 import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
 import CTA from "@/components/CTA";
+import ServiceSchema from "@/components/seo/ServiceSchema";
 
 const service = getServiceBySlug("cloud-solutions");
 
@@ -69,6 +70,13 @@ export const metadata: Metadata = {
 export default function CloudSolutionsPage() {
   return (
     <main className="overflow-hidden bg-[#050816]">
+
+      <ServiceSchema
+        name={service.title}
+        description={service.metaDescription}
+        url="https://axivontech.in/services/cloud-solutions"
+      />
+
       {/* Hero Section */}
       <ServiceHero service={service} />
 
