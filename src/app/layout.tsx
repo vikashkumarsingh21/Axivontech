@@ -6,6 +6,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import OrganizationSchema from "@/components/seo/OrganizationSchema";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -100,6 +101,8 @@ export default function RootLayout({
   </main>
 
   <Footer />
+
+  <GoogleAnalytics />
 
 </body>
     </html>
