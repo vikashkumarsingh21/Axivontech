@@ -10,7 +10,7 @@ import {
   useTransform,
   useReducedMotion,
 } from "framer-motion";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, Inter } from "next/font/google";
 const EASE_HERO = [0.16, 1, 0.3, 1] as const;
 
 /**
@@ -31,11 +31,11 @@ const inter = Inter({
   variable: "--font-body",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
-});
+// const jetbrainsMono = JetBrains_Mono({
+//   subsets: ["latin"],
+//   weight: ["400", "500"],
+//   variable: "--font-mono",
+// });
 
 /** Brand tokens */
 const COLORS = {
@@ -165,7 +165,7 @@ function Hero() {
   return (
     <section
       onPointerMove={handlePointerMove}
-      className={`relative min-h-[100svh] w-full overflow-hidden bg-[#050816] ${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      className={`relative min-h-[100svh] w-full overflow-hidden bg-[#050816] ${spaceGrotesk.variable} ${inter.variable}`}
       style={{ fontFamily: "var(--font-body)" }}
     >
       {/* ---------- Background layers ---------- */}
@@ -297,7 +297,7 @@ function Hero() {
             </motion.a>
           </motion.div>
 
-          {/* Mono stats row */}``
+          {/* Mono stats row */}
           <motion.div
             variants={itemVariants}
             className="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] uppercase tracking-wider text-white/40 lg:justify-start"

@@ -9,6 +9,7 @@ import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
 import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
 import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
 const service = getServiceBySlug("ai-solutions")!;
 
@@ -35,6 +36,24 @@ export default function AISolutionsPage() {
         description={service.metaDescription}
         url="https://axivontech.in/services/ai-solutions"
       />
+
+      <BreadcrumbSchema
+              items={[
+                {
+                  name: "Home",
+                  url: "https://axivontech.in",
+                },
+                {
+                  name: "Services",
+                  url: "https://axivontech.in/services",
+                },
+                {
+                  name: "AI Solutions",
+                  url: "https://axivontech.in/services/ai-solutions",
+                },
+              ]}
+            />
+
       {/* Hero Section */}
       <ServiceHero service={service} />
 

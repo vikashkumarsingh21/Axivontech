@@ -9,6 +9,7 @@ import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
 import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
 import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
 const service = getServiceBySlug("seo-services");
 
@@ -61,6 +62,25 @@ export default function SEOServicesPage() {
         description={service.metaDescription}
         url="https://axivontech.in/services/seo-services"
       />
+
+
+      <BreadcrumbSchema
+        items={[
+          {
+            name: "Home",
+            url: "https://axivontech.in",
+          },
+          {
+            name: "Services",
+            url: "https://axivontech.in/services",
+          },
+          {
+            name: "SEO Services",
+            url: "https://axivontech.in/services/seo-services",
+          },
+        ]}
+      />
+
       {/* Hero */}
       <ServiceHero service={service} />
 

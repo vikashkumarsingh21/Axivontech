@@ -9,6 +9,7 @@ import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
 import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
 import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
 const service = getServiceBySlug("digital-marketing");
 
@@ -75,6 +76,24 @@ export default function DigitalMarketingPage() {
         description={service.metaDescription}
         url="https://axivontech.in/services/digital-marketing"
       />
+
+      <BreadcrumbSchema
+              items={[
+                {
+                  name: "Home",
+                  url: "https://axivontech.in",
+                },
+                {
+                  name: "Services",
+                  url: "https://axivontech.in/services",
+                },
+                {
+                  name: "Digital Marketing",
+                  url: "https://axivontech.in/services/digital-marketing",
+                },
+              ]}
+            />
+      
 
 
       {/* Hero Section */}

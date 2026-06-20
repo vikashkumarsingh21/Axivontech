@@ -9,6 +9,7 @@ import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
 import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
 import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
 const service = getServiceBySlug("custom-software-development");
 
@@ -76,6 +77,23 @@ export default function CustomSoftwareDevelopmentPage() {
         description={service.metaDescription}
         url="https://axivontech.in/services/custom-software-development"
       />
+
+      <BreadcrumbSchema
+              items={[
+                {
+                  name: "Home",
+                  url: "https://axivontech.in",
+                },
+                {
+                  name: "Services",
+                  url: "https://axivontech.in/services",
+                },
+                {
+                  name: "Custom Software Development",
+                  url: "https://axivontech.in/services/custom-software-development",
+                },
+              ]}
+            />
 
       {/* Hero Section */}
       <ServiceHero service={service} />

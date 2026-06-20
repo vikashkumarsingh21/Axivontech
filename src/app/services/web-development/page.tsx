@@ -9,6 +9,7 @@ import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
 import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
 // import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
 const service = getServiceBySlug("web-development");
 
@@ -32,12 +33,31 @@ export const metadata: Metadata = {
 
 export default function WebDevelopmentPage() {
   return (
-    <main className="overflow-hidden bg-[#050816]">
+    <main className="overflow-hidden bg-[#050816']">
+      
       <ServiceSchema
         name={service.title}
         description={service.metaDescription}
         url="https://axivontech.in/services/web-development"
       />
+
+      <BreadcrumbSchema
+        items={[
+          {
+            name: "Home",
+            url: "https://axivontech.in",
+          },
+          {
+            name: "Services",
+            url: "https://axivontech.in/services",
+          },
+          {
+            name: "Web Development",
+            url: "https://axivontech.in/services/web-development",
+          },
+        ]}
+      />
+
       {/* Hero Section */}
       <ServiceHero service={service} />
 
@@ -53,8 +73,6 @@ export default function WebDevelopmentPage() {
       {/* FAQ Section */}
       <ServiceFAQ service={service} />
 
-      {/* Global CTA */}
-      {/* <CTA /> */}
     </main>
   );
 }

@@ -9,6 +9,7 @@ import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
 import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
 import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
 const service = getServiceBySlug("cloud-solutions");
 
@@ -76,6 +77,24 @@ export default function CloudSolutionsPage() {
         description={service.metaDescription}
         url="https://axivontech.in/services/cloud-solutions"
       />
+
+      <BreadcrumbSchema
+              items={[
+                {
+                  name: "Home",
+                  url: "https://axivontech.in",
+                },
+                {
+                  name: "Services",
+                  url: "https://axivontech.in/services",
+                },
+                {
+                  name: "Cloud Solutions",
+                  url: "https://axivontech.in/services/cloud-solutions",
+                },
+              ]}
+            />
+
 
       {/* Hero Section */}
       <ServiceHero service={service} />

@@ -9,6 +9,7 @@ import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
 import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
 import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
 const service = getServiceBySlug("ui-ux-design");
 
@@ -76,6 +77,24 @@ export default function UIUXDesignPage() {
         description={service.metaDescription}
         url="https://axivontech.in/services/ui-ux-design"
       />
+
+      <BreadcrumbSchema
+        items={[
+          {
+            name: "Home",
+            url: "https://axivontech.in",
+          },
+          {
+            name: "Services",
+            url: "https://axivontech.in/services",
+          },
+          {
+            name: "ui-ux-design",
+            url: "https://axivontech.in/services/ui-ux-design",
+          },
+        ]}
+      />
+
       {/* Hero Section */}
       <ServiceHero service={service} />
 
