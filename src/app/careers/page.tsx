@@ -8,7 +8,7 @@ import OpenPositions from "@/components/careers/OpenPositions";
 import HiringProcess from "@/components/careers/HiringProcess";
 import EmployeeBenefits from "@/components/careers/EmployeeBenefits";
 import CareersFAQ from "@/components/careers/CareersFAQ";
-// import CareersCTA from "@/components/careers/CareersCTA";
+// import CareersCTA from "@/components/CTA";
 
 import CTA from "@/components/CTA";
 
@@ -77,7 +77,7 @@ export default function CareersPage() {
       <CareersFAQ />
 
       {/* Careers CTA */}
-      {/* <CareersCTA /> */}
+      <CTA />
 
       {/* Global CTA */}
       <CTA />
