@@ -55,7 +55,7 @@ function CharReveal({ text, className }: { text: string; className?: string }) {
       {letters.map((char, i) => (
         <motion.span
           key={`${char}-${i}`}
-          aria-hidden="true"
+          aria-hidden={true}
           className="inline-block"
           variants={{
             hidden: { opacity: 0, y: 18, rotateX: -40 },
@@ -100,7 +100,7 @@ function FloatingQuoteMark() {
   const reduceMotion = useReducedMotion();
   return (
     <Quote
-      aria-hidden="true"
+      aria-hidden={true}
       strokeWidth={1}
       className={`pointer-events-none absolute -left-3 -top-12 h-28 w-28 text-white/[0.05] sm:-left-6 sm:-top-14 sm:h-36 sm:w-36 ${
         reduceMotion ? "" : "[animation:float_7s_ease-in-out_infinite]"
@@ -168,7 +168,7 @@ function TrustIndicators() {
           whileHover={reduceMotion ? undefined : { y: -3 }}
           className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white/70 backdrop-blur-md transition-all duration-300 hover:border-[#00D4FF]/40 hover:bg-[#00D4FF]/[0.06] hover:text-white hover:shadow-[0_0_22px_-6px_rgba(0,212,255,0.55)]"
         >
-          <CheckCircle2 className="h-4 w-4 text-[#00D4FF]" strokeWidth={1.75} aria-hidden="true" />
+          <CheckCircle2 className="h-4 w-4 text-[#00D4FF]" strokeWidth={1.75} aria-hidden={true} />
           {label}
         </motion.li>
       ))}
@@ -232,14 +232,14 @@ function FounderCard() {
       className="group relative mx-auto w-full max-w-md rounded-[28px] border border-white/[0.08] bg-white/[0.02] p-[1px] shadow-[0_0_80px_-20px_rgba(124,58,237,0.5)] transition-shadow duration-500 hover:shadow-[0_0_110px_-15px_rgba(0,212,255,0.45)]"
     >
       {/* dual-speed gradient border beam: accelerates on hover */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden rounded-[28px]">
+      <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden rounded-[28px]">
         <div className="absolute inset-[-50%] [animation:spin-cw_9s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(37,99,235,0.55)_18deg,transparent_60deg)] opacity-60 transition-opacity duration-500 group-hover:opacity-0" />
         <div className="absolute inset-[-50%] [animation:spin-cw_2.5s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(0,212,255,0.85)_12deg,transparent_45deg)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       </div>
 
       {/* mouse-follow spotlight */}
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         style={{ background: spotlightBackground }}
         className="pointer-events-none absolute inset-0 rounded-[28px] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
       />
@@ -247,14 +247,14 @@ function FounderCard() {
       <div className="relative z-10 flex flex-col items-center overflow-hidden rounded-[27px] bg-[#070b1c]/90 px-8 py-10 text-center backdrop-blur-xl sm:px-10 sm:py-12">
         {/* light reflection sheen */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.05] to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-full"
         />
 
         {/* avatar */}
         <div className="relative mb-6">
           <div
-            aria-hidden="true"
+            aria-hidden={true}
             className={`absolute inset-[-14px] rounded-full bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] opacity-40 blur-2xl transition-all duration-700 ${
               hovered ? "scale-125 opacity-70" : ""
             }`}
@@ -277,14 +277,14 @@ function FounderCard() {
               hovered ? "shadow-[0_0_32px_-2px_rgba(0,212,255,0.9)]" : ""
             }`}
           >
-            <BadgeCheck className="h-3.5 w-3.5 text-[#00D4FF]" strokeWidth={2} aria-hidden="true" />
+            <BadgeCheck className="h-3.5 w-3.5 text-[#00D4FF]" strokeWidth={2} aria-hidden={true} />
             <span className="text-[10px] font-medium tracking-wide text-white/80">Verified</span>
           </motion.div>
         </div>
 
         {/* animated status indicator */}
         <div className="mb-2 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1">
-          <span className="relative flex h-2 w-2" aria-hidden="true">
+          <span className="relative flex h-2 w-2" aria-hidden={true}>
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00D4FF] opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
           </span>
@@ -295,14 +295,14 @@ function FounderCard() {
         <p className="mt-1 text-sm font-medium text-[#00D4FF]">Founder &amp; CEO</p>
         <p className="mt-0.5 text-sm text-white/45">Axivon Technologies</p>
 
-        <div aria-hidden="true" className="my-6 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div aria-hidden={true} className="my-6 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
         <div className="flex items-center gap-2 text-white/70">
           <motion.span
             animate={reduceMotion ? undefined : { scale: [1, 1.18, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <Rocket className="h-4 w-4 text-[#7C3AED]" strokeWidth={1.75} aria-hidden="true" />
+            <Rocket className="h-4 w-4 text-[#7C3AED]" strokeWidth={1.75} aria-hidden={true} />
           </motion.span>
           <span className="text-sm font-medium tracking-wide">Building The Future</span>
         </div>
@@ -317,7 +317,7 @@ function FounderCard() {
 
 function AuroraBackground() {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       <div className="absolute left-[-5%] top-[-10%] h-[560px] w-[560px] rounded-full bg-[#2563EB]/20 blur-[120px] [animation:aurora-drift_19s_ease-in-out_infinite]" />
       <div className="absolute right-[-5%] top-[15%] h-[460px] w-[460px] rounded-full bg-[#7C3AED]/22 blur-[120px] [animation:aurora-drift_23s_ease-in-out_infinite_reverse]" />
       <div className="absolute bottom-[-15%] left-[25%] h-[480px] w-[480px] rounded-full bg-[#00D4FF]/14 blur-[130px] [animation:aurora-drift_27s_ease-in-out_infinite]" />
@@ -328,7 +328,7 @@ function AuroraBackground() {
 function GridPattern() {
   return (
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.06] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_35%,black,transparent)]"
     >
       <defs>
@@ -344,7 +344,7 @@ function GridPattern() {
 function NoiseOverlay() {
   return (
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.025] mix-blend-overlay [animation:noise-shift_1.4s_steps(4)_infinite]"
     >
       <filter id="founder-noise">
@@ -358,7 +358,7 @@ function NoiseOverlay() {
 function Vignette() {
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 [background:radial-gradient(ellipse_80%_60%_at_50%_40%,transparent_40%,#050816_100%)]"
     />
   );
@@ -391,7 +391,7 @@ function ParticlesField() {
   if (reduceMotion) return null;
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {particles.map((particle) => (
         <span
           key={particle.id}
@@ -453,7 +453,7 @@ export default function FounderMessage() {
       onMouseMove={handleSectionMouseMove}
       className="relative isolate overflow-hidden bg-[#050816] py-24 sm:py-32 2xl:py-36"
     >
-      <motion.div aria-hidden="true" style={{ y: backgroundParallaxY }} className="absolute inset-0">
+      <motion.div aria-hidden={true} style={{ y: backgroundParallaxY }} className="absolute inset-0">
         <motion.div style={{ x: reduceMotion ? 0 : orbParallaxX, y: reduceMotion ? 0 : orbParallaxY }}>
           <AuroraBackground />
         </motion.div>
@@ -473,7 +473,7 @@ export default function FounderMessage() {
           className="mx-auto max-w-3xl text-center"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-xs font-medium tracking-[0.2em] text-[#00D4FF] backdrop-blur-md">
-            <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#00D4FF]" />
+            <span aria-hidden={true} className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#00D4FF]" />
             FOUNDER&apos;S MESSAGE
           </span>
 

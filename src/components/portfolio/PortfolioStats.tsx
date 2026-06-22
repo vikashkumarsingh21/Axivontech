@@ -184,7 +184,7 @@ function useCountUp(
 
 function AuroraBackground({ reduceMotion }: { reduceMotion: boolean }) {
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden={true}>
       <motion.div
         className="absolute -left-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-blue-600/30 blur-[120px]"
         animate={reduceMotion ? undefined : { x: [0, 60, -20, 0], y: [0, 40, -30, 0] }}
@@ -208,7 +208,7 @@ function PerspectiveGrid() {
   return (
     <div
       className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%]"
-      aria-hidden="true"
+      aria-hidden={true}
       style={{
         backgroundImage:
           "linear-gradient(rgba(124,58,237,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,0.18) 1px, transparent 1px)",
@@ -242,7 +242,7 @@ function FloatingParticles({ reduceMotion }: { reduceMotion: boolean }) {
   if (reduceMotion || particles.length === 0) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden={true}>
       {particles.map((particle) => (
         <motion.span
           key={particle.id}
@@ -349,13 +349,13 @@ function StatCard({ stat, index, isSectionInView, reduceMotion }: StatCardProps)
     >
       {/* ambient hover glow */}
       <div
-        aria-hidden="true"
+        aria-hidden={true}
         className="absolute -inset-3 -z-10 rounded-[2rem] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
         style={{ background: `linear-gradient(135deg, ${stat.accent[0]}55, ${stat.accent[1]}55)` }}
       />
 
       {/* animated border beam */}
-      <div className="absolute inset-0 overflow-hidden rounded-[1.75rem]" aria-hidden="true">
+      <div className="absolute inset-0 overflow-hidden rounded-[1.75rem]" aria-hidden={true}>
         <motion.div
           className="absolute inset-[-60%] opacity-40 transition-opacity duration-700 group-hover:opacity-100"
           style={{
@@ -377,20 +377,20 @@ function StatCard({ stat, index, isSectionInView, reduceMotion }: StatCardProps)
       >
         {/* mouse-follow spotlight */}
         <motion.div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
           style={{ background: spotlightBackground }}
         />
 
         {/* diagonal shine sweep */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 -translate-x-[150%] -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-[1100ms] ease-out group-hover:translate-x-[500%]"
         />
 
         {/* floating holographic ring */}
         <motion.span
-          aria-hidden="true"
+          aria-hidden={true}
           className="absolute -right-6 -top-6 h-24 w-24 rounded-full border border-dashed opacity-20"
           style={{ borderColor: stat.accent[1] }}
           animate={reduceMotion ? undefined : { rotate: 360 }}
@@ -406,13 +406,13 @@ function StatCard({ stat, index, isSectionInView, reduceMotion }: StatCardProps)
           }}
         >
           <motion.span
-            aria-hidden="true"
+            aria-hidden={true}
             className="absolute inset-0 -z-10 rounded-2xl blur-md"
             style={{ background: stat.accent[1] }}
             animate={reduceMotion ? undefined : { opacity: [0.2, 0.45, 0.2] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           />
-          <Icon className="h-7 w-7" style={{ color: stat.accent[1] }} strokeWidth={1.75} aria-hidden="true" />
+          <Icon className="h-7 w-7" style={{ color: stat.accent[1] }} strokeWidth={1.75} aria-hidden={true} />
         </div>
 
         {/* count-up value */}
@@ -438,7 +438,7 @@ function StatCard({ stat, index, isSectionInView, reduceMotion }: StatCardProps)
 
         {/* bottom glow trail */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute -bottom-10 left-1/2 h-20 w-3/4 -translate-x-1/2 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
           style={{ background: stat.accent[1] }}
         />
@@ -508,23 +508,23 @@ export default function PortfolioStats() {
       `}</style>
 
       {/* background layers */}
-      <div className="absolute inset-0 -z-20 bg-[#050816]" aria-hidden="true" />
+      <div className="absolute inset-0 -z-20 bg-[#050816]" aria-hidden={true} />
       <AuroraBackground reduceMotion={reduceMotion} />
       <PerspectiveGrid />
       <FloatingParticles reduceMotion={reduceMotion} />
       <motion.div
         className="pointer-events-none absolute inset-0 -z-10"
         style={{ background: sectionSpotlight }}
-        aria-hidden="true"
+        aria-hidden={true}
       />
       <div
         className="pointer-events-none absolute inset-0 -z-10 opacity-[0.035] mix-blend-overlay"
         style={{ backgroundImage: NOISE_BACKGROUND }}
-        aria-hidden="true"
+        aria-hidden={true}
       />
       <div
         className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-transparent to-[#050816]"
-        aria-hidden="true"
+        aria-hidden={true}
       />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8 2xl:max-w-[90rem] 2xl:px-12">
@@ -539,11 +539,11 @@ export default function PortfolioStats() {
             variants={headerItemVariants}
             className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 backdrop-blur-sm"
           >
-            <span className="relative flex h-2 w-2" aria-hidden="true">
+            <span className="relative flex h-2 w-2" aria-hidden={true}>
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400" />
             </span>
-            <Sparkles className="h-3.5 w-3.5 text-cyan-300" aria-hidden="true" />
+            <Sparkles className="h-3.5 w-3.5 text-cyan-300" aria-hidden={true} />
             <span className="text-xs font-semibold tracking-[0.2em] text-white/70">OUR IMPACT</span>
           </motion.div>
 

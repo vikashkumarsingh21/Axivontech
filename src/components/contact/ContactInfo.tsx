@@ -90,7 +90,7 @@ export default function ContactInfo() {
             className="relative isolate overflow-hidden bg-[#050816] px-6 py-24 sm:py-32"
         >
             {/* Floating gradient blobs */}
-            <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+            <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden={true}>
                 <motion.div
                     className="absolute -left-32 top-10 h-[26rem] w-[26rem] rounded-full bg-blue-600/20 blur-[120px]"
                     animate={{
@@ -179,7 +179,7 @@ export default function ContactInfo() {
                                     {/* Icon box */}
                                     <div className="relative mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400 shadow-lg shadow-purple-500/20 transition-transform duration-500 group-hover:scale-110">
                                         <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400 opacity-60 blur-md transition-opacity duration-500 group-hover:opacity-90" />
-                                        <Icon className="relative h-5 w-5 text-white" strokeWidth={2} aria-hidden="true" />
+                                        <Icon className="relative h-5 w-5 text-white" strokeWidth={2} aria-hidden={true} />
                                     </div>
 
                                     <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400">

@@ -30,6 +30,8 @@ import {
   Zap,
 } from "lucide-react";
 
+import type { Variants } from "framer-motion";
+
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 interface Particle {
@@ -179,13 +181,18 @@ const containerVariants = {
   },
 };
 
-const fadeUpVariants = {
-  hidden: { opacity: 0, y: 32, filter: "blur(8px)" },
+const fadeUpVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 32,
+  },
   visible: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] },
+    transition: {
+      duration: 0.75,
+      ease: "easeOut",
+    },
   },
 };
 
@@ -381,7 +388,7 @@ function CounterStat({ stat, index }: { stat: StatItem; index: number }) {
     const controls = animate(0, stat.value, {
       duration: 1.6,
       delay: index * 0.12,
-      ease: [0.22, 1, 0.36, 1],
+      ease: "easeOut",
       onUpdate: (latest) => setDisplayValue(Math.round(latest)),
     });
     return () => controls.stop();
@@ -392,7 +399,7 @@ function CounterStat({ stat, index }: { stat: StatItem; index: number }) {
       ref={ref}
       initial={{ opacity: 0, y: 16 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
       className="flex flex-col gap-1"
     >
       <div className="flex items-baseline gap-0.5">
@@ -551,7 +558,7 @@ function FloatingProjectCard({
       }}
       initial={{ opacity: 0, scale: 0.85, y: 24 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.5 + spec.floatDelay * 0.15, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.8, delay: 0.5 + spec.floatDelay * 0.15, ease: "easeOut" }}
     >
       <motion.div
         animate={reduced ? {} : { y: [0, -14, 0] }}
@@ -949,7 +956,7 @@ export default function PortfolioHero() {
           <motion.div
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
             className="relative"
           >
             <PortfolioStage reduced={reduced} />

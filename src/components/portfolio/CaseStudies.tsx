@@ -30,6 +30,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+import type { Variants } from "framer-motion";
+
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 interface NumericResult {
@@ -132,13 +134,17 @@ const CASE_STUDIES: CaseStudy[] = [
 
 // ─── Animation Variants ────────────────────────────────────────────────────────
 
-const fadeUpVariants = {
-  hidden: { opacity: 0, y: 28, filter: "blur(8px)" },
+const fadeUpVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 28,
+  },
   visible: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: {
+      duration: 0.7,
+    },
   },
 };
 
@@ -352,7 +358,7 @@ function ResultChip({
     const controls = animate(0, result.value, {
       duration: 1.4,
       delay: 0.3 + index * 0.12,
-      ease: [0.22, 1, 0.36, 1],
+      ease: "easeOut",
       onUpdate: (latest) => setDisplayValue(Math.round(latest)),
     });
     return () => controls.stop();
@@ -362,7 +368,7 @@ function ResultChip({
     <motion.div
       initial={{ opacity: 0, y: 14, scale: 0.94 }}
       animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{ duration: 0.5, delay: 0.2 + index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.5, delay: 0.2 + index * 0.1, ease: "easeOut" }}
       className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl"
       style={{
         background: "rgba(255,255,255,0.035)",
@@ -428,7 +434,7 @@ function TransformationArc({
       <motion.div
         initial={{ opacity: 0, x: -16 }}
         animate={isInView ? { opacity: 1, x: 0 } : {}}
-        transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
         className="rounded-xl p-4"
         style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
       >
@@ -454,7 +460,7 @@ function TransformationArc({
       <motion.div
         initial={{ opacity: 0, scale: 0.6 }}
         animate={isInView ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 0.4, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
         className="flex justify-center -my-1"
         aria-hidden
       >
@@ -478,7 +484,7 @@ function TransformationArc({
       <motion.div
         initial={{ opacity: 0, x: 16 }}
         animate={isInView ? { opacity: 1, x: 0 } : {}}
-        transition={{ duration: 0.6, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.6, delay: 0.45, ease: "easeOut" }}
         className="rounded-xl p-4"
         style={{
           background: `linear-gradient(135deg, ${accentPrimary}10 0%, ${accentSecondary}08 100%)`,
@@ -553,7 +559,7 @@ function CaseStudyCard({
       ref={cardRef}
       initial={{ opacity: 0, x: reduced ? 0 : slideDir * 56, y: 24, filter: "blur(12px)" }}
       animate={isInView ? { opacity: 1, x: 0, y: 0, filter: "blur(0px)" } : {}}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
       style={reduced ? {} : { rotateX, rotateY, transformStyle: "preserve-3d", perspective: 1200 }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
@@ -853,7 +859,7 @@ export default function CaseStudies() {
           <div className="relative space-y-14 lg:space-y-20">
             {CASE_STUDIES.map((study, i) => {
               const isLeft = i % 2 === 0;
-              const dotRef = useRefSafe();
+
               return (
                 <CaseStudyRow
                   key={study.id}
@@ -880,9 +886,7 @@ export default function CaseStudies() {
 
 // ─── Helper: safe ref creator (avoids calling useRef conditionally inline) ────
 
-function useRefSafe() {
-  return useRef<HTMLDivElement>(null);
-}
+
 
 // ─── Case Study Row (desktop zigzag / mobile stacked) ─────────────────────────
 

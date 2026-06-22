@@ -29,7 +29,7 @@ const NAV_ITEMS: NavItem[] = [
     id: "what-are-cookies",
     label: "What Are Cookies",
     icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
         <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.2" />
         <circle cx="5" cy="6" r="1" fill="currentColor" />
         <circle cx="9" cy="5" r="0.75" fill="currentColor" />
@@ -41,7 +41,7 @@ const NAV_ITEMS: NavItem[] = [
     id: "types-of-cookies",
     label: "Types of Cookies",
     icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
         <rect x="1.5" y="1.5" width="4.5" height="4.5" rx="1" stroke="currentColor" strokeWidth="1.2" />
         <rect x="8" y="1.5" width="4.5" height="4.5" rx="1" stroke="currentColor" strokeWidth="1.2" />
         <rect x="1.5" y="8" width="4.5" height="4.5" rx="1" stroke="currentColor" strokeWidth="1.2" />
@@ -53,7 +53,7 @@ const NAV_ITEMS: NavItem[] = [
     id: "analytics-cookies",
     label: "Analytics Cookies",
     icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
         <polyline points="1.5,11 4.5,7 7,9 10,4.5 12.5,3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
@@ -62,7 +62,7 @@ const NAV_ITEMS: NavItem[] = [
     id: "performance-cookies",
     label: "Performance Cookies",
     icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
         <path d="M7 1.5v2M7 10.5v2M1.5 7h2M10.5 7h2M3.4 3.4l1.4 1.4M9.2 9.2l1.4 1.4M3.4 10.6l1.4-1.4M9.2 4.8l1.4-1.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
         <circle cx="7" cy="7" r="2" stroke="currentColor" strokeWidth="1.2" />
       </svg>
@@ -72,7 +72,7 @@ const NAV_ITEMS: NavItem[] = [
     id: "functional-cookies",
     label: "Functional Cookies",
     icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
         <path d="M2 4.5h10M2 7h7M2 9.5h5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
       </svg>
     ),
@@ -81,7 +81,7 @@ const NAV_ITEMS: NavItem[] = [
     id: "managing-cookies",
     label: "Managing Cookies",
     icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
         <path d="M2 3.5h10M5 7h7M2 7h1M2 10.5h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
         <circle cx="4" cy="7" r="1.2" fill="currentColor" />
       </svg>
@@ -91,7 +91,7 @@ const NAV_ITEMS: NavItem[] = [
     id: "third-party-cookies",
     label: "Third-Party Cookies",
     icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
         <circle cx="3" cy="7" r="1.5" stroke="currentColor" strokeWidth="1.2" />
         <circle cx="11" cy="3.5" r="1.5" stroke="currentColor" strokeWidth="1.2" />
         <circle cx="11" cy="10.5" r="1.5" stroke="currentColor" strokeWidth="1.2" />
@@ -103,7 +103,7 @@ const NAV_ITEMS: NavItem[] = [
     id: "contact-information",
     label: "Contact Information",
     icon: (
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
         <rect x="1.5" y="3" width="11" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
         <path d="M1.5 5l5.5 3.5L12.5 5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
       </svg>
@@ -245,7 +245,7 @@ const SECTIONS: SectionData[] = [
             className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
             style={{ background: "rgba(37,99,235,0.2)" }}
           >
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden={true}>
               <path d="M2 5l2.5 2.5L8 3" stroke="#60A5FA" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
@@ -273,7 +273,7 @@ const SECTIONS: SectionData[] = [
           {[
             {
               icon: (
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
                   <path d="M7 1.5C4 1.5 1.5 4 1.5 7S4 12.5 7 12.5 12.5 10 12.5 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                   <path d="M10 1.5v3h3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -284,7 +284,7 @@ const SECTIONS: SectionData[] = [
             },
             {
               icon: (
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
                   <polyline points="1.5,11 4.5,7 7,9 10,4.5 12.5,3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               ),
@@ -294,7 +294,7 @@ const SECTIONS: SectionData[] = [
             },
             {
               icon: (
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
                   <path d="M7 1.5v2M7 10.5v2M1.5 7h2M10.5 7h2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                   <circle cx="7" cy="7" r="2" stroke="currentColor" strokeWidth="1.2" />
                 </svg>
@@ -305,7 +305,7 @@ const SECTIONS: SectionData[] = [
             },
             {
               icon: (
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden={true}>
                   <path d="M2 4.5h10M2 7h7M2 9.5h5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                 </svg>
               ),
@@ -422,7 +422,7 @@ const SECTIONS: SectionData[] = [
                 className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
                 style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.25)" }}
               >
-                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden={true}>
                   <path d="M1.5 4L3 5.5L6.5 2.5" stroke="#34D399" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
@@ -568,7 +568,7 @@ const SECTIONS: SectionData[] = [
           {[
             {
               icon: (
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden={true}>
                   <rect x="1" y="2.5" width="11" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.1" />
                   <path d="M1 4.5l5.5 3.5L12 4.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
                 </svg>
@@ -579,7 +579,7 @@ const SECTIONS: SectionData[] = [
             },
             {
               icon: (
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden={true}>
                   <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.1" />
                   <path d="M6.5 1.5C6.5 1.5 4.5 4 4.5 6.5S6.5 11.5 6.5 11.5" stroke="currentColor" strokeWidth="1.1" />
                   <path d="M6.5 1.5C6.5 1.5 8.5 4 8.5 6.5S6.5 11.5 6.5 11.5" stroke="currentColor" strokeWidth="1.1" />
@@ -592,7 +592,7 @@ const SECTIONS: SectionData[] = [
             },
             {
               icon: (
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden={true}>
                   <rect x="1.5" y="1.5" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.1" />
                   <path d="M4.5 6.5h4M6.5 4.5v4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
                 </svg>
@@ -639,7 +639,7 @@ const SECTIONS: SectionData[] = [
 function AmbientBackground() {
   const prefersReduced = useReducedMotion();
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
       <div className="absolute inset-0" style={{ background: "#050816" }} />
       {/* Soft aurora — top-left */}
       <motion.div
@@ -819,7 +819,7 @@ function ContentCard({ section, index }: ContentCardProps) {
                 "0 8px 32px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.06) inset",
             }
       }
-      transition2={{ duration: 0.25, ease: "easeOut" } as unknown as undefined}
+      
     >
       {/* Top gradient accent line */}
       <div
@@ -830,7 +830,7 @@ function ContentCard({ section, index }: ContentCardProps) {
           opacity: 0,
           transition: "opacity 0.3s",
         }}
-        aria-hidden="true"
+        aria-hidden={true}
         ref={(el) => {
           if (el) {
             const parent = el.parentElement;
@@ -850,7 +850,7 @@ function ContentCard({ section, index }: ContentCardProps) {
             <span
               className="text-[11px] font-medium tabular-nums"
               style={{ color: "rgba(148,163,184,0.3)" }}
-              aria-hidden="true"
+              aria-hidden={true}
             >
               {String(index + 1).padStart(2, "0")}
             </span>
@@ -907,7 +907,7 @@ function MobileNav({ activeId, onNavigate }: MobileNavProps) {
           fill="none"
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.2 }}
-          aria-hidden="true"
+          aria-hidden={true}
         >
           <path d="M3 5l4 4 4-4" stroke="rgba(148,163,184,0.6)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
         </motion.svg>

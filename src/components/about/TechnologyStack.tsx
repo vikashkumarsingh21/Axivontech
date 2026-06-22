@@ -286,7 +286,7 @@ function BentoCard({ category, index }: { category: CategoryEntry; index: number
     >
       {/* gradient border beam */}
       <div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl"
       >
         <div className="absolute inset-[-50%] animate-[spin-cw_6s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(0,212,255,0.65)_15deg,transparent_55deg)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -294,7 +294,7 @@ function BentoCard({ category, index }: { category: CategoryEntry; index: number
 
       {/* mouse-follow spotlight */}
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         style={{ background: spotlightBackground }}
         className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
       />
@@ -302,7 +302,7 @@ function BentoCard({ category, index }: { category: CategoryEntry; index: number
       <div className="relative z-10 flex h-full flex-col gap-6 overflow-hidden rounded-[23px] bg-[#070b1c]/90 p-6 backdrop-blur-xl sm:p-8">
         {/* light reflection sheen */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.05] to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-full"
         />
 
@@ -312,7 +312,7 @@ function BentoCard({ category, index }: { category: CategoryEntry; index: number
               className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br p-[1px] ${category.gradient}`}
             >
               <div className="flex h-full w-full items-center justify-center rounded-[15px] bg-[#070b1c] transition-transform duration-500 group-hover:rotate-[8deg]">
-                <Icon className="h-6 w-6 text-white" strokeWidth={1.75} aria-hidden="true" />
+                <Icon className="h-6 w-6 text-white" strokeWidth={1.75} aria-hidden={true} />
               </div>
             </div>
           </MagneticWrap>
@@ -374,7 +374,7 @@ function OrbitRing({
 
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="absolute inset-0"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -408,7 +408,7 @@ function OrbitRing({
                 title={name}
                 className={`flex ${badgeSize} items-center justify-center rounded-xl border border-white/10 bg-[#0a1024]/90 shadow-[0_0_25px_-8px_rgba(0,212,255,0.55)] backdrop-blur-md transition-colors duration-300 hover:border-[#00D4FF]/50 hover:shadow-[0_0_35px_-6px_rgba(0,212,255,0.8)]`}
               >
-                <Icon className="h-1/2 w-1/2 text-white/90" strokeWidth={1.5} aria-hidden="true" />
+                <Icon className="h-1/2 w-1/2 text-white/90" strokeWidth={1.5} aria-hidden={true} />
               </motion.div>
             </div>
           </div>
@@ -427,8 +427,8 @@ function TechHub() {
       aria-label="Axivon technology stack visualized as orbiting tools around a central hub"
       className="relative mx-auto mt-24 flex h-[380px] w-[380px] max-w-full items-center justify-center sm:h-[480px] sm:w-[480px] lg:h-[560px] lg:w-[560px]"
     >
-      <div aria-hidden="true" className="absolute inset-[8%] rounded-full border border-white/[0.06]" />
-      <div aria-hidden="true" className="absolute inset-[28%] rounded-full border border-white/[0.06]" />
+      <div aria-hidden={true} className="absolute inset-[8%] rounded-full border border-white/[0.06]" />
+      <div aria-hidden={true} className="absolute inset-[28%] rounded-full border border-white/[0.06]" />
 
       <OrbitRing techs={ORBIT_OUTER} radius={220} duration={46} direction="ccw" badgeSize="h-12 w-12" />
       <OrbitRing techs={ORBIT_INNER} radius={128} duration={30} direction="cw" badgeSize="h-11 w-11" />
@@ -441,7 +441,7 @@ function TechHub() {
         className="relative z-10 flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] p-[2px] shadow-[0_0_80px_-12px_rgba(124,58,237,0.75)] sm:h-40 sm:w-40"
       >
         <div className="flex h-full w-full animate-[pulse-glow_3s_ease-in-out_infinite] flex-col items-center justify-center gap-1 rounded-full bg-[#050816] text-center">
-          <BrainCircuit className="h-6 w-6 text-[#00D4FF] sm:h-7 sm:w-7" strokeWidth={1.5} aria-hidden="true" />
+          <BrainCircuit className="h-6 w-6 text-[#00D4FF] sm:h-7 sm:w-7" strokeWidth={1.5} aria-hidden={true} />
           <span className="px-3 text-[10px] font-semibold tracking-[0.15em] text-white sm:text-xs">
             Modern
           </span>
@@ -465,11 +465,11 @@ function MarqueeCloud() {
   return (
     <div className="relative mt-20 overflow-hidden">
       <div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-[#050816] to-transparent sm:w-32"
       />
       <div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-[#050816] to-transparent sm:w-32"
       />
       <ul
@@ -486,7 +486,7 @@ function MarqueeCloud() {
               key={`${name}-${i}`}
               className="flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white/60 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-[#00D4FF]/40 hover:text-white hover:shadow-[0_0_25px_-8px_rgba(0,212,255,0.6)]"
             >
-              <Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+              <Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
               {name}
             </li>
           );
@@ -502,7 +502,7 @@ function MarqueeCloud() {
 
 function AuroraBackground() {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       <div className="absolute left-1/2 top-[-10%] h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-[#2563EB]/20 blur-[120px] [animation:aurora-drift_18s_ease-in-out_infinite]" />
       <div className="absolute right-[5%] top-[18%] h-[480px] w-[480px] rounded-full bg-[#7C3AED]/20 blur-[120px] [animation:aurora-drift_22s_ease-in-out_infinite_reverse]" />
       <div className="absolute bottom-[-12%] left-[8%] h-[480px] w-[480px] rounded-full bg-[#00D4FF]/15 blur-[130px] [animation:aurora-drift_26s_ease-in-out_infinite]" />
@@ -513,7 +513,7 @@ function AuroraBackground() {
 function GridPattern() {
   return (
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.07] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_30%,black,transparent)]"
     >
       <defs>
@@ -529,7 +529,7 @@ function GridPattern() {
 function NoiseOverlay() {
   return (
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.025] mix-blend-overlay [animation:noise-shift_1.4s_steps(4)_infinite]"
     >
       <filter id="axivon-tech-noise">
@@ -567,7 +567,7 @@ function ParticlesField() {
   if (reduceMotion) return null;
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {particles.map((particle) => (
         <span
           key={particle.id}
@@ -637,7 +637,7 @@ export default function TechnologyStack() {
       onMouseMove={handleSectionMouseMove}
       className="relative isolate overflow-hidden bg-[#050816] py-24 sm:py-32 2xl:py-36"
     >
-      <motion.div aria-hidden="true" style={{ y: backgroundParallaxY }} className="absolute inset-0">
+      <motion.div aria-hidden={true} style={{ y: backgroundParallaxY }} className="absolute inset-0">
         <AuroraBackground />
         <GridPattern />
         <NoiseOverlay />
@@ -654,7 +654,7 @@ export default function TechnologyStack() {
           className="mx-auto max-w-3xl text-center"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-xs font-medium tracking-[0.2em] text-[#00D4FF] backdrop-blur-md">
-            <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#00D4FF]" />
+            <span aria-hidden={true} className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#00D4FF]" />
             TECHNOLOGY ECOSYSTEM
           </span>
 

@@ -141,7 +141,7 @@ function AnimatedNumber({
 function BorderBeam({ gradient }: { gradient: string }) {
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 rounded-[32px] overflow-hidden"
     >
       <motion.div
@@ -199,7 +199,7 @@ function SpotlightCard({
       style={{ position: "relative" }}
     >
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute inset-0 rounded-[32px] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
           background: `radial-gradient(280px circle at ${springX}px ${springY}px, ${glowColor}, transparent 70%)`,
@@ -228,7 +228,7 @@ function FloatingParticles({ reduced }: { reduced: boolean }) {
   if (reduced) return null;
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {particles.map((p) => (
         <motion.div
           key={p.id}
@@ -333,7 +333,7 @@ const cardVariants = {
         >
           {/* Glow on hover via pseudo-element substitute */}
           <div
-            aria-hidden="true"
+            aria-hidden={true}
             className="pointer-events-none absolute inset-0 rounded-[32px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
             style={{
               boxShadow: `0 8px 64px -8px ${stat.glowColor}, 0 0 0 1px ${stat.glowColor}40`,
@@ -342,7 +342,7 @@ const cardVariants = {
 
           {/* Inner top-left gradient splash */}
           <div
-            aria-hidden="true"
+            aria-hidden={true}
             className="pointer-events-none absolute -top-12 -left-12 w-40 h-40 rounded-full blur-3xl opacity-20"
             style={{
               background: `radial-gradient(circle, ${stat.glowColor}, transparent)`,
@@ -356,7 +356,7 @@ const cardVariants = {
               bg-gradient-to-br ${stat.gradient}
               shadow-lg flex-shrink-0
             `}
-            aria-hidden="true"
+            aria-hidden={true}
           >
             <stat.Icon className="w-7 h-7 text-white" strokeWidth={1.8} />
           </div>
@@ -388,7 +388,7 @@ function FloatingBlobs({ reduced }: { reduced: boolean }) {
   if (reduced) return null;
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Blue blob */}
       <motion.div
         className="absolute rounded-full blur-[120px] opacity-[0.12]"
@@ -459,7 +459,7 @@ function SectionHeader({ started, reduced }: { started: boolean; reduced: boolea
           aria-label="Section badge: Our Impact"
         >
           <span
-            aria-hidden="true"
+            aria-hidden={true}
             className="w-1.5 h-1.5 rounded-full bg-[#00D4FF] animate-pulse"
           />
           OUR IMPACT

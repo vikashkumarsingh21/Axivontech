@@ -83,7 +83,7 @@ function RatingStars({ delayOffset }: { delayOffset: number }) {
       {Array.from({ length: 5 }, (_, i) => i).map((i) => (
         <motion.span
           key={i}
-          aria-hidden="true"
+          aria-hidden={true}
           initial={reduceMotion ? false : { opacity: 0, scale: 0.4 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-60px" }}
@@ -153,14 +153,14 @@ function TestimonialCard({ entry, index }: { entry: TestimonialEntry; index: num
       className="group relative rounded-[32px] border border-white/10 bg-white/[0.03] p-[1px] shadow-[0_0_50px_-20px_rgba(37,99,235,0.5)] outline-none transition-shadow duration-500 hover:shadow-[0_0_90px_-15px_rgba(0,212,255,0.5)] focus-visible:shadow-[0_0_90px_-15px_rgba(0,212,255,0.5)] focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
     >
       {/* dual-speed gradient border beam */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden rounded-[32px]">
+      <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden rounded-[32px]">
         <div className="absolute inset-[-50%] [animation:spin-cw_10s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(37,99,235,0.45)_16deg,transparent_55deg)] opacity-50 transition-opacity duration-500 group-hover:opacity-0" />
         <div className="absolute inset-[-50%] [animation:spin-cw_3s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(0,212,255,0.85)_12deg,transparent_45deg)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       </div>
 
       {/* mouse-follow spotlight */}
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         style={{ background: spotlightBackground }}
         className="pointer-events-none absolute inset-0 rounded-[32px] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
       />
@@ -168,13 +168,13 @@ function TestimonialCard({ entry, index }: { entry: TestimonialEntry; index: num
       <div className="relative z-10 flex h-full flex-col gap-5 overflow-hidden rounded-[31px] bg-[#070b1c]/90 p-6 backdrop-blur-xl sm:p-7">
         {/* light reflection sheen */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.05] to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-full"
         />
 
         <div className="flex items-center gap-3">
           <motion.div
-            aria-hidden="true"
+            aria-hidden={true}
             animate={reduceMotion ? undefined : { y: [0, -5, 0] }}
             transition={{ duration: 4 + index * 0.3, repeat: Infinity, ease: "easeInOut" }}
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] p-[2px]"
@@ -190,11 +190,11 @@ function TestimonialCard({ entry, index }: { entry: TestimonialEntry; index: num
         </div>
 
         <span className="inline-flex w-fit items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-medium tracking-wide text-white/70">
-          <BadgeCheck className="h-3 w-3 text-[#00D4FF]" strokeWidth={2} aria-hidden="true" />
+          <BadgeCheck className="h-3 w-3 text-[#00D4FF]" strokeWidth={2} aria-hidden={true} />
           Verified Feedback
         </span>
 
-        <Quote aria-hidden="true" strokeWidth={1.5} className="h-6 w-6 text-[#00D4FF]/40" />
+        <Quote aria-hidden={true} strokeWidth={1.5} className="h-6 w-6 text-[#00D4FF]/40" />
 
         <p className="flex-1 text-sm leading-relaxed text-white/65">{entry.feedback}</p>
 
@@ -210,7 +210,7 @@ function TestimonialCard({ entry, index }: { entry: TestimonialEntry; index: num
 
 function AuroraBackground() {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       <div className="absolute left-[-6%] top-[-10%] h-[560px] w-[560px] rounded-full bg-[#2563EB]/20 blur-[120px] [animation:aurora-drift_19s_ease-in-out_infinite]" />
       <div className="absolute right-[-6%] top-[18%] h-[480px] w-[480px] rounded-full bg-[#7C3AED]/20 blur-[120px] [animation:aurora-drift_24s_ease-in-out_infinite_reverse]" />
       <div className="absolute bottom-[-14%] left-[28%] h-[500px] w-[500px] rounded-full bg-[#00D4FF]/14 blur-[130px] [animation:aurora-drift_28s_ease-in-out_infinite]" />
@@ -221,7 +221,7 @@ function AuroraBackground() {
 function PerspectiveGrid() {
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-x-0 bottom-0 h-[420px] overflow-hidden [mask-image:linear-gradient(to_top,black,transparent)]"
     >
       <div
@@ -239,7 +239,7 @@ function PerspectiveGrid() {
 function NoiseOverlay() {
   return (
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.025] mix-blend-overlay [animation:noise-shift_1.4s_steps(4)_infinite]"
     >
       <filter id="testimonials-noise">
@@ -277,7 +277,7 @@ function ParticlesField() {
   if (reduceMotion) return null;
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {particles.map((particle) => (
         <span
           key={particle.id}
@@ -309,7 +309,7 @@ export default function ClientTestimonials() {
       aria-labelledby="testimonials-heading"
       className="relative isolate overflow-hidden bg-[#050816] py-24 sm:py-32 2xl:py-36"
     >
-      <div aria-hidden="true" className="absolute inset-0">
+      <div aria-hidden={true} className="absolute inset-0">
         <AuroraBackground />
         <PerspectiveGrid />
         <NoiseOverlay />
@@ -326,7 +326,7 @@ export default function ClientTestimonials() {
           className="mx-auto max-w-3xl text-center"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-xs font-medium tracking-[0.2em] text-[#00D4FF] backdrop-blur-md">
-            <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#00D4FF]" />
+            <span aria-hidden={true} className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#00D4FF]" />
             TESTIMONIALS
           </span>
 

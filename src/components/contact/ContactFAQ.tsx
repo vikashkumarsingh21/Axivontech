@@ -105,13 +105,13 @@ function AccordionRow({
           className={`absolute -inset-px rounded-2xl bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] blur-sm transition-opacity duration-500 ${
             isOpen ? "opacity-70" : "opacity-0 group-hover:opacity-50"
           }`}
-          aria-hidden="true"
+          aria-hidden={true}
         />
         <div
           className={`absolute -inset-px rounded-2xl bg-gradient-to-r from-[#2563EB]/60 via-[#7C3AED]/60 to-[#00D4FF]/60 transition-opacity duration-500 ${
             isOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"
           }`}
-          aria-hidden="true"
+          aria-hidden={true}
         />
 
         {/* Card body */}
@@ -231,19 +231,19 @@ export default function ContactFAQ() {
     >
       {/* Floating gradient blobs */}
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute -left-40 -top-40 h-[480px] w-[480px] rounded-full bg-[#2563EB]/25 blur-[120px]"
         animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute -right-40 top-10 h-[420px] w-[420px] rounded-full bg-[#7C3AED]/25 blur-[120px]"
         animate={{ x: [0, -30, 0], y: [0, 40, 0] }}
         transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute bottom-[-160px] left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#00D4FF]/20 blur-[130px]"
         animate={{ x: [0, 20, -20, 0], y: [0, -20, 0] }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}

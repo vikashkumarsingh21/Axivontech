@@ -210,7 +210,7 @@ function BackgroundLayer() {
   return (
     <div
       className="pointer-events-none absolute inset-0 overflow-hidden"
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <div className="absolute inset-0 bg-[#050816]" />
 
@@ -295,7 +295,7 @@ function AchievementCard({ stat }: { stat: AchievementStat }) {
       />
       <div className="relative flex items-center gap-4">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] shadow-lg shadow-[#7C3AED]/20">
-          <Icon className="h-5 w-5 text-white" aria-hidden="true" />
+          <Icon className="h-5 w-5 text-white" aria-hidden={true} />
         </div>
         <div>
           <p className="text-2xl font-bold text-white">{stat.value}</p>
@@ -341,7 +341,7 @@ function TimelineNode({
       >
         <Icon
           className={`h-4 w-4 ${isFuture ? "text-[#00D4FF]" : "text-white"}`}
-          aria-hidden="true"
+          aria-hidden={true}
         />
       </div>
     </motion.div>
@@ -396,7 +396,7 @@ function Timeline() {
       {/* static track */}
       <div
         className="absolute bottom-2 left-5 top-2 w-px bg-white/10"
-        aria-hidden="true"
+        aria-hidden={true}
       />
       {/* animated gradient line that grows on scroll */}
       <motion.div
@@ -405,7 +405,7 @@ function Timeline() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-80px" }}
-        aria-hidden="true"
+        aria-hidden={true}
       />
 
       <motion.ol
@@ -450,7 +450,7 @@ export default function OurStory() {
               variants={fadeUp}
               className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-md"
             >
-              <Sparkles className="h-3.5 w-3.5 text-[#00D4FF]" aria-hidden="true" />
+              <Sparkles className="h-3.5 w-3.5 text-[#00D4FF]" aria-hidden={true} />
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
                 Our Journey
               </span>
@@ -494,7 +494,7 @@ export default function OurStory() {
               variants={fadeUp}
               className={`relative mt-8 ${GLASS} p-6`}
             >
-              <Quote className="h-6 w-6 text-[#7C3AED]/70" aria-hidden="true" />
+              <Quote className="h-6 w-6 text-[#7C3AED]/70" aria-hidden={true} />
               <p className="mt-3 text-base italic leading-relaxed text-white/75">
                 We started Axivon with a simple belief: technology should be a
                 growth partner, not a hurdle. Every solution we build is
@@ -514,7 +514,7 @@ export default function OurStory() {
                 See what we&apos;re building next
                 <ArrowRight
                   className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-                  aria-hidden="true"
+                  aria-hidden={true}
                 />
               </a>
             </motion.div>

@@ -344,7 +344,7 @@ function AuroraBackground() {
     <div
       ref={ref}
       className="pointer-events-none absolute inset-0 overflow-hidden"
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <div className="absolute inset-0 bg-[#050816]" />
 
@@ -499,7 +499,7 @@ function CardIcon({
         className="relative flex h-full w-full items-center justify-center rounded-2xl shadow-lg shadow-black/30"
         style={{ background: gradient }}
       >
-        <Icon className={`${iconClass} text-white`} aria-hidden="true" />
+        <Icon className={`${iconClass} text-white`} aria-hidden={true} />
       </motion.div>
     </motion.div>
   );
@@ -555,7 +555,7 @@ function BentoCard({ card }: { card: BentoCardData }) {
       <div
         className="absolute -inset-4 rounded-[2rem] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-50"
         style={{ background: glowGradient }}
-        aria-hidden="true"
+        aria-hidden={true}
       />
 
       <div
@@ -577,7 +577,7 @@ function BentoCard({ card }: { card: BentoCardData }) {
               style={{ background: beamGradient }}
               animate={shouldReduceMotion ? undefined : { rotate: 360 }}
               transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
-              aria-hidden="true"
+              aria-hidden={true}
             />
           </div>
 
@@ -697,7 +697,7 @@ export default function WhyChooseAxivon() {
             variants={fadeUp}
             className={`inline-flex items-center gap-2 ${GLASS} px-4 py-1.5`}
           >
-            <BadgeCheck className="h-3.5 w-3.5 text-[#00D4FF]" aria-hidden="true" />
+            <BadgeCheck className="h-3.5 w-3.5 text-[#00D4FF]" aria-hidden={true} />
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
               Why Choose Axivon
             </span>

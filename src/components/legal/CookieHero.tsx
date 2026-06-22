@@ -9,7 +9,7 @@ function AuroraBackground() {
 
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 overflow-hidden"
     >
       {/* Deep base */}
@@ -97,7 +97,7 @@ function AuroraBackground() {
 function PremiumGrid() {
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.028]"
     >
       <svg
@@ -153,7 +153,7 @@ function CinematicStreak() {
   const prefersReduced = useReducedMotion();
   return (
     <motion.div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute left-0 right-0 top-[38%] h-px"
       style={{
         background:
@@ -190,7 +190,7 @@ function LegalBadge() {
         }}
       >
         {/* Pulse dot */}
-        <span className="relative flex h-1.5 w-1.5 items-center justify-center" aria-hidden="true">
+        <span className="relative flex h-1.5 w-1.5 items-center justify-center" aria-hidden={true}>
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00D4FF] opacity-40" />
           <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#00D4FF]" />
         </span>
@@ -222,7 +222,7 @@ function HeroHeading() {
     >
       {/* Subtle 3-D depth layer */}
       <span
-        aria-hidden="true"
+        aria-hidden={true}
         className="absolute inset-0 flex items-center justify-center select-none"
         style={{
           backgroundImage:
@@ -350,7 +350,7 @@ function BottomDivider() {
       initial={{ opacity: 0, scaleX: 0.5 }}
       animate={inView ? { opacity: 1, scaleX: 1 } : {}}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.5 }}
-      aria-hidden="true"
+      aria-hidden={true}
       className="mx-auto h-px w-full max-w-2xl origin-center"
       style={{
         background:
@@ -412,7 +412,7 @@ export default function CookieHero() {
 
       {/* Bottom fade into page content */}
       <div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute bottom-0 left-0 right-0 h-20"
         style={{
           background:

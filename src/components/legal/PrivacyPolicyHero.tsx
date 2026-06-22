@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+
 
 export default function PrivacyPolicyHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -63,12 +64,12 @@ export default function PrivacyPolicyHero() {
     };
   }, [prefersReducedMotion]);
 
-  const fadeUp = {
+  const fadeUp: Variants = {
     hidden: { opacity: 0, y: 22 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      transition: { delay: i * 0.13, duration: 0.62, ease: [0.22, 1, 0.36, 1] },
+      transition: { delay: i * 0.13, duration: 0.62, ease: [0.22, 1, 0.36, 1] as const },
     }),
   };
 
@@ -186,7 +187,7 @@ export default function PrivacyPolicyHero() {
               height="13"
               viewBox="0 0 11 13"
               fill="none"
-              aria-hidden="true"
+              aria-hidden={true}
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
@@ -332,7 +333,7 @@ function CalendarIcon() {
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      aria-hidden="true"
+      aria-hidden={true}
       xmlns="http://www.w3.org/2000/svg"
     >
       <rect
@@ -357,7 +358,7 @@ function RefreshIcon() {
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      aria-hidden="true"
+      aria-hidden={true}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -384,7 +385,7 @@ function GlobeIcon() {
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      aria-hidden="true"
+      aria-hidden={true}
       xmlns="http://www.w3.org/2000/svg"
     >
       <circle cx="8" cy="8" r="6.5" stroke="#67E8F9" strokeWidth="1" />

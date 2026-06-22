@@ -86,7 +86,7 @@ function ArrowIcon({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       fill="none"
       className={className}
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <path
         d="M7 17 17 7M9 7h8v8"
@@ -172,7 +172,7 @@ function Hero() {
 
       {/* Grain texture */}
       <div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute inset-0 opacity-[0.035] mix-blend-overlay"
         style={{
           backgroundImage: `url("data:image/svg+xml,${NOISE_SVG}")`,
@@ -181,7 +181,7 @@ function Hero() {
 
       {/* HUD-style perspective grid floor */}
       <div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute inset-x-0 bottom-0 h-[45%] opacity-[0.18] [mask-image:linear-gradient(to_top,black,transparent)]"
         style={{
           backgroundImage:
@@ -194,21 +194,21 @@ function Hero() {
 
       {/* Ambient gradient glows */}
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute -left-32 top-0 h-72 w-72 rounded-full opacity-30 blur-3xl sm:h-96 sm:w-96"
         style={{ backgroundColor: COLORS.primary, x: blobOneX, y: blobOneY }}
         animate={shouldReduceMotion ? undefined : { scale: [1, 1.12, 1] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute right-[-6rem] top-1/4 h-80 w-80 rounded-full opacity-25 blur-3xl sm:h-[28rem] sm:w-[28rem]"
         style={{ backgroundColor: COLORS.secondary, x: blobTwoX, y: blobTwoY }}
         animate={shouldReduceMotion ? undefined : { scale: [1, 1.15, 1] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute bottom-[-4rem] left-1/3 h-64 w-64 rounded-full opacity-20 blur-3xl"
         style={{ backgroundColor: COLORS.accent }}
         animate={shouldReduceMotion ? undefined : { scale: [1, 1.2, 1] }}
@@ -279,7 +279,7 @@ function Hero() {
               }}
             >
               <span
-                aria-hidden="true"
+                aria-hidden={true}
                 className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full"
               />
               <span className="relative z-10">Book Free Consultation</span>

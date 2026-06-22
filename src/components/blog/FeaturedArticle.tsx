@@ -153,7 +153,7 @@ function AuroraBackground() {
   ];
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden={true}>
       {orbs.map((orb, i) => (
         <motion.div
           key={i}
@@ -197,7 +197,7 @@ function PerspectiveGrid({ smx, smy }: { smx: MotionValue<number>; smy: MotionVa
     <div
       className="pointer-events-none absolute inset-x-0 bottom-0 h-[50%] overflow-hidden opacity-[0.16]"
       style={{ perspective: "700px" }}
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <motion.div
         className="absolute inset-x-[-50%] bottom-0 h-[220%] origin-bottom"
@@ -239,7 +239,7 @@ function FloatingParticles({ count = 26 }: { count?: number }) {
   if (reduceMotion) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden={true}>
       {particles.map((p) => (
         <motion.span
           key={p.id}
@@ -271,7 +271,7 @@ function FloatingParticles({ count = 26 }: { count?: number }) {
 
 function NoiseOverlay() {
   return (
-    <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.035]" aria-hidden="true">
+    <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.035]" aria-hidden={true}>
       <filter id="featured-article-noise">
         <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
       </filter>
@@ -291,7 +291,7 @@ function CursorSpotlight({ spotX, spotY }: { spotX: MotionValue<number>; spotY: 
     <motion.div
       className="pointer-events-none absolute inset-0 z-10"
       style={{ background }}
-      aria-hidden="true"
+      aria-hidden={true}
     />
   );
 }
@@ -334,7 +334,7 @@ function OrbitRing({
       }}
       animate={reduceMotion ? undefined : { rotate: reverse ? -360 : 360 }}
       transition={reduceMotion ? undefined : { duration, repeat: Infinity, ease: "linear" }}
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <span
         className="absolute h-2 w-2 rounded-full"
@@ -364,7 +364,7 @@ function KnowledgeSphere() {
         }}
         animate={reduceMotion ? undefined : { opacity: [0.5, 0.9, 0.5], scale: [1, 1.08, 1] }}
         transition={reduceMotion ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        aria-hidden="true"
+        aria-hidden={true}
       />
 
       <div
@@ -373,7 +373,7 @@ function KnowledgeSphere() {
           background: `radial-gradient(circle at 35% 30%, ${COLORS.cyan}66, ${COLORS.blue}33 45%, transparent 75%)`,
           boxShadow: `0 0 55px -8px ${COLORS.cyan}80, inset 0 0 28px ${COLORS.purple}40`,
         }}
-        aria-hidden="true"
+        aria-hidden={true}
       />
 
       <OrbitRing size={185} duration={17} color={COLORS.cyan} />
@@ -397,7 +397,7 @@ function GlassCube({
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className={`absolute ${className}`} style={{ perspective: 400 }} aria-hidden="true">
+    <div className={`absolute ${className}`} style={{ perspective: 400 }} aria-hidden={true}>
       <motion.div
         className="rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md"
         style={{
@@ -432,7 +432,7 @@ function FloatingContentPanel({
     <motion.div
       className={`absolute ${className}`}
       style={reduceMotion ? undefined : { x: layer.x, y: layer.y }}
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <motion.div
         animate={reduceMotion ? undefined : { y: [0, -12, 0] }}
@@ -473,7 +473,7 @@ function KnowledgeNetworkLines() {
       className="pointer-events-none absolute inset-0 h-full w-full opacity-50"
       viewBox="0 0 460 420"
       preserveAspectRatio="xMidYMid meet"
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <defs>
         <linearGradient id="featured-neural-line" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -587,7 +587,7 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
       {/* rotating border beam */}
       <div
         className="pointer-events-none absolute -inset-px overflow-hidden rounded-[28px] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        aria-hidden="true"
+        aria-hidden={true}
       >
         <motion.div
           className="absolute inset-[-50%]"
@@ -600,12 +600,12 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
       </div>
 
       <article className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-white/[0.025] p-6 shadow-[0_10px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-shadow duration-500 group-hover:shadow-[0_10px_55px_rgba(0,0,0,0.65)] sm:p-8">
-        <div className="pointer-events-none absolute inset-[1px] -z-10 rounded-[27px] bg-[#070b1a]" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-[1px] -z-10 rounded-[27px] bg-[#070b1a]" aria-hidden={true} />
 
         <motion.div
           className="pointer-events-none absolute inset-0 rounded-[28px] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           style={{ background: spotlightBackground }}
-          aria-hidden="true"
+          aria-hidden={true}
         />
 
         {/* media / placeholder area */}
@@ -631,17 +631,17 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
                   backgroundImage: `linear-gradient(${COLORS.cyan}26 1px, transparent 1px), linear-gradient(90deg, ${COLORS.cyan}26 1px, transparent 1px)`,
                   backgroundSize: "28px 28px",
                 }}
-                aria-hidden="true"
+                aria-hidden={true}
               />
               <motion.div
                 className="absolute inset-y-0 w-1/3 opacity-40"
                 style={{ background: `linear-gradient(90deg, transparent, ${COLORS.cyan}33, transparent)` }}
                 animate={reduceMotion ? undefined : { x: ["-120%", "220%"] }}
                 transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                aria-hidden="true"
+                aria-hidden={true}
               />
               <div className="relative flex flex-col items-center gap-2 text-white/40">
-                <ImageIcon className="h-9 w-9" strokeWidth={1.5} aria-hidden="true" />
+                <ImageIcon className="h-9 w-9" strokeWidth={1.5} aria-hidden={true} />
                 <span className="text-xs font-medium uppercase tracking-[0.16em]">Image reserved for future content</span>
               </div>
             </div>
@@ -652,14 +652,14 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
             style={isLive ? undefined : { borderColor: `${COLORS.cyan}55`, color: COLORS.cyan }}
           >
             {isLive ? (
-              <Tag className="h-3 w-3" aria-hidden="true" />
+              <Tag className="h-3 w-3" aria-hidden={true} />
             ) : (
               <motion.span
                 className="h-1.5 w-1.5 rounded-full"
                 style={{ backgroundColor: COLORS.cyan, boxShadow: `0 0 8px ${COLORS.cyan}` }}
                 animate={reduceMotion ? undefined : { opacity: [0.4, 1, 0.4] }}
                 transition={reduceMotion ? undefined : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                aria-hidden="true"
+                aria-hidden={true}
               />
             )}
             {isLive ? article!.category : "Coming Soon"}
@@ -678,19 +678,19 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
 
         <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-white/[0.06] pt-6 text-xs text-white/45">
           <span className="inline-flex items-center gap-1.5">
-            <User className="h-3.5 w-3.5" aria-hidden="true" />
+            <User className="h-3.5 w-3.5" aria-hidden={true} />
             {isLive ? (
               article!.author
             ) : (
-              <span className="h-1.5 w-16 rounded-full bg-white/10" aria-hidden="true" />
+              <span className="h-1.5 w-16 rounded-full bg-white/10" aria-hidden={true} />
             )}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
+            <Calendar className="h-3.5 w-3.5" aria-hidden={true} />
             {isLive ? (
               article!.publishedDate
             ) : (
-              <span className="h-1.5 w-20 rounded-full bg-white/10" aria-hidden="true" />
+              <span className="h-1.5 w-20 rounded-full bg-white/10" aria-hidden={true} />
             )}
           </span>
         </div>
@@ -706,14 +706,14 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
               }}
             >
               Read Article
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden="true" />
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-1" aria-hidden={true} />
             </Link>
           ) : (
             <span
               aria-disabled="true"
               className="inline-flex cursor-not-allowed items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-6 py-3 text-sm font-medium text-white/40"
             >
-              <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+              <Lock className="h-3.5 w-3.5" aria-hidden={true} />
               Available Soon
             </span>
           )}
@@ -782,7 +782,7 @@ export default function FeaturedArticle({ article }: FeaturedArticleProps) {
             variants={fadeUpVariants}
             className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 backdrop-blur-sm"
           >
-            <Sparkles className="h-3.5 w-3.5" style={{ color: COLORS.cyan }} aria-hidden="true" />
+            <Sparkles className="h-3.5 w-3.5" style={{ color: COLORS.cyan }} aria-hidden={true} />
             Featured Insight
           </motion.span>
 
@@ -829,7 +829,7 @@ export default function FeaturedArticle({ article }: FeaturedArticleProps) {
           variants={fadeUpVariants}
           className="mx-auto mt-16 flex max-w-xl items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-5 py-2.5 text-center text-xs text-white/50 backdrop-blur-sm sm:mt-20"
         >
-          <Sparkles className="h-3.5 w-3.5 shrink-0" style={{ color: COLORS.purple }} aria-hidden="true" />
+          <Sparkles className="h-3.5 w-3.5 shrink-0" style={{ color: COLORS.purple }} aria-hidden={true} />
           Future articles will be published through the Axivon CMS.
         </motion.div>
       </div>

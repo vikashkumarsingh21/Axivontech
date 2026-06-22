@@ -196,7 +196,7 @@ const BorderBeam = memo(function BorderBeam({
   if (!active || reduced) return null;
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 rounded-[28px] overflow-hidden"
     >
       <motion.div
@@ -358,7 +358,7 @@ const IndustryCard = memo(function IndustryCard({
       >
         {/* Inner glow splash */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute -top-14 -left-14 w-44 h-44 rounded-full blur-3xl transition-opacity duration-500"
           style={{
             background: `radial-gradient(circle, ${industry.glowRgba}, transparent)`,
@@ -368,7 +368,7 @@ const IndustryCard = memo(function IndustryCard({
 
         {/* Sweep gradient on hover */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-0 rounded-[28px] transition-opacity duration-500"
           style={{
             background: `radial-gradient(ellipse 65% 45% at 50% 0%, ${industry.glow}18, transparent)`,
@@ -378,7 +378,7 @@ const IndustryCard = memo(function IndustryCard({
 
         {/* Corner accent */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute bottom-0 right-0 w-32 h-32 rounded-full blur-2xl transition-opacity duration-500"
           style={{
             background: `radial-gradient(circle, ${industry.glowRgba}, transparent)`,
@@ -401,7 +401,7 @@ const IndustryCard = memo(function IndustryCard({
                 : { scale: 1, rotate: 0, y: 0 }
             }
             transition={{ duration: 0.35, ease: "easeOut" }}
-            aria-hidden="true"
+            aria-hidden={true}
           >
             <industry.Icon className="w-6 h-6 text-white" strokeWidth={1.8} />
           </motion.div>
@@ -449,7 +449,7 @@ const IndustryCard = memo(function IndustryCard({
         </div>
 
         {/* Pulse dot indicator */}
-        <div className="absolute top-5 right-5 flex" aria-hidden="true">
+        <div className="absolute top-5 right-5 flex" aria-hidden={true}>
           <AnimatePresence>
             {hovered && (
               <motion.span
@@ -550,7 +550,7 @@ const SectionHeader = memo(function SectionHeader({
           className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
           aria-label="Section: Industries We Serve"
         >
-          <span aria-hidden="true" className="relative flex">
+          <span aria-hidden={true} className="relative flex">
             <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#00D4FF] opacity-70 animate-ping" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
           </span>
@@ -610,7 +610,7 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
   );
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Animated grid */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -705,7 +705,7 @@ function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElemen
 
   return (
     <motion.div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 z-0"
       style={{
         background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(37,99,235,0.055), transparent 55%)`,
@@ -748,7 +748,7 @@ export default function IndustriesWeServe() {
 
         {/* Bottom fade */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
           style={{ background: "linear-gradient(to bottom, transparent, #050816)" }}
         />

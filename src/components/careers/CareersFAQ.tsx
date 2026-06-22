@@ -180,7 +180,7 @@ function AuroraBackground() {
   return (
     <div
       className="pointer-events-none absolute inset-0 overflow-hidden"
-      aria-hidden="true"
+      aria-hidden={true}
     >
       {orbs.map((orb, i) => (
         <motion.div
@@ -238,7 +238,7 @@ function FloatingParticles() {
   return (
     <div
       className="pointer-events-none absolute inset-0 overflow-hidden"
-      aria-hidden="true"
+      aria-hidden={true}
     >
       {particles.map((p) => (
         <motion.span
@@ -273,7 +273,7 @@ function NoiseOverlay() {
   return (
     <svg
       className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.035]"
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <filter id="careers-faq-noise">
         <feTurbulence
@@ -300,7 +300,7 @@ function ToggleIcon({ open }: { open: boolean }) {
       className="relative flex h-4 w-4 shrink-0 items-center justify-center text-current"
       animate={reduceMotion ? undefined : { rotate: open ? 180 : 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <span className="absolute h-px w-4 rounded-full bg-current" />
       <motion.span
@@ -339,7 +339,7 @@ function FaqAccordionItem({
             ? "opacity-100"
             : "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
         }`}
-        aria-hidden="true"
+        aria-hidden={true}
       >
         <motion.div
           className="absolute inset-[-60%]"
@@ -359,7 +359,7 @@ function FaqAccordionItem({
         {/* inset fill so the beam only shows as a thin rim */}
         <div
           className="pointer-events-none absolute inset-[1px] -z-10 rounded-[15px] bg-[#070b1a]"
-          aria-hidden="true"
+          aria-hidden={true}
         />
 
         {/* ambient glow, strongest while open */}
@@ -370,7 +370,7 @@ function FaqAccordionItem({
           style={{
             background: `radial-gradient(circle, ${item.accent}40, transparent 70%)`,
           }}
-          aria-hidden="true"
+          aria-hidden={true}
         />
 
         <h3 className="m-0">

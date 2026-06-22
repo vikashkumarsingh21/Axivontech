@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 export default function TermsHero() {
@@ -314,7 +314,11 @@ export default function TermsHero() {
 // ─────────────────────────────────────────────
 // Info chip data
 // ─────────────────────────────────────────────
-const INFO_CHIPS: { Icon: () => JSX.Element; label: string; value: string }[] =
+const INFO_CHIPS: {
+  Icon: () => ReactNode;
+  label: string;
+  value: string;
+}[] =
   [
     { Icon: CalendarIcon, label: "Effective Date", value: "May 1, 2026" },
     { Icon: RefreshIcon, label: "Last Updated", value: "June 2026" },
@@ -333,7 +337,7 @@ function ScrollIcon() {
       height="13"
       viewBox="0 0 12 13"
       fill="none"
-      aria-hidden="true"
+      aria-hidden={true}
       xmlns="http://www.w3.org/2000/svg"
     >
       <rect
@@ -362,7 +366,7 @@ function CalendarIcon() {
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      aria-hidden="true"
+      aria-hidden={true}
       xmlns="http://www.w3.org/2000/svg"
     >
       <rect
@@ -392,7 +396,7 @@ function RefreshIcon() {
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      aria-hidden="true"
+      aria-hidden={true}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
@@ -420,7 +424,7 @@ function ScopeIcon() {
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      aria-hidden="true"
+      aria-hidden={true}
       xmlns="http://www.w3.org/2000/svg"
     >
       <circle cx="8" cy="5.5" r="2.5" stroke="#67E8F9" strokeWidth="1" />

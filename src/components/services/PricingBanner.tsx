@@ -169,7 +169,7 @@ const BorderBeam = memo(function BorderBeam({
   if (!active || reduced) return null;
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 rounded-[28px] overflow-hidden"
     >
       <motion.div
@@ -190,7 +190,7 @@ const Shimmer = memo(function Shimmer({ active, reduced }: { active: boolean; re
   if (!active || reduced) return null;
   return (
     <motion.div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 rounded-[28px] overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -305,7 +305,7 @@ const PricingCard = memo(function PricingCard({
             }}
             aria-label="Most Popular plan"
           >
-            <Sparkles className="w-3 h-3" strokeWidth={2.5} aria-hidden="true" />
+            <Sparkles className="w-3 h-3" strokeWidth={2.5} aria-hidden={true} />
             Most Popular
           </motion.div>
         )}
@@ -330,7 +330,7 @@ const PricingCard = memo(function PricingCard({
       >
         {/* Inner corner glow */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute -top-14 -left-14 w-44 h-44 rounded-full blur-3xl transition-opacity duration-500"
           style={{
             background: `radial-gradient(circle, ${card.glowRgba}, transparent)`,
@@ -338,7 +338,7 @@ const PricingCard = memo(function PricingCard({
           }}
         />
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-0 rounded-[28px] transition-opacity duration-500"
           style={{
             background: `radial-gradient(ellipse 65% 45% at 50% 0%, ${card.glow}18, transparent)`,
@@ -364,7 +364,7 @@ const PricingCard = memo(function PricingCard({
               ? { duration: 0.35, ease: "easeOut" }
               : { y: { duration: 3.2, repeat: Infinity, ease: "easeInOut" } }
           }
-          aria-hidden="true"
+          aria-hidden={true}
         >
           <card.Icon className="w-6 h-6 text-white" strokeWidth={1.8} />
         </motion.div>
@@ -409,7 +409,7 @@ const PricingCard = memo(function PricingCard({
 
         {/* Divider */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="h-px w-full"
           style={{ background: `linear-gradient(to right, transparent, ${card.color}40, transparent)` }}
         />
@@ -420,7 +420,7 @@ const PricingCard = memo(function PricingCard({
             <li key={feat} className="flex items-center gap-3">
               <span
                 className={`flex-shrink-0 w-[18px] h-[18px] rounded-full bg-gradient-to-br ${card.gradient} flex items-center justify-center`}
-                aria-hidden="true"
+                aria-hidden={true}
               >
                 <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
               </span>
@@ -438,11 +438,11 @@ const PricingCard = memo(function PricingCard({
           tabIndex={0}
         >
           <span
-            aria-hidden="true"
+            aria-hidden={true}
             className={`absolute inset-0 bg-gradient-to-r ${card.gradient} opacity-90 transition-opacity duration-300 group-hover/cta:opacity-100`}
           />
           <span
-            aria-hidden="true"
+            aria-hidden={true}
             className="absolute inset-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-300"
             style={{ boxShadow: `inset 0 1px 0 rgba(255,255,255,0.18)` }}
           />
@@ -452,7 +452,7 @@ const PricingCard = memo(function PricingCard({
             animate={reduced ? {} : hovered ? { x: 5 } : { x: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
           >
-            <ArrowRight className="w-4 h-4" strokeWidth={2.2} aria-hidden="true" />
+            <ArrowRight className="w-4 h-4" strokeWidth={2.2} aria-hidden={true} />
           </motion.span>
         </Link>
       </div>
@@ -493,7 +493,7 @@ const TrustBar = memo(function TrustBar({
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm"
           role="listitem"
         >
-          <t.Icon className="w-3.5 h-3.5 text-[#00D4FF]" strokeWidth={1.8} aria-hidden="true" />
+          <t.Icon className="w-3.5 h-3.5 text-[#00D4FF]" strokeWidth={1.8} aria-hidden={true} />
           <span className="text-white/55 text-xs font-medium">{t.label}</span>
         </motion.div>
       ))}
@@ -531,13 +531,13 @@ const BottomCTA = memo(function BottomCTA({
       >
         {/* Gradient background */}
         <span
-          aria-hidden="true"
+          aria-hidden={true}
           className="absolute inset-0 bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] transition-all duration-500"
           style={{ backgroundSize: "200% 100%", backgroundPosition: hov ? "100% 0" : "0% 0" }}
         />
         {/* Glow */}
         <span
-          aria-hidden="true"
+          aria-hidden={true}
           className="absolute inset-0 transition-opacity duration-400"
           style={{
             boxShadow: hov
@@ -553,7 +553,7 @@ const BottomCTA = memo(function BottomCTA({
           animate={reduced ? {} : hov ? { x: 6 } : { x: 0 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
         >
-          <ArrowRight className="w-5 h-5" strokeWidth={2.2} aria-hidden="true" />
+          <ArrowRight className="w-5 h-5" strokeWidth={2.2} aria-hidden={true} />
         </motion.span>
       </Link>
     </motion.div>
@@ -588,7 +588,7 @@ const SectionHeader = memo(function SectionHeader({
           className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
           aria-label="Section: Transparent Pricing"
         >
-          <span aria-hidden="true" className="relative flex">
+          <span aria-hidden={true} className="relative flex">
             <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#00D4FF] opacity-70 animate-ping" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
           </span>
@@ -653,7 +653,7 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
   );
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Animated grid */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -756,7 +756,7 @@ function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElemen
 
   return (
     <motion.div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 z-0"
       style={{
         background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(37,99,235,0.055), transparent 55%)`,
@@ -821,7 +821,7 @@ export default function PricingBanner() {
 
         {/* Bottom fade */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
           style={{ background: "linear-gradient(to bottom, transparent, #050816)" }}
         />

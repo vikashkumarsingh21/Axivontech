@@ -83,7 +83,7 @@ export default function AboutHero() {
     >
       {/* Subtle grid pattern */}
       <div
-        aria-hidden="true"
+        aria-hidden={true}
         className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:56px_56px]"
         style={{
           maskImage:
@@ -95,19 +95,19 @@ export default function AboutHero() {
 
       {/* Floating gradient orbs */}
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute -left-44 top-10 h-[460px] w-[460px] rounded-full bg-[#2563EB]/25 blur-[130px]"
         animate={{ x: [0, 40, 0], y: [0, 35, 0] }}
         transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute -right-44 top-1/3 h-[420px] w-[420px] rounded-full bg-[#7C3AED]/25 blur-[130px]"
         animate={{ x: [0, -35, 0], y: [0, 45, 0] }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute bottom-[-180px] left-1/3 h-[420px] w-[420px] rounded-full bg-[#00D4FF]/20 blur-[140px]"
         animate={{ x: [0, 30, -20, 0], y: [0, -25, 0] }}
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
@@ -161,7 +161,7 @@ export default function AboutHero() {
               className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#2563EB] to-[#7C3AED] px-7 py-3.5 text-sm font-semibold text-white shadow-[0_0_30px_-8px_rgba(37,99,235,0.8)] outline-none transition-shadow duration-300 hover:shadow-[0_0_45px_-6px_rgba(124,58,237,0.9)] focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60 sm:w-auto"
             >
               <span
-                aria-hidden="true"
+                aria-hidden={true}
                 className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full"
               />
               <span className="relative">Explore Services</span>
@@ -195,7 +195,7 @@ export default function AboutHero() {
                 <CheckCircle2
                   className="h-4 w-4 shrink-0 text-[#00D4FF]"
                   strokeWidth={2.5}
-                  aria-hidden="true"
+                  aria-hidden={true}
                 />
                 {item.label}
               </li>
@@ -213,13 +213,13 @@ export default function AboutHero() {
         >
           {/* Floating glow behind card */}
           <motion.div
-            aria-hidden="true"
+            aria-hidden={true}
             className="pointer-events-none absolute -right-10 -top-10 h-56 w-56 rounded-full bg-[#7C3AED]/40 blur-[90px]"
             animate={{ x: [0, 18, 0], y: [0, -14, 0] }}
             transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
-            aria-hidden="true"
+            aria-hidden={true}
             className="pointer-events-none absolute -bottom-10 -left-10 h-56 w-56 rounded-full bg-[#2563EB]/40 blur-[90px]"
             animate={{ x: [0, -18, 0], y: [0, 16, 0] }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
@@ -227,11 +227,11 @@ export default function AboutHero() {
 
           {/* Gradient border layers */}
           <div
-            aria-hidden="true"
+            aria-hidden={true}
             className="absolute -inset-px rounded-3xl bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] opacity-60 blur-sm"
           />
           <div
-            aria-hidden="true"
+            aria-hidden={true}
             className="absolute -inset-px rounded-3xl bg-gradient-to-br from-[#2563EB]/70 via-[#7C3AED]/70 to-[#00D4FF]/70"
           />
 
@@ -262,7 +262,7 @@ export default function AboutHero() {
                   <stat.icon
                     className="h-4 w-4 text-[#00D4FF]"
                     strokeWidth={2.25}
-                    aria-hidden="true"
+                    aria-hidden={true}
                   />
                   <span className="text-lg font-bold text-white sm:text-xl">
                     {stat.value}
@@ -297,7 +297,7 @@ export default function AboutHero() {
 
       {/* Scroll indicator */}
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2, duration: 0.8 }}

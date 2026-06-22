@@ -196,7 +196,7 @@ function CTAButton({ children, href = "#contact", variant, icon, ariaLabel }: CT
         {icon ?? (
           <ArrowRight
             className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-            aria-hidden="true"
+            aria-hidden={true}
           />
         )}
       </motion.span>
@@ -253,7 +253,7 @@ function HolographicRings({ reduceMotion }: { reduceMotion: boolean }) {
 
 function FloatingTechIcons({ reduceMotion }: { reduceMotion: boolean }) {
   return (
-    <div className="pointer-events-none absolute inset-0 hidden sm:block" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 hidden sm:block" aria-hidden={true}>
       {FLOATING_ICONS.map(({ id, Icon, top, left, size, duration, delay, depth }) => (
         <motion.div
           key={id}
@@ -307,7 +307,7 @@ function AmbientParticles({ reduceMotion }: { reduceMotion: boolean }) {
   if (reduceMotion) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden={true}>
       {particles.map((p) => (
         <motion.span
           key={p.id}
@@ -342,7 +342,7 @@ function AmbientParticles({ reduceMotion }: { reduceMotion: boolean }) {
 function PerspectiveGrid() {
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_30%,black_70%,transparent)]"
     >
       <div
@@ -400,7 +400,7 @@ export default function PortfolioCTA() {
       {/* ---------------------------------------------------------------- */}
 
       {/* Aurora wash */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div className="pointer-events-none absolute inset-0" aria-hidden={true}>
         <motion.div
           className="absolute -top-1/3 left-1/2 h-[60vw] w-[60vw] max-w-[900px] max-h-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.35),transparent_65%)] blur-3xl"
           animate={reduceMotion ? undefined : { x: [-40, 40, -40], y: [0, 30, 0] }}
@@ -425,12 +425,12 @@ export default function PortfolioCTA() {
       <motion.div
         className="pointer-events-none absolute inset-0"
         style={{ background: spotlightBackground }}
-        aria-hidden="true"
+        aria-hidden={true}
       />
 
       {/* Noise texture */}
       <div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay"
         style={{
           backgroundImage:
@@ -458,7 +458,7 @@ export default function PortfolioCTA() {
             animate={reduceMotion ? undefined : { rotate: [0, 18, -10, 0] }}
             transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <Sparkles className="h-3.5 w-3.5 text-cyan-300" aria-hidden="true" />
+            <Sparkles className="h-3.5 w-3.5 text-cyan-300" aria-hidden={true} />
           </motion.span>
           <span className="text-xs font-medium uppercase tracking-[0.18em] text-white/80">
             Let&rsquo;s Build Something Amazing
@@ -473,7 +473,7 @@ export default function PortfolioCTA() {
           {/* Border beam around the card */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem]">
             <motion.div
-              aria-hidden="true"
+              aria-hidden={true}
               className="absolute -inset-[150%]"
               style={{
                 background:
@@ -493,7 +493,7 @@ export default function PortfolioCTA() {
 
           {/* Soft top reflection */}
           <div
-            aria-hidden="true"
+            aria-hidden={true}
             className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-[2rem] bg-gradient-to-r from-transparent via-white/40 to-transparent"
           />
 
@@ -548,7 +548,7 @@ export default function PortfolioCTA() {
                 variant="primary"
                 href="#start-project"
                 ariaLabel="Start your project with Axivon Technologies"
-                icon={<Zap className="h-4 w-4" aria-hidden="true" />}
+                icon={<Zap className="h-4 w-4" aria-hidden={true} />}
               >
                 Start Your Project
               </CTAButton>
@@ -556,7 +556,7 @@ export default function PortfolioCTA() {
                 variant="secondary"
                 href="#consultation"
                 ariaLabel="Book a free consultation with Axivon Technologies"
-                icon={<CalendarCheck className="h-4 w-4" aria-hidden="true" />}
+                icon={<CalendarCheck className="h-4 w-4" aria-hidden={true} />}
               >
                 Book A Free Consultation
               </CTAButton>
@@ -574,7 +574,7 @@ export default function PortfolioCTA() {
                   className="flex items-center gap-2 text-sm font-medium text-white/70"
                 >
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#2563EB] to-[#00D4FF]">
-                    <Check className="h-3 w-3 text-white" strokeWidth={3} aria-hidden="true" />
+                    <Check className="h-3 w-3 text-white" strokeWidth={3} aria-hidden={true} />
                   </span>
                   {label}
                 </li>

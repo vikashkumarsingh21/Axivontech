@@ -133,7 +133,7 @@ function AuroraBackground() {
   return (
     <div
       className="pointer-events-none absolute inset-0 overflow-hidden"
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <div className="absolute inset-0 bg-[#050816]" />
 
@@ -239,7 +239,7 @@ function CardIcon({
         className="relative flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg shadow-black/30"
         style={{ background: gradient }}
       >
-        <Icon className="h-6 w-6 text-white" aria-hidden="true" />
+        <Icon className="h-6 w-6 text-white" aria-hidden={true} />
       </motion.div>
     </div>
   );
@@ -261,7 +261,7 @@ function MissionVisionCard({ card }: { card: MissionVisionCardData }) {
       <div
         className="absolute -inset-4 rounded-[2rem] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-50"
         style={{ background: glowGradient }}
-        aria-hidden="true"
+        aria-hidden={true}
       />
 
       <motion.div
@@ -276,7 +276,7 @@ function MissionVisionCard({ card }: { card: MissionVisionCardData }) {
             style={{ background: conicGradient }}
             animate={shouldReduceMotion ? undefined : { rotate: 360 }}
             transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
-            aria-hidden="true"
+            aria-hidden={true}
           />
         </div>
 
@@ -334,7 +334,7 @@ export default function MissionVision() {
             variants={fadeUp}
             className={`inline-flex items-center gap-2 ${GLASS} px-4 py-1.5`}
           >
-            <Compass className="h-3.5 w-3.5 text-[#00D4FF]" aria-hidden="true" />
+            <Compass className="h-3.5 w-3.5 text-[#00D4FF]" aria-hidden={true} />
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
               Our Purpose
             </span>

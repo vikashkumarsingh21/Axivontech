@@ -144,7 +144,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
   return (
     <p id={id} role="alert" className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-red-400">
-      <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+      <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden={true} />
       {message}
     </p>
   );
@@ -152,7 +152,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 
 function RequiredMark() {
   return (
-    <span className="text-cyan-400" aria-hidden="true">
+    <span className="text-cyan-400" aria-hidden={true}>
       {" "}
       *
     </span>
@@ -215,7 +215,7 @@ export default function ContactForm() {
       className="relative isolate overflow-hidden bg-[#050816] px-6 py-24 sm:py-32"
     >
       {/* Floating gradient blobs */}
-      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden={true}>
         <motion.div
           className="absolute -left-32 top-0 h-[26rem] w-[26rem] rounded-full bg-blue-600/20 blur-[120px]"
           animate={{ y: [0, 30, 0], x: [0, 20, 0] }}
@@ -284,7 +284,7 @@ export default function ContactForm() {
                       className="flex flex-col items-center justify-center gap-4 py-16 text-center"
                     >
                       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400 shadow-lg shadow-purple-500/30">
-                        <CheckCircle2 className="h-8 w-8 text-white" aria-hidden="true" />
+                        <CheckCircle2 className="h-8 w-8 text-white" aria-hidden={true} />
                       </div>
                       <h3 className="text-2xl font-bold text-white">Message Sent!</h3>
                       <p className="max-w-sm text-sm leading-relaxed text-slate-400">
@@ -426,7 +426,7 @@ export default function ContactForm() {
                             </select>
                             <ChevronDown
                               className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-                              aria-hidden="true"
+                              aria-hidden={true}
                             />
                           </div>
                           <FieldError id="service-error" message={errors.service} />
@@ -461,7 +461,7 @@ export default function ContactForm() {
                             </select>
                             <ChevronDown
                               className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-                              aria-hidden="true"
+                              aria-hidden={true}
                             />
                           </div>
                           <FieldError id="budget-error" message={errors.budget} />
@@ -500,7 +500,7 @@ export default function ContactForm() {
                             role="alert"
                             className="flex items-start gap-2 overflow-hidden rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
                           >
-                            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden={true} />
                             <span>
                               Something went wrong while sending your message. Please
                               try again, or email us directly at{" "}
@@ -528,7 +528,7 @@ export default function ContactForm() {
                         >
                           {status === "loading" ? (
                             <>
-                              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                              <Loader2 className="h-4 w-4 animate-spin" aria-hidden={true} />
                               Sending...
                             </>
                           ) : (
@@ -536,7 +536,7 @@ export default function ContactForm() {
                               Send Message
                               <ArrowRight
                                 className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-                                aria-hidden="true"
+                                aria-hidden={true}
                               />
                             </>
                           )}
@@ -571,7 +571,7 @@ export default function ContactForm() {
                       className="flex items-center gap-3"
                     >
                       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400 shadow-md shadow-purple-500/20">
-                        <CheckCircle2 className="h-4 w-4 text-white" aria-hidden="true" />
+                        <CheckCircle2 className="h-4 w-4 text-white" aria-hidden={true} />
                       </span>
                       <span className="text-sm font-medium text-slate-200 sm:text-base">{benefit}</span>
                     </motion.li>
@@ -587,7 +587,7 @@ export default function ContactForm() {
                     className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-colors duration-200 hover:bg-white/[0.05] focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                   >
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400">
-                      <Clock3 className="h-4.5 w-4.5 text-white" aria-hidden="true" />
+                      <Clock3 className="h-4.5 w-4.5 text-white" aria-hidden={true} />
                     </span>
                     <span className="flex flex-col">
                       <span className="text-xs font-medium uppercase tracking-wide text-slate-400">
@@ -603,7 +603,7 @@ export default function ContactForm() {
                     className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-colors duration-200 hover:bg-white/[0.05] focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                   >
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400">
-                      <Mail className="h-4.5 w-4.5 text-white" aria-hidden="true" />
+                      <Mail className="h-4.5 w-4.5 text-white" aria-hidden={true} />
                     </span>
                     <span className="flex flex-col">
                       <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Email</span>
@@ -619,7 +619,7 @@ export default function ContactForm() {
                     className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-colors duration-200 hover:bg-white/[0.05] focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                   >
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400">
-                      <MessageCircle className="h-4.5 w-4.5 text-white" aria-hidden="true" />
+                      <MessageCircle className="h-4.5 w-4.5 text-white" aria-hidden={true} />
                     </span>
                     <span className="flex flex-col">
                       <span className="text-xs font-medium uppercase tracking-wide text-slate-400">WhatsApp</span>

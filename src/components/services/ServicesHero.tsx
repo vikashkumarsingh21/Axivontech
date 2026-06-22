@@ -76,7 +76,7 @@ function polarToXY(angleDeg: number, radius: number) {
 
 function BackgroundBlobs({ reduced }: { reduced: boolean }) {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Aurora sweep */}
       {!reduced && (
         <>
@@ -151,7 +151,7 @@ function Particles({ reduced }: { reduced: boolean }) {
 
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 overflow-hidden"
     >
       {particles.map((p) => (
@@ -200,7 +200,7 @@ function MouseSpotlight() {
 
   return (
     <motion.div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none fixed inset-0 z-0"
       style={{
         background: `radial-gradient(380px circle at ${sx}px ${sy}px, rgba(37,99,235,0.07), transparent 60%)`,
@@ -226,7 +226,7 @@ function OrbitDashboard({ reduced }: { reduced: boolean }) {
       {[460, 420, 390].map((size, i) => (
         <div
           key={size}
-          aria-hidden="true"
+          aria-hidden={true}
           className="absolute rounded-full border border-white/[0.05]"
           style={{ width: size, height: size }}
         />
@@ -234,7 +234,7 @@ function OrbitDashboard({ reduced }: { reduced: boolean }) {
 
       {/* Orbit path ring */}
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="absolute rounded-full border border-white/[0.08]"
         style={{ width: 410, height: 410 }}
         animate={reduced ? {} : { rotate: 360 }}
@@ -243,7 +243,7 @@ function OrbitDashboard({ reduced }: { reduced: boolean }) {
 
       {/* Spinning orbit group */}
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="absolute"
         style={{ width: 410, height: 410 }}
         animate={reduced ? {} : { rotate: 360 }}
@@ -360,7 +360,7 @@ function OrbitDashboard({ reduced }: { reduced: boolean }) {
         {!reduced && [1, 2].map((n) => (
           <motion.div
             key={n}
-            aria-hidden="true"
+            aria-hidden={true}
             className="absolute rounded-[28px] border border-[#2563EB]/20"
             style={{ inset: -n * 14 }}
             animate={{ opacity: [0.4, 0, 0.4] }}
@@ -389,7 +389,7 @@ function OrbitDashboard({ reduced }: { reduced: boolean }) {
         </div>
 
         {/* Animated dot */}
-        <div className="flex gap-1" aria-hidden="true">
+        <div className="flex gap-1" aria-hidden={true}>
           {[0, 1, 2].map((d) => (
             <motion.div
               key={d}
@@ -422,11 +422,11 @@ function CTAButtons({ reduced }: { reduced: boolean }) {
         aria-label="Book a free consultation"
       >
         <span
-          aria-hidden="true"
+          aria-hidden={true}
           className="absolute inset-0 bg-gradient-to-r from-[#2563EB] to-[#7C3AED] transition-all duration-300 group-hover:from-[#1d4ed8] group-hover:to-[#6d28d9]"
         />
         <span
-          aria-hidden="true"
+          aria-hidden={true}
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.15)" }}
         />
@@ -486,7 +486,7 @@ function HeroContent({ reduced }: { reduced: boolean }) {
           className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
           aria-label="Section badge: Our Services"
         >
-          <span aria-hidden="true" className="relative flex">
+          <span aria-hidden={true} className="relative flex">
             <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#00D4FF] opacity-75 animate-ping" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00D4FF]" />
           </span>
@@ -535,7 +535,7 @@ function HeroContent({ reduced }: { reduced: boolean }) {
         className="flex items-center gap-3 pt-2"
         aria-label="8 services available"
       >
-        <div className="flex -space-x-2" aria-hidden="true">
+        <div className="flex -space-x-2" aria-hidden={true}>
           {["#2563EB", "#7C3AED", "#00D4FF", "#2563EB"].map((c, i) => (
             <div
               key={i}
@@ -621,7 +621,7 @@ export default function ServicesHero() {
 
         {/* Bottom fade */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute bottom-0 left-0 right-0 h-32"
           style={{ background: "linear-gradient(to bottom, transparent, #050816)" }}
         />

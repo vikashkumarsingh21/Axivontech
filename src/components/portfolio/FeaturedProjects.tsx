@@ -29,6 +29,8 @@ import {
   FlaskConical,
 } from "lucide-react";
 
+import type { Variants } from "framer-motion";
+
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 type ProjectStatus = "Live" | "In Development" | "Beta";
@@ -162,24 +164,24 @@ const STATUS_STYLES: Record<ProjectStatus, { bg: string; border: string; color: 
 
 // ─── Animation Variants ────────────────────────────────────────────────────────
 
-const fadeUpVariants = {
+const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 28, filter: "blur(8px)" },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, ease: "easeOut" },
   },
 };
 
-const cardReveal = {
-  hidden: { opacity: 0, y: 40, scale: 0.95, filter: "blur(10px)" },
+const cardReveal: Variants = {
+  hidden: { opacity: 0, y: 40, scale: 0.95 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
     scale: 1,
     filter: "blur(0px)",
-    transition: { duration: 0.7, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, delay: i * 0.1, ease: "easeOut" },
   }),
 };
 
@@ -486,7 +488,7 @@ function ProjectVisual({
       <motion.div
         className="w-full h-full"
         animate={hovered && !reduced ? { scale: 1.06 } : { scale: 1 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
       >
         {renderMotif()}
       </motion.div>
@@ -501,7 +503,7 @@ function TechChip({ name, index, isInView }: { name: string; index: number; isIn
     <motion.span
       initial={{ opacity: 0, y: 6, scale: 0.92 }}
       animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{ duration: 0.4, delay: 0.3 + index * 0.06, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.4, delay: 0.3 + index * 0.06, ease: "easeOut" }}
       whileHover={{ scale: 1.06, y: -1 }}
       className="text-[11px] font-medium px-2.5 py-1 rounded-md"
       style={{

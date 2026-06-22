@@ -16,19 +16,19 @@ export default function CTA() {
     >
       {/* Floating gradient blobs */}
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute -left-52 top-0 h-[520px] w-[520px] rounded-full bg-[#2563EB]/25 blur-[140px]"
         animate={{ x: [0, 50, 0], y: [0, 40, 0] }}
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute -right-52 top-10 h-[460px] w-[460px] rounded-full bg-[#7C3AED]/25 blur-[140px]"
         animate={{ x: [0, -40, 0], y: [0, 50, 0] }}
         transition={{ duration: 17, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute bottom-[-200px] left-1/2 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[#00D4FF]/20 blur-[150px]"
         animate={{ x: [0, 30, -30, 0], y: [0, -30, 0] }}
         transition={{ duration: 19, repeat: Infinity, ease: "easeInOut" }}
@@ -44,14 +44,14 @@ export default function CTA() {
       >
         {/* Pulsing glow */}
         <motion.div
-          aria-hidden="true"
+          aria-hidden={true}
           className="absolute -inset-1 rounded-[2rem] bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] blur-2xl sm:rounded-[2.5rem]"
           animate={{ opacity: [0.35, 0.65, 0.35] }}
           transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
         />
         {/* Crisp gradient border line */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="absolute -inset-px rounded-[2rem] bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] opacity-70 sm:rounded-[2.5rem]"
         />
 
@@ -89,7 +89,7 @@ export default function CTA() {
               className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#2563EB] to-[#7C3AED] px-8 py-4 text-sm font-semibold text-white shadow-[0_0_30px_-8px_rgba(37,99,235,0.8)] transition-shadow duration-300 hover:shadow-[0_0_45px_-6px_rgba(124,58,237,0.9)] sm:w-auto"
             >
               <span
-                aria-hidden="true"
+                aria-hidden={true}
                 className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full"
               />
               <span className="relative">Get Free Consultation</span>
@@ -127,7 +127,7 @@ export default function CTA() {
             </a>
 
             <span
-              aria-hidden="true"
+              aria-hidden={true}
               className="hidden h-1 w-1 rounded-full bg-slate-600 sm:block"
             />
 

@@ -163,7 +163,7 @@ const BackgroundParticles = memo(function BackgroundParticles() {
   );
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {particles.map((p) => (
         <motion.div
           key={p.id}
@@ -193,7 +193,7 @@ const BackgroundParticles = memo(function BackgroundParticles() {
 
 const AuroraBackground = memo(function AuroraBackground() {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Grid */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -261,7 +261,7 @@ function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElemen
 
   return (
     <motion.div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 z-0"
       style={{
         background: `radial-gradient(400px circle at ${sx}px ${sy}px, rgba(37,99,235,0.06), transparent 55%)`,
@@ -283,7 +283,7 @@ const BorderBeam = memo(function BorderBeam({
 }) {
   if (!active || reduced) return null;
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[24px] overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 rounded-[24px] overflow-hidden">
       <motion.div
         className={`absolute h-[2px] w-24 bg-gradient-to-r ${gradient} blur-[1px] opacity-90`}
         animate={{ offsetDistance: ["0%", "100%"] }}
@@ -310,7 +310,7 @@ function TimelinePath({
     "M 0 40 C 80 40, 100 20, 180 40 C 260 60, 280 20, 360 40 C 440 60, 460 20, 540 40 C 620 60, 640 20, 720 40 C 800 60, 820 20, 900 40 C 980 60, 1000 20, 1080 40 C 1160 60, 1180 20, 1260 40";
 
   return (
-    <div className="relative w-full h-20 hidden lg:block" aria-hidden="true">
+    <div className="relative w-full h-20 hidden lg:block" aria-hidden={true}>
       <svg
         className="absolute inset-0 w-full h-full"
         viewBox="0 0 1260 80"
@@ -384,7 +384,7 @@ function TimelinePath({
 
 function VerticalLine({ visible, reduced }: { visible: boolean; reduced: boolean }) {
   return (
-    <div className="absolute left-6 top-0 bottom-0 w-px lg:hidden" aria-hidden="true">
+    <div className="absolute left-6 top-0 bottom-0 w-px lg:hidden" aria-hidden={true}>
       <motion.div
         className="w-full origin-top"
         style={{
@@ -498,7 +498,7 @@ const StepCard = memo(function StepCard({
       >
         {/* Inner glow */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute -top-12 -left-12 w-36 h-36 rounded-full blur-3xl transition-opacity duration-500"
           style={{
             background: `radial-gradient(circle, ${step.glowRgba}, transparent)`,
@@ -508,7 +508,7 @@ const StepCard = memo(function StepCard({
 
         {/* Spotlight sweep */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-0 rounded-[24px] transition-opacity duration-500"
           style={{
             background: `radial-gradient(ellipse 65% 45% at 50% 0%, ${step.glow}18, transparent)`,
@@ -528,7 +528,7 @@ const StepCard = memo(function StepCard({
           </span>
 
           {/* Pulse dot */}
-          <div className="relative flex" aria-hidden="true">
+          <div className="relative flex" aria-hidden={true}>
             <motion.span
               className="absolute inline-flex h-2.5 w-2.5 rounded-full opacity-60"
               style={{ background: step.color }}
@@ -553,7 +553,7 @@ const StepCard = memo(function StepCard({
               : { scale: 1, rotate: 0, y: 0 }
           }
           transition={{ duration: 0.35, ease: "easeOut" }}
-          aria-hidden="true"
+          aria-hidden={true}
         >
           <step.Icon className="w-5 h-5 text-white" strokeWidth={1.9} />
         </motion.div>
@@ -590,7 +590,7 @@ const StepCard = memo(function StepCard({
                   <span
                     className="w-1 h-1 rounded-full flex-shrink-0"
                     style={{ background: step.color }}
-                    aria-hidden="true"
+                    aria-hidden={true}
                   />
                   {d}
                 </motion.li>
@@ -631,7 +631,7 @@ const SectionHeader = memo(function SectionHeader({
           className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
           aria-label="Section: Our Process"
         >
-          <span aria-hidden="true" className="relative flex">
+          <span aria-hidden={true} className="relative flex">
             <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#00D4FF] opacity-70 animate-ping" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
           </span>
@@ -691,7 +691,7 @@ function HorizontalTimeline({
               <StepCard step={step} index={i} visible={visible} reduced={reduced} isHorizontal />
             </div>
           ) : (
-            <div key={step.id} className="col-span-1 invisible pointer-events-none" aria-hidden="true" />
+            <div key={step.id} className="col-span-1 invisible pointer-events-none" aria-hidden={true} />
           )
         )}
       </div>
@@ -707,7 +707,7 @@ function HorizontalTimeline({
               <StepCard step={step} index={i} visible={visible} reduced={reduced} isHorizontal />
             </div>
           ) : (
-            <div key={step.id} className="col-span-1 invisible pointer-events-none" aria-hidden="true" />
+            <div key={step.id} className="col-span-1 invisible pointer-events-none" aria-hidden={true} />
           )
         )}
       </div>
@@ -739,7 +739,7 @@ function VerticalTimeline({
           <div
             className="absolute -left-14 top-6 flex items-center justify-center w-5 h-5 rounded-full border-2 border-[#050816] z-10"
             style={{ background: step.color, boxShadow: `0 0 10px ${step.glowRgba}` }}
-            aria-hidden="true"
+            aria-hidden={true}
           >
             <motion.div
               className="w-2 h-2 rounded-full bg-white"
@@ -794,7 +794,7 @@ export default function DevelopmentProcess() {
 
         {/* Bottom fade */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
           style={{ background: "linear-gradient(to bottom, transparent, #050816)" }}
         />

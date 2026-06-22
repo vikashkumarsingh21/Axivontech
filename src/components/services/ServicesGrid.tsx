@@ -175,7 +175,7 @@ const SERVICES: Service[] = [
 const BorderBeam = memo(function BorderBeam({ gradient, active }: { gradient: string; active: boolean }) {
   if (!active) return null;
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[28px] overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 rounded-[28px] overflow-hidden">
       <motion.div
         className={`absolute h-[2px] w-28 bg-gradient-to-r ${gradient} blur-[1px] opacity-90`}
         animate={{ offsetDistance: ["0%", "100%"] }}
@@ -271,7 +271,7 @@ const ServiceCard = memo(function ServiceCard({
       >
         {/* Inner glow splash */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute -top-16 -left-16 w-48 h-48 rounded-full blur-3xl transition-opacity duration-500"
           style={{
             background: `radial-gradient(circle, ${service.glowRgba}, transparent)`,
@@ -281,7 +281,7 @@ const ServiceCard = memo(function ServiceCard({
 
         {/* Spotlight radial */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-0 rounded-[28px] transition-opacity duration-500"
           style={{
             background: `radial-gradient(ellipse 60% 50% at 50% 0%, ${service.glow}18, transparent)`,
@@ -304,7 +304,7 @@ const ServiceCard = memo(function ServiceCard({
                 : { scale: 1, rotate: 0 }
             }
             transition={{ duration: 0.35, ease: "easeOut" }}
-            aria-hidden="true"
+            aria-hidden={true}
           >
             <service.Icon className="w-6 h-6 text-white" strokeWidth={1.8} />
           </motion.div>
@@ -326,7 +326,7 @@ const ServiceCard = memo(function ServiceCard({
             <li key={feat} className="flex items-center gap-2.5">
               <span
                 className={`flex-shrink-0 w-4 h-4 rounded-full bg-gradient-to-br ${service.gradient} flex items-center justify-center`}
-                aria-hidden="true"
+                aria-hidden={true}
               >
                 <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
               </span>
@@ -384,7 +384,7 @@ const SectionHeader = memo(function SectionHeader({
           className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
           aria-label="Section: Our Expertise"
         >
-          <span aria-hidden="true" className="relative flex">
+          <span aria-hidden={true} className="relative flex">
             <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#00D4FF] opacity-70 animate-ping" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
           </span>
@@ -444,7 +444,7 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
   );
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Grid */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -547,7 +547,7 @@ function SectionSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElem
 
   return (
     <motion.div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 z-0"
       style={{
         background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(37,99,235,0.055), transparent 55%)`,
@@ -605,7 +605,7 @@ export default function ServicesGrid() {
 
         {/* Bottom section fade */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
           style={{ background: "linear-gradient(to bottom, transparent, #050816)" }}
         />

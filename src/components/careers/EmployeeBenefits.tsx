@@ -200,7 +200,7 @@ function AuroraBackground() {
   return (
     <div
       className="pointer-events-none absolute inset-0 overflow-hidden"
-      aria-hidden="true"
+      aria-hidden={true}
     >
       {orbs.map((orb, i) => (
         <motion.div
@@ -246,7 +246,7 @@ function PerspectiveGrid() {
     <div
       className="pointer-events-none absolute inset-x-0 bottom-0 h-[45%] overflow-hidden opacity-[0.15]"
       style={{ perspective: "600px" }}
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <div
         className="absolute inset-x-[-50%] bottom-0 h-[200%] origin-bottom"
@@ -288,7 +288,7 @@ function FloatingParticles() {
   if (reduceMotion) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden={true}>
       {particles.map((p) => (
         <motion.span
           key={p.id}
@@ -325,7 +325,7 @@ function NoiseOverlay() {
   return (
     <svg
       className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.035]"
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <filter id="employee-benefits-noise">
         <feTurbulence
@@ -406,7 +406,7 @@ function BenefitCard({ benefit }: { benefit: Benefit }) {
       {/* rotating border beam, visible on hover/focus */}
       <div
         className="absolute -inset-px overflow-hidden rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100"
-        aria-hidden="true"
+        aria-hidden={true}
       >
         <motion.div
           className="absolute inset-[-60%]"
@@ -427,21 +427,21 @@ function BenefitCard({ benefit }: { benefit: Benefit }) {
         {/* inset card to sit just inside the rotating beam */}
         <div
           className="absolute inset-[1px] -z-10 rounded-[15px] bg-[#070b1a]"
-          aria-hidden="true"
+          aria-hidden={true}
         />
 
         {/* mouse-follow spotlight */}
         <motion.div
           className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           style={{ background: spotlightBackground }}
-          aria-hidden="true"
+          aria-hidden={true}
         />
 
         {/* ambient glow that intensifies on hover */}
         <div
           className="pointer-events-none absolute -inset-6 -z-10 rounded-[28px] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
           style={{ background: `radial-gradient(circle, ${benefit.accent}40, transparent 70%)` }}
-          aria-hidden="true"
+          aria-hidden={true}
         />
 
         <div style={{ transform: "translateZ(40px)" }} className="relative">
@@ -453,7 +453,7 @@ function BenefitCard({ benefit }: { benefit: Benefit }) {
               className="h-6 w-6"
               style={{ color: benefit.accent }}
               strokeWidth={1.75}
-              aria-hidden="true"
+              aria-hidden={true}
             />
           </div>
 

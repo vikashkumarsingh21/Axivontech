@@ -160,7 +160,7 @@ const BorderBeam = memo(function BorderBeam({
   if (!active || reduced) return null;
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 rounded-[20px] overflow-hidden"
     >
       <motion.div
@@ -266,7 +266,7 @@ const FAQAccordionItem = memo(function FAQAccordionItem({
       >
         {/* Inner top glow */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute -top-8 -left-8 w-32 h-32 rounded-full blur-3xl transition-opacity duration-500"
           style={{
             background: `radial-gradient(circle, ${faq.glowRgba}, transparent)`,
@@ -276,7 +276,7 @@ const FAQAccordionItem = memo(function FAQAccordionItem({
 
         {/* Sweep gradient */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-0 rounded-[20px] transition-opacity duration-500"
           style={{
             background: `radial-gradient(ellipse 70% 40% at 50% 0%, ${faq.glow}15, transparent)`,
@@ -287,7 +287,7 @@ const FAQAccordionItem = memo(function FAQAccordionItem({
         {/* Pulse glow ring when open */}
         {isOpen && !reduced && (
           <motion.div
-            aria-hidden="true"
+            aria-hidden={true}
             className="pointer-events-none absolute inset-0 rounded-[20px]"
             animate={{ opacity: [0.3, 0.1, 0.3] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
@@ -324,7 +324,7 @@ const FAQAccordionItem = memo(function FAQAccordionItem({
                 : { rotate: 0, scale: 1 }
             }
             transition={{ duration: 0.35, ease: EASE_FAQ }}
-            aria-hidden="true"
+            aria-hidden={true}
           >
             {isOpen ? (
               <Minus className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
@@ -362,7 +362,7 @@ const FAQAccordionItem = memo(function FAQAccordionItem({
             >
               {/* Gradient divider */}
               <div
-                aria-hidden="true"
+                aria-hidden={true}
                 className="mx-6 h-px mb-5"
                 style={{
                   background: `linear-gradient(to right, transparent, ${faq.color}50, transparent)`,
@@ -410,7 +410,7 @@ const LeftPanel = memo(function LeftPanel({
           className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
           aria-label="Section: Frequently Asked Questions"
         >
-          <span aria-hidden="true" className="relative flex">
+          <span aria-hidden={true} className="relative flex">
             <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#00D4FF] opacity-70 animate-ping" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
           </span>
@@ -485,7 +485,7 @@ const LeftPanel = memo(function LeftPanel({
                 background: `linear-gradient(135deg, ${["#2563EB", "#7C3AED", "#00D4FF", "#2563EB"][i]}30, ${["#00D4FF", "#2563EB", "#7C3AED", "#7C3AED"][i]}20)`,
                 border: `1px solid ${["#2563EB", "#7C3AED", "#00D4FF", "#2563EB"][i]}35`,
               }}
-              aria-hidden="true"
+              aria-hidden={true}
             >
               <badge.Icon
                 className="w-4 h-4"
@@ -520,7 +520,7 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
   );
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Grid */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -622,7 +622,7 @@ function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElemen
 
   return (
     <motion.div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 z-0"
       style={{
         background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(37,99,235,0.05), transparent 55%)`,
@@ -692,7 +692,7 @@ export default function ServicesFAQ() {
 
         {/* Bottom fade */}
         <div
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
           style={{ background: "linear-gradient(to bottom, transparent, #050816)" }}
         />

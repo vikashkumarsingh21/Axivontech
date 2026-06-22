@@ -220,7 +220,7 @@ function Holographic404({ reduceMotion }: { reduceMotion: boolean }) {
       >
         {/* Back glow layer */}
         <span
-          aria-hidden="true"
+          aria-hidden={true}
           className="absolute inset-0 flex items-center justify-center bg-[linear-gradient(120deg,#2563EB,#7C3AED,#00D4FF)] bg-clip-text text-transparent blur-2xl opacity-70 text-[5.5rem] font-black leading-none tracking-tighter sm:text-[9rem] lg:text-[12rem]"
         >
           404
@@ -245,7 +245,7 @@ function Holographic404({ reduceMotion }: { reduceMotion: boolean }) {
 
         {/* Glass sheen overlay */}
         <span
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-0 flex items-center justify-center text-[5.5rem] font-black leading-none tracking-tighter text-white/10 sm:text-[9rem] lg:text-[12rem]"
           style={{
             WebkitMaskImage: "linear-gradient(115deg, transparent 30%, white 50%, transparent 70%)",
@@ -257,7 +257,7 @@ function Holographic404({ reduceMotion }: { reduceMotion: boolean }) {
 
         {/* Scanline */}
         <motion.span
-          aria-hidden="true"
+          aria-hidden={true}
           className="pointer-events-none absolute inset-x-0 h-px bg-cyan-300/70 blur-[1px]"
           animate={reduceMotion ? undefined : { top: ["0%", "100%", "0%"] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -283,7 +283,7 @@ function NeonRings({ reduceMotion }: { reduceMotion: boolean }) {
       {rings.map((ring, i) => (
         <motion.div
           key={ring.size}
-          aria-hidden="true"
+          aria-hidden={true}
           className="absolute rounded-full border"
           style={{
             width: ring.size,
@@ -313,7 +313,7 @@ function NeonRings({ reduceMotion }: { reduceMotion: boolean }) {
 
 function FloatingPanels({ reduceMotion }: { reduceMotion: boolean }) {
   return (
-    <div className="pointer-events-none absolute inset-0 hidden sm:block" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 hidden sm:block" aria-hidden={true}>
       {FLOATING_PANELS.map(({ id, Icon, top, left, rotate, duration, delay, depth, label }) => (
         <motion.div
           key={id}
@@ -342,7 +342,7 @@ function FloatingPanels({ reduceMotion }: { reduceMotion: boolean }) {
 
 function FloatingCodeSnippets({ reduceMotion }: { reduceMotion: boolean }) {
   return (
-    <div className="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden={true}>
       {CODE_SNIPPETS.map(({ id, text, top, left, duration, delay }) => (
         <motion.div
           key={id}
@@ -385,7 +385,7 @@ function AmbientParticles({ reduceMotion }: { reduceMotion: boolean }) {
   if (reduceMotion) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden={true}>
       {particles.map((p) => (
         <motion.span
           key={p.id}
@@ -412,7 +412,7 @@ function AmbientParticles({ reduceMotion }: { reduceMotion: boolean }) {
 function PerspectiveGrid() {
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={true}
       className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_30%,black_75%,transparent)]"
     >
       <div
@@ -435,7 +435,7 @@ function PerspectiveGrid() {
 function BrokenPortal({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       viewBox="0 0 400 400"
       className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[120%] w-[120%] max-w-[820px] opacity-60"
     >
@@ -517,7 +517,7 @@ export default function NotFound() {
       {/* Background layers                                                */}
       {/* ---------------------------------------------------------------- */}
 
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div className="pointer-events-none absolute inset-0" aria-hidden={true}>
         <motion.div
           className="absolute -top-1/3 left-1/2 h-[60vw] w-[60vw] max-w-[900px] max-h-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.35),transparent_65%)] blur-3xl"
           animate={reduceMotion ? undefined : { x: [-40, 40, -40], y: [0, 30, 0] }}
@@ -541,11 +541,11 @@ export default function NotFound() {
       <motion.div
         className="pointer-events-none absolute inset-0"
         style={{ background: spotlightBackground }}
-        aria-hidden="true"
+        aria-hidden={true}
       />
 
       <div
-        aria-hidden="true"
+        aria-hidden={true}
         className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay"
         style={{
           backgroundImage:
@@ -588,7 +588,7 @@ export default function NotFound() {
             animate={reduceMotion ? undefined : { rotate: [0, 14, -10, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           >
-            <AlertTriangle className="h-3.5 w-3.5 text-cyan-300" aria-hidden="true" />
+            <AlertTriangle className="h-3.5 w-3.5 text-cyan-300" aria-hidden={true} />
           </motion.span>
           <span className="text-xs font-medium uppercase tracking-[0.18em] text-white/80">
             Error 404
@@ -646,7 +646,7 @@ export default function NotFound() {
             href="/"
             variant="primary"
             ariaLabel="Go to the Axivon Technologies homepage"
-            icon={<Home className="h-4 w-4" aria-hidden="true" />}
+            icon={<Home className="h-4 w-4" aria-hidden={true} />}
           >
             Go To Homepage
           </NavButton>
@@ -654,7 +654,7 @@ export default function NotFound() {
             href="/services"
             variant="secondary"
             ariaLabel="Explore Axivon Technologies services"
-            icon={<Compass className="h-4 w-4" aria-hidden="true" />}
+            icon={<Compass className="h-4 w-4" aria-hidden={true} />}
           >
             Explore Services
           </NavButton>
@@ -662,7 +662,7 @@ export default function NotFound() {
             href="/contact"
             variant="ghost"
             ariaLabel="Contact Axivon Technologies"
-            icon={<MessageSquare className="h-4 w-4" aria-hidden="true" />}
+            icon={<MessageSquare className="h-4 w-4" aria-hidden={true} />}
           >
             Contact Us
           </NavButton>
@@ -673,9 +673,9 @@ export default function NotFound() {
           variants={fadeUpVariants}
           className="mt-12 flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.2em] text-white/35"
         >
-          <Terminal className="h-3.5 w-3.5" aria-hidden="true" />
+          <Terminal className="h-3.5 w-3.5" aria-hidden={true} />
           <span>axivon://system · route_not_found</span>
-          <Braces className="h-3.5 w-3.5" aria-hidden="true" />
+          <Braces className="h-3.5 w-3.5" aria-hidden={true} />
         </motion.div>
       </motion.div>
     </main>

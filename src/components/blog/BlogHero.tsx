@@ -153,7 +153,7 @@ function AuroraBackground() {
   ];
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden={true}>
       {orbs.map((orb, i) => (
         <motion.div
           key={i}
@@ -203,7 +203,7 @@ function PerspectiveGrid({
     <div
       className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] overflow-hidden opacity-[0.18]"
       style={{ perspective: "700px" }}
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <motion.div
         className="absolute inset-x-[-50%] bottom-0 h-[220%] origin-bottom"
@@ -245,7 +245,7 @@ function FloatingParticles({ count = 30 }: { count?: number }) {
   if (reduceMotion) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden={true}>
       {particles.map((p) => (
         <motion.span
           key={p.id}
@@ -277,7 +277,7 @@ function FloatingParticles({ count = 30 }: { count?: number }) {
 
 function NoiseOverlay() {
   return (
-    <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.035]" aria-hidden="true">
+    <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.035]" aria-hidden={true}>
       <filter id="blog-hero-noise">
         <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
       </filter>
@@ -303,7 +303,7 @@ function CursorSpotlight({
     <motion.div
       className="pointer-events-none absolute inset-0 z-10"
       style={{ background }}
-      aria-hidden="true"
+      aria-hidden={true}
     />
   );
 }
@@ -388,7 +388,7 @@ function OrbitRing({
       transition={
         reduceMotion ? undefined : { duration, repeat: Infinity, ease: "linear" }
       }
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <span
         className="absolute h-2 w-2 rounded-full"
@@ -419,7 +419,7 @@ function KnowledgeSphere() {
         }}
         animate={reduceMotion ? undefined : { opacity: [0.5, 0.9, 0.5], scale: [1, 1.08, 1] }}
         transition={reduceMotion ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" }}
-        aria-hidden="true"
+        aria-hidden={true}
       />
 
       {/* core */}
@@ -429,7 +429,7 @@ function KnowledgeSphere() {
           background: `radial-gradient(circle at 35% 30%, ${COLORS.cyan}66, ${COLORS.blue}33 45%, transparent 75%)`,
           boxShadow: `0 0 60px -8px ${COLORS.cyan}80, inset 0 0 30px ${COLORS.purple}40`,
         }}
-        aria-hidden="true"
+        aria-hidden={true}
       />
 
       <OrbitRing size={210} duration={18} color={COLORS.cyan} />
@@ -458,7 +458,7 @@ function HoloCard({
     <motion.div
       className={`absolute ${className}`}
       style={reduceMotion ? undefined : { x: layer.x, y: layer.y }}
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <motion.div
         animate={reduceMotion ? undefined : { y: [0, -12, 0] }}
@@ -500,7 +500,7 @@ function GlassCube({
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className={`absolute ${className}`} style={{ perspective: 400 }} aria-hidden="true">
+    <div className={`absolute ${className}`} style={{ perspective: 400 }} aria-hidden={true}>
       <motion.div
         className="rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md"
         style={{
@@ -538,7 +538,7 @@ function TopicPill({
     <motion.div
       className={`absolute ${className}`}
       style={reduceMotion ? undefined : { x: layer.x, y: layer.y }}
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <motion.div
         animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
@@ -571,7 +571,7 @@ function NeuralConnections() {
       className="pointer-events-none absolute inset-0 h-full w-full opacity-50"
       viewBox="0 0 560 500"
       preserveAspectRatio="xMidYMid meet"
-      aria-hidden="true"
+      aria-hidden={true}
     >
       <defs>
         <linearGradient id="neural-line" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -733,7 +733,7 @@ export default function BlogHero({
               style={{ backgroundColor: COLORS.cyan, boxShadow: `0 0 8px ${COLORS.cyan}` }}
               animate={reduceMotion ? undefined : { opacity: [0.4, 1, 0.4] }}
               transition={reduceMotion ? undefined : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              aria-hidden="true"
+              aria-hidden={true}
             />
             Axivon Insights
           </motion.span>
@@ -774,12 +774,12 @@ export default function BlogHero({
                 <span
                   className="absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                   style={{ background: `linear-gradient(135deg, ${COLORS.purple}, ${COLORS.cyan})` }}
-                  aria-hidden="true"
+                  aria-hidden={true}
                 />
                 Explore Articles
                 <ArrowRight
                   className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-                  aria-hidden="true"
+                  aria-hidden={true}
                 />
               </Link>
             </MagneticWrap>
