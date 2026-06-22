@@ -31,6 +31,12 @@ const COMPANY_LINKS: FooterLink[] = [
     { label: "Contact", href: "/contact" },
 ];
 
+const LEGAL_LINKS: FooterLink[] = [
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Terms & Conditions", href: "/terms-and-conditions" },
+    { label: "Cookies Policy", href: "/cookies-policy" },
+];
+
 const SERVICE_LINKS: FooterLink[] = [
     { label: "Web Development", href: "/services" },
     { label: "Mobile App Development", href: "/services" },
@@ -192,9 +198,8 @@ export default function Footer() {
                         <h3 className="mb-5 text-sm font-semibold uppercase tracking-[0.2em] text-white">
                             Contact
                         </h3>
-                        <ul className="flex flex-col gap-3">
 
-                            {/* Email */}
+                        <ul className="flex flex-col gap-3">
                             <li>
                                 <a
                                     href="mailto:info@axivontech.in"
@@ -205,20 +210,18 @@ export default function Footer() {
                                 </a>
                             </li>
 
-                            {/* WhatsApp */}
                             <li>
                                 <a
-                                    href="https://wa.me/91943263768"
+                                    href="https://wa.me/919473263768"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white"
                                 >
                                     <FaWhatsapp className="h-4 w-4 text-green-500" />
-                                    +91 943263768
+                                    +91 9473263768
                                 </a>
                             </li>
 
-                            {/* Website */}
                             <li>
                                 <a
                                     href="https://axivontech.in"
@@ -230,10 +233,9 @@ export default function Footer() {
                                     axivontech.in
                                 </a>
                             </li>
-
                         </ul>
                     </motion.div>
-                </motion.div>
+                </motion.div >
 
                 {/* Bottom bar */}
                 <motion.div
@@ -241,16 +243,37 @@ export default function Footer() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.4 }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-8 text-center sm:flex-row sm:text-left"
+                    className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-8 text-center lg:flex-row lg:text-left"
                 >
                     <p className="text-sm text-slate-500">
                         © 2026 Axivon Technologies. All Rights Reserved.
                     </p>
+
+                    <nav
+                        aria-label="Legal"
+                        className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1"
+                    >
+                        {LEGAL_LINKS.map((link, index) => (
+                            <span key={link.label} className="flex items-center gap-x-2">
+                                <a
+                                    href={link.href}
+                                    className="text-sm text-slate-500 transition-colors duration-300 hover:text-white"
+                                >
+                                    {link.label}
+                                </a>
+
+                                {index < LEGAL_LINKS.length - 1 && (
+                                    <span className="text-slate-600">•</span>
+                                )}
+                            </span>
+                        ))}
+                    </nav>
+
                     <p className="text-sm text-slate-500">
                         Built with Innovation, Technology and Vision.
                     </p>
                 </motion.div>
-            </div>
-        </footer>
+            </div >
+        </footer >
     );
 }
