@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CareerApplication from "@/components/careers/CareerApplication";
 
 import CareersHero from "@/components/careers/CareersHero";
 
@@ -76,8 +77,8 @@ export default function CareersPage() {
       {/* FAQ */}
       <CareersFAQ />
 
-      {/* Careers CTA */}
-      <CTA />
+      {/* Career Application Form */}
+      <CareerApplication />
 
       {/* Global CTA */}
       <CTA />
