@@ -34,7 +34,7 @@ const COMPANY_LINKS: FooterLink[] = [
 const LEGAL_LINKS: FooterLink[] = [
     { label: "Privacy Policy", href: "/privacy-policy" },
     { label: "Terms & Conditions", href: "/terms-and-conditions" },
-    { label: "Cookies Policy", href: "/cookies-policy" },
+    { label: "Cookies Policy", href: "/app/cookie-policy" },
 ];
 
 const SERVICE_LINKS: FooterLink[] = [

@@ -133,11 +133,10 @@ const inputBase =
   "w-full rounded-xl border bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-slate-500 backdrop-blur-sm transition-colors duration-200 focus:outline-none focus:ring-2";
 
 function fieldClasses(hasError: boolean) {
-  return `${inputBase} ${
-    hasError
+  return `${inputBase} ${hasError
       ? "border-red-500/50 focus:border-red-400/60 focus:ring-red-400/30"
       : "border-white/10 focus:border-cyan-400/50 focus:ring-cyan-400/30"
-  }`;
+    }`;
 }
 
 function FieldError({ id, message }: { id: string; message?: string }) {
@@ -286,17 +285,18 @@ export default function ContactForm() {
                       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400 shadow-lg shadow-purple-500/30">
                         <CheckCircle2 className="h-8 w-8 text-white" aria-hidden={true} />
                       </div>
-                      <h3 className="text-2xl font-bold text-white">Message Sent!</h3>
+                      <h3 className="text-2xl font-bold text-white">Inquiry Submitted Successfully</h3>
                       <p className="max-w-sm text-sm leading-relaxed text-slate-400">
-                        Thanks for reaching out. Our team will review your project
-                        details and get back to you within 24 hours.
+                        Thank you for contacting Axivon Technologies.
+                        Our team has received your project inquiry and will review the details carefully.
+                        You can expect a response within 24 business hours.
                       </p>
                       <button
                         type="button"
                         onClick={handleReset}
                         className="mt-2 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition-colors duration-200 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f24]"
                       >
-                        Send Another Message
+                        Create New Inquiry
                       </button>
                     </motion.div>
                   ) : (
@@ -411,9 +411,8 @@ export default function ContactForm() {
                               aria-required="true"
                               aria-invalid={Boolean(errors.service)}
                               aria-describedby={errors.service ? "service-error" : undefined}
-                              className={`${fieldClasses(Boolean(errors.service))} appearance-none pr-10 ${
-                                formData.service ? "text-white" : "text-slate-500"
-                              }`}
+                              className={`${fieldClasses(Boolean(errors.service))} appearance-none pr-10 ${formData.service ? "text-white" : "text-slate-500"
+                                }`}
                             >
                               <option value="" disabled className="bg-[#0a0f24] text-slate-500">
                                 Select a service
@@ -446,9 +445,8 @@ export default function ContactForm() {
                               aria-required="true"
                               aria-invalid={Boolean(errors.budget)}
                               aria-describedby={errors.budget ? "budget-error" : undefined}
-                              className={`${fieldClasses(Boolean(errors.budget))} appearance-none pr-10 ${
-                                formData.budget ? "text-white" : "text-slate-500"
-                              }`}
+                              className={`${fieldClasses(Boolean(errors.budget))} appearance-none pr-10 ${formData.budget ? "text-white" : "text-slate-500"
+                                }`}
                             >
                               <option value="" disabled className="bg-[#0a0f24] text-slate-500">
                                 Select your budget
