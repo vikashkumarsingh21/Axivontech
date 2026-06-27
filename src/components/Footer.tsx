@@ -34,15 +34,15 @@ const COMPANY_LINKS: FooterLink[] = [
 const LEGAL_LINKS: FooterLink[] = [
     { label: "Privacy Policy", href: "/privacy-policy" },
     { label: "Terms & Conditions", href: "/terms-and-conditions" },
-    { label: "Cookies Policy", href: "/app/cookie-policy" },
+    { label: "Cookies Policy", href: "/cookie-policy" },
 ];
 
 const SERVICE_LINKS: FooterLink[] = [
-    { label: "Web Development", href: "/services" },
-    { label: "Mobile App Development", href: "/services" },
-    { label: "AI Solutions", href: "/services" },
-    { label: "Digital Marketing", href: "/services" },
-    { label: "SEO & SEM", href: "/services" },
+    { label: "Web Development", href: "/services/web-development" },
+    { label: "Mobile App Development", href: "/services/mobile-app-development" },
+    { label: "AI Solutions", href: "/services/ai-solutions" },
+    { label: "Digital Marketing", href: "/services/digital-marketing" },
+    { label: "SEO & SEM", href: "/services/seo-services" },
 ];
 
 const SOCIAL_LINKS = [

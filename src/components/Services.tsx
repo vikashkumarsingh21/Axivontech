@@ -208,13 +208,13 @@ export default function Services() {
                     {service.description}
                   </p>
 
-                  <button
+                  {/* <button
                     type="button"
                     className="inline-flex w-fit items-center gap-2 text-sm font-medium text-[#00D4FF] transition-all duration-300 hover:gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] rounded-sm"
                   >
                     Learn More
                     <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  </button>
+                  </button> */}
                 </div>
               </motion.div>
             );

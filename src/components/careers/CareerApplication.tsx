@@ -6,7 +6,7 @@ import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from
 import {
   User, Mail, Phone, MapPin, Link, GitBranch, Globe, FileText,
   ChevronDown, Send, CheckCircle, Loader2, Briefcase, Sparkles,
-  Zap, Globe2,  Trophy, ArrowUpRight
+  Zap, Globe2, Trophy, ArrowUpRight
 } from "lucide-react";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -422,54 +422,79 @@ export default function CareerApplication() {
     fullName: "", email: "", phone: "", position: "", location: "",
     linkedin: "", github: "", portfolio: "", resumeUrl: "", coverLetter: "",
   });
-const [status, setStatus] = useState<FormStatus>("idle");
+  const [status, setStatus] = useState<FormStatus>("idle");
 
-const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbwk0wNZz3agHASmWb3PUXfYRvijng6rN7SLPf2AoiHnLdpo-gxEKSnCqKOT25rht-Mg/exec";
 
-const handleChange = useCallback((name: keyof FormData, value: string) => {
-  setForm((prev) => ({ ...prev, [name]: value }));
-}, []);
+  const handleChange = useCallback((name: keyof FormData, value: string) => {
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }, []);
 
-async function handleSubmit(e: React.FormEvent) {
-  e.preventDefault();
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
 
-  try {
-    setStatus("loading");
-
-    const response = await fetch(SCRIPT_URL, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify(form),
-});
-
-    const data = await response.json();
-
-    if (data.success) {
-      setStatus("success");
-
-      setForm({
-        fullName: "",
-        email: "",
-        phone: "",
-        position: "",
-        location: "",
-        linkedin: "",
-        github: "",
-        portfolio: "",
-        resumeUrl: "",
-        coverLetter: "",
-      });
-    } else {
-      setStatus("error");
+    if (
+      !form.fullName.trim() ||
+      !form.email.trim() ||
+      !form.position.trim() ||
+      !form.location.trim() ||
+      !form.resumeUrl.trim()
+    ) {
+      alert("Please fill all required fields.");
+      return;
     }
-  } catch (error) {
-    console.error(error);
-    setStatus("error");
-  }
+
+    const emailRegex =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (!emailRegex.test(form.email)) {
+  alert("Please enter a valid email address.");
+  return;
 }
+
+    try {
+      setStatus("loading");
+
+      const response = await fetch("/api/careers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit application");
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStatus("success");
+
+        setForm({
+          fullName: "",
+          email: "",
+          phone: "",
+          position: "",
+          location: "",
+          linkedin: "",
+          github: "",
+          portfolio: "",
+          resumeUrl: "",
+          coverLetter: "",
+        });
+      } else {
+        setStatus("error");
+      }
+    }
+    catch (error) {
+      console.error("Career Form Error:", error);
+
+      setStatus("error");
+
+      alert("Application submission failed. Please try again.");
+    }
+  }
 
 
 

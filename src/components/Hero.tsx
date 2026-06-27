@@ -287,7 +287,7 @@ function Hero() {
             </motion.a>
 
             <motion.a
-              href="/portfolio/page.tsx"
+              href="/portfolio#PortfolioHero"
               whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
               className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-xl transition-colors duration-300 hover:border-[#00D4FF]/50 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] sm:w-auto"

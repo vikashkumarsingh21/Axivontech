@@ -508,7 +508,7 @@ export default function OurStory() {
             {/* CTA */}
             <motion.div variants={fadeUp} className="mt-8">
               <a
-                href="#services"
+                href="/services"
                 className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-md transition-colors duration-300 hover:border-white/25 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
               >
                 See what we&apos;re building next

@@ -431,7 +431,7 @@ export default function ServiceFAQ({ service }: ServiceFAQProps) {
 
   const faqs = service?.faqs ?? [];
   const consultationHref = service.consultationHref ?? "/contact";
-  const whatsappHref = service.whatsappHref ?? "https://wa.me/910000000000";
+  const whatsappHref = service.whatsappHref ?? "https://wa.me/919473263768";
 
   const handleToggle = (idx: number) => {
     setOpenIndex((prev) => (prev === idx ? null : idx));
