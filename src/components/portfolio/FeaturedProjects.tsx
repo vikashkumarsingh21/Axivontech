@@ -30,25 +30,11 @@ import {
 } from "lucide-react";
 
 import type { Variants } from "framer-motion";
-
+import { featuredProjects } from "@/data/portfolio";
+import { PortfolioProject } from "@/data/portfolio/types";
+type ProjectStatus = PortfolioProject["status"];
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
-type ProjectStatus = "Live" | "In Development" | "Beta";
-
-interface Project {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  technologies: string[];
-  status: ProjectStatus;
-  icon: React.ElementType;
-  accentPrimary: string;
-  accentSecondary: string;
-  visual: "agriculture" | "water" | "ai" | "cloud" | "ecommerce" | "healthcare";
-  caseStudyHref: string;
-  liveDemoHref: string;
-}
 
 interface Particle {
   id: number;
@@ -61,105 +47,10 @@ interface Particle {
   drift: number;
 }
 
-// ─── Project Data ───────────────────────────────────────────────────────────────
-
-const PROJECTS: Project[] = [
-  {
-    id: "krishi-drishti",
-    title: "Krishi Drishti",
-    category: "Smart Agriculture",
-    description:
-      "AI-powered irrigation and crop monitoring platform with IoT integration and real-time analytics.",
-    technologies: ["Next.js", "Firebase", "Arduino", "AI"],
-    status: "Live",
-    icon: Sprout,
-    accentPrimary: "#2563EB",
-    accentSecondary: "#00D4FF",
-    visual: "agriculture",
-    caseStudyHref: "/portfolio/krishi-drishti",
-    liveDemoHref: "#",
-  },
-  {
-    id: "jalmitra",
-    title: "JalMitra",
-    category: "Environmental Innovation",
-    description:
-      "Autonomous waste collection system for rivers and water bodies using AI and IoT.",
-    technologies: ["Computer Vision", "IoT", "AI"],
-    status: "In Development",
-    icon: Waves,
-    accentPrimary: "#00D4FF",
-    accentSecondary: "#2563EB",
-    visual: "water",
-    caseStudyHref: "/portfolio/jalmitra",
-    liveDemoHref: "#",
-  },
-  {
-    id: "ai-business-assistant",
-    title: "AI Business Assistant",
-    category: "Artificial Intelligence",
-    description:
-      "Business automation platform powered by generative AI and smart workflows.",
-    technologies: ["GPT-4o", "LangChain", "Node.js"],
-    status: "Beta",
-    icon: BrainCircuit,
-    accentPrimary: "#7C3AED",
-    accentSecondary: "#00D4FF",
-    visual: "ai",
-    caseStudyHref: "/portfolio/ai-business-assistant",
-    liveDemoHref: "#",
-  },
-  {
-    id: "enterprise-cloud-platform",
-    title: "Enterprise Cloud Platform",
-    category: "Cloud Solutions",
-    description:
-      "Scalable enterprise infrastructure with cloud-native architecture.",
-    technologies: ["AWS", "Kubernetes", "Terraform"],
-    status: "Live",
-    icon: Cloud,
-    accentPrimary: "#2563EB",
-    accentSecondary: "#7C3AED",
-    visual: "cloud",
-    caseStudyHref: "/portfolio/enterprise-cloud-platform",
-    liveDemoHref: "#",
-  },
-  {
-    id: "ecommerce-platform",
-    title: "E-Commerce Platform",
-    category: "Web Development",
-    description:
-      "Modern high-performance online shopping platform optimized for conversions.",
-    technologies: ["Next.js", "Stripe", "PostgreSQL"],
-    status: "Live",
-    icon: ShoppingCart,
-    accentPrimary: "#00D4FF",
-    accentSecondary: "#7C3AED",
-    visual: "ecommerce",
-    caseStudyHref: "/portfolio/ecommerce-platform",
-    liveDemoHref: "#",
-  },
-  {
-    id: "healthcare-mobile-app",
-    title: "Healthcare Mobile App",
-    category: "Mobile Application",
-    description:
-      "Cross-platform healthcare management solution with real-time monitoring.",
-    technologies: ["React Native", "Firebase", "HealthKit"],
-    status: "Beta",
-    icon: HeartPulse,
-    accentPrimary: "#7C3AED",
-    accentSecondary: "#2563EB",
-    visual: "healthcare",
-    caseStudyHref: "/portfolio/healthcare-mobile-app",
-    liveDemoHref: "#",
-  },
-];
-
 const STATUS_STYLES: Record<ProjectStatus, { bg: string; border: string; color: string; icon: React.ElementType }> = {
   Live: { bg: "rgba(0,212,255,0.1)", border: "rgba(0,212,255,0.28)", color: "#67e8f9", icon: CheckCircle2 },
   "In Development": { bg: "rgba(124,58,237,0.1)", border: "rgba(124,58,237,0.28)", color: "#c4b5fd", icon: Clock },
-  Beta: { bg: "rgba(37,99,235,0.1)", border: "rgba(37,99,235,0.28)", color: "#93c5fd", icon: FlaskConical },
+  Completed: { bg: "rgba(37,99,235,0.1)", border: "rgba(37,99,235,0.28)", color: "#93c5fd", icon: FlaskConical },
 };
 
 // ─── Animation Variants ────────────────────────────────────────────────────────
@@ -306,7 +197,7 @@ function ProjectVisual({
   reduced,
   hovered,
 }: {
-  visual: Project["visual"];
+  visual: PortfolioProject["visual"];
   accentPrimary: string;
   accentSecondary: string;
   reduced: boolean;
@@ -519,7 +410,7 @@ function TechChip({ name, index, isInView }: { name: string; index: number; isIn
 
 // ─── Project Card ──────────────────────────────────────────────────────────────
 
-function ProjectCard({ project, index, reduced }: { project: Project; index: number; reduced: boolean }) {
+function ProjectCard({ project, index, reduced }: { project: PortfolioProject; index: number; reduced: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(cardRef, { once: true, margin: "-60px" });
   const [hovered, setHovered] = useState(false);
@@ -726,7 +617,7 @@ function ProjectCard({ project, index, reduced }: { project: Project; index: num
 
           {/* Description */}
           <p className="text-sm leading-relaxed mb-4 flex-1" style={{ color: "rgba(255,255,255,0.45)" }}>
-            {project.description}
+            {project.shortDescription}
           </p>
 
           {/* Tech chips */}
@@ -739,7 +630,7 @@ function ProjectCard({ project, index, reduced }: { project: Project; index: num
           {/* Action buttons */}
           <div className="flex items-center gap-2 mt-auto">
             <motion.a
-              href={project.caseStudyHref}
+              href={`/portfolio/${project.slug}`}
               aria-label={`View case study for ${project.title}`}
               whileHover={reduced ? {} : { scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -753,7 +644,7 @@ function ProjectCard({ project, index, reduced }: { project: Project; index: num
               <ArrowUpRight size={13} aria-hidden />
             </motion.a>
             <motion.a
-              href={project.liveDemoHref}
+              href={project.liveUrl}
               aria-label={`View live demo for ${project.title}`}
               whileHover={reduced ? {} : { scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -904,7 +795,7 @@ export default function FeaturedProjects() {
           role="list"
           aria-label="Featured projects by Axivon Technologies"
         >
-          {PROJECTS.map((project, i) => (
+          {featuredProjects.map((project, i) => (
             <div key={project.id} role="listitem" className="h-full">
               <ProjectCard project={project} index={i} reduced={reduced} />
             </div>

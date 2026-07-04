@@ -16,77 +16,90 @@ import {
   ArrowRight,
   type LucideIcon,
 } from "lucide-react";
+import Link from "next/link";
 
 interface Service {
   icon: LucideIcon;
   title: string;
   description: string;
+  href: string;
 }
 
 const SERVICES: Service[] = [
   {
     icon: Code2,
     title: "Web Development",
+    href: "services/web-development",
     description:
-      "Custom, high-performance websites built with modern frameworks — fast, secure, and engineered to convert visitors into customers.",
+      "Professional custom website development services using Next.js, React, and modern technologies to create fast, SEO-friendly, secure, and scalable business websites.",
   },
   {
     icon: ShoppingCart,
     title: "E-Commerce Development",
+    href: "/services/web-development",
     description:
       "Scalable online stores with seamless checkout flows, payment integrations, and inventory systems built for growth.",
   },
   {
     icon: Smartphone,
     title: "Mobile App Development",
+    href: "/services/mobile-app-development",
     description:
       "Native and cross-platform apps for iOS and Android, designed for speed, stability, and a polished user experience.",
   },
   {
     icon: Search,
     title: "SEO & SEM",
+    href: "services/seo-services",
     description:
       "Data-driven search strategies that improve rankings, drive qualified traffic, and maximize return on ad spend.",
   },
   {
     icon: PenTool,
     title: "UI/UX Design",
+    href: "/services/ui-ux-design",
     description:
       "Intuitive, research-backed interfaces that balance aesthetics with usability across every screen and device.",
   },
   {
     icon: Megaphone,
     title: "Digital Marketing",
+    href: "services/digital-marketing",
     description:
       "Integrated campaigns across search, social, and email that build brand presence and generate measurable demand.",
   },
   {
     icon: Palette,
     title: "Graphic Design",
+    href: "/services/graphic-design",
     description:
       "Distinctive visual identities — from logos to brand systems — that make your business instantly recognizable.",
   },
   {
     icon: Video,
     title: "Video Production",
+    href: "/services/video-production",
     description:
       "Cinematic brand films, product demos, and social content produced end-to-end, from concept to final edit.",
   },
   {
     icon: Terminal,
     title: "Custom Software Development",
+    href: "services/custom-software-development",
     description:
       "Tailored software built around your workflows, replacing rigid off-the-shelf tools with systems that fit.",
   },
   {
     icon: BrainCircuit,
     title: "AI & Cloud Solutions",
+    href: "services/cloud-solutions",
     description:
       "Intelligent automation and scalable cloud infrastructure that future-proof your operations and cut costs.",
   },
   {
     icon: Bot,
     title: "Chatbot Development",
+    href: "services/ai-solutions",
     description:
       "Conversational AI assistants that handle support, qualify leads, and engage customers around the clock.",
   },
@@ -208,13 +221,13 @@ export default function Services() {
                     {service.description}
                   </p>
 
-                  {/* <button
-                    type="button"
-                    className="inline-flex w-fit items-center gap-2 text-sm font-medium text-[#00D4FF] transition-all duration-300 hover:gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] rounded-sm"
+                  <Link
+                    href={service.href}
+                    className="inline-flex items-center gap-2 text-sm font-medium text-[#00D4FF] hover:gap-3 transition-all"
                   >
                     Learn More
-                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  </button> */}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
                 </div>
               </motion.div>
             );

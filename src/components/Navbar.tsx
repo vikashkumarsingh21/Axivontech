@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import {
   AnimatePresence,
   motion,
   useReducedMotion,
   type Variants,
-} from "framer-motion";const EASE_NAV = [0.22, 1, 0.36, 1] as const;
+} from "framer-motion"; const EASE_NAV = [0.22, 1, 0.36, 1] as const;
 
 interface NavLink {
   label: string;
@@ -67,40 +69,29 @@ export default function Navbar() {
   return (
     <header
       className={`sticky top-0 z-50 w-full backdrop-blur-xl backdrop-saturate-150 transition-all duration-500 ${scrolled
-          ? "border-b border-white/10 bg-[#07070b]/80 shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
-          : "border-b border-white/5 bg-[#07070b]/40"
+        ? "border-b border-white/10 bg-[#07070b]/80 shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
+        : "border-b border-white/5 bg-[#07070b]/40"
         }`}
     >
       {/* signature hairline glow */}
       <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
 
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
-        {/* Logo */}
-        <a
+        {/* Company Logo */}
+        <Link
           href="/"
-          className="group flex items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#07070b]"
-          aria-label="Axivon Technologies home"
+          className="group flex items-center rounded-md transition-transform duration-300 hover:scale-[1.02]"
+          aria-label="Axivon Technologies Home"
         >
-          <span className="relative flex h-8 w-8 items-center justify-center transition-transform duration-300 group-hover:scale-105">
-            <svg viewBox="0 0 32 32" className="h-8 w-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="axivon-mark" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#60A5FA" />
-                  <stop offset="100%" stopColor="#7C3AED" />
-                </linearGradient>
-              </defs>
-              <path d="M16 2L29 9V23L16 30L3 23V9L16 2Z" stroke="url(#axivon-mark)" strokeWidth="1.6" />
-              <path d="M16 9L22.5 12.7V20.1L16 23.8L9.5 20.1V12.7L16 9Z" fill="url(#axivon-mark)" fillOpacity="0.85" />
-            </svg>
-          </span>
-          <span className="flex flex-col leading-none">
-            <span className="text-[1.05rem] font-semibold tracking-tight text-white">Axivon</span>
-            <span className="text-[0.6rem] font-medium uppercase tracking-[0.2em] text-slate-400">
-              Technologies
-            </span>
-          </span>
-        </a>
-
+          <Image
+            src="/images/logo/logo.png"
+            alt="Axivon Technologies Logo"
+            width={220}
+            height={60}
+            priority
+            className="h-14 w-auto"
+          />
+        </Link>
         {/* Desktop links */}
         <ul
           className="hidden items-center gap-1 lg:flex"

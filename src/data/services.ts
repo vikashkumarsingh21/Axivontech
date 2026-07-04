@@ -64,12 +64,12 @@ export const servicesData: ServiceData[] = [
     shortDescription:
       "High-performance websites and web applications engineered for scale, speed, and conversions.",
     heroDescription:
-      "At Axivon Technologies, we build web experiences that don't just look exceptional — they perform. From lightning-fast marketing sites to complex SaaS platforms, our engineering team delivers pixel-perfect, SEO-optimised, and conversion-focused web solutions that help startups grow and enterprises modernise.",
+      "Axivon Technologies provides professional Website Development Services for startups, enterprises and growing businesses. We build SEO-friendly, high-performance websites........",
     badge: "Full-Stack Excellence",
     icon: "Globe",
-    metaTitle: "Web Development Services | Axivon Technologies",
+    metaTitle: "Website Development Company | Custom Web Development Services | Axivon Technologies",
     metaDescription:
-      "Axivon Technologies delivers high-performance web development — from marketing sites to enterprise SaaS platforms. Next.js, React, TypeScript. Get a free consultation.",
+      "Axivon Technologies delivers high-performance web development — from marketing sites to enterprise SaaS platforms. Next.js, React, TypeScript. Looking for a professional Website Development Company? Axivon Technologies builds fast, SEO-friendly, secure and scalable business websites using Next.js, React and modern technologies. Contact us today.",
     benefits: [
       {
         title: "Blazing-Fast Performance",
@@ -192,7 +192,7 @@ export const servicesData: ServiceData[] = [
       "Axivon Technologies crafts mobile experiences that users love and businesses rely on. Whether you're launching a consumer app on the App Store or deploying a mission-critical enterprise tool, our mobile team delivers polished, performant, and scalable applications for iOS and Android.",
     badge: "iOS & Android",
     icon: "Smartphone",
-    metaTitle: "Mobile App Development Services | Axivon Technologies",
+    metaTitle: "Mobile App Development Company | Android & iOS App Developers | Axivon Technologies",
     metaDescription:
       "Expert iOS and Android app development by Axivon Technologies. React Native, Swift, Kotlin. We build high-performance apps for startups and enterprises. Free consultation.",
     benefits: [
@@ -317,7 +317,7 @@ export const servicesData: ServiceData[] = [
       "Axivon Technologies helps businesses harness the transformative power of artificial intelligence — not with off-the-shelf tools, but with bespoke AI systems built around your data, your workflows, and your goals. From LLM-powered products to computer vision pipelines, we make enterprise AI accessible and actionable.",
     badge: "Generative AI & ML",
     icon: "BrainCircuit",
-    metaTitle: "AI Solutions & Machine Learning Development | Axivon Technologies",
+    metaTitle: "AI Development Company | AI Solutions & Machine Learning | Axivon Technologies",
     metaDescription:
       "Custom AI solutions by Axivon Technologies — LLM integration, RAG pipelines, computer vision, predictive analytics, and AI automation. Book a free AI strategy session.",
     benefits: [
@@ -567,7 +567,7 @@ export const servicesData: ServiceData[] = [
       "Axivon Technologies delivers enterprise-grade SEO programmes that go beyond keyword rankings. We build sustainable organic growth engines — combining technical excellence, authoritative content, and strategic link acquisition — to make your website the most trusted resource in your industry.",
     badge: "Technical & Content SEO",
     icon: "TrendingUp",
-    metaTitle: "SEO Services for Startups & Enterprises | Axivon Technologies",
+    metaTitle: "SEO Company | Technical SEO & Local SEO Services | Axivon Technologies",
     metaDescription:
       "Axivon Technologies provides technical SEO, content strategy, and link building that drives compounding organic growth. Get a free SEO audit today.",
     benefits: [

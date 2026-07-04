@@ -245,14 +245,19 @@ function Hero() {
             className="text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-7xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            <span className="block">Future-Ready Technology</span>
+            <span className="block">
+              Professional Website Development &
+            </span>
+            <span className="block">
+              Mobile App Development Services
+            </span>
             <span
               className="block bg-clip-text text-transparent"
               style={{
                 backgroundImage: `linear-gradient(90deg, ${COLORS.primary}, ${COLORS.secondary}, ${COLORS.accent})`,
               }}
             >
-              For Modern Businesses
+              for Startups & Businesses
             </span>
           </motion.h1>
 
@@ -261,7 +266,7 @@ function Hero() {
             variants={itemVariants}
             className="mt-6 max-w-xl text-base leading-relaxed text-white/60 sm:text-lg"
           >
-            Axivon Technologies helps businesses grow through websites, mobile applications, AI-powered solutions, cloud technologies, and digital marketing services.
+            Axivon Technologies is a leading Website Development, Mobile App Development, AI Solutions, UI/UX Design, SEO and Custom Software Development company helping startups, businesses and enterprises build secure, scalable and high-performance digital products.
           </motion.p>
 
           {/* CTAs */}
@@ -282,7 +287,7 @@ function Hero() {
                 aria-hidden={true}
                 className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full"
               />
-              <span className="relative z-10">Book Free Consultation</span>
+              <span className="relative z-10">Get Free Consultation</span>
               <ArrowIcon className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </motion.a>
 
@@ -292,7 +297,7 @@ function Hero() {
               whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
               className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-xl transition-colors duration-300 hover:border-[#00D4FF]/50 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] sm:w-auto"
             >
-              <span>View Portfolio</span>
+              <span>Explore Our Portfolio</span>
               <ArrowIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </motion.a>
           </motion.div>

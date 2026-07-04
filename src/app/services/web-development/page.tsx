@@ -19,13 +19,46 @@ if (!service) {
 
 export const metadata: Metadata = {
   title: service.metaTitle,
+
   description: service.metaDescription,
+
+  alternates: {
+    canonical:
+      "https://axivontech.in/services/web-development",
+  },
+
+  openGraph: {
+    title: service.metaTitle,
+
+    description: service.metaDescription,
+
+    url: "https://axivontech.in/services/web-development",
+
+    siteName: "Axivon Technologies",
+
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+
+    title: service.metaTitle,
+
+    description: service.metaDescription,
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
   keywords: [
-    "Web Development",
+    "Website Development Company",
+    "Web Development Company",
+    "Custom Website Development",
+    "Business Website Development",
     "Next.js Development",
     "React Development",
-    "Custom Website Development",
-    "Business Website",
     "SEO Friendly Website",
     "Axivon Technologies",
   ],
@@ -33,7 +66,7 @@ export const metadata: Metadata = {
 
 export default function WebDevelopmentPage() {
   return (
-    <main className="overflow-hidden bg-[#050816']">
+    <main className="overflow-hidden bg-[#050816]">
       
       <ServiceSchema
         name={service.title}

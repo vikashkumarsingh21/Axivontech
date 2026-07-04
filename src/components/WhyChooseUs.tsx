@@ -12,6 +12,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+
+import Link from "next/link";
+
 interface Feature {
   icon: LucideIcon;
   title: string;
@@ -27,7 +30,7 @@ interface Stat {
 const FEATURES: Feature[] = [
   {
     icon: Users,
-    title: "Expert Development Team",
+    title: "Experienced Development Team",
     description:
       "Senior engineers and designers who've shipped products for startups and enterprises alike, not junior hires learning on your budget.",
   },
@@ -39,7 +42,7 @@ const FEATURES: Feature[] = [
   },
   {
     icon: Rocket,
-    title: "Fast Project Delivery",
+    title: "Agile & Fast Delivery",
     description:
       "Clear milestones and parallel workstreams get your product live in weeks, not quarters, without cutting corners.",
   },
@@ -47,7 +50,7 @@ const FEATURES: Feature[] = [
     icon: TrendingUp,
     title: "SEO & Growth Focused",
     description:
-      "Every build is structured for search visibility from day one, so your site earns traffic instead of just looking good.",
+      "Every website and application is built with SEO best practices, performance optimization, and scalable architecture to help businesses attract more customers online.",
   },
   {
     icon: ShieldCheck,
@@ -57,17 +60,17 @@ const FEATURES: Feature[] = [
   },
   {
     icon: Headset,
-    title: "Dedicated Support",
+    title: "Dedicated Technical Support",
     description:
       "A direct line to your team after launch — real responses, not ticket queues, whenever something needs attention.",
   },
 ];
 
 const STATS: Stat[] = [
-  { end: 10, suffix: "+", label: "Projects Delivered" },
-  { end: 100, suffix: "%", label: "Client Satisfaction" },
-  { end: 100, suffix: "%", label: "Client Focus" },
-  { end: 24, suffix: "/7", label: "Support" },
+  { end: 10, suffix: "+", label: "Projects Completed" },
+  { end: 5, suffix: "+", label: "Services Offered" },
+  { end: 24, suffix: "/7", label: "Technical Support" },
+  { end: 100, suffix: "%", label: "Commitment to Quality" },
 ];
 
 const headerVariants: Variants = {
@@ -173,8 +176,7 @@ export default function WhyChooseUs() {
             </span>
           </h2>
           <p className="mt-5 text-balance text-base leading-relaxed text-slate-400 sm:text-lg">
-            We combine innovation, design, technology, and business strategy to
-            help organizations grow faster.
+            Axivon Technologies delivers professional website development, mobile app development, AI solutions, and custom software services with a strong focus on quality, innovation, performance, and long-term business growth.
           </p>
         </motion.div>
 

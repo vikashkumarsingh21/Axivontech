@@ -10,6 +10,8 @@ import {
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Mail, Globe } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 
 interface FooterLink {
@@ -97,26 +99,18 @@ export default function Footer() {
                 >
                     {/* Column 1: Brand */}
                     <motion.div variants={itemVariants} className="sm:col-span-2 lg:col-span-1">
-                        <a href="/" className="group inline-flex items-center gap-2.5">
-                            <span className="relative flex h-8 w-8 items-center justify-center transition-transform duration-300 group-hover:scale-105">
-                                <svg viewBox="0 0 32 32" className="h-8 w-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <defs>
-                                        <linearGradient id="axivon-mark-footer" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-                                            <stop offset="0%" stopColor="#2563EB" />
-                                            <stop offset="100%" stopColor="#7C3AED" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M16 2L29 9V23L16 30L3 23V9L16 2Z" stroke="url(#axivon-mark-footer)" strokeWidth="1.6" />
-                                    <path d="M16 9L22.5 12.7V20.1L16 23.8L9.5 20.1V12.7L16 9Z" fill="url(#axivon-mark-footer)" fillOpacity="0.85" />
-                                </svg>
-                            </span>
-                            <span className="flex flex-col leading-none">
-                                <span className="text-[1.05rem] font-semibold tracking-tight text-white">Axivon</span>
-                                <span className="text-[0.6rem] font-medium uppercase tracking-[0.2em] text-slate-400">
-                                    Technologies
-                                </span>
-                            </span>
-                        </a>
+                        <Link
+                            href="/"
+                            className="group inline-flex items-center transition-transform duration-300 hover:scale-[1.02]"
+                        >
+                            <Image
+                                src="/images/logo/logo.png"
+                                alt="Axivon Technologies Logo"
+                                width={220}
+                                height={60}
+                                className="h-12 w-auto object-contain"
+                            />
+                        </Link>
 
                         <p className="mt-5 max-w-sm text-sm leading-relaxed text-slate-400">
                             We craft future-ready digital products — websites, apps, and
