@@ -17,7 +17,7 @@ export function handleApiError(error: unknown) {
 
   if (error instanceof ZodError) {
     return NextResponse.json(
-      { error: "Validation Error", details: error.errors },
+      { error: "Validation Error", details: error.format() },
       { status: 400 }
     );
   }
