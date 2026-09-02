@@ -130,7 +130,7 @@ const fieldVariants = {
 };
 
 const inputBase =
-  "w-full rounded-xl border bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-slate-500 backdrop-blur-sm transition-colors duration-200 focus:outline-none focus:ring-2";
+  "w-full rounded-xl border bg-[#141414]/[0.03] px-4 py-3 text-sm text-white placeholder:text-slate-500 backdrop-blur-sm transition-colors duration-200 focus:outline-none focus:ring-2";
 
 function fieldClasses(hasError: boolean) {
   return `${inputBase} ${hasError
@@ -151,7 +151,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 
 function RequiredMark() {
   return (
-    <span className="text-cyan-400" aria-hidden={true}>
+    <span className="text-[#e8a064]" aria-hidden={true}>
       {" "}
       *
     </span>
@@ -211,12 +211,12 @@ export default function ContactForm() {
     <section
       id="contact-form"
       aria-labelledby="contact-form-heading"
-      className="relative isolate overflow-hidden bg-[#050816] px-6 py-24 sm:py-32"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] px-6 py-24 sm:py-32"
     >
       {/* Floating gradient blobs */}
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden={true}>
         <motion.div
-          className="absolute -left-32 top-0 h-[26rem] w-[26rem] rounded-full bg-blue-600/20 blur-[120px]"
+          className="absolute -left-32 top-0 h-[26rem] w-[26rem] rounded-full bg-[#e8a064]/20 blur-[120px]"
           animate={{ y: [0, 30, 0], x: [0, 20, 0] }}
           transition={{ duration: 13, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -241,7 +241,7 @@ export default function ContactForm() {
           viewport={{ once: true, amount: 0.3 }}
           variants={sectionVariants}
         >
-          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold tracking-[0.2em] text-cyan-300 backdrop-blur-sm">
+          <span className="inline-flex items-center rounded-full border border-white/10 bg-[#141414]/5 px-4 py-1.5 text-xs font-semibold tracking-[0.2em] text-[#e8a064] backdrop-blur-sm">
             PROJECT INQUIRY
           </span>
 
@@ -250,7 +250,7 @@ export default function ContactForm() {
             className="mt-6 text-balance text-4xl font-bold tracking-tight text-white sm:text-5xl"
           >
             Tell Us About{" "}
-            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#e8a064] via-[#d4915c] to-[#c9922a] bg-clip-text text-transparent">
               Your Project
             </span>
           </h2>
@@ -270,7 +270,7 @@ export default function ContactForm() {
         >
           {/* LEFT: Form */}
           <motion.div variants={columnVariants} className="lg:col-span-3">
-            <div className="relative rounded-2xl bg-gradient-to-br from-blue-500/40 via-purple-500/20 to-cyan-400/40 p-px shadow-[0_0_60px_-15px_rgba(124,58,237,0.35)]">
+            <div className="relative rounded-2xl bg-gradient-to-br from-[#e8a064]/40 via-purple-500/20 to-cyan-400/40 p-px shadow-[0_0_60px_-15px_rgba(201,146,42,0.35)]">
               <div className="rounded-2xl bg-[#0a0f24]/90 p-6 backdrop-blur-xl sm:p-8">
                 <AnimatePresence mode="wait">
                   {status === "success" ? (
@@ -282,7 +282,7 @@ export default function ContactForm() {
                       transition={{ duration: 0.4, ease: EASE_CONTACT }}
                       className="flex flex-col items-center justify-center gap-4 py-16 text-center"
                     >
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400 shadow-lg shadow-purple-500/30">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#e8a064] via-purple-500 to-cyan-400 shadow-lg shadow-purple-500/30">
                         <CheckCircle2 className="h-8 w-8 text-white" aria-hidden={true} />
                       </div>
                       <h3 className="text-2xl font-bold text-white">Inquiry Submitted Successfully</h3>
@@ -294,7 +294,7 @@ export default function ContactForm() {
                       <button
                         type="button"
                         onClick={handleReset}
-                        className="mt-2 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition-colors duration-200 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f24]"
+                        className="mt-2 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-[#141414]/5 px-5 py-2.5 text-sm font-medium text-white transition-colors duration-200 hover:bg-[#141414]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f24]"
                       >
                         Create New Inquiry
                       </button>
@@ -522,7 +522,7 @@ export default function ContactForm() {
                           whileHover={status === "loading" ? undefined : { scale: 1.02 }}
                           whileTap={status === "loading" ? undefined : { scale: 0.98 }}
                           aria-label="Send Message"
-                          className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/25 transition-shadow duration-300 hover:shadow-xl hover:shadow-purple-500/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f24] disabled:cursor-not-allowed disabled:opacity-70"
+                          className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-[#e8a064] via-purple-600 to-cyan-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/25 transition-shadow duration-300 hover:shadow-xl hover:shadow-purple-500/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f24] disabled:cursor-not-allowed disabled:opacity-70"
                         >
                           {status === "loading" ? (
                             <>
@@ -549,7 +549,7 @@ export default function ContactForm() {
 
           {/* RIGHT: Info panel */}
           <motion.div variants={columnVariants} className="lg:col-span-2">
-            <div className="relative h-full rounded-2xl bg-gradient-to-br from-cyan-400/30 via-purple-500/20 to-blue-500/30 p-px shadow-[0_0_60px_-15px_rgba(0,212,255,0.25)]">
+            <div className="relative h-full rounded-2xl bg-gradient-to-br from-cyan-400/30 via-purple-500/20 to-[#d4915c]/30 p-px shadow-[0_0_60px_-15px_rgba(212,145,92,0.25)]">
               <div className="flex h-full flex-col rounded-2xl bg-[#0a0f24]/90 p-6 backdrop-blur-xl sm:p-8">
                 <h3 className="text-xl font-bold text-white sm:text-2xl">Why Work With Axivon?</h3>
 
@@ -568,7 +568,7 @@ export default function ContactForm() {
                       transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       className="flex items-center gap-3"
                     >
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400 shadow-md shadow-purple-500/20">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#e8a064] via-purple-500 to-cyan-400 shadow-md shadow-purple-500/20">
                         <CheckCircle2 className="h-4 w-4 text-white" aria-hidden={true} />
                       </span>
                       <span className="text-sm font-medium text-slate-200 sm:text-base">{benefit}</span>
@@ -582,9 +582,9 @@ export default function ContactForm() {
                   <a
                     href="#contact-form"
                     aria-label="Our response time is within 24 hours"
-                    className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-colors duration-200 hover:bg-white/[0.05] focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                    className="flex items-center gap-3 rounded-xl border border-white/5 bg-[#141414]/[0.02] p-3 transition-colors duration-200 hover:bg-[#141414]/[0.05] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]"
                   >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#e8a064] via-purple-500 to-cyan-400">
                       <Clock3 className="h-4.5 w-4.5 text-white" aria-hidden={true} />
                     </span>
                     <span className="flex flex-col">
@@ -598,9 +598,9 @@ export default function ContactForm() {
                   <a
                     href="mailto:info@axivontech.in"
                     aria-label="Email us at info@axivontech.in"
-                    className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-colors duration-200 hover:bg-white/[0.05] focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                    className="flex items-center gap-3 rounded-xl border border-white/5 bg-[#141414]/[0.02] p-3 transition-colors duration-200 hover:bg-[#141414]/[0.05] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]"
                   >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#e8a064] via-purple-500 to-cyan-400">
                       <Mail className="h-4.5 w-4.5 text-white" aria-hidden={true} />
                     </span>
                     <span className="flex flex-col">
@@ -614,9 +614,9 @@ export default function ContactForm() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Chat with us on WhatsApp at +91 94732 63768"
-                    className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-colors duration-200 hover:bg-white/[0.05] focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                    className="flex items-center gap-3 rounded-xl border border-white/5 bg-[#141414]/[0.02] p-3 transition-colors duration-200 hover:bg-[#141414]/[0.05] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]"
                   >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#e8a064] via-purple-500 to-cyan-400">
                       <MessageCircle className="h-4.5 w-4.5 text-white" aria-hidden={true} />
                     </span>
                     <span className="flex flex-col">

@@ -27,10 +27,10 @@ import {
 /* ------------------------------------------------------------------ */
 
 const COLORS = {
-  bg: "#050816",
-  blue: "#2563EB",
-  purple: "#7C3AED",
-  cyan: "#00D4FF",
+  bg: "#0f0f0f",
+  blue: "#e8a064",
+  purple: "#c9922a",
+  cyan: "#d4915c",
 } as const;
 
 /* ------------------------------------------------------------------ */
@@ -465,7 +465,7 @@ function HoloCard({
         transition={
           reduceMotion ? undefined : { duration: 5 + delay, repeat: Infinity, ease: "easeInOut", delay }
         }
-        className="relative rounded-xl border border-white/10 bg-white/[0.04] p-3 backdrop-blur-xl"
+        className="relative rounded-xl border border-white/10 bg-[#141414]/[0.04] p-3 backdrop-blur-xl"
         style={{ width, boxShadow: "0 18px 40px -16px rgba(0,0,0,0.6)" }}
       >
         <div
@@ -477,10 +477,10 @@ function HoloCard({
             className="h-2 w-2 rounded-full"
             style={{ backgroundColor: accent, boxShadow: `0 0 8px ${accent}` }}
           />
-          <span className="h-1.5 w-10 rounded-full bg-white/20" />
+          <span className="h-1.5 w-10 rounded-full bg-[#141414]/20" />
         </div>
-        <span className="block h-1.5 w-full rounded-full bg-white/10" />
-        <span className="mt-1.5 block h-1.5 w-2/3 rounded-full bg-white/10" />
+        <span className="block h-1.5 w-full rounded-full bg-[#141414]/10" />
+        <span className="mt-1.5 block h-1.5 w-2/3 rounded-full bg-[#141414]/10" />
       </motion.div>
     </motion.div>
   );
@@ -502,7 +502,7 @@ function GlassCube({
   return (
     <div className={`absolute ${className}`} style={{ perspective: 400 }} aria-hidden={true}>
       <motion.div
-        className="rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md"
+        className="rounded-lg border border-white/10 bg-[#141414]/[0.03] backdrop-blur-md"
         style={{
           width: size,
           height: size,
@@ -545,7 +545,7 @@ function TopicPill({
         transition={
           reduceMotion ? undefined : { duration: 4.5 + delay, repeat: Infinity, ease: "easeInOut", delay }
         }
-        className="flex items-center gap-1.5 whitespace-nowrap rounded-full border bg-white/[0.04] px-3 py-1.5 backdrop-blur-xl"
+        className="flex items-center gap-1.5 whitespace-nowrap rounded-full border bg-[#141414]/[0.04] px-3 py-1.5 backdrop-blur-xl"
         style={{ borderColor: `${topic.accent}55`, boxShadow: `0 0 20px -10px ${topic.accent}` }}
       >
         <Icon className="h-3.5 w-3.5" style={{ color: topic.accent }} strokeWidth={1.75} />
@@ -709,7 +709,7 @@ export default function BlogHero({
       aria-label="Axivon Insights — technology blog hero"
       onMouseMove={handlePointerMove}
       onMouseLeave={handlePointerLeave}
-      className="relative isolate overflow-hidden bg-[#050816] px-6 py-28 sm:py-32 lg:px-8"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] px-6 py-28 sm:py-32 lg:px-8"
     >
       <AuroraBackground />
       <PerspectiveGrid smx={smx} smy={smy} />
@@ -726,7 +726,7 @@ export default function BlogHero({
         >
           <motion.span
             variants={fadeUpVariants}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 backdrop-blur-sm"
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#141414]/[0.04] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 backdrop-blur-sm"
           >
             <motion.span
               className="h-1.5 w-1.5 rounded-full"
@@ -765,7 +765,7 @@ export default function BlogHero({
             <MagneticWrap>
               <Link
                 href={exploreHref}
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full px-7 py-3.5 text-sm font-semibold text-white outline-none transition-transform duration-300 focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full px-7 py-3.5 text-sm font-semibold text-white outline-none transition-transform duration-300 focus-visible:ring-2 focus-visible:ring-[#d4915c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]"
                 style={{
                   background: `linear-gradient(135deg, ${COLORS.blue}, ${COLORS.purple})`,
                   boxShadow: `0 8px 30px -8px ${COLORS.purple}90`,
@@ -787,7 +787,7 @@ export default function BlogHero({
             <MagneticWrap>
               <Link
                 href={latestHref}
-                className="group relative inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-white/90 outline-none backdrop-blur-sm transition-colors duration-300 hover:border-white/30 hover:bg-white/[0.06] focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+                className="group relative inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#141414]/[0.03] px-7 py-3.5 text-sm font-semibold text-white/90 outline-none backdrop-blur-sm transition-colors duration-300 hover:border-white/30 hover:bg-[#141414]/[0.06] focus-visible:ring-2 focus-visible:ring-[#d4915c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]"
               >
                 Latest Insights
               </Link>

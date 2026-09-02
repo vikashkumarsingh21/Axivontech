@@ -59,12 +59,12 @@ interface OpenPosition {
 /* -------------------------------------------------------------------------- */
 
 const DASHBOARD_METRICS: DashboardMetric[] = [
-  { id: "pipeline", label: "Active Hiring Pipeline", value: "32", delta: "+8 this week", icon: Activity, accent: "#00D4FF" },
-  { id: "openings", label: "Open Positions", value: "14", delta: "5 new", icon: Briefcase, accent: "#2563EB" },
-  { id: "applications", label: "Applications Received", value: "2,481", delta: "+312 today", icon: Users, accent: "#7C3AED" },
-  { id: "matching", label: "AI Talent Matching", value: "97.2%", delta: "accuracy", icon: Sparkles, accent: "#00D4FF" },
-  { id: "locations", label: "Global Team Locations", value: "18", delta: "countries", icon: Globe2, accent: "#2563EB" },
-  { id: "growth", label: "Team Growth Metrics", value: "+64%", delta: "YoY", icon: TrendingUp, accent: "#7C3AED" },
+  { id: "pipeline", label: "Active Hiring Pipeline", value: "32", delta: "+8 this week", icon: Activity, accent: "#d4915c" },
+  { id: "openings", label: "Open Positions", value: "14", delta: "5 new", icon: Briefcase, accent: "#e8a064" },
+  { id: "applications", label: "Applications Received", value: "2,481", delta: "+312 today", icon: Users, accent: "#c9922a" },
+  { id: "matching", label: "AI Talent Matching", value: "97.2%", delta: "accuracy", icon: Sparkles, accent: "#d4915c" },
+  { id: "locations", label: "Global Team Locations", value: "18", delta: "countries", icon: Globe2, accent: "#e8a064" },
+  { id: "growth", label: "Team Growth Metrics", value: "+64%", delta: "YoY", icon: TrendingUp, accent: "#c9922a" },
 ];
 
 const OPEN_POSITIONS: OpenPosition[] = [
@@ -105,19 +105,19 @@ function AuroraLayer({ reduceMotion }: { reduceMotion: boolean }) {
     <div aria-hidden className="absolute inset-0 overflow-hidden">
       <motion.div
         className="absolute -top-48 -left-40 h-[40rem] w-[40rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(37,99,235,0.4), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(232,160,100,0.4), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, 70, 0], y: [0, 50, 0] }}
         transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute top-1/4 -right-40 h-[36rem] w-[36rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(124,58,237,0.38), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(201,146,42,0.38), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, -60, 0], y: [0, -40, 0] }}
         transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute bottom-[-10rem] left-1/3 h-[34rem] w-[34rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(0,212,255,0.28), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(212,145,92,0.28), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, 50, 0], y: [0, -30, 0] }}
         transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -156,16 +156,16 @@ function NoiseTexture() {
 
 function FloatingParticles({ reduceMotion }: { reduceMotion: boolean }) {
   const particles = [
-    { left: 6, top: 18, size: 3, hue: "#00D4FF", dur: 12 },
-    { left: 14, top: 62, size: 2, hue: "#2563EB", dur: 16 },
-    { left: 22, top: 36, size: 2.5, hue: "#7C3AED", dur: 14 },
-    { left: 38, top: 80, size: 2, hue: "#00D4FF", dur: 18 },
-    { left: 48, top: 12, size: 3, hue: "#7C3AED", dur: 13 },
-    { left: 62, top: 54, size: 2, hue: "#2563EB", dur: 17 },
-    { left: 74, top: 28, size: 2.5, hue: "#00D4FF", dur: 15 },
-    { left: 84, top: 70, size: 3, hue: "#7C3AED", dur: 19 },
-    { left: 92, top: 40, size: 2, hue: "#2563EB", dur: 14 },
-    { left: 58, top: 88, size: 2, hue: "#00D4FF", dur: 16 },
+    { left: 6, top: 18, size: 3, hue: "#d4915c", dur: 12 },
+    { left: 14, top: 62, size: 2, hue: "#e8a064", dur: 16 },
+    { left: 22, top: 36, size: 2.5, hue: "#c9922a", dur: 14 },
+    { left: 38, top: 80, size: 2, hue: "#d4915c", dur: 18 },
+    { left: 48, top: 12, size: 3, hue: "#c9922a", dur: 13 },
+    { left: 62, top: 54, size: 2, hue: "#e8a064", dur: 17 },
+    { left: 74, top: 28, size: 2.5, hue: "#d4915c", dur: 15 },
+    { left: 84, top: 70, size: 3, hue: "#c9922a", dur: 19 },
+    { left: 92, top: 40, size: 2, hue: "#e8a064", dur: 14 },
+    { left: 58, top: 88, size: 2, hue: "#d4915c", dur: 16 },
   ];
 
   return (
@@ -199,7 +199,7 @@ function GradientWord({ children }: { children: ReactNode }) {
     <motion.span
       className="relative inline-block bg-clip-text text-transparent"
       style={{
-        backgroundImage: "linear-gradient(110deg, #00D4FF, #2563EB 35%, #7C3AED 65%, #00D4FF)",
+        backgroundImage: "linear-gradient(110deg, #d4915c, #e8a064 35%, #c9922a 65%, #d4915c)",
         backgroundSize: "300% 100%",
       }}
       animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
@@ -261,17 +261,17 @@ function MagneticButton({
       whileTap={{ scale: 0.96 }}
       className={[
         "group relative inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold outline-none transition-shadow duration-300",
-        "focus-visible:ring-2 focus-visible:ring-[#00D4FF]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]",
+        "focus-visible:ring-2 focus-visible:ring-[#d4915c]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]",
         isPrimary
-          ? "text-white shadow-[0_10px_40px_-8px_rgba(37,99,235,0.65)] hover:shadow-[0_16px_55px_-8px_rgba(124,58,237,0.75)]"
-          : "border border-white/15 bg-white/[0.04] text-white/90 backdrop-blur-md hover:border-[#00D4FF]/40 hover:bg-white/[0.08]",
+          ? "text-white shadow-[0_10px_40px_-8px_rgba(232,160,100,0.65)] hover:shadow-[0_16px_55px_-8px_rgba(201,146,42,0.75)]"
+          : "border border-white/15 bg-[#141414]/[0.04] text-white/90 backdrop-blur-md hover:border-[#d4915c]/40 hover:bg-[#141414]/[0.08]",
       ].join(" ")}
     >
       {isPrimary && (
         <span
           aria-hidden
           className="absolute inset-0 -z-10 rounded-full"
-          style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)" }}
+          style={{ background: "linear-gradient(135deg, #e8a064, #c9922a)" }}
         />
       )}
       {isPrimary && (
@@ -295,7 +295,7 @@ function BorderBeam({ active, speed = 3.5 }: { active: boolean; speed?: number }
       aria-hidden
       className="pointer-events-none absolute inset-0 rounded-2xl"
       style={{
-        background: "conic-gradient(from 0deg, #00D4FF, #2563EB, #7C3AED, #00D4FF)",
+        background: "conic-gradient(from 0deg, #d4915c, #e8a064, #c9922a, #d4915c)",
         opacity: active ? 0.85 : 0,
         padding: 1.5,
         WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
@@ -330,11 +330,11 @@ function JobCard({ position, className, floatDelay }: { position: OpenPosition; 
       <div className="absolute inset-0 rounded-xl border border-white/10" />
       <div
         className={[
-          "relative flex items-center gap-3 rounded-xl bg-white/[0.05] px-4 py-3.5 backdrop-blur-xl transition-shadow duration-300",
-          hovered ? "shadow-[0_0_30px_-4px_rgba(0,212,255,0.55)]" : "shadow-[0_8px_24px_rgba(0,0,0,0.3)]",
+          "relative flex items-center gap-3 rounded-xl bg-[#141414]/[0.05] px-4 py-3.5 backdrop-blur-xl transition-shadow duration-300",
+          hovered ? "shadow-[0_0_30px_-4px_rgba(212,145,92,0.55)]" : "shadow-[0_8px_24px_rgba(0,0,0,0.3)]",
         ].join(" ")}
       >
-        <span className="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-gradient-to-br from-[#2563EB]/30 to-[#7C3AED]/30 text-[#00D4FF]">
+        <span className="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-gradient-to-br from-[#e8a064]/30 to-[#c9922a]/30 text-[#d4915c]">
           <Icon className="h-4.5 w-4.5" strokeWidth={2} aria-hidden />
         </span>
         <span className="min-w-0">
@@ -356,7 +356,7 @@ function MetricCard({ metric, index }: { metric: DashboardMetric; index: number 
     <motion.div
       variants={fadeUp}
       custom={index}
-      className="relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl"
+      className="relative overflow-hidden rounded-xl border border-white/10 bg-[#141414]/[0.04] p-4 backdrop-blur-xl"
     >
       <div
         aria-hidden
@@ -425,10 +425,10 @@ function RecruitmentDashboard() {
         <BorderBeam active speed={6} />
         <div className="absolute inset-0 rounded-2xl border border-white/10" />
 
-        <div className="relative overflow-hidden rounded-2xl bg-white/[0.045] p-5 shadow-[0_30px_90px_-20px_rgba(37,99,235,0.55)] backdrop-blur-2xl sm:p-6">
+        <div className="relative overflow-hidden rounded-2xl bg-[#141414]/[0.045] p-5 shadow-[0_30px_90px_-20px_rgba(232,160,100,0.55)] backdrop-blur-2xl sm:p-6">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00D4FF]/70 to-transparent"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#d4915c]/70 to-transparent"
           />
 
           {/* Header */}
@@ -437,10 +437,10 @@ function RecruitmentDashboard() {
               <p className="text-sm font-semibold text-white">Talent Intelligence</p>
               <p className="text-[11px] text-white/45">Recruitment dashboard · Live</p>
             </div>
-            <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-medium text-[#00D4FF]">
+            <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-[#141414]/5 px-2.5 py-1 text-[10px] font-medium text-[#d4915c]">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00D4FF] opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#00D4FF]" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#d4915c] opacity-60" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#d4915c]" />
               </span>
               Live
             </span>
@@ -459,10 +459,10 @@ function RecruitmentDashboard() {
           </motion.div>
 
           {/* Mini growth bars */}
-          <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+          <div className="mt-5 rounded-xl border border-white/10 bg-[#141414]/[0.03] p-4">
             <div className="flex items-center justify-between">
               <p className="text-[11px] font-medium text-white/55">Team growth — last 6 months</p>
-              <span className="text-[11px] font-semibold text-[#00D4FF]">+64%</span>
+              <span className="text-[11px] font-semibold text-[#d4915c]">+64%</span>
             </div>
             <div className="mt-3 flex items-end gap-2">
               {[38, 52, 46, 64, 78, 92].map((h, i) => (
@@ -470,7 +470,7 @@ function RecruitmentDashboard() {
                   key={i}
                   className="flex-1 rounded-t-md"
                   style={{
-                    background: "linear-gradient(180deg, #00D4FF, #2563EB 60%, #7C3AED)",
+                    background: "linear-gradient(180deg, #d4915c, #e8a064 60%, #c9922a)",
                     height: `${h * 0.55}px`,
                   }}
                   initial={{ scaleY: 0, opacity: 0 }}
@@ -521,7 +521,7 @@ export default function CareersHero() {
       onMouseMove={handleSectionMove}
       aria-label="Careers at Axivon Technologies — hero"
       className="relative isolate w-full overflow-hidden px-4 py-24 sm:px-6 sm:py-28 lg:px-10 lg:py-32 2xl:px-20"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
     >
       <style>{`
         @keyframes axv-careers-spin { to { transform: rotate(360deg); } }
@@ -539,12 +539,12 @@ export default function CareersHero() {
       <motion.div
         aria-hidden
         className="pointer-events-none absolute left-[6%] top-[18%] h-72 w-72 rounded-full blur-[100px] sm:h-96 sm:w-96"
-        style={{ background: "radial-gradient(circle, rgba(0,212,255,0.3), transparent 70%)", x: orbX, y: orbY }}
+        style={{ background: "radial-gradient(circle, rgba(212,145,92,0.3), transparent 70%)", x: orbX, y: orbY }}
       />
       <motion.div
         aria-hidden
         className="pointer-events-none absolute bottom-[12%] right-[8%] h-80 w-80 rounded-full blur-[110px] sm:h-[26rem] sm:w-[26rem]"
-        style={{ background: "radial-gradient(circle, rgba(124,58,237,0.28), transparent 70%)", x: orbXInverse, y: orbYInverse }}
+        style={{ background: "radial-gradient(circle, rgba(201,146,42,0.28), transparent 70%)", x: orbXInverse, y: orbYInverse }}
       />
 
       <div className="relative mx-auto grid max-w-[1400px] grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-12 2xl:max-w-[1600px]">
@@ -557,7 +557,7 @@ export default function CareersHero() {
         >
           <motion.span
             variants={fadeUp}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#00D4FF] backdrop-blur-md"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#141414]/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#d4915c] backdrop-blur-md"
           >
             <Rocket className="h-3.5 w-3.5" aria-hidden />
             We Are Hiring
@@ -590,7 +590,7 @@ export default function CareersHero() {
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
             </MagneticButton>
             <MagneticButton href="#life-at-axivon" variant="secondary" ariaLabel="See life at Axivon Technologies">
-              <PlayCircle className="h-4 w-4 text-[#00D4FF]" aria-hidden />
+              <PlayCircle className="h-4 w-4 text-[#d4915c]" aria-hidden />
               Life At Axivon
             </MagneticButton>
           </motion.div>

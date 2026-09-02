@@ -2,11 +2,9 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { Compass, Rocket, Globe, type LucideIcon } from "lucide-react";
-const EASE_MISSION = [0.22, 1, 0.36, 1] as const;
+import { Badge } from "@/components/ui";
 
-/* -------------------------------------------------------------------------- */
-/*  Types                                                                      */
-/* -------------------------------------------------------------------------- */
+const EASE_MISSION = [0.22, 1, 0.36, 1] as const;
 
 interface MissionVisionCardData {
   id: string;
@@ -18,18 +16,6 @@ interface MissionVisionCardData {
   to: string;
 }
 
-interface Particle {
-  top: string;
-  left: string;
-  size: number;
-  duration: number;
-  delay: number;
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Static content                                                            */
-/* -------------------------------------------------------------------------- */
-
 const CARDS: MissionVisionCardData[] = [
   {
     id: "mission",
@@ -37,9 +23,9 @@ const CARDS: MissionVisionCardData[] = [
     title: "Our Mission",
     description:
       "To empower businesses with innovative, scalable, and future-ready technology solutions that drive growth, efficiency, and long-term success.",
-    from: "#2563EB",
-    via: "#7C3AED",
-    to: "#00D4FF",
+    from: "#c47a3a",
+    via: "#e8a064",
+    to: "#f0b07a",
   },
   {
     id: "vision",
@@ -47,29 +33,11 @@ const CARDS: MissionVisionCardData[] = [
     title: "Our Vision",
     description:
       "To become a globally trusted technology partner delivering cutting-edge digital experiences, intelligent solutions, and transformative innovations.",
-    from: "#7C3AED",
-    via: "#00D4FF",
-    to: "#2563EB",
+    from: "#f0b07a",
+    via: "#e8a064",
+    to: "#c47a3a",
   },
 ];
-
-const PARTICLES: Particle[] = [
-  { top: "14%", left: "12%", size: 3, duration: 7.5, delay: 0 },
-  { top: "24%", left: "78%", size: 2, duration: 9, delay: 1 },
-  { top: "44%", left: "22%", size: 2.5, duration: 8.2, delay: 0.5 },
-  { top: "58%", left: "86%", size: 3, duration: 10.5, delay: 1.8 },
-  { top: "70%", left: "34%", size: 2, duration: 7, delay: 2.2 },
-  { top: "82%", left: "64%", size: 2.5, duration: 9.5, delay: 0.8 },
-  { top: "10%", left: "50%", size: 2, duration: 6.5, delay: 1.4 },
-  { top: "92%", left: "16%", size: 3, duration: 8.8, delay: 0.2 },
-];
-
-const GLASS =
-  "rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl";
-
-/* -------------------------------------------------------------------------- */
-/*  Animation variants                                                        */
-/* -------------------------------------------------------------------------- */
 
 const containerStagger = {
   hidden: {},
@@ -95,38 +63,6 @@ const cardVariants = {
   },
 };
 
-/* -------------------------------------------------------------------------- */
-/*  Animated gradient text                                                    */
-/* -------------------------------------------------------------------------- */
-
-function GradientText({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  const shouldReduceMotion = useReducedMotion();
-
-  return (
-    <motion.span
-      className={`inline-block bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-[length:200%_auto] bg-clip-text text-transparent ${className}`}
-      animate={
-        shouldReduceMotion
-          ? undefined
-          : { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }
-      }
-      transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-    >
-      {children}
-    </motion.span>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Background: grid, aurora streaks, orbs, particles                         */
-/* -------------------------------------------------------------------------- */
-
 function AuroraBackground() {
   const shouldReduceMotion = useReducedMotion();
 
@@ -135,11 +71,11 @@ function AuroraBackground() {
       className="pointer-events-none absolute inset-0 overflow-hidden"
       aria-hidden={true}
     >
-      <div className="absolute inset-0 bg-[#050816]" />
+      <div className="absolute inset-0 bg-[#0f0f0f]" />
 
       {/* animated grid pattern */}
       <div
-        className="absolute inset-0 opacity-[0.06]"
+        className="absolute inset-0 opacity-[0.025]"
         style={{
           backgroundImage:
             "linear-gradient(to right, rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.7) 1px, transparent 1px)",
@@ -151,65 +87,35 @@ function AuroraBackground() {
         }}
       />
 
-      {/* aurora streaks */}
+      {/* aurora streaks using warm amber colors */}
       <motion.div
-        className="absolute left-1/2 top-[-10%] h-[34rem] w-[150%] -translate-x-1/2 rotate-[-6deg] opacity-25 mix-blend-screen blur-[110px]"
+        className="absolute left-1/2 top-[-10%] h-[34rem] w-[150%] -translate-x-1/2 rotate-[-6deg] opacity-[0.12] mix-blend-screen blur-[110px]"
         style={{
           background:
-            "linear-gradient(90deg, transparent, #2563EB, #7C3AED, #00D4FF, transparent)",
+            "linear-gradient(90deg, transparent, #c47a3a, #e8a064, #f0b07a, transparent)",
         }}
         animate={shouldReduceMotion ? undefined : { x: ["-4%", "4%", "-4%"] }}
         transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div
-        className="absolute left-1/2 top-[8%] h-[24rem] w-[140%] -translate-x-1/2 rotate-[5deg] opacity-15 mix-blend-screen blur-[100px]"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, #00D4FF, #2563EB, transparent)",
-        }}
-        animate={shouldReduceMotion ? undefined : { x: ["3%", "-3%", "3%"] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-      />
 
       {/* floating gradient orbs */}
       <motion.div
-        className="absolute -left-24 top-10 h-[24rem] w-[24rem] rounded-full bg-[#2563EB]/25 blur-[120px]"
+        className="absolute -left-24 top-10 h-[24rem] w-[24rem] rounded-full bg-[#e8a064]/5 blur-[120px]"
         animate={shouldReduceMotion ? undefined : { x: [0, 25, 0], y: [0, 15, 0] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute -right-20 bottom-0 h-[26rem] w-[26rem] rounded-full bg-[#7C3AED]/25 blur-[130px]"
+        className="absolute -right-20 bottom-0 h-[26rem] w-[26rem] rounded-full bg-[#c47a3a]/4 blur-[130px]"
         animate={shouldReduceMotion ? undefined : { x: [0, -20, 0], y: [0, -20, 0] }}
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
 
-      {/* floating particles */}
-      {!shouldReduceMotion &&
-        PARTICLES.map((p, i) => (
-          <motion.span
-            key={i}
-            className="absolute rounded-full bg-white/40"
-            style={{ top: p.top, left: p.left, width: p.size, height: p.size }}
-            animate={{ opacity: [0, 1, 0], y: [0, -24, 0] }}
-            transition={{
-              duration: p.duration,
-              delay: p.delay,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-
       {/* fade into surrounding sections */}
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#050816] to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#050816] to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0f0f0f] to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0f0f0f] to-transparent" />
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*  Icon badge with pulse ring                                                */
-/* -------------------------------------------------------------------------- */
 
 function CardIcon({
   Icon,
@@ -239,15 +145,11 @@ function CardIcon({
         className="relative flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg shadow-black/30"
         style={{ background: gradient }}
       >
-        <Icon className="h-6 w-6 text-white" aria-hidden={true} />
+        <Icon className="h-6 w-6 text-[#0f0f0f]" aria-hidden={true} />
       </motion.div>
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*  Mission / Vision card                                                     */
-/* -------------------------------------------------------------------------- */
 
 function MissionVisionCard({ card }: { card: MissionVisionCardData }) {
   const Icon = card.icon;
@@ -259,7 +161,7 @@ function MissionVisionCard({ card }: { card: MissionVisionCardData }) {
     <motion.div variants={cardVariants} className="group relative h-full">
       {/* ambient glow, intensifies on hover */}
       <div
-        className="absolute -inset-4 rounded-[2rem] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-50"
+        className="absolute -inset-4 rounded-[2rem] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-40"
         style={{ background: glowGradient }}
         aria-hidden={true}
       />
@@ -281,10 +183,10 @@ function MissionVisionCard({ card }: { card: MissionVisionCardData }) {
         </div>
 
         {/* glass surface */}
-        <div className="relative z-10 flex h-full flex-col overflow-hidden rounded-[1.45rem] bg-[#0a0f23]/90 p-8 backdrop-blur-2xl sm:p-10">
+        <div className="relative z-10 flex h-full flex-col overflow-hidden rounded-[1.45rem] bg-[#141414]/95 p-8 backdrop-blur-2xl sm:p-10 border border-[#262626]">
           {/* subtle moving inner glow */}
           <motion.div
-            className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-20 blur-3xl"
+            className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-10 blur-3xl"
             style={{ background: card.via }}
             animate={
               shouldReduceMotion ? undefined : { x: [0, 14, 0], y: [0, 10, 0] }
@@ -295,10 +197,10 @@ function MissionVisionCard({ card }: { card: MissionVisionCardData }) {
           <div className="relative">
             <CardIcon Icon={Icon} from={card.from} to={card.to} />
 
-            <h3 className="mt-6 text-2xl font-bold text-white sm:text-3xl">
+            <h3 className="mt-6 text-2xl font-bold text-[#f4f4f5] sm:text-3xl">
               {card.title}
             </h3>
-            <p className="mt-4 text-base leading-relaxed text-white/65 sm:text-lg">
+            <p className="mt-4 text-base leading-relaxed text-[#a1a1aa] sm:text-lg">
               {card.description}
             </p>
           </div>
@@ -308,16 +210,12 @@ function MissionVisionCard({ card }: { card: MissionVisionCardData }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Main export                                                               */
-/* -------------------------------------------------------------------------- */
-
 export default function MissionVision() {
   return (
     <section
       id="mission-vision"
       aria-labelledby="mission-vision-heading"
-      className="relative isolate overflow-hidden bg-[#050816] px-6 py-24 sm:px-8 md:py-32 lg:px-12"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] px-6 py-24 sm:px-8 md:py-32 lg:px-12"
     >
       <AuroraBackground />
 
@@ -330,32 +228,29 @@ export default function MissionVision() {
           viewport={{ once: true, margin: "-100px" }}
           className="mx-auto max-w-3xl text-center"
         >
-          <motion.div
-            variants={fadeUp}
-            className={`inline-flex items-center gap-2 ${GLASS} px-4 py-1.5`}
-          >
-            <Compass className="h-3.5 w-3.5 text-[#00D4FF]" aria-hidden={true} />
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
-              Our Purpose
-            </span>
+          <motion.div variants={fadeUp} className="mb-6 flex justify-center">
+            <Badge>
+              <Compass className="h-3.5 w-3.5 text-[#e8a064]" aria-hidden={true} />
+              <span className="ml-1.5">Our Purpose</span>
+            </Badge>
           </motion.div>
 
           <motion.h2
             id="mission-vision-heading"
             variants={fadeUp}
-            className="mt-6 text-4xl font-bold leading-[1.15] tracking-tight text-white sm:text-5xl lg:text-6xl"
+            className="mt-6 text-4xl font-bold leading-[1.15] tracking-tight text-[#f4f4f5] sm:text-5xl lg:text-6xl"
           >
             <span className="block">
-              Driven By <GradientText>Mission.</GradientText>
+              Driven By <span className="text-gradient-amber">Mission.</span>
             </span>
             <span className="block">
-              Focused On <GradientText>Vision.</GradientText>
+              Focused On <span className="text-gradient-amber">Vision.</span>
             </span>
           </motion.h2>
 
           <motion.p
             variants={fadeUp}
-            className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/65 sm:text-lg"
+            className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-[#a1a1aa] sm:text-lg"
           >
             At Axivon Technologies, our mission and vision guide every
             solution we create. We help businesses embrace innovation,

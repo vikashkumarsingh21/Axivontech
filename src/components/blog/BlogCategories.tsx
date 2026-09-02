@@ -206,7 +206,7 @@ function CategoryCard({ category }: { category: BlogCategory }) {
         tabIndex={0}
         role="group"
         aria-label={`${category.name} — category coming soon`}
-        className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-[0_10px_40px_-22px_rgba(0,0,0,0.7)] backdrop-blur-xl outline-none transition-all duration-300 hover:border-white/20 hover:shadow-[0_24px_60px_-20px_rgba(0,0,0,0.75),0_0_0_1px_rgba(0,212,255,0.07),0_0_36px_-14px_rgba(124,58,237,0.12)] focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] sm:p-7"
+        className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#141414]/[0.04] p-6 shadow-[0_10px_40px_-22px_rgba(0,0,0,0.7)] backdrop-blur-xl outline-none transition-all duration-300 hover:border-white/20 hover:shadow-[0_24px_60px_-20px_rgba(0,0,0,0.75),0_0_0_1px_rgba(212,145,92,0.07),0_0_36px_-14px_rgba(201,146,42,0.12)] focus-visible:ring-2 focus-visible:ring-[#d4915c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] sm:p-7"
       >
         {/* rotating gradient border beam, revealed on hover/focus */}
         <span className="card-beam" aria-hidden={true} />
@@ -217,16 +217,16 @@ function CategoryCard({ category }: { category: BlogCategory }) {
           aria-hidden={true}
           style={{
             background:
-              "radial-gradient(150px circle at var(--mx, 50%) var(--my, 50%), rgba(0,212,255,0.09), transparent 72%)",
+              "radial-gradient(150px circle at var(--mx, 50%) var(--my, 50%), rgba(212,145,92,0.09), transparent 72%)",
           }}
         />
 
         <div className="relative z-10 flex h-full flex-col" style={{ transform: "translateZ(28px)" }}>
           <div className="mb-5 flex items-start justify-between gap-3">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-[#2563EB]/20 via-[#7C3AED]/20 to-[#00D4FF]/20 transition-transform duration-300 group-hover:scale-110">
-              <Icon className="h-6 w-6 text-[#00D4FF]" strokeWidth={1.75} aria-hidden={true} />
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-[#e8a064]/20 via-[#c9922a]/20 to-[#d4915c]/20 transition-transform duration-300 group-hover:scale-110">
+              <Icon className="h-6 w-6 text-[#d4915c]" strokeWidth={1.75} aria-hidden={true} />
             </span>
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-white/55">
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/10 bg-[#141414]/5 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-white/55">
               <Clock className="h-3 w-3" aria-hidden={true} />
               Coming Soon
             </span>
@@ -245,7 +245,7 @@ function CategoryCard({ category }: { category: BlogCategory }) {
               Future Articles
             </span>
             <ArrowUpRight
-              className="h-4 w-4 text-white/30 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#00D4FF]"
+              className="h-4 w-4 text-white/30 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#d4915c]"
               aria-hidden={true}
             />
           </div>
@@ -274,10 +274,10 @@ function BackgroundAtmosphere() {
   );
 
   const orbs = [
-    { top: "14%", left: "9%", size: 4, color: "#00D4FF", duration: 13, delay: 0 },
-    { top: "26%", left: "91%", size: 5, color: "#7C3AED", duration: 15, delay: 1.6 },
-    { top: "72%", left: "6%", size: 4, color: "#2563EB", duration: 12, delay: 2.8 },
-    { top: "82%", left: "93%", size: 4, color: "#00D4FF", duration: 16, delay: 0.9 },
+    { top: "14%", left: "9%", size: 4, color: "#d4915c", duration: 13, delay: 0 },
+    { top: "26%", left: "91%", size: 5, color: "#c9922a", duration: 15, delay: 1.6 },
+    { top: "72%", left: "6%", size: 4, color: "#e8a064", duration: 12, delay: 2.8 },
+    { top: "82%", left: "93%", size: 4, color: "#d4915c", duration: 16, delay: 0.9 },
   ];
 
   return (
@@ -293,7 +293,7 @@ function BackgroundAtmosphere() {
           left: "-20%",
           width: 560,
           height: 560,
-          background: "radial-gradient(circle, #2563EB, transparent 70%)",
+          background: "radial-gradient(circle, #e8a064, transparent 70%)",
           animationDuration: "30s",
         }}
       />
@@ -304,7 +304,7 @@ function BackgroundAtmosphere() {
           right: "-20%",
           width: 600,
           height: 600,
-          background: "radial-gradient(circle, #7C3AED, transparent 70%)",
+          background: "radial-gradient(circle, #c9922a, transparent 70%)",
           animationDuration: "34s",
           animationDelay: "-12s",
         }}
@@ -392,7 +392,7 @@ export default function BlogCategories() {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       aria-labelledby="blog-categories-heading"
-      className="relative isolate overflow-hidden bg-[#050816] py-24 sm:py-28 lg:py-32"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] py-24 sm:py-28 lg:py-32"
     >
       <BackgroundAtmosphere />
 
@@ -402,7 +402,7 @@ export default function BlogCategories() {
         style={{
           opacity: isHovering ? 1 : 0,
           background:
-            "radial-gradient(600px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%), rgba(0,212,255,0.05), transparent 45%)",
+            "radial-gradient(600px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%), rgba(212,145,92,0.05), transparent 45%)",
         }}
         aria-hidden={true}
       />
@@ -416,7 +416,7 @@ export default function BlogCategories() {
           variants={fadeUp}
           className="mx-auto max-w-3xl text-center"
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#00D4FF] backdrop-blur-md">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#141414]/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#d4915c] backdrop-blur-md">
             <Sparkles className="h-3.5 w-3.5" aria-hidden={true} />
             Blog Categories
           </span>
@@ -461,8 +461,8 @@ export default function BlogCategories() {
           variants={fadeUp}
           className="mt-16 flex justify-center"
         >
-          <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-5 py-2.5 backdrop-blur-md">
-            <Database className="h-4 w-4 text-[#7C3AED]" aria-hidden={true} />
+          <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-[#141414]/[0.03] px-5 py-2.5 backdrop-blur-md">
+            <Database className="h-4 w-4 text-[#c9922a]" aria-hidden={true} />
             <p className="text-xs text-white/50 sm:text-sm">
               Categories will be managed dynamically through the{" "}
               <span className="font-medium text-white/75">Axivon CMS</span>.
@@ -489,7 +489,7 @@ export default function BlogCategories() {
         }
 
         .depth-gradient {
-          background: linear-gradient(180deg, #070b1d 0%, #050816 45%, #04060f 100%);
+          background: linear-gradient(180deg, #070b1d 0%, #0f0f0f 45%, #04060f 100%);
         }
 
         .aurora-blob {

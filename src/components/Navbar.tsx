@@ -8,7 +8,9 @@ import {
   motion,
   useReducedMotion,
   type Variants,
-} from "framer-motion"; const EASE_NAV = [0.22, 1, 0.36, 1] as const;
+} from "framer-motion";
+
+const EASE_NAV = [0.22, 1, 0.36, 1] as const;
 
 interface NavLink {
   label: string;
@@ -62,25 +64,18 @@ export default function Navbar() {
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    setIsOpen(false);
-  }, []);
-
   return (
     <header
-      className={`sticky top-0 z-50 w-full backdrop-blur-xl backdrop-saturate-150 transition-all duration-500 ${scrolled
-        ? "border-b border-white/10 bg-[#07070b]/80 shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
-        : "border-b border-white/5 bg-[#07070b]/40"
-        }`}
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        scrolled
+          ? "border-b border-[#262626] bg-[#0f0f0f]/95 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+          : "border-b border-transparent bg-[#0f0f0f]/90 backdrop-blur-xl"
+      }`}
     >
-      {/* signature hairline glow */}
-      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
-
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
-        {/* Company Logo */}
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-10">
         <Link
           href="/"
-          className="group flex items-center rounded-md transition-transform duration-300 hover:scale-[1.02]"
+          className="group flex items-center rounded-md transition-opacity hover:opacity-90"
           aria-label="Axivon Technologies Home"
         >
           <Image
@@ -89,10 +84,10 @@ export default function Navbar() {
             width={220}
             height={60}
             priority
-            className="h-14 w-auto"
+            className="h-12 w-auto sm:h-14 brightness-0 invert"
           />
         </Link>
-        {/* Desktop links */}
+
         <ul
           className="hidden items-center gap-1 lg:flex"
           onMouseLeave={() => setHovered(null)}
@@ -102,14 +97,14 @@ export default function Navbar() {
               <a
                 href={link.href}
                 onMouseEnter={() => setHovered(link.href)}
-                className="relative z-10 block rounded-full px-4 py-2 text-[0.875rem] font-medium text-slate-300 transition-colors duration-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60"
+                className="relative z-10 block rounded-full px-4 py-2 text-sm font-medium text-[#a1a1aa] transition-colors duration-200 hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
               >
                 {link.label}
               </a>
               {hovered === link.href && (
                 <motion.span
                   layoutId="nav-hover-pill"
-                  className="absolute inset-0 rounded-full bg-white/[0.06] ring-1 ring-white/10"
+                  className="absolute inset-0 rounded-full bg-[#1c1c1e]"
                   transition={
                     shouldReduceMotion
                       ? { duration: 0 }
@@ -121,13 +116,12 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* CTA + Hamburger */}
         <div className="flex items-center gap-3">
           <motion.a
             href="/contact#contact-form"
-            whileHover={shouldReduceMotion ? undefined : { scale: 1.035 }}
-            whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-            className="relative hidden overflow-hidden rounded-full bg-gradient-to-r from-blue-500 to-violet-600 px-5 py-2.5 text-[0.85rem] font-semibold text-white lg:inline-flex"
+            whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+            whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+            className="hidden rounded-full bg-[#e8a064] px-5 py-2.5 text-sm font-semibold text-[#0f0f0f] shadow-[0_4px_16px_rgba(232,160,100,0.25)] transition-colors hover:bg-[#f0b07a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 lg:inline-flex"
           >
             Book Consultation
           </motion.a>
@@ -138,21 +132,21 @@ export default function Navbar() {
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
             onClick={() => setIsOpen((v) => !v)}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60 lg:hidden"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[#262626] bg-[#141414] text-[#a1a1aa] shadow-sm hover:bg-[#1c1c1e] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 lg:hidden"
           >
             <span className="relative flex h-3.5 w-4 flex-col justify-between">
               <motion.span
-                className="h-[1.5px] w-full bg-white"
+                className="h-[2px] w-full bg-current"
                 animate={isOpen ? { rotate: 45, y: 5.5 } : { rotate: 0, y: 0 }}
                 transition={{ duration: shouldReduceMotion ? 0 : 0.25 }}
               />
               <motion.span
-                className="h-[1.5px] w-full bg-white"
+                className="h-[2px] w-full bg-current"
                 animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
                 transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
               />
               <motion.span
-                className="h-[1.5px] w-full bg-white"
+                className="h-[2px] w-full bg-current"
                 animate={isOpen ? { rotate: -45, y: -5.5 } : { rotate: 0, y: 0 }}
                 transition={{ duration: shouldReduceMotion ? 0 : 0.25 }}
               />
@@ -161,7 +155,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -173,21 +166,21 @@ export default function Navbar() {
             animate="open"
             exit="closed"
             variants={menuVariants}
-            className="overflow-hidden border-t border-white/10 bg-[#07070b]/95 backdrop-blur-xl lg:hidden"
+            className="overflow-hidden border-t border-[#262626] bg-[#141414] shadow-[0_16px_40px_rgba(0,0,0,0.5)] lg:hidden"
           >
             <motion.ul
               variants={linkListVariants}
               initial="closed"
               animate="open"
               exit="closed"
-              className="flex flex-col gap-1 px-6 py-6"
+              className="flex flex-col gap-1 px-5 py-5"
             >
               {NAV_LINKS.map((link) => (
                 <motion.li key={link.href} variants={linkItemVariants}>
                   <a
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className="block rounded-lg px-3 py-3 text-[0.95rem] font-medium text-slate-200 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60"
+                    className="block rounded-2xl px-3 py-3 text-sm font-medium text-[#a1a1aa] transition-colors hover:bg-[#1c1c1e] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
                   >
                     {link.label}
                   </a>
@@ -195,9 +188,9 @@ export default function Navbar() {
               ))}
               <motion.li variants={linkItemVariants} className="mt-2">
                 <a
-                  href="/contact"
+                  href="/contact#contact-form"
                   onClick={() => setIsOpen(false)}
-                  className="block rounded-full bg-gradient-to-r from-blue-500 to-violet-600 px-5 py-3 text-center text-[0.9rem] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(99,102,241,0.65)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+                  className="block rounded-full bg-[#e8a064] px-5 py-3 text-center text-sm font-semibold text-[#0f0f0f] transition-colors hover:bg-[#f0b07a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
                 >
                   Book Consultation
                 </a>

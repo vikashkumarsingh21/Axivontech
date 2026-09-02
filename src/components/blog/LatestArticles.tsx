@@ -153,7 +153,7 @@ function ArticleCard({ article, index }: { article: ArticleSlot; index: number }
           transformStyle: "preserve-3d",
         }}
         aria-label={`Article slot ${article.slot}`}
-        className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[0_10px_40px_-22px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-all duration-300 hover:border-white/15 hover:shadow-[0_24px_55px_-18px_rgba(0,0,0,0.75),0_0_0_1px_rgba(37,99,235,0.12)] focus-within:border-white/15"
+        className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#141414]/[0.03] shadow-[0_10px_40px_-22px_rgba(0,0,0,0.7)] backdrop-blur-xl transition-all duration-300 hover:border-white/15 hover:shadow-[0_24px_55px_-18px_rgba(0,0,0,0.75),0_0_0_1px_rgba(232,160,100,0.12)] focus-within:border-white/15"
       >
         {/* top edge highlight — light "catching" the card, no spin, no glow ring */}
         <span className="card-edge-highlight" aria-hidden={true} />
@@ -179,8 +179,8 @@ function ArticleCard({ article, index }: { article: ArticleSlot; index: number }
             strokeWidth={1.5}
             aria-hidden={true}
           />
-          <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-[#050816]/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-white/60 backdrop-blur-md">
-            <span className="status-dot h-1.5 w-1.5 rounded-full bg-[#00D4FF]" aria-hidden={true} />
+          <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-[#0f0f0f]/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-white/60 backdrop-blur-md">
+            <span className="status-dot h-1.5 w-1.5 rounded-full bg-[#d4915c]" aria-hidden={true} />
             Coming Soon
           </span>
         </div>
@@ -206,7 +206,7 @@ function ArticleCard({ article, index }: { article: ArticleSlot; index: number }
             aria-disabled="true"
             aria-label={`Article slot ${article.slot} — available soon`}
             onClick={(event) => event.preventDefault()}
-            className="inline-flex w-fit cursor-not-allowed items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-medium text-white/60 outline-none transition-colors duration-300 hover:border-white/20 hover:text-white/80 focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+            className="inline-flex w-fit cursor-not-allowed items-center gap-1.5 rounded-full border border-white/10 bg-[#141414]/[0.04] px-4 py-2 text-xs font-medium text-white/60 outline-none transition-colors duration-300 hover:border-white/20 hover:text-white/80 focus-visible:ring-2 focus-visible:ring-[#d4915c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]"
           >
             Available Soon
             <ArrowUpRight className="h-3.5 w-3.5" aria-hidden={true} />
@@ -248,7 +248,7 @@ function BackgroundAtmosphere() {
           left: "-18%",
           width: 520,
           height: 520,
-          background: "radial-gradient(circle, #2563EB, transparent 70%)",
+          background: "radial-gradient(circle, #e8a064, transparent 70%)",
           animationDuration: "32s",
         }}
       />
@@ -259,7 +259,7 @@ function BackgroundAtmosphere() {
           right: "-18%",
           width: 560,
           height: 560,
-          background: "radial-gradient(circle, #7C3AED, transparent 70%)",
+          background: "radial-gradient(circle, #c9922a, transparent 70%)",
           animationDuration: "36s",
           animationDelay: "-14s",
         }}
@@ -320,7 +320,7 @@ export default function LatestArticles() {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       aria-labelledby="latest-articles-heading"
-      className="relative isolate overflow-hidden bg-[#050816] py-24 sm:py-28 lg:py-32"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] py-24 sm:py-28 lg:py-32"
     >
       <BackgroundAtmosphere />
 
@@ -330,7 +330,7 @@ export default function LatestArticles() {
         style={{
           opacity: isHovering ? 1 : 0,
           background:
-            "radial-gradient(560px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%), rgba(37,99,235,0.045), transparent 45%)",
+            "radial-gradient(560px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%), rgba(232,160,100,0.045), transparent 45%)",
         }}
         aria-hidden={true}
       />
@@ -344,7 +344,7 @@ export default function LatestArticles() {
           variants={fadeUp}
           className="mx-auto max-w-3xl text-center"
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#00D4FF] backdrop-blur-md">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#141414]/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#d4915c] backdrop-blur-md">
             <Sparkles className="h-3.5 w-3.5" aria-hidden={true} />
             Latest Articles
           </span>
@@ -387,8 +387,8 @@ export default function LatestArticles() {
           variants={fadeUp}
           className="mt-16 flex justify-center"
         >
-          <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-5 py-2.5 backdrop-blur-md">
-            <Database className="h-4 w-4 text-[#7C3AED]" aria-hidden={true} />
+          <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-[#141414]/[0.03] px-5 py-2.5 backdrop-blur-md">
+            <Database className="h-4 w-4 text-[#c9922a]" aria-hidden={true} />
             <p className="text-xs text-white/50 sm:text-sm">
               Latest articles will be managed dynamically through the{" "}
               <span className="font-medium text-white/75">Axivon CMS</span>.
@@ -416,7 +416,7 @@ export default function LatestArticles() {
         }
 
         .depth-gradient {
-          background: linear-gradient(180deg, #070b1d 0%, #050816 45%, #04060f 100%);
+          background: linear-gradient(180deg, #070b1d 0%, #0f0f0f 45%, #04060f 100%);
         }
 
         .aurora-blob {

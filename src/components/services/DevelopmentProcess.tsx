@@ -14,8 +14,6 @@ import {
   useReducedMotion,
   useMotionValue,
   useSpring,
-  useScroll,
-  useTransform,
   AnimatePresence,
 } from "framer-motion";
 import {
@@ -27,9 +25,9 @@ import {
   Rocket,
   TrendingUp,
 } from "lucide-react";
-const EASE_PROCESS = [0.22, 1, 0.36, 1] as const;
+import { Badge } from "@/components/ui";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+const EASE_PROCESS = [0.22, 1, 0.36, 1] as const;
 
 interface Step {
   id: number;
@@ -55,8 +53,6 @@ interface Particle {
   opacity: number;
 }
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
 const STEPS: Step[] = [
   {
     id: 1,
@@ -64,10 +60,10 @@ const STEPS: Step[] = [
     title: "Discovery",
     description: "Deep-dive into your vision, goals, and market landscape.",
     Icon: Compass,
-    color: "#2563EB",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.45)",
-    gradient: "from-[#2563EB] to-[#00D4FF]",
+    color: "#c47a3a",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
+    gradient: "from-[#c47a3a] to-[#e8a064]",
     detail: ["Stakeholder interviews", "Market analysis", "Goal alignment"],
   },
   {
@@ -76,10 +72,10 @@ const STEPS: Step[] = [
     title: "Strategy",
     description: "Craft a clear roadmap with milestones, tech stack, and priorities.",
     Icon: Map,
-    color: "#3B5BDB",
-    glow: "#3B5BDB",
-    glowRgba: "rgba(59,91,219,0.45)",
-    gradient: "from-[#3B5BDB] to-[#7C3AED]",
+    color: "#e8a064",
+    glow: "#e8a064",
+    glowRgba: "rgba(232,160,100,0.3)",
+    gradient: "from-[#e8a064] to-[#f0b07a]",
     detail: ["Tech architecture", "Sprint planning", "Risk mapping"],
   },
   {
@@ -88,10 +84,10 @@ const STEPS: Step[] = [
     title: "Design",
     description: "Pixel-perfect UI/UX that balances beauty with conversion.",
     Icon: PenTool,
-    color: "#7C3AED",
-    glow: "#7C3AED",
-    glowRgba: "rgba(124,58,237,0.45)",
-    gradient: "from-[#7C3AED] to-[#9333EA]",
+    color: "#f0b07a",
+    glow: "#f0b07a",
+    glowRgba: "rgba(240,176,122,0.3)",
+    gradient: "from-[#f0b07a] to-[#c47a3a]",
     detail: ["Wireframes & prototypes", "Design systems", "User testing"],
   },
   {
@@ -100,10 +96,10 @@ const STEPS: Step[] = [
     title: "Development",
     description: "Scalable, clean code built with the right technologies.",
     Icon: Code2,
-    color: "#9333EA",
-    glow: "#9333EA",
-    glowRgba: "rgba(147,51,234,0.45)",
-    gradient: "from-[#9333EA] to-[#00D4FF]",
+    color: "#c47a3a",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
+    gradient: "from-[#c47a3a] to-[#e8a064]",
     detail: ["Agile sprints", "Code reviews", "CI/CD pipelines"],
   },
   {
@@ -112,10 +108,10 @@ const STEPS: Step[] = [
     title: "Testing",
     description: "Rigorous QA across devices, browsers, and edge cases.",
     Icon: ShieldCheck,
-    color: "#06B6D4",
-    glow: "#06B6D4",
-    glowRgba: "rgba(6,182,212,0.45)",
-    gradient: "from-[#06B6D4] to-[#00D4FF]",
+    color: "#e8a064",
+    glow: "#e8a064",
+    glowRgba: "rgba(232,160,100,0.3)",
+    gradient: "from-[#e8a064] to-[#f0b07a]",
     detail: ["Automated testing", "Performance audits", "Security checks"],
   },
   {
@@ -124,10 +120,10 @@ const STEPS: Step[] = [
     title: "Launch",
     description: "Smooth deployment with zero downtime and full monitoring.",
     Icon: Rocket,
-    color: "#00D4FF",
-    glow: "#00D4FF",
-    glowRgba: "rgba(0,212,255,0.45)",
-    gradient: "from-[#00D4FF] to-[#2563EB]",
+    color: "#f0b07a",
+    glow: "#f0b07a",
+    glowRgba: "rgba(240,176,122,0.3)",
+    gradient: "from-[#f0b07a] to-[#c47a3a]",
     detail: ["Cloud deployment", "DNS & CDN setup", "Launch checklist"],
   },
   {
@@ -136,28 +132,26 @@ const STEPS: Step[] = [
     title: "Growth Support",
     description: "Ongoing optimization, analytics, and feature iteration.",
     Icon: TrendingUp,
-    color: "#2563EB",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.45)",
-    gradient: "from-[#2563EB] to-[#7C3AED]",
+    color: "#c47a3a",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
+    gradient: "from-[#c47a3a] to-[#e8a064]",
     detail: ["Analytics & insights", "Feature roadmap", "24/7 support"],
   },
 ];
 
-// ─── Particles ────────────────────────────────────────────────────────────────
-
 const BackgroundParticles = memo(function BackgroundParticles() {
   const particles = useMemo<Particle[]>(
     () =>
-      Array.from({ length: 30 }, (_, i) => ({
+      Array.from({ length: 24 }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
         size: Math.random() * 1.8 + 0.6,
         dur: Math.random() * 14 + 9,
         delay: Math.random() * 9,
-        color: ["#2563EB", "#7C3AED", "#00D4FF"][i % 3],
-        opacity: Math.random() * 0.18 + 0.07,
+        color: ["#c47a3a", "#e8a064", "#f0b07a"][i % 3],
+        opacity: Math.random() * 0.12 + 0.05,
       })),
     []
   );
@@ -189,14 +183,11 @@ const BackgroundParticles = memo(function BackgroundParticles() {
   );
 });
 
-// ─── Aurora Background ────────────────────────────────────────────────────────
-
 const AuroraBackground = memo(function AuroraBackground() {
   return (
     <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* Grid */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.02]"
         style={{
           backgroundImage: `
             linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
@@ -209,7 +200,7 @@ const AuroraBackground = memo(function AuroraBackground() {
         className="absolute rounded-full blur-[170px]"
         style={{
           width: 750, height: 420,
-          background: "radial-gradient(ellipse, rgba(37,99,235,0.13), transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(232,160,100,0.05), transparent 70%)",
           top: "-5%", left: "-8%",
         }}
         animate={{ x: [0, 80, 0], y: [0, 50, 0] }}
@@ -219,28 +210,15 @@ const AuroraBackground = memo(function AuroraBackground() {
         className="absolute rounded-full blur-[180px]"
         style={{
           width: 600, height: 500,
-          background: "radial-gradient(ellipse, rgba(124,58,237,0.11), transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(196,122,58,0.04), transparent 70%)",
           bottom: "-5%", right: "-5%",
         }}
         animate={{ x: [0, -55, 0], y: [0, -35, 0] }}
         transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 5 }}
       />
-      <motion.div
-        className="absolute rounded-full blur-[130px]"
-        style={{
-          width: 500, height: 500,
-          background: "radial-gradient(circle, rgba(0,212,255,0.07), transparent 70%)",
-          top: "40%", left: "45%",
-          translateX: "-50%",
-        }}
-        animate={{ x: [0, 40, -30, 0], y: [0, -28, 28, 0] }}
-        transition={{ duration: 34, repeat: Infinity, ease: "easeInOut", delay: 10 }}
-      />
     </div>
   );
 });
-
-// ─── Mouse Spotlight ──────────────────────────────────────────────────────────
 
 function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElement | null> }) {
   const mx = useMotionValue(-1000);
@@ -249,14 +227,22 @@ function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElemen
   const sy = useSpring(my, { stiffness: 55, damping: 20 });
 
   useEffect(() => {
+    let frameId: number | null = null;
     const move = (e: MouseEvent) => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      mx.set(e.clientX - rect.left);
-      my.set(e.clientY - rect.top);
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = null;
+        if (!sectionRef.current) return;
+        const rect = sectionRef.current.getBoundingClientRect();
+        mx.set(e.clientX - rect.left);
+        my.set(e.clientY - rect.top);
+      });
     };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
+    window.addEventListener("mousemove", move, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", move);
+      if (frameId) cancelAnimationFrame(frameId);
+    };
   }, [mx, my, sectionRef]);
 
   return (
@@ -264,13 +250,11 @@ function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElemen
       aria-hidden={true}
       className="pointer-events-none absolute inset-0 z-0"
       style={{
-        background: `radial-gradient(400px circle at ${sx}px ${sy}px, rgba(37,99,235,0.06), transparent 55%)`,
+        background: `radial-gradient(400px circle at ${sx}px ${sy}px, rgba(232,160,100,0.04), transparent 55%)`,
       }}
     />
   );
 }
-
-// ─── Border Beam ──────────────────────────────────────────────────────────────
 
 const BorderBeam = memo(function BorderBeam({
   gradient,
@@ -296,8 +280,6 @@ const BorderBeam = memo(function BorderBeam({
   );
 });
 
-// ─── Desktop Timeline Path ─────────────────────────────────────────────────────
-
 function TimelinePath({
   visible,
   reduced,
@@ -305,7 +287,6 @@ function TimelinePath({
   visible: boolean;
   reduced: boolean;
 }) {
-  // A smooth horizontal SVG path with gentle vertical wave
   const pathD =
     "M 0 40 C 80 40, 100 20, 180 40 C 260 60, 280 20, 360 40 C 440 60, 460 20, 540 40 C 620 60, 640 20, 720 40 C 800 60, 820 20, 900 40 C 980 60, 1000 20, 1080 40 C 1160 60, 1180 20, 1260 40";
 
@@ -319,15 +300,15 @@ function TimelinePath({
       >
         <defs>
           <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#2563EB" stopOpacity="0.3" />
-            <stop offset="35%" stopColor="#7C3AED" stopOpacity="0.4" />
-            <stop offset="70%" stopColor="#00D4FF" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#2563EB" stopOpacity="0.3" />
+            <stop offset="0%" stopColor="#c47a3a" stopOpacity="0.3" />
+            <stop offset="35%" stopColor="#e8a064" stopOpacity="0.4" />
+            <stop offset="70%" stopColor="#f0b07a" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#c47a3a" stopOpacity="0.3" />
           </linearGradient>
           <linearGradient id="beamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="transparent" />
-            <stop offset="40%" stopColor="#00D4FF" stopOpacity="0.9" />
-            <stop offset="60%" stopColor="#7C3AED" stopOpacity="0.9" />
+            <stop offset="40%" stopColor="#f0b07a" stopOpacity="0.9" />
+            <stop offset="60%" stopColor="#e8a064" stopOpacity="0.9" />
             <stop offset="100%" stopColor="transparent" />
           </linearGradient>
           <filter id="beamBlur">
@@ -335,7 +316,6 @@ function TimelinePath({
           </filter>
         </defs>
 
-        {/* Base path */}
         <motion.path
           d={pathD}
           stroke="url(#pathGrad)"
@@ -346,10 +326,9 @@ function TimelinePath({
           transition={{ duration: reduced ? 0 : 2.2, ease: "easeInOut", delay: 0.3 }}
         />
 
-        {/* Dashed overlay */}
         <motion.path
           d={pathD}
-          stroke="rgba(255,255,255,0.06)"
+          stroke="rgba(255,255,255,0.04)"
           strokeWidth="1"
           strokeDasharray="4 8"
           strokeLinecap="round"
@@ -358,7 +337,6 @@ function TimelinePath({
           transition={{ duration: reduced ? 0 : 2.2, ease: "easeInOut", delay: 0.5 }}
         />
 
-        {/* Moving beam */}
         {!reduced && visible && (
           <motion.path
             d={pathD}
@@ -380,26 +358,23 @@ function TimelinePath({
   );
 }
 
-// ─── Vertical Timeline Line (Mobile) ──────────────────────────────────────────
-
 function VerticalLine({ visible, reduced }: { visible: boolean; reduced: boolean }) {
   return (
     <div className="absolute left-6 top-0 bottom-0 w-px lg:hidden" aria-hidden={true}>
       <motion.div
         className="w-full origin-top"
         style={{
-          background: "linear-gradient(to bottom, #2563EB, #7C3AED, #00D4FF, #2563EB)",
+          background: "linear-gradient(to bottom, #c47a3a, #e8a064, #f0b07a, #c47a3a)",
           opacity: 0.35,
         }}
         initial={{ scaleY: 0 }}
         animate={visible ? { scaleY: 1 } : { scaleY: 0 }}
         transition={{ duration: reduced ? 0 : 1.8, ease: "easeInOut", delay: 0.2 }}
       />
-      {/* Moving bead */}
       {!reduced && visible && (
         <motion.div
           className="absolute left-1/2 -translate-x-1/2 w-2 h-8 rounded-full blur-sm"
-          style={{ background: "linear-gradient(to bottom, #00D4FF, #7C3AED)" }}
+          style={{ background: "linear-gradient(to bottom, #f0b07a, #e8a064)" }}
           animate={{ top: ["0%", "100%", "0%"] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         />
@@ -407,8 +382,6 @@ function VerticalLine({ visible, reduced }: { visible: boolean; reduced: boolean
     </div>
   );
 }
-
-// ─── Step Card ────────────────────────────────────────────────────────────────
 
 const StepCard = memo(function StepCard({
   step,
@@ -450,7 +423,6 @@ const StepCard = memo(function StepCard({
     rotateY.set(0);
   }, [rotateX, rotateY]);
 
-  // Stagger: horizontal staggers left to right; vertical staggers top down
   const delay = reduced ? 0 : index * 0.11 + 0.4;
 
   const cardVariants = {
@@ -480,7 +452,7 @@ const StepCard = memo(function StepCard({
     >
       <div
         ref={cardRef}
-        className="relative flex flex-col gap-4 rounded-[24px] border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-6 overflow-hidden transition-colors duration-400 cursor-default"
+        className="relative flex flex-col gap-4 rounded-[24px] border border-[#262626] bg-[#141414] p-6 overflow-hidden transition-colors duration-400 cursor-default"
         style={{
           boxShadow: hovered
             ? `0 0 0 1px ${step.glowRgba}, 0 8px 50px -8px ${step.glowRgba}, 0 20px 60px -16px ${step.glowRgba}50`
@@ -496,7 +468,6 @@ const StepCard = memo(function StepCard({
         onFocus={() => setHovered(true)}
         onBlur={handleMouseLeave}
       >
-        {/* Inner glow */}
         <div
           aria-hidden={true}
           className="pointer-events-none absolute -top-12 -left-12 w-36 h-36 rounded-full blur-3xl transition-opacity duration-500"
@@ -506,7 +477,6 @@ const StepCard = memo(function StepCard({
           }}
         />
 
-        {/* Spotlight sweep */}
         <div
           aria-hidden={true}
           className="pointer-events-none absolute inset-0 rounded-[24px] transition-opacity duration-500"
@@ -518,7 +488,6 @@ const StepCard = memo(function StepCard({
 
         <BorderBeam gradient={step.gradient} active={hovered} reduced={reduced} />
 
-        {/* Step number */}
         <div className="flex items-center justify-between">
           <span
             className="text-[11px] font-bold tracking-[0.2em] uppercase"
@@ -527,7 +496,6 @@ const StepCard = memo(function StepCard({
             {step.number}
           </span>
 
-          {/* Pulse dot */}
           <div className="relative flex" aria-hidden={true}>
             <motion.span
               className="absolute inline-flex h-2.5 w-2.5 rounded-full opacity-60"
@@ -542,7 +510,6 @@ const StepCard = memo(function StepCard({
           </div>
         </div>
 
-        {/* Icon */}
         <motion.div
           className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${step.gradient} flex items-center justify-center shadow-lg flex-shrink-0`}
           animate={
@@ -555,18 +522,15 @@ const StepCard = memo(function StepCard({
           transition={{ duration: 0.35, ease: "easeOut" }}
           aria-hidden={true}
         >
-          <step.Icon className="w-5 h-5 text-white" strokeWidth={1.9} />
+          <step.Icon className="w-5 h-5 text-[#0f0f0f]" strokeWidth={1.9} />
         </motion.div>
 
-        {/* Title */}
         <h3 className="text-white font-bold text-lg tracking-tight leading-tight">
           {step.title}
         </h3>
 
-        {/* Description */}
-        <p className="text-white/45 text-sm leading-relaxed">{step.description}</p>
+        <p className="text-[#a1a1aa] text-sm leading-relaxed">{step.description}</p>
 
-        {/* Detail list — expands on hover or focus */}
         <AnimatePresence>
           {(hovered || expanded) && (
             <motion.ul
@@ -584,8 +548,7 @@ const StepCard = memo(function StepCard({
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.06, duration: 0.22 }}
-                  className="flex items-center gap-2 text-xs"
-                  style={{ color: "rgba(255,255,255,0.5)" }}
+                  className="flex items-center gap-2 text-xs text-[#a1a1aa]"
                 >
                   <span
                     className="w-1 h-1 rounded-full flex-shrink-0"
@@ -602,8 +565,6 @@ const StepCard = memo(function StepCard({
     </motion.div>
   );
 });
-
-// ─── Section Header ───────────────────────────────────────────────────────────
 
 const SectionHeader = memo(function SectionHeader({
   visible,
@@ -627,16 +588,13 @@ const SectionHeader = memo(function SectionHeader({
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
       >
-        <span
-          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
-          aria-label="Section: Our Process"
-        >
+        <Badge>
           <span aria-hidden={true} className="relative flex">
-            <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#00D4FF] opacity-70 animate-ping" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
+            <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#e8a064] opacity-70 animate-ping" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#e8a064]" />
           </span>
-          Our Process
-        </span>
+          <span className="ml-2">Our Process</span>
+        </Badge>
       </motion.div>
 
       <motion.h2
@@ -648,22 +606,14 @@ const SectionHeader = memo(function SectionHeader({
       >
         How We Turn Ideas Into
         <br />
-        <span
-          className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent"
-          style={{
-            backgroundSize: "200% 100%",
-            animation: reduced ? "none" : "gradientShift 5s ease infinite",
-          }}
-        >
-          Digital Success
-        </span>
+        <span className="text-gradient-amber">Digital Success</span>
       </motion.h2>
 
       <motion.p
         variants={reduced ? undefined : v(2)}
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
-        className="text-white/45 text-base sm:text-lg leading-relaxed max-w-xl"
+        className="text-[#a1a1aa] text-base sm:text-lg leading-relaxed max-w-xl"
       >
         A proven development methodology that transforms ideas into scalable
         digital products.
@@ -671,8 +621,6 @@ const SectionHeader = memo(function SectionHeader({
     </div>
   );
 });
-
-// ─── Desktop Horizontal Layout ────────────────────────────────────────────────
 
 function HorizontalTimeline({
   visible,
@@ -683,7 +631,6 @@ function HorizontalTimeline({
 }) {
   return (
     <div className="hidden lg:flex flex-col gap-0">
-      {/* Top row: cards 1,3,5,7 (odd indices) */}
       <div className="grid grid-cols-7 gap-4 mb-0">
         {STEPS.map((step, i) =>
           i % 2 === 0 ? (
@@ -696,10 +643,8 @@ function HorizontalTimeline({
         )}
       </div>
 
-      {/* Animated path */}
       <TimelinePath visible={visible} reduced={reduced} />
 
-      {/* Bottom row: cards 2,4,6 (even indices) */}
       <div className="grid grid-cols-7 gap-4">
         {STEPS.map((step, i) =>
           i % 2 !== 0 ? (
@@ -715,8 +660,6 @@ function HorizontalTimeline({
   );
 }
 
-// ─── Mobile Vertical Layout ───────────────────────────────────────────────────
-
 function VerticalTimeline({
   visible,
   reduced,
@@ -728,16 +671,14 @@ function VerticalTimeline({
     <div className="lg:hidden relative pl-14">
       <VerticalLine visible={visible} reduced={reduced} />
 
-      {/* Node dots on line */}
       {STEPS.map((step, i) => (
         <div
           key={step.id}
           className="relative mb-5 last:mb-0"
           style={{ minHeight: 90 }}
         >
-          {/* Timeline node */}
           <div
-            className="absolute -left-14 top-6 flex items-center justify-center w-5 h-5 rounded-full border-2 border-[#050816] z-10"
+            className="absolute -left-14 top-6 flex items-center justify-center w-5 h-5 rounded-full border-2 border-[#0f0f0f] z-10"
             style={{ background: step.color, boxShadow: `0 0 10px ${step.glowRgba}` }}
             aria-hidden={true}
           >
@@ -755,50 +696,33 @@ function VerticalTimeline({
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-
 export default function DevelopmentProcess() {
   const reduced = useReducedMotion() ?? false;
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
   return (
-    <>
-      <style>{`
-        @keyframes gradientShift {
-          0%   { background-position: 0% 50%; }
-          50%  { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-      `}</style>
+    <section
+      ref={sectionRef}
+      id="development-process"
+      aria-labelledby="process-heading"
+      className="relative w-full overflow-hidden py-24 sm:py-32 bg-[#0f0f0f]"
+    >
+      <AuroraBackground />
+      {!reduced && <BackgroundParticles />}
+      {!reduced && <MouseSpotlight sectionRef={sectionRef} />}
 
-      <section
-        ref={sectionRef}
-        id="development-process"
-        aria-labelledby="process-heading"
-        className="relative w-full overflow-hidden py-24 sm:py-32"
-        style={{ background: "#050816" }}
-      >
-        {/* Background layers */}
-        <AuroraBackground />
-        {!reduced && <BackgroundParticles />}
-        {!reduced && <MouseSpotlight sectionRef={sectionRef} />}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeader visible={isInView} reduced={reduced} />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeader visible={isInView} reduced={reduced} />
+        <HorizontalTimeline visible={isInView} reduced={reduced} />
+        <VerticalTimeline visible={isInView} reduced={reduced} />
+      </div>
 
-          {/* Layouts */}
-          <HorizontalTimeline visible={isInView} reduced={reduced} />
-          <VerticalTimeline visible={isInView} reduced={reduced} />
-        </div>
-
-        {/* Bottom fade */}
-        <div
-          aria-hidden={true}
-          className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
-          style={{ background: "linear-gradient(to bottom, transparent, #050816)" }}
-        />
-      </section>
-    </>
+      <div
+        aria-hidden={true}
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0f0f0f] to-transparent"
+      />
+    </section>
   );
 }

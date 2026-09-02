@@ -195,7 +195,7 @@ function TopicCard({ topic, index }: { topic: TrendingTopic; index: number }) {
         tabIndex={0}
         role="group"
         aria-label={`${topic.name} — topic coming soon`}
-        className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-[0_10px_40px_-22px_rgba(0,0,0,0.7)] backdrop-blur-xl outline-none transition-all duration-300 hover:border-white/15 hover:shadow-[0_24px_55px_-18px_rgba(0,0,0,0.75),0_0_0_1px_rgba(124,58,237,0.10),0_0_30px_-14px_rgba(0,212,255,0.12)] focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] sm:p-7"
+        className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#141414]/[0.03] p-6 shadow-[0_10px_40px_-22px_rgba(0,0,0,0.7)] backdrop-blur-xl outline-none transition-all duration-300 hover:border-white/15 hover:shadow-[0_24px_55px_-18px_rgba(0,0,0,0.75),0_0_0_1px_rgba(201,146,42,0.10),0_0_30px_-14px_rgba(212,145,92,0.12)] focus-visible:ring-2 focus-visible:ring-[#d4915c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] sm:p-7"
       >
         {/* unified mouse-spotlight + subtle holographic sheen — one quiet layer */}
         <span
@@ -203,7 +203,7 @@ function TopicCard({ topic, index }: { topic: TrendingTopic; index: number }) {
           aria-hidden={true}
           style={{
             background:
-              "radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.14), rgba(0,212,255,0.08) 38%, rgba(124,58,237,0.08) 62%, transparent 78%)",
+              "radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.14), rgba(212,145,92,0.08) 38%, rgba(201,146,42,0.08) 62%, transparent 78%)",
           }}
         />
 
@@ -214,7 +214,7 @@ function TopicCard({ topic, index }: { topic: TrendingTopic; index: number }) {
 
         <div className="relative z-10 flex h-full flex-col" style={{ transform: "translateZ(18px)" }}>
           <div className="mb-5 flex items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-white/55">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-[#141414]/5 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-white/55">
               <Clock className="h-3 w-3" aria-hidden={true} />
               Coming Soon
             </span>
@@ -265,7 +265,7 @@ function BackgroundAtmosphere() {
           right: "-18%",
           width: 540,
           height: 540,
-          background: "radial-gradient(circle, #7C3AED, transparent 70%)",
+          background: "radial-gradient(circle, #c9922a, transparent 70%)",
           animationDuration: "33s",
         }}
       />
@@ -276,7 +276,7 @@ function BackgroundAtmosphere() {
           left: "-18%",
           width: 560,
           height: 560,
-          background: "radial-gradient(circle, #00D4FF, transparent 70%)",
+          background: "radial-gradient(circle, #d4915c, transparent 70%)",
           animationDuration: "37s",
           animationDelay: "-15s",
         }}
@@ -337,7 +337,7 @@ export default function TrendingTopics() {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       aria-labelledby="trending-topics-heading"
-      className="relative isolate overflow-hidden bg-[#050816] py-24 sm:py-28 lg:py-32"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] py-24 sm:py-28 lg:py-32"
     >
       <BackgroundAtmosphere />
 
@@ -347,7 +347,7 @@ export default function TrendingTopics() {
         style={{
           opacity: isHovering ? 1 : 0,
           background:
-            "radial-gradient(560px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%), rgba(0,212,255,0.045), transparent 45%)",
+            "radial-gradient(560px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%), rgba(212,145,92,0.045), transparent 45%)",
         }}
         aria-hidden={true}
       />
@@ -361,7 +361,7 @@ export default function TrendingTopics() {
           variants={fadeUp}
           className="mx-auto max-w-3xl text-center"
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#00D4FF] backdrop-blur-md">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#141414]/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#d4915c] backdrop-blur-md">
             <Flame className="h-3.5 w-3.5" aria-hidden={true} />
             Trending Topics
           </span>
@@ -404,8 +404,8 @@ export default function TrendingTopics() {
           variants={fadeUp}
           className="mt-16 flex justify-center"
         >
-          <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-5 py-2.5 backdrop-blur-md">
-            <Database className="h-4 w-4 text-[#7C3AED]" aria-hidden={true} />
+          <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-[#141414]/[0.03] px-5 py-2.5 backdrop-blur-md">
+            <Database className="h-4 w-4 text-[#c9922a]" aria-hidden={true} />
             <p className="text-xs text-white/50 sm:text-sm">
               Trending topics will be managed dynamically through the{" "}
               <span className="font-medium text-white/75">Axivon CMS</span>.
@@ -433,7 +433,7 @@ export default function TrendingTopics() {
         }
 
         .depth-gradient {
-          background: linear-gradient(180deg, #070b1d 0%, #050816 45%, #04060f 100%);
+          background: linear-gradient(180deg, #070b1d 0%, #0f0f0f 45%, #04060f 100%);
         }
 
         .aurora-blob {

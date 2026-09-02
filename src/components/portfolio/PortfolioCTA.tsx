@@ -141,11 +141,11 @@ function CTAButton({ children, href = "#contact", variant, icon, ariaLabel }: CT
       className={[
         "group relative isolate inline-flex items-center justify-center gap-2.5",
         "rounded-full px-8 py-4 text-sm sm:text-base font-semibold tracking-wide",
-        "outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]",
+        "outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]",
         "transition-colors duration-300 select-none",
         isPrimary
-          ? "text-white focus-visible:ring-cyan-400"
-          : "text-white/90 focus-visible:ring-white/60 border border-white/15 bg-white/[0.04] backdrop-blur-md hover:bg-white/[0.08] hover:border-white/25",
+          ? "text-white focus-visible:ring-[#e8a064]"
+          : "text-white/90 focus-visible:ring-white/60 border border-white/15 bg-[#141414]/[0.04] backdrop-blur-md hover:bg-[#141414]/[0.08] hover:border-white/25",
       ].join(" ")}
     >
       {isPrimary && (
@@ -153,12 +153,12 @@ function CTAButton({ children, href = "#contact", variant, icon, ariaLabel }: CT
           {/* Gradient fill */}
           <span
             aria-hidden
-            className="absolute inset-0 -z-10 rounded-full bg-[linear-gradient(110deg,#2563EB,45%,#7C3AED,75%,#00D4FF)] opacity-100 transition-transform duration-500 group-hover:scale-[1.04]"
+            className="absolute inset-0 -z-10 rounded-full bg-[linear-gradient(110deg,#e8a064,45%,#c9922a,75%,#d4915c)] opacity-100 transition-transform duration-500 group-hover:scale-[1.04]"
           />
           {/* Animated glow halo */}
           <motion.span
             aria-hidden
-            className="absolute -inset-1 -z-20 rounded-full bg-[linear-gradient(110deg,#2563EB,#7C3AED,#00D4FF)] opacity-60 blur-xl"
+            className="absolute -inset-1 -z-20 rounded-full bg-[linear-gradient(110deg,#e8a064,#c9922a,#d4915c)] opacity-60 blur-xl"
             animate={
               prefersReducedMotion
                 ? undefined
@@ -178,7 +178,7 @@ function CTAButton({ children, href = "#contact", variant, icon, ariaLabel }: CT
           </span>
           {/* Sheen sweep */}
           <span className="absolute inset-0 -z-10 overflow-hidden rounded-full">
-            <span className="absolute -inset-y-4 -left-1/2 w-1/3 -skew-x-12 bg-white/30 blur-md opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:translate-x-[280%]" />
+            <span className="absolute -inset-y-4 -left-1/2 w-1/3 -skew-x-12 bg-[#141414]/30 blur-md opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:translate-x-[280%]" />
           </span>
         </>
       )}
@@ -210,9 +210,9 @@ function CTAButton({ children, href = "#contact", variant, icon, ariaLabel }: CT
 
 function HolographicRings({ reduceMotion }: { reduceMotion: boolean }) {
   const rings = [
-    { size: 340, color: "rgba(37,99,235,0.35)", duration: 22, reverse: false },
-    { size: 470, color: "rgba(124,58,237,0.28)", duration: 30, reverse: true },
-    { size: 600, color: "rgba(0,212,255,0.2)", duration: 38, reverse: false },
+    { size: 340, color: "rgba(232,160,100,0.35)", duration: 22, reverse: false },
+    { size: 470, color: "rgba(201,146,42,0.28)", duration: 30, reverse: true },
+    { size: 600, color: "rgba(212,145,92,0.2)", duration: 38, reverse: false },
   ];
 
   return (
@@ -275,10 +275,10 @@ function FloatingTechIcons({ reduceMotion }: { reduceMotion: boolean }) {
           }}
         >
           <div
-            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm"
+            className="flex items-center justify-center rounded-2xl border border-white/10 bg-[#141414]/[0.03] backdrop-blur-sm"
             style={{ width: size * 2, height: size * 2 }}
           >
-            <Icon size={size} className="text-cyan-300/70" strokeWidth={1.5} />
+            <Icon size={size} className="text-[#e8a064]/70" strokeWidth={1.5} />
           </div>
         </motion.div>
       ))}
@@ -317,7 +317,7 @@ function AmbientParticles({ reduceMotion }: { reduceMotion: boolean }) {
             left: `${p.left}%`,
             width: p.size,
             height: p.size,
-            boxShadow: "0 0 6px 1px rgba(0,212,255,0.6)",
+            boxShadow: "0 0 6px 1px rgba(212,145,92,0.6)",
           }}
           animate={{
             y: [0, -40, 0],
@@ -349,7 +349,7 @@ function PerspectiveGrid() {
         className="absolute inset-x-0 bottom-0 h-[140%] origin-bottom opacity-[0.18]"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(124,58,237,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,0.5) 1px, transparent 1px)",
+            "linear-gradient(rgba(201,146,42,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(232,160,100,0.5) 1px, transparent 1px)",
           backgroundSize: "64px 64px",
           transform: "perspective(600px) rotateX(58deg)",
         }}
@@ -375,7 +375,7 @@ export default function PortfolioCTA() {
   const spotlightBackground = useTransform(
     [smoothX, smoothY],
     ([sx, sy]) =>
-      `radial-gradient(560px circle at ${sx}% ${sy}%, rgba(0,212,255,0.16), transparent 60%)`
+      `radial-gradient(560px circle at ${sx}% ${sy}%, rgba(212,145,92,0.16), transparent 60%)`
   );
 
   const handlePointerMove = useCallback(
@@ -393,7 +393,7 @@ export default function PortfolioCTA() {
       ref={sectionRef}
       onMouseMove={handlePointerMove}
       aria-labelledby="portfolio-cta-heading"
-      className="relative isolate w-full overflow-hidden bg-[#050816] px-4 py-24 sm:px-6 sm:py-32 lg:py-40"
+      className="relative isolate w-full overflow-hidden bg-[#0f0f0f] px-4 py-24 sm:px-6 sm:py-32 lg:py-40"
     >
       {/* ---------------------------------------------------------------- */}
       {/* Background layers                                                */}
@@ -402,17 +402,17 @@ export default function PortfolioCTA() {
       {/* Aurora wash */}
       <div className="pointer-events-none absolute inset-0" aria-hidden={true}>
         <motion.div
-          className="absolute -top-1/3 left-1/2 h-[60vw] w-[60vw] max-w-[900px] max-h-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.35),transparent_65%)] blur-3xl"
+          className="absolute -top-1/3 left-1/2 h-[60vw] w-[60vw] max-w-[900px] max-h-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(232,160,100,0.35),transparent_65%)] blur-3xl"
           animate={reduceMotion ? undefined : { x: [-40, 40, -40], y: [0, 30, 0] }}
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute top-1/4 -right-1/4 h-[50vw] w-[50vw] max-w-[760px] max-h-[760px] rounded-full bg-[radial-gradient(circle,rgba(124,58,237,0.3),transparent_65%)] blur-3xl"
+          className="absolute top-1/4 -right-1/4 h-[50vw] w-[50vw] max-w-[760px] max-h-[760px] rounded-full bg-[radial-gradient(circle,rgba(201,146,42,0.3),transparent_65%)] blur-3xl"
           animate={reduceMotion ? undefined : { x: [20, -30, 20], y: [-20, 20, -20] }}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute bottom-0 left-0 h-[45vw] w-[45vw] max-w-[640px] max-h-[640px] -translate-x-1/4 translate-y-1/4 rounded-full bg-[radial-gradient(circle,rgba(0,212,255,0.25),transparent_65%)] blur-3xl"
+          className="absolute bottom-0 left-0 h-[45vw] w-[45vw] max-w-[640px] max-h-[640px] -translate-x-1/4 translate-y-1/4 rounded-full bg-[radial-gradient(circle,rgba(212,145,92,0.25),transparent_65%)] blur-3xl"
           animate={reduceMotion ? undefined : { x: [0, 40, 0], y: [0, -20, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -452,13 +452,13 @@ export default function PortfolioCTA() {
         {/* Badge */}
         <motion.div
           variants={fadeUpVariants}
-          className="relative mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 backdrop-blur-md"
+          className="relative mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#141414]/[0.04] px-4 py-1.5 backdrop-blur-md"
         >
           <motion.span
             animate={reduceMotion ? undefined : { rotate: [0, 18, -10, 0] }}
             transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <Sparkles className="h-3.5 w-3.5 text-cyan-300" aria-hidden={true} />
+            <Sparkles className="h-3.5 w-3.5 text-[#e8a064]" aria-hidden={true} />
           </motion.span>
           <span className="text-xs font-medium uppercase tracking-[0.18em] text-white/80">
             Let&rsquo;s Build Something Amazing
@@ -468,7 +468,7 @@ export default function PortfolioCTA() {
         {/* Glassmorphism card wrapping the core CTA */}
         <motion.div
           variants={fadeUpVariants}
-          className="relative w-full rounded-[2rem] border border-white/10 bg-white/[0.03] px-6 py-12 shadow-[0_0_120px_-20px_rgba(37,99,235,0.45)] backdrop-blur-xl sm:px-10 sm:py-16 lg:px-16"
+          className="relative w-full rounded-[2rem] border border-white/10 bg-[#141414]/[0.03] px-6 py-12 shadow-[0_0_120px_-20px_rgba(232,160,100,0.45)] backdrop-blur-xl sm:px-10 sm:py-16 lg:px-16"
         >
           {/* Border beam around the card */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem]">
@@ -477,13 +477,13 @@ export default function PortfolioCTA() {
               className="absolute -inset-[150%]"
               style={{
                 background:
-                  "conic-gradient(from 0deg, transparent 0%, rgba(0,212,255,0.55) 8%, transparent 18%)",
+                  "conic-gradient(from 0deg, transparent 0%, rgba(212,145,92,0.55) 8%, transparent 18%)",
               }}
               animate={reduceMotion ? undefined : { rotate: 360 }}
               transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
             />
           </div>
-          <div className="pointer-events-none absolute inset-[1px] rounded-[calc(2rem-1px)] bg-[#050816]/[0.92]" />
+          <div className="pointer-events-none absolute inset-[1px] rounded-[calc(2rem-1px)] bg-[#0f0f0f]/[0.92]" />
 
           {/* Holographic rings + floating icons, contained within the card */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem]">
@@ -507,7 +507,7 @@ export default function PortfolioCTA() {
               Ready To{" "}
               <span className="relative inline-block">
                 <motion.span
-                  className="bg-[linear-gradient(110deg,#2563EB,#7C3AED,#00D4FF,#2563EB)] bg-clip-text text-transparent"
+                  className="bg-[linear-gradient(110deg,#e8a064,#c9922a,#d4915c,#e8a064)] bg-clip-text text-transparent"
                   style={{ backgroundSize: "300% 100%" }}
                   animate={reduceMotion ? undefined : { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
@@ -518,7 +518,7 @@ export default function PortfolioCTA() {
               Your{" "}
               <span className="relative inline-block">
                 <motion.span
-                  className="bg-[linear-gradient(110deg,#00D4FF,#2563EB,#7C3AED,#00D4FF)] bg-clip-text text-transparent"
+                  className="bg-[linear-gradient(110deg,#d4915c,#e8a064,#c9922a,#d4915c)] bg-clip-text text-transparent"
                   style={{ backgroundSize: "300% 100%" }}
                   animate={reduceMotion ? undefined : { backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "linear", delay: 0.4 }}
@@ -573,7 +573,7 @@ export default function PortfolioCTA() {
                   key={id}
                   className="flex items-center gap-2 text-sm font-medium text-white/70"
                 >
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#2563EB] to-[#00D4FF]">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#e8a064] to-[#d4915c]">
                     <Check className="h-3 w-3 text-white" strokeWidth={3} aria-hidden={true} />
                   </span>
                   {label}

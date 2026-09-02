@@ -84,8 +84,8 @@ const PROJECT_CARDS: ProjectCardSpec[] = [
     icon: Globe,
     metric: "98",
     metricLabel: "Performance Score",
-    accentPrimary: "#2563EB",
-    accentSecondary: "#00D4FF",
+    accentPrimary: "#e8a064",
+    accentSecondary: "#f0c590",
     top: "4%",
     left: "-4%",
     depth: 1.1,
@@ -98,8 +98,8 @@ const PROJECT_CARDS: ProjectCardSpec[] = [
     icon: Smartphone,
     metric: "4.9★",
     metricLabel: "App Store Rating",
-    accentPrimary: "#7C3AED",
-    accentSecondary: "#2563EB",
+    accentPrimary: "#d4915c",
+    accentSecondary: "#e8a064",
     top: "16%",
     right: "-6%",
     depth: 0.9,
@@ -112,8 +112,8 @@ const PROJECT_CARDS: ProjectCardSpec[] = [
     icon: BrainCircuit,
     metric: "10x",
     metricLabel: "Faster Insights",
-    accentPrimary: "#00D4FF",
-    accentSecondary: "#7C3AED",
+    accentPrimary: "#c9922a",
+    accentSecondary: "#e8a064",
     top: "46%",
     left: "-10%",
     depth: 1.25,
@@ -126,8 +126,8 @@ const PROJECT_CARDS: ProjectCardSpec[] = [
     icon: Cloud,
     metric: "99.9%",
     metricLabel: "Uptime SLA",
-    accentPrimary: "#2563EB",
-    accentSecondary: "#7C3AED",
+    accentPrimary: "#4ade80",
+    accentSecondary: "#86efac",
     top: "60%",
     right: "-2%",
     depth: 1.0,
@@ -140,8 +140,8 @@ const PROJECT_CARDS: ProjectCardSpec[] = [
     icon: Palette,
     metric: "+42%",
     metricLabel: "Conversion Lift",
-    accentPrimary: "#7C3AED",
-    accentSecondary: "#00D4FF",
+    accentPrimary: "#e8a064",
+    accentSecondary: "#f5d4a8",
     top: "78%",
     left: "2%",
     depth: 0.85,
@@ -154,8 +154,8 @@ const PROJECT_CARDS: ProjectCardSpec[] = [
     icon: Code2,
     metric: "200+",
     metricLabel: "Systems Shipped",
-    accentPrimary: "#00D4FF",
-    accentSecondary: "#2563EB",
+    accentPrimary: "#a1a1aa",
+    accentSecondary: "#f4f4f5",
     top: "32%",
     right: "20%",
     depth: 1.15,
@@ -165,10 +165,10 @@ const PROJECT_CARDS: ProjectCardSpec[] = [
 ];
 
 const STATS: StatItem[] = [
-  { value: 10, suffix: "+", label: "Projects Delivered", color: "#2563EB" },
-  { value: 100, suffix: "%", label: "Client Satisfaction", color: "#00D4FF" },
-  { value: 5, suffix: "+", label: "Technology Domains", color: "#7C3AED" },
-  { value: 24, suffix: "/7", label: "Support & Innovation", color: "#00D4FF" },
+  { value: 10, suffix: "+", label: "Projects Delivered", color: "#e8a064" },
+  { value: 100, suffix: "%", label: "Client Satisfaction", color: "#f0c590" },
+  { value: 5, suffix: "+", label: "Technology Domains", color: "#c9922a" },
+  { value: 24, suffix: "/7", label: "Support & Innovation", color: "#d4915c" },
 ];
 
 // ─── Animation Variants ────────────────────────────────────────────────────────
@@ -204,7 +204,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
       <motion.div
         className="absolute -top-56 -left-40 w-[720px] h-[720px] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(37,99,235,0.2) 0%, rgba(37,99,235,0.05) 55%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(232,160,100,0.15) 0%, rgba(232,160,100,0.04) 55%, transparent 70%)",
           filter: "blur(50px)",
         }}
         animate={reduced ? {} : { x: [0, 90, -40, 0], y: [0, 60, -30, 0], scale: [1, 1.15, 0.92, 1] }}
@@ -213,7 +213,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
       <motion.div
         className="absolute top-1/4 -right-48 w-[640px] h-[640px] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(124,58,237,0.18) 0%, rgba(124,58,237,0.05) 55%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(201,146,42,0.12) 0%, rgba(201,146,42,0.04) 55%, transparent 70%)",
           filter: "blur(50px)",
         }}
         animate={reduced ? {} : { x: [0, -70, 45, 0], y: [0, -80, 50, 0], scale: [1, 0.88, 1.12, 1] }}
@@ -222,7 +222,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
       <motion.div
         className="absolute -bottom-32 left-1/3 w-[520px] h-[420px] rounded-full"
         style={{
-          background: "radial-gradient(ellipse, rgba(0,212,255,0.12) 0%, rgba(0,212,255,0.03) 55%, transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(212,145,92,0.08) 0%, rgba(212,145,92,0.02) 55%, transparent 70%)",
           filter: "blur(60px)",
         }}
         animate={reduced ? {} : { x: [0, 60, -80, 0], y: [0, -40, 30, 0], scale: [1, 1.1, 0.95, 1] }}
@@ -241,8 +241,8 @@ function PerspectiveGrid() {
         className="absolute inset-0"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(37,99,235,0.045) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(37,99,235,0.045) 1px, transparent 1px)
+            linear-gradient(rgba(232,160,100,0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(232,160,100,0.035) 1px, transparent 1px)
           `,
           backgroundSize: "64px 64px",
           maskImage: "radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 75%)",
@@ -305,7 +305,7 @@ function FloatingParticles({ reduced }: { reduced: boolean }) {
             top: `${p.y}%`,
             width: p.size,
             height: p.size,
-            background: `radial-gradient(circle, rgba(0,212,255,${p.opacity}) 0%, rgba(124,58,237,${p.opacity * 0.6}) 100%)`,
+            background: `radial-gradient(circle, rgba(232,160,100,${p.opacity}) 0%, rgba(201,146,42,${p.opacity * 0.6}) 100%)`,
           }}
           animate={{ y: [0, -130, 0], x: [0, p.drift, 0], opacity: [0, p.opacity, 0], scale: [0.5, 1.2, 0.5] }}
           transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
@@ -349,7 +349,7 @@ function NeuralField({ reduced }: { reduced: boolean }) {
             y1={node.y}
             x2={target.x}
             y2={target.y}
-            stroke="rgba(0,212,255,0.15)"
+            stroke="rgba(212,145,92,0.15)"
             strokeWidth="0.15"
             animate={{ opacity: [0.1, 0.4, 0.1] }}
             transition={{ duration: 4, repeat: Infinity, delay: node.delay, ease: "easeInOut" }}
@@ -362,7 +362,7 @@ function NeuralField({ reduced }: { reduced: boolean }) {
           cx={node.x}
           cy={node.y}
           r="0.5"
-          fill="#00D4FF"
+          fill="#d4915c"
           animate={{ opacity: [0.3, 1, 0.3], r: [0.4, 0.7, 0.4] }}
           transition={{ duration: 3, repeat: Infinity, delay: node.delay, ease: "easeInOut" }}
         />
@@ -465,8 +465,8 @@ function MagneticButton({
         y: springY,
         ...(isPrimary
           ? {
-              background: "linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)",
-              boxShadow: "0 0 0 1px rgba(37,99,235,0.4), 0 10px 30px rgba(37,99,235,0.35)",
+              background: "linear-gradient(135deg, #e8a064 0%, #c9922a 100%)",
+              boxShadow: "0 0 0 1px rgba(232,160,100,0.4), 0 10px 30px rgba(232,160,100,0.35)",
               color: "#ffffff",
             }
           : {
@@ -480,7 +480,7 @@ function MagneticButton({
       onMouseLeave={handleMouseLeave}
       whileHover={{ scale: 1.04 }}
       whileTap={{ scale: 0.97 }}
-      className="relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-semibold text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+      className="relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl font-semibold text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]"
     >
       {isPrimary && (
         <motion.div
@@ -572,7 +572,7 @@ function FloatingProjectCard({
         role="img"
         aria-label={`${spec.label}: ${spec.metric} ${spec.metricLabel}`}
         style={reduced ? {} : { rotateX, rotateY, transformStyle: "preserve-3d", perspective: 800 }}
-        className="relative w-[168px] sm:w-[180px] cursor-default select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-2xl"
+        className="relative w-[168px] sm:w-[180px] cursor-default select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] rounded-2xl"
       >
         {/* Glow halo */}
         <motion.div
@@ -670,9 +670,9 @@ function FloatingProjectCard({
 
 function HolographicSphere({ reduced }: { reduced: boolean }) {
   const ringConfigs = [
-    { size: 100, color: "rgba(37,99,235,0.35)", duration: 14, dashed: false },
-    { size: 140, color: "rgba(124,58,237,0.3)", duration: 20, dashed: true },
-    { size: 180, color: "rgba(0,212,255,0.22)", duration: 26, dashed: false },
+    { size: 100, color: "rgba(232,160,100,0.35)", duration: 14, dashed: false },
+    { size: 140, color: "rgba(201,146,42,0.3)", duration: 20, dashed: true },
+    { size: 180, color: "rgba(212,145,92,0.22)", duration: 26, dashed: false },
   ];
 
   return (
@@ -681,7 +681,7 @@ function HolographicSphere({ reduced }: { reduced: boolean }) {
       <motion.div
         className="absolute w-40 h-40 rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(37,99,235,0.45) 0%, rgba(124,58,237,0.25) 45%, transparent 75%)",
+          background: "radial-gradient(circle, rgba(232,160,100,0.45) 0%, rgba(201,146,42,0.25) 45%, transparent 75%)",
           filter: "blur(20px)",
         }}
         animate={reduced ? {} : { scale: [1, 1.15, 1], opacity: [0.6, 0.9, 0.6] }}
@@ -692,10 +692,10 @@ function HolographicSphere({ reduced }: { reduced: boolean }) {
       <motion.div
         className="absolute w-24 h-24 rounded-full flex items-center justify-center"
         style={{
-          background: "linear-gradient(135deg, rgba(37,99,235,0.5) 0%, rgba(124,58,237,0.4) 50%, rgba(0,212,255,0.35) 100%)",
+          background: "linear-gradient(135deg, rgba(232,160,100,0.5) 0%, rgba(201,146,42,0.4) 50%, rgba(212,145,92,0.35) 100%)",
           border: "1px solid rgba(255,255,255,0.25)",
           backdropFilter: "blur(8px)",
-          boxShadow: "0 0 60px rgba(37,99,235,0.5), inset 0 0 30px rgba(255,255,255,0.15)",
+          boxShadow: "0 0 60px rgba(232,160,100,0.5), inset 0 0 30px rgba(255,255,255,0.15)",
         }}
         animate={reduced ? {} : { scale: [1, 1.06, 1] }}
         transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
@@ -746,7 +746,7 @@ function HolographicSphere({ reduced }: { reduced: boolean }) {
               }}
               transition={{ duration: 16, repeat: Infinity, ease: "linear", delay: i * 0.4 }}
             >
-              <Icon size={13} className="text-cyan-300/80" aria-hidden />
+              <Icon size={13} className="text-[#e8a064]/80" aria-hidden />
             </motion.div>
           );
         })}
@@ -768,14 +768,22 @@ function PortfolioStage({ reduced }: { reduced: boolean }) {
 
   useEffect(() => {
     if (reduced) return;
+    let frameId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = stageRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      mouseX.set((e.clientX - rect.left) / rect.width);
-      mouseY.set((e.clientY - rect.top) / rect.height);
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = null;
+        const rect = stageRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        mouseX.set((e.clientX - rect.left) / rect.width);
+        mouseY.set((e.clientY - rect.top) / rect.height);
+      });
     };
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (frameId) cancelAnimationFrame(frameId);
+    };
   }, [mouseX, mouseY, reduced]);
 
   return (
@@ -789,7 +797,7 @@ function PortfolioStage({ reduced }: { reduced: boolean }) {
       <div
         className="absolute inset-0 rounded-full pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse 60% 55% at 50% 45%, rgba(37,99,235,0.1) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse 60% 55% at 50% 45%, rgba(232,160,100,0.1) 0%, transparent 70%)",
           filter: "blur(40px)",
         }}
         aria-hidden
@@ -821,7 +829,7 @@ function PortfolioStage({ reduced }: { reduced: boolean }) {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse 70% 70% at 50% 50%, transparent 50%, #050816 100%)",
+          background: "radial-gradient(ellipse 70% 70% at 50% 50%, transparent 50%, #0f0f0f 100%)",
         }}
         aria-hidden
       />
@@ -836,7 +844,7 @@ function GradientWord({ children }: { children: React.ReactNode }) {
     <span
       className="inline-block"
       style={{
-        background: "linear-gradient(135deg, #2563EB 0%, #00D4FF 45%, #7C3AED 100%)",
+        background: "linear-gradient(135deg, #e8a064 0%, #d4915c 45%, #c9922a 100%)",
         WebkitBackgroundClip: "text",
         WebkitTextFillColor: "transparent",
         backgroundClip: "text",
@@ -864,7 +872,7 @@ export default function PortfolioHero() {
     <section
       ref={sectionRef}
       className="relative min-h-screen flex items-center overflow-hidden"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
       aria-label="Portfolio hero section"
     >
       {/* ── Background Layers ── */}
@@ -888,14 +896,14 @@ export default function PortfolioHero() {
               <div
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-widest"
                 style={{
-                  background: "linear-gradient(90deg, rgba(37,99,235,0.12), rgba(124,58,237,0.12))",
-                  border: "1px solid rgba(124,58,237,0.3)",
-                  color: "#a78bfa",
+                  background: "linear-gradient(90deg, rgba(232,160,100,0.12), rgba(201,146,42,0.12))",
+                  border: "1px solid rgba(201,146,42,0.3)",
+                  color: "#e8a064",
                 }}
               >
                 <motion.div
                   className="w-1.5 h-1.5 rounded-full"
-                  style={{ background: "#7C3AED" }}
+                  style={{ background: "#c9922a" }}
                   animate={reduced ? {} : { scale: [1, 1.4, 1], opacity: [0.7, 1, 0.7] }}
                   transition={{ duration: 2.5, repeat: Infinity }}
                   aria-hidden
@@ -967,7 +975,7 @@ export default function PortfolioHero() {
       {/* ── Bottom fade ── */}
       <div
         className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: "linear-gradient(to top, #050816 0%, transparent 100%)" }}
+        style={{ background: "linear-gradient(to top, #0f0f0f 0%, transparent 100%)" }}
         aria-hidden
       />
     </section>

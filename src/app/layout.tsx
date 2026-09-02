@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import OrganizationSchema from "@/components/seo/OrganizationSchema";
 import LocalBusinessSchema from "@/components/seo/LocalBusinessSchema";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import ChatWidget from "@/components/chatbot/ChatWidget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -107,7 +108,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-screen flex flex-col bg-[#050816]">
+      <body className="min-h-screen flex flex-col bg-[#0f0f0f] text-[#f4f4f5]">
 
   <OrganizationSchema />
   <LocalBusinessSchema />
@@ -120,6 +121,8 @@ export default function RootLayout({
   <Footer />
 
   <GoogleAnalytics />
+
+  <ChatWidget />
 
 </body>
     </html>

@@ -114,7 +114,7 @@ function Particles() {
             top: `${p.y}%`,
             width: p.size,
             height: p.size,
-            background: `radial-gradient(circle, rgba(37,99,235,${p.opacity}) 0%, rgba(124,58,237,${p.opacity * 0.6}) 100%)`,
+            background: `radial-gradient(circle, rgba(232,160,100,${p.opacity}) 0%, rgba(201,146,42,${p.opacity * 0.6}) 100%)`,
           }}
           animate={{
             y: [0, -120, 0],
@@ -143,8 +143,8 @@ function AnimatedGrid() {
         className="absolute inset-0"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px)
+            linear-gradient(rgba(232,160,100,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(232,160,100,0.04) 1px, transparent 1px)
           `,
           backgroundSize: "64px 64px",
         }}
@@ -155,7 +155,7 @@ function AnimatedGrid() {
       <motion.div
         className="absolute inset-0"
         style={{
-          backgroundImage: `linear-gradient(45deg, rgba(0,212,255,0.02) 25%, transparent 25%)`,
+          backgroundImage: `linear-gradient(45deg, rgba(212,145,92,0.02) 25%, transparent 25%)`,
           backgroundSize: "128px 128px",
         }}
         animate={{ backgroundPositionX: ["0px", "128px"] }}
@@ -175,7 +175,7 @@ function AuroraBackground() {
         className="absolute -top-48 -left-48 w-[600px] h-[600px] rounded-full"
         style={{
           background:
-            "radial-gradient(circle, rgba(37,99,235,0.18) 0%, rgba(37,99,235,0.04) 55%, transparent 70%)",
+            "radial-gradient(circle, rgba(232,160,100,0.18) 0%, rgba(232,160,100,0.04) 55%, transparent 70%)",
           filter: "blur(40px)",
         }}
         animate={{
@@ -190,7 +190,7 @@ function AuroraBackground() {
         className="absolute top-1/3 -right-32 w-[500px] h-[500px] rounded-full"
         style={{
           background:
-            "radial-gradient(circle, rgba(124,58,237,0.16) 0%, rgba(124,58,237,0.04) 55%, transparent 70%)",
+            "radial-gradient(circle, rgba(201,146,42,0.16) 0%, rgba(201,146,42,0.04) 55%, transparent 70%)",
           filter: "blur(40px)",
         }}
         animate={{
@@ -205,7 +205,7 @@ function AuroraBackground() {
         className="absolute -bottom-24 left-1/3 w-[400px] h-[400px] rounded-full"
         style={{
           background:
-            "radial-gradient(circle, rgba(0,212,255,0.1) 0%, rgba(0,212,255,0.03) 55%, transparent 70%)",
+            "radial-gradient(circle, rgba(212,145,92,0.1) 0%, rgba(212,145,92,0.03) 55%, transparent 70%)",
           filter: "blur(60px)",
         }}
         animate={{
@@ -231,7 +231,7 @@ function BorderBeam({ className = "" }: { className?: string }) {
         className="absolute w-[200%] h-[2px] top-0 left-0"
         style={{
           background:
-            "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.8) 30%, rgba(0,212,255,1) 50%, rgba(124,58,237,0.8) 70%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(232,160,100,0.8) 30%, rgba(212,145,92,1) 50%, rgba(201,146,42,0.8) 70%, transparent 100%)",
         }}
         animate={{ x: ["-100%", "50%"] }}
         transition={{ duration: 3, repeat: Infinity, ease: "linear", repeatDelay: 1.5 }}
@@ -240,7 +240,7 @@ function BorderBeam({ className = "" }: { className?: string }) {
         className="absolute w-[2px] h-[200%] top-0 right-0"
         style={{
           background:
-            "linear-gradient(180deg, transparent 0%, rgba(124,58,237,0.8) 30%, rgba(0,212,255,1) 50%, rgba(37,99,235,0.8) 70%, transparent 100%)",
+            "linear-gradient(180deg, transparent 0%, rgba(201,146,42,0.8) 30%, rgba(212,145,92,1) 50%, rgba(232,160,100,0.8) 70%, transparent 100%)",
         }}
         animate={{ y: ["-100%", "50%"] }}
         transition={{ duration: 3, repeat: Infinity, ease: "linear", repeatDelay: 1.5, delay: 1.5 }}
@@ -286,9 +286,9 @@ function TechCard({ service }: { service: ServiceData }) {
 
   // Orbit items
   const orbitItems = [
-    { label: "Secure", icon: Shield, color: "#2563EB", angle: 0 },
-    { label: "Fast", icon: Zap, color: "#00D4FF", angle: 120 },
-    { label: "Live", icon: Activity, color: "#7C3AED", angle: 240 },
+    { label: "Secure", icon: Shield, color: "#e8a064", angle: 0 },
+    { label: "Fast", icon: Zap, color: "#d4915c", angle: 120 },
+    { label: "Live", icon: Activity, color: "#c9922a", angle: 240 },
   ];
 
   return (
@@ -304,7 +304,7 @@ function TechCard({ service }: { service: ServiceData }) {
       <motion.div
         className="absolute -inset-8 rounded-3xl pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse at ${glowX}% ${glowY}%, rgba(37,99,235,0.2) 0%, rgba(124,58,237,0.12) 40%, transparent 70%)`,
+          background: `radial-gradient(ellipse at ${glowX}% ${glowY}%, rgba(232,160,100,0.2) 0%, rgba(201,146,42,0.12) 40%, transparent 70%)`,
           filter: "blur(20px)",
         }}
       />
@@ -341,7 +341,7 @@ function TechCard({ service }: { service: ServiceData }) {
               {/* Orbit ring */}
               <motion.div
                 className="absolute inset-0 rounded-full"
-                style={{ border: "1px dashed rgba(37,99,235,0.3)" }}
+                style={{ border: "1px dashed rgba(232,160,100,0.3)" }}
                 animate={{ rotate: 360 }}
                 transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
               />
@@ -379,14 +379,14 @@ function TechCard({ service }: { service: ServiceData }) {
                 className="absolute inset-2 rounded-xl flex items-center justify-center"
                 style={{
                   background:
-                    "linear-gradient(135deg, rgba(37,99,235,0.3) 0%, rgba(124,58,237,0.3) 100%)",
-                  border: "1px solid rgba(37,99,235,0.4)",
-                  boxShadow: "0 0 20px rgba(37,99,235,0.3)",
+                    "linear-gradient(135deg, rgba(232,160,100,0.3) 0%, rgba(201,146,42,0.3) 100%)",
+                  border: "1px solid rgba(232,160,100,0.4)",
+                  boxShadow: "0 0 20px rgba(232,160,100,0.3)",
                 }}
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               >
-                <IconComponent size={20} className="text-blue-400" />
+                <IconComponent size={20} className="text-[#e8a064]" />
               </motion.div>
             </div>
 
@@ -394,13 +394,13 @@ function TechCard({ service }: { service: ServiceData }) {
             <div
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium"
               style={{
-                background: "rgba(0,212,255,0.08)",
-                border: "1px solid rgba(0,212,255,0.2)",
-                color: "#00D4FF",
+                background: "rgba(212,145,92,0.08)",
+                border: "1px solid rgba(212,145,92,0.2)",
+                color: "#d4915c",
               }}
             >
               <motion.div
-                className="w-1.5 h-1.5 rounded-full bg-[#00D4FF]"
+                className="w-1.5 h-1.5 rounded-full bg-[#d4915c]"
                 animate={{ opacity: [1, 0.3, 1], scale: [1, 0.8, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
@@ -412,9 +412,9 @@ function TechCard({ service }: { service: ServiceData }) {
           <div
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-3 tracking-wide uppercase"
             style={{
-              background: "linear-gradient(90deg, rgba(37,99,235,0.15), rgba(124,58,237,0.15))",
-              border: "1px solid rgba(124,58,237,0.25)",
-              color: "#a78bfa",
+              background: "linear-gradient(90deg, rgba(232,160,100,0.15), rgba(201,146,42,0.15))",
+              border: "1px solid rgba(201,146,42,0.25)",
+              color: "#e8a064",
             }}
           >
             {service.badge}
@@ -437,9 +437,9 @@ function TechCard({ service }: { service: ServiceData }) {
         {/* Metrics row */}
         <div className="p-6 grid grid-cols-3 gap-4">
           {[
-            { label: "Uptime", value: "99.9%", color: "#00D4FF" },
-            { label: "Projects", value: "200+", color: "#2563EB" },
-            { label: "Rating", value: "5.0★", color: "#7C3AED" },
+            { label: "Uptime", value: "99.9%", color: "#d4915c" },
+            { label: "Projects", value: "200+", color: "#e8a064" },
+            { label: "Rating", value: "5.0★", color: "#c9922a" },
           ].map((metric) => (
             <div key={metric.label} className="text-center">
               <motion.div
@@ -472,8 +472,8 @@ function TechCard({ service }: { service: ServiceData }) {
                 key={tech.name}
                 className="text-xs px-2 py-0.5 rounded-md font-medium"
                 style={{
-                  background: "rgba(37,99,235,0.1)",
-                  border: "1px solid rgba(37,99,235,0.2)",
+                  background: "rgba(232,160,100,0.1)",
+                  border: "1px solid rgba(232,160,100,0.2)",
                   color: "rgba(147,197,253,0.7)",
                 }}
               >
@@ -484,8 +484,8 @@ function TechCard({ service }: { service: ServiceData }) {
               <span
                 className="text-xs px-2 py-0.5 rounded-md font-medium"
                 style={{
-                  background: "rgba(124,58,237,0.1)",
-                  border: "1px solid rgba(124,58,237,0.2)",
+                  background: "rgba(201,146,42,0.1)",
+                  border: "1px solid rgba(201,146,42,0.2)",
                   color: "rgba(196,181,253,0.7)",
                 }}
               >
@@ -500,7 +500,7 @@ function TechCard({ service }: { service: ServiceData }) {
       <motion.div
         className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-48 h-12 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse, rgba(37,99,235,0.2) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(232,160,100,0.2) 0%, transparent 70%)",
           filter: "blur(16px)",
         }}
         animate={{ opacity: [0.4, 0.8, 0.4], scaleX: [0.8, 1.1, 0.8] }}
@@ -551,7 +551,7 @@ function MagneticButton({
       onMouseLeave={handleMouseLeave}
       whileHover={{ scale: 1.04 }}
       whileTap={{ scale: 0.97 }}
-      className={`relative inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-semibold text-sm transition-shadow duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] ${variant === "primary"
+      className={`relative inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-semibold text-sm transition-shadow duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] ${variant === "primary"
           ? "text-white"
           : "text-white/80 hover:text-white"
         } ${className}`}
@@ -561,9 +561,9 @@ function MagneticButton({
         ...(variant === "primary"
           ? {
             background:
-              "linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)",
+              "linear-gradient(135deg, #e8a064 0%, #c9922a 100%)",
             boxShadow:
-              "0 0 0 1px rgba(37,99,235,0.4), 0 8px 24px rgba(37,99,235,0.35)",
+              "0 0 0 1px rgba(232,160,100,0.4), 0 8px 24px rgba(232,160,100,0.35)",
           }
           : {
             background: "rgba(255,255,255,0.05)",
@@ -597,12 +597,20 @@ export default function ServiceHero({ service }: ServiceHeroProps) {
   const parallaxY = useTransform(mouseY, [0, 1], [-8, 8]);
 
   useEffect(() => {
+    let frameId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX / window.innerWidth);
-      mouseY.set(e.clientY / window.innerHeight);
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = null;
+        mouseX.set(e.clientX / window.innerWidth);
+        mouseY.set(e.clientY / window.innerHeight);
+      });
     };
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (frameId) cancelAnimationFrame(frameId);
+    };
   }, [mouseX, mouseY]);
 
   const whatsappHref = `https://wa.me/919473263768?text=${encodeURIComponent(
@@ -613,7 +621,7 @@ export default function ServiceHero({ service }: ServiceHeroProps) {
     <section
       ref={sectionRef}
       className="relative min-h-screen flex items-center overflow-hidden"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
       aria-label={`${service.title} hero section`}
     >
       {/* ── Background Layers ── */}
@@ -628,7 +636,7 @@ export default function ServiceHero({ service }: ServiceHeroProps) {
           x: parallaxX,
           y: parallaxY,
           background:
-            "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(37,99,235,0.06) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(232,160,100,0.06) 0%, transparent 70%)",
         }}
         aria-hidden
       />
@@ -650,14 +658,14 @@ export default function ServiceHero({ service }: ServiceHeroProps) {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-widest"
                 style={{
                   background:
-                    "linear-gradient(90deg, rgba(37,99,235,0.12), rgba(124,58,237,0.12))",
-                  border: "1px solid rgba(124,58,237,0.3)",
-                  color: "#a78bfa",
+                    "linear-gradient(90deg, rgba(232,160,100,0.12), rgba(201,146,42,0.12))",
+                  border: "1px solid rgba(201,146,42,0.3)",
+                  color: "#e8a064",
                 }}
               >
                 <motion.div
                   className="w-1.5 h-1.5 rounded-full"
-                  style={{ background: "#7C3AED" }}
+                  style={{ background: "#c9922a" }}
                   animate={{ scale: [1, 1.4, 1], opacity: [0.7, 1, 0.7] }}
                   transition={{ duration: 2.5, repeat: Infinity }}
                 />
@@ -685,7 +693,7 @@ export default function ServiceHero({ service }: ServiceHeroProps) {
                   className="block text-4xl sm:text-5xl xl:text-6xl mt-1"
                   style={{
                     background:
-                      "linear-gradient(135deg, #2563EB 0%, #00D4FF 50%, #7C3AED 100%)",
+                      "linear-gradient(135deg, #e8a064 0%, #d4915c 50%, #c9922a 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
@@ -722,10 +730,10 @@ export default function ServiceHero({ service }: ServiceHeroProps) {
                 >
                   <div
                     className="w-3 h-3 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: "rgba(0,212,255,0.15)", border: "1px solid rgba(0,212,255,0.3)" }}
+                    style={{ background: "rgba(212,145,92,0.15)", border: "1px solid rgba(212,145,92,0.3)" }}
                   >
                     <svg width="6" height="5" viewBox="0 0 6 5" fill="none">
-                      <path d="M1 2.5L2.5 4L5 1" stroke="#00D4FF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M1 2.5L2.5 4L5 1" stroke="#d4915c" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                   {item}
@@ -759,10 +767,10 @@ export default function ServiceHero({ service }: ServiceHeroProps) {
                 {["2563EB", "7C3AED", "00D4FF", "2563EB"].map((color, i) => (
                   <div
                     key={i}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ring-2 ring-[#050816]"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ring-2 ring-[#0f0f0f]"
                     style={{
-                      background: `linear-gradient(135deg, #${color} 0%, #050816 150%)`,
-                      border: "2px solid #050816",
+                      background: `linear-gradient(135deg, #${color} 0%, #0f0f0f 150%)`,
+                      border: "2px solid #0f0f0f",
                     }}
                   >
                     {["AK", "SR", "MJ", "TL"][i]}
@@ -796,7 +804,7 @@ export default function ServiceHero({ service }: ServiceHeroProps) {
         className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
         style={{
           background:
-            "linear-gradient(to top, #050816 0%, transparent 100%)",
+            "linear-gradient(to top, #0f0f0f 0%, transparent 100%)",
         }}
         aria-hidden
       />

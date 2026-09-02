@@ -69,9 +69,9 @@ const STEP_TIMES = [
 ];
 
 const ACCENT_CYCLE = [
-  { primary: "#2563EB", secondary: "#00D4FF", glow: "rgba(37,99,235,0.25)" },
-  { primary: "#7C3AED", secondary: "#2563EB", glow: "rgba(124,58,237,0.25)" },
-  { primary: "#00D4FF", secondary: "#7C3AED", glow: "rgba(0,212,255,0.2)" },
+  { primary: "#e8a064", secondary: "#d4915c", glow: "rgba(232,160,100,0.25)" },
+  { primary: "#c9922a", secondary: "#e8a064", glow: "rgba(201,146,42,0.25)" },
+  { primary: "#d4915c", secondary: "#c9922a", glow: "rgba(212,145,92,0.2)" },
 ];
 
 const PHASE_LABELS = ["Discovery", "Planning", "Development", "Launch", "Support"];
@@ -143,7 +143,7 @@ function BackgroundParticles({ reduced }: { reduced: boolean }) {
           style={{
             left: `${p.x}%`, top: `${p.y}%`,
             width: p.size, height: p.size,
-            background: `radial-gradient(circle, rgba(37,99,235,${p.opacity}) 0%, rgba(124,58,237,${p.opacity * 0.5}) 100%)`,
+            background: `radial-gradient(circle, rgba(232,160,100,${p.opacity}) 0%, rgba(201,146,42,${p.opacity * 0.5}) 100%)`,
           }}
           animate={{ y: [0, -100, 0], x: [0, p.xDrift, 0], opacity: [0, p.opacity, 0] }}
           transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
@@ -193,8 +193,8 @@ function GridOverlay() {
         className="absolute inset-0"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(37,99,235,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(37,99,235,0.03) 1px, transparent 1px)
+            linear-gradient(rgba(232,160,100,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(232,160,100,0.03) 1px, transparent 1px)
           `,
           backgroundSize: "72px 72px",
         }}
@@ -231,7 +231,7 @@ function TimelineBeam({ reduced }: { reduced: boolean }) {
         className="absolute top-0 left-0 right-0 origin-top"
         style={{
           scaleY: reduced ? 1 : scaleY,
-          background: "linear-gradient(to bottom, #2563EB 0%, #00D4FF 40%, #7C3AED 80%, #2563EB 100%)",
+          background: "linear-gradient(to bottom, #e8a064 0%, #d4915c 40%, #c9922a 80%, #e8a064 100%)",
           backgroundSize: "100% 300%",
         }}
         animate={reduced ? {} : { backgroundPositionY: ["0%", "100%", "0%"] }}
@@ -242,7 +242,7 @@ function TimelineBeam({ reduced }: { reduced: boolean }) {
           <motion.div
             className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full"
             style={{
-              background: "radial-gradient(circle, #00D4FF 0%, rgba(0,212,255,0) 80%)",
+              background: "radial-gradient(circle, #d4915c 0%, rgba(212,145,92,0) 80%)",
               filter: "blur(4px)",
             }}
             animate={{ opacity: [0.6, 1, 0.6] }}
@@ -275,7 +275,7 @@ function MobileTimelineLine({ reduced }: { reduced: boolean }) {
         className="absolute top-0 left-0 right-0 origin-top"
         style={{
           scaleY: reduced ? 1 : scaleY,
-          background: "linear-gradient(to bottom, #2563EB, #00D4FF, #7C3AED)",
+          background: "linear-gradient(to bottom, #e8a064, #d4915c, #c9922a)",
         }}
       />
     </div>
@@ -663,7 +663,7 @@ function ProcessSummaryPanel({ reduced }: { reduced: boolean }) {
           className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none"
           style={{
             background:
-              "linear-gradient(90deg, transparent 0%, #2563EB 25%, #00D4FF 50%, #7C3AED 75%, transparent 100%)",
+              "linear-gradient(90deg, transparent 0%, #e8a064 25%, #d4915c 50%, #c9922a 75%, transparent 100%)",
           }}
           animate={{ opacity: [0.4, 1, 0.4] }}
           transition={{ duration: 4, repeat: Infinity }}
@@ -676,7 +676,7 @@ function ProcessSummaryPanel({ reduced }: { reduced: boolean }) {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 70% 60% at 50% 100%, rgba(37,99,235,0.06) 0%, transparent 70%)",
+            "radial-gradient(ellipse 70% 60% at 50% 100%, rgba(232,160,100,0.06) 0%, transparent 70%)",
         }}
         aria-hidden
       />
@@ -747,7 +747,7 @@ function ProcessSummaryPanel({ reduced }: { reduced: boolean }) {
               className="flex items-center gap-1.5 text-xs font-medium"
               style={{ color: "rgba(255,255,255,0.35)" }}
             >
-              <CheckCircle2 size={12} style={{ color: "#00D4FF" }} aria-hidden />
+              <CheckCircle2 size={12} style={{ color: "#d4915c" }} aria-hidden />
               {item}
             </motion.div>
           ))}
@@ -772,8 +772,8 @@ function SectionHeader({ service, inView }: { service: ServiceData; inView: bool
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest"
           style={{
-            background: "rgba(124,58,237,0.1)",
-            border: "1px solid rgba(124,58,237,0.25)",
+            background: "rgba(201,146,42,0.1)",
+            border: "1px solid rgba(201,146,42,0.25)",
             color: "#c4b5fd",
           }}
         >
@@ -797,7 +797,7 @@ function SectionHeader({ service, inView }: { service: ServiceData; inView: bool
         <br />
         <span
           style={{
-            background: "linear-gradient(135deg, #2563EB 0%, #00D4FF 45%, #7C3AED 100%)",
+            background: "linear-gradient(135deg, #e8a064 0%, #d4915c 45%, #c9922a 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
@@ -843,7 +843,7 @@ export default function ServiceProcess({ service }: ServiceProcessProps) {
     <section
       ref={sectionRef}
       className="relative overflow-hidden py-24 lg:py-32"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
       aria-labelledby="process-heading"
     >
       {/* Background */}
@@ -876,7 +876,7 @@ export default function ServiceProcess({ service }: ServiceProcessProps) {
       {/* Bottom fade */}
       <div
         className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
-        style={{ background: "linear-gradient(to top, #050816 0%, transparent 100%)" }}
+        style={{ background: "linear-gradient(to top, #0f0f0f 0%, transparent 100%)" }}
         aria-hidden
       />
     </section>

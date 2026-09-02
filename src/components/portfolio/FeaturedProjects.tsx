@@ -48,9 +48,9 @@ interface Particle {
 }
 
 const STATUS_STYLES: Record<ProjectStatus, { bg: string; border: string; color: string; icon: React.ElementType }> = {
-  Live: { bg: "rgba(0,212,255,0.1)", border: "rgba(0,212,255,0.28)", color: "#67e8f9", icon: CheckCircle2 },
-  "In Development": { bg: "rgba(124,58,237,0.1)", border: "rgba(124,58,237,0.28)", color: "#c4b5fd", icon: Clock },
-  Completed: { bg: "rgba(37,99,235,0.1)", border: "rgba(37,99,235,0.28)", color: "#93c5fd", icon: FlaskConical },
+  Live: { bg: "rgba(212,145,92,0.1)", border: "rgba(212,145,92,0.28)", color: "#67e8f9", icon: CheckCircle2 },
+  "In Development": { bg: "rgba(201,146,42,0.1)", border: "rgba(201,146,42,0.28)", color: "#c4b5fd", icon: Clock },
+  Completed: { bg: "rgba(232,160,100,0.1)", border: "rgba(232,160,100,0.28)", color: "#93c5fd", icon: FlaskConical },
 };
 
 // ─── Animation Variants ────────────────────────────────────────────────────────
@@ -84,7 +84,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
       <motion.div
         className="absolute -top-52 -left-36 w-[640px] h-[640px] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(37,99,235,0.16) 0%, transparent 65%)",
+          background: "radial-gradient(circle, rgba(232,160,100,0.16) 0%, transparent 65%)",
           filter: "blur(50px)",
         }}
         animate={reduced ? {} : { x: [0, 70, -35, 0], y: [0, 55, -25, 0], scale: [1, 1.12, 0.93, 1] }}
@@ -93,7 +93,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
       <motion.div
         className="absolute top-1/3 -right-44 w-[560px] h-[560px] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 65%)",
+          background: "radial-gradient(circle, rgba(201,146,42,0.14) 0%, transparent 65%)",
           filter: "blur(50px)",
         }}
         animate={reduced ? {} : { x: [0, -55, 35, 0], y: [0, -65, 40, 0], scale: [1, 0.9, 1.1, 1] }}
@@ -102,7 +102,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
       <motion.div
         className="absolute -bottom-28 left-1/3 w-[480px] h-[380px] rounded-full"
         style={{
-          background: "radial-gradient(ellipse, rgba(0,212,255,0.1) 0%, transparent 65%)",
+          background: "radial-gradient(ellipse, rgba(212,145,92,0.1) 0%, transparent 65%)",
           filter: "blur(60px)",
         }}
         animate={reduced ? {} : { scaleX: [1, 1.15, 0.92, 1], scaleY: [1, 0.85, 1.08, 1] }}
@@ -119,8 +119,8 @@ function PerspectiveGrid() {
         className="absolute inset-0"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(37,99,235,0.035) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(37,99,235,0.035) 1px, transparent 1px)
+            linear-gradient(rgba(232,160,100,0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(232,160,100,0.035) 1px, transparent 1px)
           `,
           backgroundSize: "68px 68px",
           maskImage: "radial-gradient(ellipse 75% 60% at 50% 20%, black 25%, transparent 75%)",
@@ -178,7 +178,7 @@ function BackgroundParticles({ reduced }: { reduced: boolean }) {
             top: `${p.y}%`,
             width: p.size,
             height: p.size,
-            background: `radial-gradient(circle, rgba(0,212,255,${p.opacity}) 0%, rgba(124,58,237,${p.opacity * 0.5}) 100%)`,
+            background: `radial-gradient(circle, rgba(212,145,92,${p.opacity}) 0%, rgba(201,146,42,${p.opacity * 0.5}) 100%)`,
           }}
           animate={{ y: [0, -100, 0], x: [0, p.drift, 0], opacity: [0, p.opacity, 0] }}
           transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
@@ -634,10 +634,10 @@ function ProjectCard({ project, index, reduced }: { project: PortfolioProject; i
               aria-label={`View case study for ${project.title}`}
               whileHover={reduced ? {} : { scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-lg text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] transition-colors"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-lg text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] transition-colors"
               style={{
                 background: `linear-gradient(135deg, ${project.accentPrimary} 0%, ${project.accentSecondary} 100%)`,
-                color: "#050816",
+                color: "#0f0f0f",
               }}
             >
               View Case Study
@@ -648,7 +648,7 @@ function ProjectCard({ project, index, reduced }: { project: PortfolioProject; i
               aria-label={`View live demo for ${project.title}`}
               whileHover={reduced ? {} : { scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-lg text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-lg text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] transition-colors"
               style={{
                 background: "rgba(255,255,255,0.05)",
                 border: "1px solid rgba(255,255,255,0.12)",
@@ -672,7 +672,7 @@ function GradientWord({ children }: { children: React.ReactNode }) {
     <span
       className="inline-block"
       style={{
-        background: "linear-gradient(135deg, #2563EB 0%, #00D4FF 45%, #7C3AED 100%)",
+        background: "linear-gradient(135deg, #e8a064 0%, #d4915c 45%, #c9922a 100%)",
         WebkitBackgroundClip: "text",
         WebkitTextFillColor: "transparent",
         backgroundClip: "text",
@@ -705,14 +705,14 @@ function SectionHeader({ inView }: { inView: boolean }) {
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest"
           style={{
-            background: "linear-gradient(90deg, rgba(37,99,235,0.12), rgba(124,58,237,0.12))",
-            border: "1px solid rgba(124,58,237,0.3)",
-            color: "#a78bfa",
+            background: "linear-gradient(90deg, rgba(232,160,100,0.12), rgba(201,146,42,0.12))",
+            border: "1px solid rgba(201,146,42,0.3)",
+            color: "#e8a064",
           }}
         >
           <motion.div
             className="w-1.5 h-1.5 rounded-full"
-            style={{ background: "#7C3AED" }}
+            style={{ background: "#c9922a" }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
             aria-hidden
@@ -768,7 +768,7 @@ export default function FeaturedProjects() {
     <section
       ref={sectionRef}
       className="relative overflow-hidden py-24 lg:py-32"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
       aria-labelledby="featured-projects-heading"
     >
       {/* Background */}
@@ -806,7 +806,7 @@ export default function FeaturedProjects() {
       {/* Bottom fade */}
       <div
         className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
-        style={{ background: "linear-gradient(to top, #050816 0%, transparent 100%)" }}
+        style={{ background: "linear-gradient(to top, #0f0f0f 0%, transparent 100%)" }}
         aria-hidden
       />
     </section>

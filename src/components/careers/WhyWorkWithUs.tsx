@@ -49,7 +49,7 @@ const BENEFITS: Benefit[] = [
     title: "Innovation First",
     description:
       "Work on cutting-edge AI, cloud, web, and automation technologies that solve real-world problems.",
-    accent: "#00D4FF",
+    accent: "#d4915c",
   },
   {
     id: "growth",
@@ -57,7 +57,7 @@ const BENEFITS: Benefit[] = [
     title: "Career Growth",
     description:
       "Learn, experiment, and grow with continuous opportunities for personal and professional development.",
-    accent: "#2563EB",
+    accent: "#e8a064",
   },
   {
     id: "remote",
@@ -65,7 +65,7 @@ const BENEFITS: Benefit[] = [
     title: "Remote Flexibility",
     description:
       "Enjoy a modern work culture focused on outcomes, flexibility, and productivity.",
-    accent: "#7C3AED",
+    accent: "#c9922a",
   },
   {
     id: "culture",
@@ -73,7 +73,7 @@ const BENEFITS: Benefit[] = [
     title: "Collaborative Culture",
     description:
       "Work alongside passionate engineers, designers, and innovators who love building exceptional products.",
-    accent: "#00D4FF",
+    accent: "#d4915c",
   },
   {
     id: "learning",
@@ -81,7 +81,7 @@ const BENEFITS: Benefit[] = [
     title: "Learning & Development",
     description:
       "Stay ahead with access to modern technologies, workshops, mentorship, and innovation-driven projects.",
-    accent: "#2563EB",
+    accent: "#e8a064",
   },
   {
     id: "impact",
@@ -89,7 +89,7 @@ const BENEFITS: Benefit[] = [
     title: "Meaningful Impact",
     description:
       "Build products and solutions that create measurable value for businesses and communities.",
-    accent: "#7C3AED",
+    accent: "#c9922a",
   },
 ];
 
@@ -139,19 +139,19 @@ function AuroraLayer({ reduceMotion }: { reduceMotion: boolean }) {
     <div aria-hidden className="absolute inset-0 overflow-hidden">
       <motion.div
         className="absolute -top-44 -right-36 h-[38rem] w-[38rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(124,58,237,0.36), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(201,146,42,0.36), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, -60, 0], y: [0, 40, 0] }}
         transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute top-1/3 -left-40 h-[34rem] w-[34rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(37,99,235,0.36), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(232,160,100,0.36), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, 55, 0], y: [0, -35, 0] }}
         transition={{ duration: 27, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute bottom-[-12rem] right-1/3 h-[32rem] w-[32rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(0,212,255,0.26), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(212,145,92,0.26), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, -45, 0], y: [0, 25, 0] }}
         transition={{ duration: 23, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -189,14 +189,14 @@ function NoiseTexture() {
 
 function FloatingParticles({ reduceMotion }: { reduceMotion: boolean }) {
   const particles = [
-    { left: 8, top: 14, size: 3, hue: "#00D4FF", dur: 13 },
-    { left: 18, top: 70, size: 2, hue: "#7C3AED", dur: 17 },
-    { left: 30, top: 40, size: 2.5, hue: "#2563EB", dur: 15 },
-    { left: 44, top: 84, size: 2, hue: "#00D4FF", dur: 19 },
-    { left: 56, top: 10, size: 3, hue: "#7C3AED", dur: 14 },
-    { left: 68, top: 58, size: 2, hue: "#2563EB", dur: 16 },
-    { left: 80, top: 22, size: 2.5, hue: "#00D4FF", dur: 18 },
-    { left: 90, top: 66, size: 3, hue: "#7C3AED", dur: 20 },
+    { left: 8, top: 14, size: 3, hue: "#d4915c", dur: 13 },
+    { left: 18, top: 70, size: 2, hue: "#c9922a", dur: 17 },
+    { left: 30, top: 40, size: 2.5, hue: "#e8a064", dur: 15 },
+    { left: 44, top: 84, size: 2, hue: "#d4915c", dur: 19 },
+    { left: 56, top: 10, size: 3, hue: "#c9922a", dur: 14 },
+    { left: 68, top: 58, size: 2, hue: "#e8a064", dur: 16 },
+    { left: 80, top: 22, size: 2.5, hue: "#d4915c", dur: 18 },
+    { left: 90, top: 66, size: 3, hue: "#c9922a", dur: 20 },
   ];
 
   return (
@@ -254,7 +254,7 @@ function GradientWord({ children }: { children: ReactNode }) {
     <motion.span
       className="relative inline-block bg-clip-text text-transparent"
       style={{
-        backgroundImage: "linear-gradient(110deg, #00D4FF, #2563EB 35%, #7C3AED 65%, #00D4FF)",
+        backgroundImage: "linear-gradient(110deg, #d4915c, #e8a064 35%, #c9922a 65%, #d4915c)",
         backgroundSize: "300% 100%",
       }}
       animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
@@ -275,7 +275,7 @@ function BorderBeam({ active, speed = 3.2 }: { active: boolean; speed?: number }
       aria-hidden
       className="pointer-events-none absolute inset-0 rounded-2xl"
       style={{
-        background: "conic-gradient(from 0deg, #00D4FF, #2563EB, #7C3AED, #00D4FF)",
+        background: "conic-gradient(from 0deg, #d4915c, #e8a064, #c9922a, #d4915c)",
         opacity: active ? 0.9 : 0,
         padding: 1.5,
         WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
@@ -353,7 +353,7 @@ function BenefitCard({ benefit, index }: { benefit: Benefit; index: number }) {
         style={{ rotateX: srx, rotateY: sry, transformStyle: "preserve-3d" }}
         whileHover={{ scale: 1.03, y: -6 }}
         transition={{ type: "spring", stiffness: 260, damping: 22 }}
-        className="group relative h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60"
+        className="group relative h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-[#d4915c]/60"
         tabIndex={0}
         role="article"
         aria-label={benefit.title}
@@ -363,7 +363,7 @@ function BenefitCard({ benefit, index }: { benefit: Benefit; index: number }) {
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-2xl"
           style={{
-            background: "conic-gradient(from 0deg, #00D4FF, #2563EB, #7C3AED, #00D4FF)",
+            background: "conic-gradient(from 0deg, #d4915c, #e8a064, #c9922a, #d4915c)",
             padding: 1.5,
             WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
             WebkitMaskComposite: "xor",
@@ -376,7 +376,7 @@ function BenefitCard({ benefit, index }: { benefit: Benefit; index: number }) {
         {/* glass body */}
         <div
           className={[
-            "relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/[0.045] p-7 backdrop-blur-xl transition-shadow duration-300",
+            "relative flex h-full flex-col overflow-hidden rounded-2xl bg-[#141414]/[0.045] p-7 backdrop-blur-xl transition-shadow duration-300",
             "shadow-[0_10px_40px_-12px_rgba(0,0,0,0.45)] group-hover:shadow-[0_24px_70px_-18px_var(--axv-glow)]",
           ].join(" ")}
           style={{ ["--axv-glow" as string]: `${benefit.accent}66` }}
@@ -456,7 +456,7 @@ export default function WhyWorkWithUs() {
       onMouseMove={handleSectionMove}
       aria-label="Why work with Axivon Technologies"
       className="relative isolate w-full overflow-hidden px-4 py-24 sm:px-6 sm:py-28 lg:px-10 lg:py-32 2xl:px-20"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
     >
       <style>{`
         @keyframes wwu-spin { to { transform: rotate(360deg); } }
@@ -471,20 +471,20 @@ export default function WhyWorkWithUs() {
       <NoiseTexture />
 
       {/* Bonus: floating holographic circles */}
-      <HolographicCircle size={220} className="left-[4%] top-[12%]" hue="#00D4FF" duration={11} />
-      <HolographicCircle size={160} className="right-[6%] top-[8%]" hue="#7C3AED" duration={14} />
-      <HolographicCircle size={260} className="bottom-[6%] right-[10%]" hue="#2563EB" duration={13} />
+      <HolographicCircle size={220} className="left-[4%] top-[12%]" hue="#d4915c" duration={11} />
+      <HolographicCircle size={160} className="right-[6%] top-[8%]" hue="#c9922a" duration={14} />
+      <HolographicCircle size={260} className="bottom-[6%] right-[10%]" hue="#e8a064" duration={13} />
 
       {/* Parallax gradient orbs */}
       <motion.div
         aria-hidden
         className="pointer-events-none absolute left-[10%] top-[10%] h-72 w-72 rounded-full blur-[100px] sm:h-96 sm:w-96"
-        style={{ background: "radial-gradient(circle, rgba(0,212,255,0.28), transparent 70%)", x: orbX, y: orbY }}
+        style={{ background: "radial-gradient(circle, rgba(212,145,92,0.28), transparent 70%)", x: orbX, y: orbY }}
       />
       <motion.div
         aria-hidden
         className="pointer-events-none absolute bottom-[8%] right-[6%] h-80 w-80 rounded-full blur-[110px] sm:h-[26rem] sm:w-[26rem]"
-        style={{ background: "radial-gradient(circle, rgba(124,58,237,0.3), transparent 70%)", x: orbXInverse, y: orbYInverse }}
+        style={{ background: "radial-gradient(circle, rgba(201,146,42,0.3), transparent 70%)", x: orbXInverse, y: orbYInverse }}
       />
 
       <div className="relative mx-auto max-w-[1400px] 2xl:max-w-[1600px]">
@@ -498,7 +498,7 @@ export default function WhyWorkWithUs() {
         >
           <motion.span
             variants={fadeUp}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#00D4FF] backdrop-blur-md"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#141414]/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#d4915c] backdrop-blur-md"
           >
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
             Why Join Axivon

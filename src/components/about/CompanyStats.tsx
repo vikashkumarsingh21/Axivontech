@@ -4,9 +4,9 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useInView, useReducedMotion, useMotionValue, useSpring } from "framer-motion";
 import { Briefcase, Cpu, Clock3, HeartHandshake } from "lucide-react";
 import type { TargetAndTransition } from "framer-motion";
-const EASE_PREMIUM = [0.22, 1, 0.36, 1] as const;
+import { Badge } from "@/components/ui";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+const EASE_PREMIUM = [0.22, 1, 0.36, 1] as const;
 
 interface Stat {
   id: number;
@@ -30,32 +30,30 @@ interface Particle {
   opacity: number;
 }
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-
 const STATS: Stat[] = [
   {
     id: 1,
-    number: 20,
+    number: 10,
     suffix: "+",
     title: "Projects Delivered",
     description:
       "Successfully delivered modern websites, applications, and digital solutions.",
     Icon: Briefcase,
-    gradient: "from-[#2563EB] to-[#00D4FF]",
-    glowColor: "rgba(37,99,235,0.35)",
-    ariaLabel: "20 plus projects delivered",
+    gradient: "from-[#c47a3a] to-[#e8a064]",
+    glowColor: "rgba(232,160,100,0.2)",
+    ariaLabel: "10 plus projects delivered",
   },
   {
     id: 2,
-    number: 10,
+    number: 5,
     suffix: "+",
-    title: "Technologies Used",
+    title: "Services Offered",
     description:
       "Modern technologies powering scalable and future-ready solutions.",
     Icon: Cpu,
-    gradient: "from-[#7C3AED] to-[#2563EB]",
-    glowColor: "rgba(124,58,237,0.35)",
-    ariaLabel: "10 plus technologies used",
+    gradient: "from-[#e8a064] to-[#f0b07a]",
+    glowColor: "rgba(240,176,122,0.2)",
+    ariaLabel: "5 plus services offered",
   },
   {
     id: 3,
@@ -65,8 +63,8 @@ const STATS: Stat[] = [
     description:
       "Fast communication and dedicated support for every client.",
     Icon: Clock3,
-    gradient: "from-[#00D4FF] to-[#7C3AED]",
-    glowColor: "rgba(0,212,255,0.35)",
+    gradient: "from-[#f0b07a] to-[#c47a3a]",
+    glowColor: "rgba(232,160,100,0.2)",
     ariaLabel: "24 hour response time",
   },
   {
@@ -77,13 +75,11 @@ const STATS: Stat[] = [
     description:
       "Every decision is made to maximize business growth and user experience.",
     Icon: HeartHandshake,
-    gradient: "from-[#2563EB] to-[#7C3AED]",
-    glowColor: "rgba(37,99,235,0.35)",
+    gradient: "from-[#c47a3a] to-[#f0b07a]",
+    glowColor: "rgba(232,160,100,0.2)",
     ariaLabel: "100 percent client focus",
   },
 ];
-
-// ─── Count-Up Hook ────────────────────────────────────────────────────────────
 
 function useCountUp(target: number, duration: number, start: boolean, reduced: boolean) {
   const [count, setCount] = useState(0);
@@ -99,7 +95,6 @@ function useCountUp(target: number, duration: number, start: boolean, reduced: b
       if (!startTime) startTime = timestamp;
       const elapsed = timestamp - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.floor(eased * target));
       if (progress < 1) raf = requestAnimationFrame(step);
@@ -111,8 +106,6 @@ function useCountUp(target: number, duration: number, start: boolean, reduced: b
 
   return count;
 }
-
-// ─── Animated Number ──────────────────────────────────────────────────────────
 
 function AnimatedNumber({
   stat,
@@ -136,8 +129,6 @@ function AnimatedNumber({
   );
 }
 
-// ─── Border Beam ─────────────────────────────────────────────────────────────
-
 function BorderBeam({ gradient }: { gradient: string }) {
   return (
     <div
@@ -157,8 +148,6 @@ function BorderBeam({ gradient }: { gradient: string }) {
     </div>
   );
 }
-
-// ─── Spotlight ────────────────────────────────────────────────────────────────
 
 function SpotlightCard({
   children,
@@ -210,18 +199,16 @@ function SpotlightCard({
   );
 }
 
-// ─── Floating Particles ───────────────────────────────────────────────────────
-
 function FloatingParticles({ reduced }: { reduced: boolean }) {
   const [particles] = useState<Particle[]>(() =>
-    Array.from({ length: 24 }, (_, i) => ({
+    Array.from({ length: 18 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: Math.random() * 2.5 + 1,
       duration: Math.random() * 12 + 8,
       delay: Math.random() * 6,
-      opacity: Math.random() * 0.35 + 0.1,
+      opacity: Math.random() * 0.15 + 0.05,
     }))
   );
 
@@ -238,11 +225,7 @@ function FloatingParticles({ reduced }: { reduced: boolean }) {
             top: `${p.y}%`,
             width: p.size,
             height: p.size,
-            background: p.id % 3 === 0
-              ? "#2563EB"
-              : p.id % 3 === 1
-              ? "#7C3AED"
-              : "#00D4FF",
+            background: p.id % 2 === 0 ? "#e8a064" : "#c47a3a",
             opacity: p.opacity,
             boxShadow: `0 0 ${p.size * 3}px currentColor`,
           }}
@@ -263,8 +246,6 @@ function FloatingParticles({ reduced }: { reduced: boolean }) {
   );
 }
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
-
 function StatCard({
   stat,
   index,
@@ -276,32 +257,30 @@ function StatCard({
   sectionStarted: boolean;
   reduced: boolean;
 }) {
-  const EASE_PREMIUM = [0.22, 1, 0.36, 1] as const;
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 48, scale: 0.94 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.65,
-      delay: index * 0.13,
-      ease: EASE_PREMIUM,
-    },
-  },
-};
-
- const hoverVariants: TargetAndTransition | undefined = reduced
-  ? undefined
-  : {
-      scale: 1.03,
-      rotateX: 3,
-      rotateY: -3,
+  const cardVariants = {
+    hidden: { opacity: 0, y: 48, scale: 0.94 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
       transition: {
-        duration: 0.3,
+        duration: 0.65,
+        delay: index * 0.13,
+        ease: EASE_PREMIUM,
       },
-    };
+    },
+  };
+
+  const hoverVariants: TargetAndTransition | undefined = reduced
+    ? undefined
+    : {
+        scale: 1.03,
+        rotateX: 3,
+        rotateY: -3,
+        transition: {
+          duration: 0.3,
+        },
+      };
   return (
     <motion.article
       variants={reduced ? undefined : cardVariants}
@@ -315,23 +294,9 @@ const cardVariants = {
       style={{ perspective: 800 }}
     >
       <SpotlightCard glowColor={stat.glowColor}>
-        {/* Card base */}
         <div
-          className={`
-            relative overflow-hidden rounded-[32px]
-            bg-white/[0.03] border border-white/10
-            backdrop-blur-xl
-            p-8 flex flex-col gap-6
-            transition-all duration-500
-            group-hover:border-white/20
-            group-hover:bg-white/[0.06]
-            group-focus:ring-2 group-focus:ring-[#2563EB]/60
-          `}
-          style={{
-            boxShadow: `0 0 0 0 transparent`,
-          }}
+          className="relative overflow-hidden rounded-[32px] bg-[#141414] border border-[#262626] p-8 flex flex-col gap-6 transition-all duration-500 group-hover:border-[rgba(232,160,100,0.25)] group-hover:bg-[#1c1c1e] group-focus:ring-2 group-focus:ring-[#e8a064]/60"
         >
-          {/* Glow on hover via pseudo-element substitute */}
           <div
             aria-hidden={true}
             className="pointer-events-none absolute inset-0 rounded-[32px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -340,7 +305,6 @@ const cardVariants = {
             }}
           />
 
-          {/* Inner top-left gradient splash */}
           <div
             aria-hidden={true}
             className="pointer-events-none absolute -top-12 -left-12 w-40 h-40 rounded-full blur-3xl opacity-20"
@@ -351,14 +315,10 @@ const cardVariants = {
 
           {/* Icon */}
           <div
-            className={`
-              w-14 h-14 rounded-2xl flex items-center justify-center
-              bg-gradient-to-br ${stat.gradient}
-              shadow-lg flex-shrink-0
-            `}
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br ${stat.gradient} shadow-lg flex-shrink-0`}
             aria-hidden={true}
           >
-            <stat.Icon className="w-7 h-7 text-white" strokeWidth={1.8} />
+            <stat.Icon className="w-7 h-7 text-[#0f0f0f]" strokeWidth={1.8} />
           </div>
 
           {/* Number */}
@@ -366,15 +326,15 @@ const cardVariants = {
 
           {/* Title & Description */}
           <div className="flex flex-col gap-2">
-            <h3 className="text-white font-semibold text-lg leading-snug tracking-tight">
+            <h3 className="text-[#f4f4f5] font-semibold text-lg leading-snug tracking-tight">
               {stat.title}
             </h3>
-            <p className="text-white/45 text-sm leading-relaxed">
+            <p className="text-[#a1a1aa] text-sm leading-relaxed">
               {stat.description}
             </p>
           </div>
 
-          {/* Animated border beam */}
+          {/* Border beam */}
           {!reduced && <BorderBeam gradient={stat.gradient} />}
         </div>
       </SpotlightCard>
@@ -382,121 +342,49 @@ const cardVariants = {
   );
 }
 
-// ─── Floating Blobs ───────────────────────────────────────────────────────────
-
-function FloatingBlobs({ reduced }: { reduced: boolean }) {
-  if (reduced) return null;
-
-  return (
-    <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* Blue blob */}
-      <motion.div
-        className="absolute rounded-full blur-[120px] opacity-[0.12]"
-        style={{
-          width: 600,
-          height: 600,
-          background: "radial-gradient(circle, #2563EB, transparent 70%)",
-          top: "-15%",
-          left: "-10%",
-        }}
-        animate={{ x: [0, 60, 0], y: [0, 40, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-      />
-      {/* Purple blob */}
-      <motion.div
-        className="absolute rounded-full blur-[140px] opacity-[0.10]"
-        style={{
-          width: 500,
-          height: 500,
-          background: "radial-gradient(circle, #7C3AED, transparent 70%)",
-          bottom: "-10%",
-          right: "5%",
-        }}
-        animate={{ x: [0, -50, 0], y: [0, -35, 0] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-      />
-      {/* Cyan blob */}
-      <motion.div
-        className="absolute rounded-full blur-[100px] opacity-[0.08]"
-        style={{
-          width: 400,
-          height: 400,
-          background: "radial-gradient(circle, #00D4FF, transparent 70%)",
-          top: "40%",
-          left: "50%",
-          translateX: "-50%",
-        }}
-        animate={{ x: [0, 30, -30, 0], y: [0, -25, 25, 0] }}
-        transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 6 }}
-      />
-    </div>
-  );
-}
-
-// ─── Section Header ───────────────────────────────────────────────────────────
-
 function SectionHeader({ started, reduced }: { started: boolean; reduced: boolean }) {
   const variants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, delay: i * 0.12, ease: EASE_PREMIUM, },
+      transition: { duration: 0.7, delay: i * 0.12, ease: EASE_PREMIUM },
     }),
   };
 
   return (
     <div className="text-center max-w-2xl mx-auto mb-16 flex flex-col items-center gap-5">
-      {/* Badge */}
       <motion.div
         custom={0}
         variants={reduced ? undefined : variants}
         initial={reduced ? undefined : "hidden"}
         animate={started ? "visible" : "hidden"}
       >
-        <span
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
-          aria-label="Section badge: Our Impact"
-        >
-          <span
-            aria-hidden={true}
-            className="w-1.5 h-1.5 rounded-full bg-[#00D4FF] animate-pulse"
-          />
-          OUR IMPACT
-        </span>
+        <Badge>
+          <span aria-hidden={true} className="w-1.5 h-1.5 rounded-full bg-[#e8a064] animate-pulse" />
+          <span className="ml-1.5">OUR IMPACT</span>
+        </Badge>
       </motion.div>
 
-      {/* Heading */}
       <motion.h2
         custom={1}
         variants={reduced ? undefined : variants}
         initial={reduced ? undefined : "hidden"}
         animate={started ? "visible" : "hidden"}
-        className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.1]"
+        className="text-4xl sm:text-5xl font-extrabold tracking-tight text-[#f4f4f5] leading-[1.1]"
       >
         Numbers That{" "}
-        <span className="relative inline-block">
-          <span
-            className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent"
-            style={{
-              backgroundSize: "200% 100%",
-              animation: reduced ? "none" : "gradientShift 4s ease infinite",
-            }}
-          >
-            Reflect
-          </span>
-        </span>
+        <span className="text-gradient-amber">Reflect</span>
         <br />
         Our Commitment
       </motion.h2>
 
-      {/* Description */}
       <motion.p
         custom={2}
         variants={reduced ? undefined : variants}
         initial={reduced ? undefined : "hidden"}
         animate={started ? "visible" : "hidden"}
-        className="text-white/50 text-base sm:text-lg leading-relaxed max-w-xl"
+        className="text-[#a1a1aa] text-base sm:text-lg leading-relaxed max-w-xl"
       >
         Every project, innovation, and client interaction helps us grow stronger
         and deliver better solutions.
@@ -504,8 +392,6 @@ function SectionHeader({ started, reduced }: { started: boolean; reduced: boolea
     </div>
   );
 }
-
-// ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function CompanyStats() {
   const reduced = useReducedMotion() ?? false;
@@ -518,53 +404,34 @@ export default function CompanyStats() {
   }, [isInView, started]);
 
   return (
-    <>
-      {/* Gradient shift keyframe */}
-      <style>{`
-        @keyframes gradientShift {
-          0%   { background-position: 0% 50%; }
-          50%  { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-      `}</style>
+    <section
+      ref={sectionRef}
+      aria-labelledby="stats-heading"
+      className="relative w-full overflow-hidden py-24 sm:py-32 bg-[#0f0f0f]"
+    >
+      <FloatingParticles reduced={reduced} />
 
-      <section
-        ref={sectionRef}
-        aria-labelledby="stats-heading"
-        className="relative w-full overflow-hidden py-24 sm:py-32"
-        style={{ background: "#050816" }}
-      >
-        {/* Floating background blobs */}
-        <FloatingBlobs reduced={reduced} />
-
-        {/* Particles */}
-        <FloatingParticles reduced={reduced} />
-
-        {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div id="stats-heading">
-            <SectionHeader started={started} reduced={reduced} />
-          </div>
-
-          {/* Cards Grid */}
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-6"
-            role="list"
-            aria-label="Company statistics"
-          >
-            {STATS.map((stat, i) => (
-              <StatCard
-                key={stat.id}
-                stat={stat}
-                index={i}
-                sectionStarted={started}
-                reduced={reduced}
-              />
-            ))}
-          </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div id="stats-heading">
+          <SectionHeader started={started} reduced={reduced} />
         </div>
-      </section>
-    </>
+
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-6"
+          role="list"
+          aria-label="Company statistics"
+        >
+          {STATS.map((stat, i) => (
+            <StatCard
+              key={stat.id}
+              stat={stat}
+              index={i}
+              sectionStarted={started}
+              reduced={reduced}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

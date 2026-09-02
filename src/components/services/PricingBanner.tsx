@@ -30,10 +30,9 @@ import {
   Shield,
   Headphones,
 } from "lucide-react";
+import { Badge } from "@/components/ui";
 
 const EASE_PRICING = [0.22, 1, 0.36, 1] as const;
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface PricingCard {
   id: number;
@@ -67,8 +66,6 @@ interface Particle {
   opacity: number;
 }
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
 const CARDS: PricingCard[] = [
   {
     id: 1,
@@ -83,10 +80,10 @@ const CARDS: PricingCard[] = [
       "Contact Form",
       "Fast Loading",
     ],
-    gradient: "from-[#2563EB] to-[#00D4FF]",
-    color: "#2563EB",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.42)",
+    gradient: "from-[#c47a3a] to-[#e8a064]",
+    color: "#c47a3a",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
     cta: "Get Started",
   },
   {
@@ -102,10 +99,10 @@ const CARDS: PricingCard[] = [
       "Order Management",
       "Admin Panel",
     ],
-    gradient: "from-[#7C3AED] to-[#2563EB]",
-    color: "#7C3AED",
-    glow: "#7C3AED",
-    glowRgba: "rgba(124,58,237,0.42)",
+    gradient: "from-[#e8a064] to-[#f0b07a]",
+    color: "#e8a064",
+    glow: "#e8a064",
+    glowRgba: "rgba(232,160,100,0.3)",
     cta: "Get Started",
   },
   {
@@ -121,10 +118,10 @@ const CARDS: PricingCard[] = [
       "API Integration",
       "App Deployment",
     ],
-    gradient: "from-[#00D4FF] to-[#7C3AED]",
-    color: "#00D4FF",
-    glow: "#00D4FF",
-    glowRgba: "rgba(0,212,255,0.42)",
+    gradient: "from-[#f0b07a] to-[#c47a3a]",
+    color: "#f0b07a",
+    glow: "#f0b07a",
+    glowRgba: "rgba(240,176,122,0.3)",
     popular: true,
     cta: "Get Started",
   },
@@ -140,10 +137,10 @@ const CARDS: PricingCard[] = [
       "Automation",
       "Enterprise Platforms",
     ],
-    gradient: "from-[#2563EB] to-[#7C3AED]",
-    color: "#2563EB",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.42)",
+    gradient: "from-[#c47a3a] to-[#f0b07a]",
+    color: "#c47a3a",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
     cta: "Talk to Us",
   },
 ];
@@ -154,8 +151,6 @@ const TRUST: TrustItem[] = [
   { Icon: BadgeCheck, label: "Transparent Pricing" },
   { Icon: Headphones, label: "Dedicated Support" },
 ];
-
-// ─── Border Beam ──────────────────────────────────────────────────────────────
 
 const BorderBeam = memo(function BorderBeam({
   gradient,
@@ -168,10 +163,7 @@ const BorderBeam = memo(function BorderBeam({
 }) {
   if (!active || reduced) return null;
   return (
-    <div
-      aria-hidden={true}
-      className="pointer-events-none absolute inset-0 rounded-[28px] overflow-hidden"
-    >
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 rounded-[28px] overflow-hidden">
       <motion.div
         className={`absolute h-[2px] w-28 bg-gradient-to-r ${gradient} blur-[1px] opacity-90`}
         animate={{ offsetDistance: ["0%", "100%"] }}
@@ -183,8 +175,6 @@ const BorderBeam = memo(function BorderBeam({
     </div>
   );
 });
-
-// ─── Shimmer Effect ───────────────────────────────────────────────────────────
 
 const Shimmer = memo(function Shimmer({ active, reduced }: { active: boolean; reduced: boolean }) {
   if (!active || reduced) return null;
@@ -201,14 +191,12 @@ const Shimmer = memo(function Shimmer({ active, reduced }: { active: boolean; re
           background:
             "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 50%, transparent 60%)",
         }}
-        animate={{ left: ["−100%", "200%"] }}
+        animate={{ left: ["-100%", "200%"] }}
         transition={{ duration: 1.4, ease: "easeInOut" }}
       />
     </motion.div>
   );
 });
-
-// ─── Pricing Card ─────────────────────────────────────────────────────────────
 
 const PricingCard = memo(function PricingCard({
   card,
@@ -224,13 +212,11 @@ const PricingCard = memo(function PricingCard({
   const [hovered, setHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // 3D tilt
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
   const springX = useSpring(rotateX, { stiffness: 180, damping: 24 });
   const springY = useSpring(rotateY, { stiffness: 180, damping: 24 });
 
-  // Magnetic nudge
   const magX = useMotionValue(0);
   const magY = useMotionValue(0);
   const magSX = useSpring(magX, { stiffness: 110, damping: 18 });
@@ -290,22 +276,16 @@ const PricingCard = memo(function PricingCard({
       onFocus={() => setHovered(true)}
       onBlur={handleMouseLeave}
     >
-      {/* Popular badge */}
       <AnimatePresence>
         {card.popular && (
           <motion.div
             initial={{ opacity: 0, y: -8, scale: 0.85 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: delay + 0.25, duration: 0.4, ease: EASE_PRICING }}
-            className="absolute -top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase"
-            style={{
-              background: "linear-gradient(90deg, #00D4FF, #7C3AED)",
-              boxShadow: "0 0 20px rgba(0,212,255,0.5), 0 0 40px rgba(124,58,237,0.3)",
-              color: "#fff",
-            }}
+            className="absolute -top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase bg-gradient-to-r from-[#c47a3a] to-[#e8a064] shadow-[0_0_20px_rgba(232,160,100,0.3)] text-[#0f0f0f]"
             aria-label="Most Popular plan"
           >
-            <Sparkles className="w-3 h-3" strokeWidth={2.5} aria-hidden={true} />
+            <Sparkles className="w-3 h-3 text-[#0f0f0f]" strokeWidth={2.5} aria-hidden={true} />
             Most Popular
           </motion.div>
         )}
@@ -313,22 +293,21 @@ const PricingCard = memo(function PricingCard({
 
       <div
         ref={cardRef}
-        className={`relative h-full flex flex-col gap-6 rounded-[28px] border bg-white/[0.03] backdrop-blur-xl p-7 overflow-hidden transition-colors duration-400 focus-within:ring-2 focus-within:ring-[#2563EB]/50 ${card.popular ? "mt-4" : ""}`}
+        className={`relative h-full flex flex-col gap-6 rounded-[28px] border bg-[#141414]/95 border-[#262626] backdrop-blur-xl p-7 overflow-hidden transition-colors duration-400 focus-within:ring-2 focus-within:ring-[#e8a064]/50 ${card.popular ? "mt-4" : ""}`}
         style={{
           boxShadow: hovered
             ? `0 0 0 1px ${card.glowRgba}, 0 8px 60px -8px ${card.glowRgba}, 0 28px 72px -18px ${card.glowRgba}55`
             : card.popular
-            ? `0 0 0 1px rgba(0,212,255,0.2), 0 4px 32px -4px rgba(0,212,255,0.15)`
+            ? `0 0 0 1px rgba(232,160,100,0.2), 0 4px 32px -4px rgba(232,160,100,0.15)`
             : "inset 0 1px 0 rgba(255,255,255,0.04)",
           borderColor: hovered
             ? `${card.glow}55`
             : card.popular
-            ? "rgba(0,212,255,0.25)"
+            ? "rgba(232,160,100,0.25)"
             : "rgba(255,255,255,0.08)",
           transition: "box-shadow 0.4s ease, border-color 0.4s ease",
         }}
       >
-        {/* Inner corner glow */}
         <div
           aria-hidden={true}
           className="pointer-events-none absolute -top-14 -left-14 w-44 h-44 rounded-full blur-3xl transition-opacity duration-500"
@@ -349,314 +328,130 @@ const PricingCard = memo(function PricingCard({
         <BorderBeam gradient={card.gradient} active={hovered} reduced={reduced} />
         <Shimmer active={hovered} reduced={reduced} />
 
-        {/* Icon */}
-        <motion.div
-          className={`w-[52px] h-[52px] rounded-2xl bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-lg flex-shrink-0`}
-          animate={
-            reduced
-              ? {}
-              : hovered
-              ? { scale: 1.12, rotate: 9, y: -4 }
-              : { scale: 1, rotate: 0, y: [0, -5, 0] }
-          }
-          transition={
-            hovered
-              ? { duration: 0.35, ease: "easeOut" }
-              : { y: { duration: 3.2, repeat: Infinity, ease: "easeInOut" } }
-          }
-          aria-hidden={true}
-        >
-          <card.Icon className="w-6 h-6 text-white" strokeWidth={1.8} />
-        </motion.div>
-
-        {/* Title */}
-        <div className="flex flex-col gap-1">
-          <h3 className="text-white font-bold text-lg tracking-tight">{card.title}</h3>
-          <p className="text-white/35 text-xs font-medium tracking-wide uppercase">
-            {card.priceNote}
-          </p>
+        <div className="flex-shrink-0">
+          <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-md`}>
+            <card.Icon className="w-5 h-5 text-[#0f0f0f]" strokeWidth={1.8} />
+          </div>
         </div>
 
-        {/* Price */}
-        <div className="flex items-end gap-1">
-          {!isCustom ? (
-            <>
-              <span
-                className="text-[13px] font-semibold self-start mt-1.5"
-                style={{ color: card.color, opacity: 0.8 }}
-              >
-                {card.currency}
-              </span>
-              <motion.span
-                className="text-4xl font-extrabold tracking-tight text-white leading-none"
-                animate={reduced ? {} : { opacity: [1, 0.7, 1] }}
-                transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: index * 0.4 }}
-                aria-label={`${card.currency}${card.price}`}
-              >
-                {card.price}
-              </motion.span>
-            </>
-          ) : (
-            <span
-              className="text-4xl font-extrabold tracking-tight leading-none bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent"
-              style={{ backgroundSize: "200% 100%", animation: reduced ? "none" : "gradientShift 5s ease infinite" }}
-              aria-label="Custom quote pricing"
-            >
-              Custom
+        <div>
+          <h3 className="text-white font-bold text-xl tracking-tight leading-none mb-4">
+            {card.title}
+          </h3>
+          <div className="flex items-baseline gap-1">
+            {card.currency && (
+              <span className="text-white/45 text-lg font-semibold">{card.currency}</span>
+            )}
+            <span className="text-white text-3xl sm:text-4xl font-extrabold tracking-tight">
+              {card.price}
             </span>
+            {!isCustom && (
+              <span className="text-white/45 text-sm ml-1">/{card.priceNote.toLowerCase()}</span>
+            )}
+          </div>
+          {isCustom && (
+            <p className="text-white/45 text-xs mt-1">{card.priceNote}</p>
           )}
         </div>
 
-        {/* Divider */}
-        <div
-          aria-hidden={true}
-          className="h-px w-full"
-          style={{ background: `linear-gradient(to right, transparent, ${card.color}40, transparent)` }}
-        />
-
-        {/* Features */}
-        <ul className="flex flex-col gap-3 flex-1" role="list" aria-label={`${card.title} features`}>
+        <ul className="flex flex-col gap-3 flex-grow" role="list" aria-label={`${card.title} plan features`}>
           {card.features.map((feat) => (
             <li key={feat} className="flex items-center gap-3">
-              <span
-                className={`flex-shrink-0 w-[18px] h-[18px] rounded-full bg-gradient-to-br ${card.gradient} flex items-center justify-center`}
-                aria-hidden={true}
-              >
-                <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+              <span className={`w-4 h-4 rounded-full bg-gradient-to-br ${card.gradient} flex items-center justify-center`} aria-hidden={true}>
+                <Check className="w-2.5 h-2.5 text-[#0f0f0f]" strokeWidth={3.5} />
               </span>
-              <span className="text-white/55 text-sm leading-none">{feat}</span>
+              <span className="text-white/60 text-sm leading-none">{feat}</span>
             </li>
           ))}
         </ul>
 
-        {/* CTA */}
         <Link
           href="/contact#contact-form"
-          className="group/cta relative inline-flex items-center justify-center gap-2.5 w-full py-3.5 rounded-2xl text-sm font-semibold text-white overflow-hidden transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#050816] mt-auto"
-          style={{ focusRingColor: card.color } as React.CSSProperties}
-          aria-label={`${card.cta} — ${card.title}`}
-          tabIndex={0}
+          className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 focus:outline-none ${
+            card.popular
+              ? "bg-[#e8a064] text-[#0f0f0f] hover:bg-[#f0b07a] shadow-md shadow-[#e8a064]/10"
+              : "border border-[#303030] bg-[#1c1c1e] text-[#d4d4d4] hover:text-[#f4f4f5] hover:border-[rgba(232,160,100,0.4)]"
+          }`}
+          aria-label={`${card.cta} for ${card.title} plan`}
         >
-          <span
-            aria-hidden={true}
-            className={`absolute inset-0 bg-gradient-to-r ${card.gradient} opacity-90 transition-opacity duration-300 group-hover/cta:opacity-100`}
-          />
-          <span
-            aria-hidden={true}
-            className="absolute inset-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-300"
-            style={{ boxShadow: `inset 0 1px 0 rgba(255,255,255,0.18)` }}
-          />
-          <span className="relative">{card.cta}</span>
-          <motion.span
-            className="relative"
-            animate={reduced ? {} : hovered ? { x: 5 } : { x: 0 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-          >
-            <ArrowRight className="w-4 h-4" strokeWidth={2.2} aria-hidden={true} />
-          </motion.span>
+          {card.cta}
+          <ArrowRight className="w-4 h-4" strokeWidth={2.2} />
         </Link>
       </div>
     </motion.article>
   );
 });
 
-// ─── Trust Bar ────────────────────────────────────────────────────────────────
-
-const TrustBar = memo(function TrustBar({
-  visible,
-  reduced,
-}: {
-  visible: boolean;
-  reduced: boolean;
-}) {
-  return (
-    <motion.div
-      initial={reduced ? undefined : { opacity: 0, y: 24 }}
-      animate={
-        visible
-          ? { opacity: 1, y: 0, transition: { duration: 0.7, delay: 0.9, ease: EASE_PRICING } }
-          : { opacity: 0, y: 24 }
-      }
-      className="flex flex-wrap items-center justify-center gap-3 mt-14"
-      role="list"
-      aria-label="Trust indicators"
-    >
-      {TRUST.map((t, i) => (
-        <motion.div
-          key={t.label}
-          initial={reduced ? undefined : { opacity: 0, scale: 0.88 }}
-          animate={
-            visible
-              ? { opacity: 1, scale: 1, transition: { delay: 1.0 + i * 0.08, duration: 0.45, ease: EASE_PRICING } }
-              : { opacity: 0, scale: 0.88 }
-          }
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm"
-          role="listitem"
-        >
-          <t.Icon className="w-3.5 h-3.5 text-[#00D4FF]" strokeWidth={1.8} aria-hidden={true} />
-          <span className="text-white/55 text-xs font-medium">{t.label}</span>
-        </motion.div>
-      ))}
-    </motion.div>
-  );
-});
-
-// ─── Bottom CTA ───────────────────────────────────────────────────────────────
-
-const BottomCTA = memo(function BottomCTA({
-  visible,
-  reduced,
-}: {
-  visible: boolean;
-  reduced: boolean;
-}) {
-  const [hov, setHov] = useState(false);
-
-  return (
-    <motion.div
-      initial={reduced ? undefined : { opacity: 0, y: 20 }}
-      animate={
-        visible
-          ? { opacity: 1, y: 0, transition: { duration: 0.7, delay: 1.15, ease: EASE_PRICING } }
-          : { opacity: 0, y: 20 }
-      }
-      className="flex justify-center mt-10"
-    >
-      <Link
-        href="/contact#contact-form"
-        onMouseEnter={() => setHov(true)}
-        onMouseLeave={() => setHov(false)}
-        className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl text-sm font-semibold text-white overflow-hidden focus:outline-none focus:ring-2 focus:ring-[#2563EB]/60 focus:ring-offset-2 focus:ring-offset-[#050816]"
-        aria-label="Get a custom quote for your project"
-      >
-        {/* Gradient background */}
-        <span
-          aria-hidden={true}
-          className="absolute inset-0 bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] transition-all duration-500"
-          style={{ backgroundSize: "200% 100%", backgroundPosition: hov ? "100% 0" : "0% 0" }}
-        />
-        {/* Glow */}
-        <span
-          aria-hidden={true}
-          className="absolute inset-0 transition-opacity duration-400"
-          style={{
-            boxShadow: hov
-              ? "0 0 40px rgba(37,99,235,0.55), 0 0 80px rgba(124,58,237,0.35)"
-              : "0 0 0 transparent",
-            borderRadius: "inherit",
-            opacity: hov ? 1 : 0,
-          }}
-        />
-        <span className="relative font-bold tracking-tight">Get Custom Quote</span>
-        <motion.span
-          className="relative"
-          animate={reduced ? {} : hov ? { x: 6 } : { x: 0 }}
-          transition={{ duration: 0.25, ease: "easeOut" }}
-        >
-          <ArrowRight className="w-5 h-5" strokeWidth={2.2} aria-hidden={true} />
-        </motion.span>
-      </Link>
-    </motion.div>
-  );
-});
-
-// ─── Section Header ───────────────────────────────────────────────────────────
-
-const SectionHeader = memo(function SectionHeader({
-  visible,
-  reduced,
-}: {
-  visible: boolean;
-  reduced: boolean;
-}) {
-  const v = (i: number) => ({
-    hidden: { opacity: 0, y: 26, filter: "blur(7px)" },
+function SectionHeader({ visible, reduced }: { visible: boolean; reduced: boolean }) {
+  const stagger = (i: number) => ({
+    hidden: { opacity: 0, y: 28, filter: "blur(6px)" },
     visible: {
       opacity: 1, y: 0, filter: "blur(0px)",
-      transition: { duration: 0.72, delay: i * 0.13, ease: EASE_PRICING },
+      transition: { duration: 0.7, delay: i * 0.12, ease: EASE_PRICING },
     },
   });
 
   return (
-    <div className="text-center max-w-2xl mx-auto mb-16 flex flex-col items-center gap-5">
+    <div className="text-center max-w-2xl mx-auto mb-20 flex flex-col items-center gap-5">
       <motion.div
-        variants={reduced ? undefined : v(0)}
+        variants={reduced ? undefined : stagger(0)}
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
       >
-        <span
-          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
-          aria-label="Section: Transparent Pricing"
-        >
+        <Badge>
           <span aria-hidden={true} className="relative flex">
-            <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#00D4FF] opacity-70 animate-ping" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
+            <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#e8a064] opacity-70 animate-ping" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#e8a064]" />
           </span>
-          Transparent Pricing
-        </span>
+          <span className="ml-2">Simple Pricing</span>
+        </Badge>
       </motion.div>
 
       <motion.h2
-        variants={reduced ? undefined : v(1)}
+        variants={reduced ? undefined : stagger(1)}
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
         className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.1]"
         id="pricing-heading"
       >
-        Affordable Solutions
+        Clear Plans For
         <br />
-        <span
-          className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent"
-          style={{
-            backgroundSize: "200% 100%",
-            animation: reduced ? "none" : "gradientShift 5s ease infinite",
-          }}
-        >
-          Built For Growth
-        </span>
+        <span className="text-gradient-amber">Every Growth Stage</span>
       </motion.h2>
 
-      <motion.div
-        variants={reduced ? undefined : v(2)}
+      <motion.p
+        variants={reduced ? undefined : stagger(2)}
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
-        className="flex flex-col items-center gap-1"
+        className="text-[#a1a1aa] text-base sm:text-lg leading-relaxed max-w-xl"
       >
-        <p className="text-white/45 text-base sm:text-lg leading-relaxed">
-          Every project is unique.
-        </p>
-        <p className="text-white/35 text-sm sm:text-base leading-relaxed max-w-xl text-center">
-          We provide custom pricing based on requirements, features, timelines,
-          and business goals.
-        </p>
-      </motion.div>
+        Choose a transparent starting plan or talk to us for bespoke custom
+        software solutions.
+      </motion.p>
     </div>
   );
-});
+}
 
-// ─── Background ───────────────────────────────────────────────────────────────
-
-const Background = memo(function Background({ reduced }: { reduced: boolean }) {
+function Background({ reduced }: { reduced: boolean }) {
   const particles = useMemo<Particle[]>(
     () =>
-      Array.from({ length: 28 }, (_, i) => ({
+      Array.from({ length: 24 }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
-        size: Math.random() * 1.8 + 0.6,
+        size: Math.random() * 2 + 0.8,
         dur: Math.random() * 14 + 8,
-        delay: Math.random() * 9,
-        color: ["#2563EB", "#7C3AED", "#00D4FF"][i % 3],
-        opacity: Math.random() * 0.18 + 0.07,
+        delay: Math.random() * 8,
+        color: ["#c47a3a", "#e8a064", "#f0b07a"][i % 3],
+        opacity: Math.random() * 0.12 + 0.05,
       })),
     []
   );
 
   return (
     <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* Animated grid */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.02]"
         style={{
           backgroundImage: `
             linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
@@ -666,50 +461,29 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
         }}
       />
 
-      {/* Noise overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.018]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          backgroundRepeat: "repeat",
-          backgroundSize: "128px",
-        }}
-      />
-
       {!reduced && (
         <>
           <motion.div
-            className="absolute rounded-full blur-[170px]"
+            className="absolute rounded-full blur-[160px]"
             style={{
-              width: 700, height: 420,
-              background: "radial-gradient(ellipse, rgba(37,99,235,0.13), transparent 70%)",
-              top: "0%", left: "-8%",
+              width: 700, height: 400,
+              background: "radial-gradient(ellipse, rgba(232,160,100,0.05), transparent 70%)",
+              top: "5%", left: "-8%",
             }}
-            animate={{ x: [0, 70, 0], y: [0, 45, 0] }}
-            transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ x: [0, 70, 0], y: [0, 40, 0] }}
+            transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
             className="absolute rounded-full blur-[180px]"
             style={{
               width: 600, height: 500,
-              background: "radial-gradient(ellipse, rgba(124,58,237,0.11), transparent 70%)",
+              background: "radial-gradient(ellipse, rgba(196,122,58,0.04), transparent 70%)",
               bottom: "0%", right: "-5%",
             }}
-            animate={{ x: [0, -55, 0], y: [0, -35, 0] }}
-            transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 5 }}
-          />
-          <motion.div
-            className="absolute rounded-full blur-[130px]"
-            style={{
-              width: 500, height: 500,
-              background: "radial-gradient(circle, rgba(0,212,255,0.07), transparent 70%)",
-              top: "45%", left: "50%", translateX: "-50%",
-            }}
-            animate={{ x: [0, 38, -30, 0], y: [0, -26, 26, 0] }}
-            transition={{ duration: 32, repeat: Infinity, ease: "easeInOut", delay: 9 }}
+            animate={{ x: [0, -50, 0], y: [0, -35, 0] }}
+            transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 4 }}
           />
 
-          {/* Particles */}
           {particles.map((p) => (
             <motion.div
               key={p.id}
@@ -722,9 +496,9 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
                 boxShadow: `0 0 ${p.size * 5}px ${p.color}`,
               }}
               animate={{
-                y: [0, -22, 0],
-                x: [0, Math.sin(p.id * 1.4) * 10, 0],
-                opacity: [p.opacity, p.opacity * 2.2, p.opacity],
+                y: [0, -24, 0],
+                x: [0, Math.sin(p.id * 1.3) * 12, 0],
+                opacity: [p.opacity, p.opacity * 2, p.opacity],
               }}
               transition={{ duration: p.dur, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
             />
@@ -733,25 +507,32 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
       )}
     </div>
   );
-});
+}
 
-// ─── Mouse Spotlight ──────────────────────────────────────────────────────────
-
-function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElement | null> }) {
+function SectionSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElement | null> }) {
   const mx = useMotionValue(-1000);
   const my = useMotionValue(-1000);
-  const sx = useSpring(mx, { stiffness: 55, damping: 20 });
-  const sy = useSpring(my, { stiffness: 55, damping: 20 });
+  const sx = useSpring(mx, { stiffness: 55, damping: 18 });
+  const sy = useSpring(my, { stiffness: 55, damping: 18 });
 
   useEffect(() => {
-    const move = (e: MouseEvent) => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      mx.set(e.clientX - rect.left);
-      my.set(e.clientY - rect.top);
+    let frameId: number | null = null;
+    const handleMove = (e: MouseEvent) => {
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = null;
+        if (!sectionRef.current) return;
+        const rect = sectionRef.current.getBoundingClientRect();
+        mx.set(e.clientX - rect.left);
+        my.set(e.clientY - rect.top);
+      });
     };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
+
+    window.addEventListener("mousemove", handleMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      if (frameId) cancelAnimationFrame(frameId);
+    };
   }, [mx, my, sectionRef]);
 
   return (
@@ -759,73 +540,60 @@ function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElemen
       aria-hidden={true}
       className="pointer-events-none absolute inset-0 z-0"
       style={{
-        background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(37,99,235,0.055), transparent 55%)`,
+        background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(232,160,100,0.04), transparent 55%)`,
       }}
     />
   );
 }
 
-// ─── Main Export ──────────────────────────────────────────────────────────────
-
 export default function PricingBanner() {
   const reduced = useReducedMotion() ?? false;
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
   return (
-    <>
-      <style>{`
-        @keyframes gradientShift {
-          0%   { background-position: 0% 50%; }
-          50%  { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-      `}</style>
+    <section
+      id="pricing-banner"
+      ref={sectionRef}
+      aria-labelledby="pricing-heading"
+      className="relative w-full overflow-hidden py-24 sm:py-32 bg-[#0f0f0f]"
+    >
+      <Background reduced={reduced} />
+      {!reduced && <SectionSpotlight sectionRef={sectionRef} />}
 
-      <section
-        ref={sectionRef}
-        id="pricing"
-        aria-labelledby="pricing-heading"
-        className="relative w-full overflow-hidden py-24 sm:py-32"
-        style={{ background: "#050816" }}
-      >
-        <Background reduced={reduced} />
-        {!reduced && <MouseSpotlight sectionRef={sectionRef} />}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeader visible={isInView} reduced={reduced} />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeader visible={isInView} reduced={reduced} />
-
-          {/* Pricing grid */}
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6 items-start"
-            role="list"
-            aria-label="Pricing plans"
-          >
-            {CARDS.map((card, i) => (
-              <PricingCard
-                key={card.id}
-                card={card}
-                index={i}
-                visible={isInView}
-                reduced={reduced}
-              />
-            ))}
-          </div>
-
-          {/* Trust bar */}
-          <TrustBar visible={isInView} reduced={reduced} />
-
-          {/* Bottom CTA */}
-          <BottomCTA visible={isInView} reduced={reduced} />
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-6 items-stretch"
+          role="list"
+          aria-label="Axivon Technologies pricing plans"
+        >
+          {CARDS.map((card, i) => (
+            <PricingCard
+              key={card.id}
+              card={card}
+              index={i}
+              visible={isInView}
+              reduced={reduced}
+            />
+          ))}
         </div>
 
-        {/* Bottom fade */}
-        <div
-          aria-hidden={true}
-          className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
-          style={{ background: "linear-gradient(to bottom, transparent, #050816)" }}
-        />
-      </section>
-    </>
+        <div className="mt-16 flex flex-wrap justify-center items-center gap-8 sm:gap-12 border-t border-[#262626] pt-8">
+          {TRUST.map((t, i) => (
+            <div key={i} className="flex items-center gap-2.5 text-[#a1a1aa]">
+              <t.Icon className="w-5 h-5 text-[#e8a064]" strokeWidth={1.8} />
+              <span className="text-sm font-semibold tracking-wide">{t.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div
+        aria-hidden={true}
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0f0f0f] to-transparent"
+      />
+    </section>
   );
 }

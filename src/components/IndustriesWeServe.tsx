@@ -16,6 +16,7 @@ import {
   Lightbulb,
   type LucideIcon,
 } from "lucide-react";
+import { SectionHeader } from "@/components/ui";
 
 interface Industry {
   icon: LucideIcon;
@@ -38,22 +39,21 @@ const INDUSTRIES: Industry[] = [
 ];
 
 const headerVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
 const gridVariants: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.04, delayChildren: 0.05 } },
 };
 
 const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 28, scale: 0.96 },
+  hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.4, ease: "easeOut" },
   },
 };
 
@@ -61,45 +61,31 @@ export default function IndustriesWeServe() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden bg-[#050816] py-24 sm:py-32">
-      {/* Floating gradient background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <motion.div
-          aria-hidden
-          className="absolute left-1/4 top-0 h-[26rem] w-[26rem] -translate-x-1/2 rounded-full bg-[#2563EB]/20 blur-[120px]"
-          animate={shouldReduceMotion ? undefined : { x: [0, 30, 0], y: [0, 20, 0] }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          aria-hidden
-          className="absolute bottom-0 right-1/4 h-[28rem] w-[28rem] translate-x-1/2 rounded-full bg-[#7C3AED]/20 blur-[130px]"
-          animate={shouldReduceMotion ? undefined : { x: [0, -25, 0], y: [0, -25, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
+    <section className="bg-[#0f0f0f] py-24 sm:py-28 relative">
+      {/* Ambient soft glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 right-0 h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,_rgba(232,160,100,0.04),_transparent_70%)]"
+      />
+      
+      <div className="mx-auto max-w-7xl px-6 lg:px-10 relative">
         {/* Section header */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
           variants={headerVariants}
-          className="mx-auto mb-16 max-w-2xl text-center sm:mb-20"
+          className="mx-auto mb-16 max-w-2xl text-center"
         >
-          <span className="mb-4 inline-block text-xs font-semibold uppercase tracking-[0.25em] text-[#00D4FF]">
-            Where We Work
-          </span>
-          <h2 className="text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-            Industries{" "}
-            <span className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent">
-              We Serve
-            </span>
-          </h2>
-          <p className="mt-5 text-balance text-base leading-relaxed text-slate-400 sm:text-lg">
-            Delivering future-ready digital solutions across multiple
-            industries worldwide.
-          </p>
+          <SectionHeader
+            overline="Where We Work"
+            heading={
+              <>
+                Industries We <span className="text-gradient-amber">Serve</span>
+              </>
+            }
+            body="Delivering future-ready digital solutions across key sectors to build growth, trust, and operational efficiency."
+          />
         </motion.div>
 
         {/* Industry cards */}
@@ -108,7 +94,7 @@ export default function IndustriesWeServe() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
           variants={gridVariants}
-          className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6"
+          className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6"
         >
           {INDUSTRIES.map((industry) => {
             const Icon = industry.icon;
@@ -116,22 +102,16 @@ export default function IndustriesWeServe() {
               <motion.div
                 key={industry.label}
                 variants={cardVariants}
-                whileHover={shouldReduceMotion ? undefined : { y: -5, scale: 1.03 }}
-                transition={{ type: "spring", stiffness: 320, damping: 22 }}
-                className="group relative"
+                whileHover={shouldReduceMotion ? undefined : { y: -3 }}
+                transition={{ duration: 0.2 }}
+                className="group flex flex-col items-center justify-center gap-4 rounded-xl border border-[#262626] bg-[#141414] p-6 text-center transition-all duration-200 hover:border-[rgba(232,160,100,0.25)] hover:bg-[#1c1c1e] hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]"
               >
-                {/* Glow / gradient border layer */}
-                <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-70" />
-
-                {/* Card body */}
-                <div className="relative flex flex-col items-center justify-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-10 text-center backdrop-blur-xl transition-colors duration-500 group-hover:border-transparent">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB]/20 via-[#7C3AED]/20 to-[#00D4FF]/20 ring-1 ring-white/10 transition-transform duration-500 group-hover:scale-110">
-                    <Icon className="h-7 w-7 text-[#00D4FF]" strokeWidth={1.75} />
-                  </div>
-                  <span className="text-[0.95rem] font-semibold text-white">
-                    {industry.label}
-                  </span>
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#1c1c1e] text-[#71717a] transition-all duration-200 group-hover:scale-110 group-hover:bg-[#2a1f14] group-hover:text-[#e8a064]">
+                  <Icon className="h-6 w-6" strokeWidth={1.75} />
                 </div>
+                <span className="text-sm font-semibold text-[#a1a1aa] group-hover:text-[#f4f4f5] transition-colors">
+                  {industry.label}
+                </span>
               </motion.div>
             );
           })}

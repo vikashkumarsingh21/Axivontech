@@ -14,10 +14,10 @@ import {
 /* ------------------------------------------------------------------ */
 
 const COLORS = {
-  bg: "#050816",
-  blue: "#2563EB",
-  purple: "#7C3AED",
-  cyan: "#00D4FF",
+  bg: "#0f0f0f",
+  blue: "#e8a064",
+  purple: "#c9922a",
+  cyan: "#d4915c",
 } as const;
 
 /* ------------------------------------------------------------------ */
@@ -355,7 +355,7 @@ function FaqAccordionItem({
         />
       </div>
 
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.025] shadow-[0_8px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-shadow duration-500 group-hover:shadow-[0_8px_40px_rgba(0,0,0,0.6)]">
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#141414]/[0.025] shadow-[0_8px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-shadow duration-500 group-hover:shadow-[0_8px_40px_rgba(0,0,0,0.6)]">
         {/* inset fill so the beam only shows as a thin rim */}
         <div
           className="pointer-events-none absolute inset-[1px] -z-10 rounded-[15px] bg-[#070b1a]"
@@ -380,13 +380,13 @@ function FaqAccordionItem({
             aria-expanded={isOpen}
             aria-controls={panelId}
             onClick={onToggle}
-            className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] sm:px-8 sm:py-6"
+            className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left outline-none focus-visible:ring-2 focus-visible:ring-[#d4915c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] sm:px-8 sm:py-6"
           >
             <span className="text-[15px] font-medium tracking-tight text-white sm:text-base">
               {item.question}
             </span>
             <span
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] transition-colors duration-300"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#141414]/[0.04] transition-colors duration-300"
               style={isOpen ? { borderColor: `${item.accent}80`, color: item.accent } : { color: "rgba(255,255,255,0.7)" }}
             >
               <ToggleIcon open={isOpen} />
@@ -435,7 +435,7 @@ export default function CareersFAQ() {
   return (
     <section
       aria-labelledby="careers-faq-heading"
-      className="relative isolate overflow-hidden bg-[#050816] px-6 py-28 sm:py-32 lg:px-8"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] px-6 py-28 sm:py-32 lg:px-8"
     >
       <AuroraBackground />
       <FloatingParticles />
@@ -451,7 +451,7 @@ export default function CareersFAQ() {
         >
           <motion.span
             variants={fadeUpVariants}
-            className="mb-6 inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 backdrop-blur-sm"
+            className="mb-6 inline-flex items-center rounded-full border border-white/10 bg-[#141414]/[0.04] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 backdrop-blur-sm"
           >
             Careers FAQ
           </motion.span>

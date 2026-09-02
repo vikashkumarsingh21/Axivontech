@@ -53,7 +53,7 @@ const STEPS: ProcessStep[] = [
     title: "Application",
     description:
       "Submit your application and share your skills, experience, projects, and interests.",
-    accent: "#00D4FF",
+    accent: "#d4915c",
   },
   {
     id: "review",
@@ -62,7 +62,7 @@ const STEPS: ProcessStep[] = [
     title: "Review",
     description:
       "Our team carefully reviews your profile, projects, and technical background.",
-    accent: "#2563EB",
+    accent: "#e8a064",
   },
   {
     id: "interview",
@@ -71,7 +71,7 @@ const STEPS: ProcessStep[] = [
     title: "Interview",
     description:
       "A friendly discussion to understand your technical knowledge, communication skills, and career goals.",
-    accent: "#7C3AED",
+    accent: "#c9922a",
   },
   {
     id: "selection",
@@ -80,7 +80,7 @@ const STEPS: ProcessStep[] = [
     title: "Selection",
     description:
       "Qualified candidates move forward based on skills, potential, and alignment with our culture.",
-    accent: "#00D4FF",
+    accent: "#d4915c",
   },
   {
     id: "onboarding",
@@ -89,7 +89,7 @@ const STEPS: ProcessStep[] = [
     title: "Onboarding",
     description:
       "Start your journey with Axivon Technologies and begin building meaningful products.",
-    accent: "#7C3AED",
+    accent: "#c9922a",
   },
 ];
 
@@ -123,19 +123,19 @@ function AuroraLayer({ reduceMotion }: { reduceMotion: boolean }) {
     <div aria-hidden className="absolute inset-0 overflow-hidden">
       <motion.div
         className="absolute -top-44 -right-36 h-[38rem] w-[38rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(124,58,237,0.34), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(201,146,42,0.34), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, -55, 0], y: [0, 40, 0] }}
         transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute top-1/3 -left-40 h-[34rem] w-[34rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(37,99,235,0.34), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(232,160,100,0.34), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, 50, 0], y: [0, -35, 0] }}
         transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute bottom-[-12rem] right-1/3 h-[32rem] w-[32rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(0,212,255,0.24), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(212,145,92,0.24), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, -40, 0], y: [0, 25, 0] }}
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -173,14 +173,14 @@ function NoiseTexture() {
 
 function FloatingParticles({ reduceMotion }: { reduceMotion: boolean }) {
   const particles = [
-    { left: 8, top: 12, size: 3, hue: "#00D4FF", dur: 13 },
-    { left: 18, top: 64, size: 2, hue: "#7C3AED", dur: 17 },
-    { left: 30, top: 36, size: 2.5, hue: "#2563EB", dur: 15 },
-    { left: 44, top: 80, size: 2, hue: "#00D4FF", dur: 19 },
-    { left: 60, top: 20, size: 3, hue: "#7C3AED", dur: 14 },
-    { left: 74, top: 58, size: 2, hue: "#2563EB", dur: 16 },
-    { left: 86, top: 30, size: 2.5, hue: "#00D4FF", dur: 18 },
-    { left: 94, top: 70, size: 3, hue: "#7C3AED", dur: 20 },
+    { left: 8, top: 12, size: 3, hue: "#d4915c", dur: 13 },
+    { left: 18, top: 64, size: 2, hue: "#c9922a", dur: 17 },
+    { left: 30, top: 36, size: 2.5, hue: "#e8a064", dur: 15 },
+    { left: 44, top: 80, size: 2, hue: "#d4915c", dur: 19 },
+    { left: 60, top: 20, size: 3, hue: "#c9922a", dur: 14 },
+    { left: 74, top: 58, size: 2, hue: "#e8a064", dur: 16 },
+    { left: 86, top: 30, size: 2.5, hue: "#d4915c", dur: 18 },
+    { left: 94, top: 70, size: 3, hue: "#c9922a", dur: 20 },
   ];
 
   return (
@@ -214,7 +214,7 @@ function GradientPhrase({ children }: { children: ReactNode }) {
     <motion.span
       className="relative inline-block bg-clip-text text-transparent"
       style={{
-        backgroundImage: "linear-gradient(110deg, #00D4FF, #2563EB 35%, #7C3AED 65%, #00D4FF)",
+        backgroundImage: "linear-gradient(110deg, #d4915c, #e8a064 35%, #c9922a 65%, #d4915c)",
         backgroundSize: "300% 100%",
       }}
       animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
@@ -290,14 +290,14 @@ function StepCard({ step, align }: { step: ProcessStep; align: "left" | "right" 
         tabIndex={0}
         role="article"
         aria-label={`Step ${step.step}: ${step.title}`}
-        className="group relative rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60"
+        className="group relative rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-[#d4915c]/60"
       >
         {/* animated border beam */}
         <motion.span
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-2xl"
           style={{
-            background: "conic-gradient(from 0deg, #00D4FF, #2563EB, #7C3AED, #00D4FF)",
+            background: "conic-gradient(from 0deg, #d4915c, #e8a064, #c9922a, #d4915c)",
             padding: 1.5,
             WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
             WebkitMaskComposite: "xor",
@@ -310,7 +310,7 @@ function StepCard({ step, align }: { step: ProcessStep; align: "left" | "right" 
 
         <div
           className={[
-            "relative overflow-hidden rounded-2xl bg-white/[0.045] p-6 backdrop-blur-xl transition-shadow duration-300 sm:p-7",
+            "relative overflow-hidden rounded-2xl bg-[#141414]/[0.045] p-6 backdrop-blur-xl transition-shadow duration-300 sm:p-7",
             "shadow-[0_10px_40px_-12px_rgba(0,0,0,0.45)] group-hover:shadow-[0_24px_70px_-18px_var(--axv-glow)]",
           ].join(" ")}
           style={{ ["--axv-glow" as string]: `${step.accent}66` }}
@@ -427,7 +427,7 @@ export default function HiringProcess() {
       onMouseMove={handleSectionMove}
       aria-label="Axivon Technologies hiring process"
       className="relative isolate w-full overflow-hidden px-4 py-24 sm:px-6 sm:py-28 lg:px-10 lg:py-32 2xl:px-20"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
     >
       <style>{`
         @keyframes hp-spin { to { transform: rotate(360deg); } }
@@ -444,12 +444,12 @@ export default function HiringProcess() {
       <motion.div
         aria-hidden
         className="pointer-events-none absolute left-[8%] top-[12%] h-72 w-72 rounded-full blur-[100px] sm:h-96 sm:w-96"
-        style={{ background: "radial-gradient(circle, rgba(124,58,237,0.26), transparent 70%)", x: orbX, y: orbY }}
+        style={{ background: "radial-gradient(circle, rgba(201,146,42,0.26), transparent 70%)", x: orbX, y: orbY }}
       />
       <motion.div
         aria-hidden
         className="pointer-events-none absolute bottom-[8%] right-[6%] h-80 w-80 rounded-full blur-[110px] sm:h-[26rem] sm:w-[26rem]"
-        style={{ background: "radial-gradient(circle, rgba(0,212,255,0.26), transparent 70%)", x: orbXInverse, y: orbYInverse }}
+        style={{ background: "radial-gradient(circle, rgba(212,145,92,0.26), transparent 70%)", x: orbXInverse, y: orbYInverse }}
       />
 
       <div className="relative mx-auto max-w-[1400px] 2xl:max-w-[1600px]">
@@ -463,7 +463,7 @@ export default function HiringProcess() {
         >
           <motion.span
             variants={fadeUp}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#00D4FF] backdrop-blur-md"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#141414]/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#d4915c] backdrop-blur-md"
           >
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
             Hiring Process
@@ -490,7 +490,7 @@ export default function HiringProcess() {
           {/* base rail */}
           <div
             aria-hidden
-            className="absolute left-7 top-0 h-full w-px bg-white/10 lg:left-1/2 lg:-translate-x-1/2"
+            className="absolute left-7 top-0 h-full w-px bg-[#141414]/10 lg:left-1/2 lg:-translate-x-1/2"
           />
           {/* animated progress line */}
           <motion.div
@@ -501,8 +501,8 @@ export default function HiringProcess() {
             <div
               className="h-full w-full"
               style={{
-                backgroundImage: "linear-gradient(to bottom, #00D4FF, #2563EB, #7C3AED)",
-                boxShadow: "0 0 12px 1px rgba(0,212,255,0.6)",
+                backgroundImage: "linear-gradient(to bottom, #d4915c, #e8a064, #c9922a)",
+                boxShadow: "0 0 12px 1px rgba(212,145,92,0.6)",
               }}
             />
           </motion.div>

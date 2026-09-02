@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducedMotion, motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import {
   Code2,
   ShoppingCart,
@@ -8,8 +8,6 @@ import {
   Search,
   PenTool,
   Megaphone,
-  Palette,
-  Video,
   Terminal,
   BrainCircuit,
   Bot,
@@ -17,221 +15,230 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { SectionHeader } from "@/components/ui";
 
 interface Service {
   icon: LucideIcon;
   title: string;
   description: string;
   href: string;
+  featured?: boolean;
 }
 
 const SERVICES: Service[] = [
   {
     icon: Code2,
     title: "Web Development",
-    href: "services/web-development",
-    description:
-      "Professional custom website development services using Next.js, React, and modern technologies to create fast, SEO-friendly, secure, and scalable business websites.",
-  },
-  {
-    icon: ShoppingCart,
-    title: "E-Commerce Development",
     href: "/services/web-development",
     description:
-      "Scalable online stores with seamless checkout flows, payment integrations, and inventory systems built for growth.",
+      "Custom websites and business platforms built for speed, clarity, and long-term scalability using Next.js, React, and TypeScript.",
+    featured: true,
   },
   {
     icon: Smartphone,
     title: "Mobile App Development",
     href: "/services/mobile-app-development",
     description:
-      "Native and cross-platform apps for iOS and Android, designed for speed, stability, and a polished user experience.",
+      "Native and cross-platform iOS and Android apps designed around real business workflows and user needs.",
+  },
+  {
+    icon: BrainCircuit,
+    title: "AI Solutions",
+    href: "/services/ai-solutions",
+    description:
+      "Intelligent automation, chatbots, and AI-powered systems that reduce friction and improve business efficiency.",
   },
   {
     icon: Search,
     title: "SEO & SEM",
-    href: "services/seo-services",
+    href: "/services/seo-services",
     description:
-      "Data-driven search strategies that improve rankings, drive qualified traffic, and maximize return on ad spend.",
+      "Search strategies that improve discoverability, traffic quality, and measurable ROI over time.",
   },
   {
     icon: PenTool,
     title: "UI/UX Design",
     href: "/services/ui-ux-design",
     description:
-      "Intuitive, research-backed interfaces that balance aesthetics with usability across every screen and device.",
+      "Research-led design systems that turn complex products into clear, usable, and trustworthy journeys.",
   },
   {
     icon: Megaphone,
     title: "Digital Marketing",
-    href: "services/digital-marketing",
+    href: "/services/digital-marketing",
     description:
-      "Integrated campaigns across search, social, and email that build brand presence and generate measurable demand.",
+      "Campaigns that connect content, channels, and conversion paths to support consistent business growth.",
   },
   {
-    icon: Palette,
-    title: "Graphic Design",
-    href: "/services/graphic-design",
+    icon: ShoppingCart,
+    title: "E-Commerce Development",
+    href: "/services/web-development",
     description:
-      "Distinctive visual identities — from logos to brand systems — that make your business instantly recognizable.",
-  },
-  {
-    icon: Video,
-    title: "Video Production",
-    href: "/services/video-production",
-    description:
-      "Cinematic brand films, product demos, and social content produced end-to-end, from concept to final edit.",
+      "Scalable online stores with clean UX, conversion-focused flows, and smooth checkout experiences.",
   },
   {
     icon: Terminal,
-    title: "Custom Software Development",
-    href: "services/custom-software-development",
+    title: "Custom Software",
+    href: "/services/custom-software-development",
     description:
-      "Tailored software built around your workflows, replacing rigid off-the-shelf tools with systems that fit.",
-  },
-  {
-    icon: BrainCircuit,
-    title: "AI & Cloud Solutions",
-    href: "services/cloud-solutions",
-    description:
-      "Intelligent automation and scalable cloud infrastructure that future-proof your operations and cut costs.",
+      "Tailored systems that fit your operations, reduce manual work, and scale alongside your team.",
   },
   {
     icon: Bot,
     title: "Chatbot Development",
-    href: "services/ai-solutions",
+    href: "/services/ai-solutions",
     description:
-      "Conversational AI assistants that handle support, qualify leads, and engage customers around the clock.",
+      "Conversational experiences that support service delivery, lead capture, and customer engagement.",
   },
 ];
 
 const headerVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
 const gridVariants: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.08 } },
 };
 
 const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" } },
 };
+
+function ServiceCard({ service, featured }: { service: Service; featured?: boolean }) {
+  const Icon = service.icon;
+  return (
+    <Link
+      href={service.href}
+      className={`group flex flex-col rounded-2xl border transition-all duration-200 ${
+        featured
+          ? "border-[rgba(232,160,100,0.25)] bg-[#1c1c1e] hover:border-[rgba(232,160,100,0.45)] hover:shadow-[0_8px_32px_rgba(232,160,100,0.10)]"
+          : "border-[#262626] bg-[#141414] hover:border-[#303030] hover:bg-[#1c1c1e]"
+      } p-6`}
+    >
+      {/* Icon */}
+      <div
+        className={`mb-5 flex h-11 w-11 items-center justify-center rounded-xl ${
+          featured
+            ? "bg-[#2a1f14] text-[#e8a064]"
+            : "bg-[#1c1c1e] text-[#71717a] group-hover:text-[#e8a064]"
+        } transition-colors duration-200`}
+      >
+        <Icon className="h-5 w-5" strokeWidth={1.8} />
+      </div>
+
+      {/* Title */}
+      <h3
+        className={`mb-2 text-base font-semibold leading-snug ${
+          featured ? "text-[#f4f4f5]" : "text-[#d4d4d4] group-hover:text-[#f4f4f5]"
+        } transition-colors`}
+      >
+        {service.title}
+      </h3>
+
+      {/* Description */}
+      <p className="mb-5 flex-1 text-sm leading-6 text-[#71717a]">
+        {service.description}
+      </p>
+
+      {/* CTA */}
+      <span
+        className={`inline-flex items-center gap-1.5 text-xs font-semibold transition-all duration-200 ${
+          featured
+            ? "text-[#e8a064] group-hover:gap-2.5"
+            : "text-[#52525b] group-hover:text-[#e8a064] group-hover:gap-2.5"
+        }`}
+      >
+        Learn More
+        <ArrowRight className="h-3.5 w-3.5" />
+      </span>
+    </Link>
+  );
+}
 
 export default function Services() {
   const shouldReduceMotion = useReducedMotion();
+  const featured = SERVICES[0];
+  const rest = SERVICES.slice(1);
 
   return (
-    <section
-      id="services"
-      className="relative overflow-hidden bg-[#050816] py-24 sm:py-32"
-    >
-      {/* Floating gradient background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <motion.div
-          aria-hidden
-          className="absolute -left-32 top-10 h-[28rem] w-[28rem] rounded-full bg-[#2563EB]/25 blur-[120px]"
-          animate={
-            shouldReduceMotion
-              ? undefined
-              : { x: [0, 40, 0], y: [0, 30, 0] }
-          }
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          aria-hidden
-          className="absolute right-[-10rem] top-1/3 h-[32rem] w-[32rem] rounded-full bg-[#7C3AED]/20 blur-[130px]"
-          animate={
-            shouldReduceMotion
-              ? undefined
-              : { x: [0, -30, 0], y: [0, 40, 0] }
-          }
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          aria-hidden
-          className="absolute bottom-[-8rem] left-1/3 h-[26rem] w-[26rem] rounded-full bg-[#00D4FF]/10 blur-[120px]"
-          animate={
-            shouldReduceMotion
-              ? undefined
-              : { x: [0, 25, 0], y: [0, -25, 0] }
-          }
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
+    <section id="services" className="bg-[#0f0f0f] py-24 sm:py-28">
+      {/* Top border */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+        <div className="mb-1 h-px w-full bg-gradient-to-r from-transparent via-[#262626] to-transparent" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
-        {/* Section header */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-24 sm:pt-28">
+        {/* Header */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
           variants={headerVariants}
-          className="mx-auto mb-16 max-w-2xl text-center sm:mb-20"
+          className="mb-16"
         >
-          <span className="mb-4 inline-block text-xs font-semibold uppercase tracking-[0.25em] text-[#00D4FF]">
-            What We Offer
-          </span>
-          <h2 className="text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-            Our{" "}
-            <span className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent">
-              Services
-            </span>
-          </h2>
-          <p className="mt-5 text-balance text-base leading-relaxed text-slate-400 sm:text-lg">
-            Helping businesses scale with innovative technology solutions,
-            digital transformation, and future-ready systems.
-          </p>
+          <SectionHeader
+            overline="What We Build"
+            heading={
+              <>
+                Technology services built{" "}
+                <span className="text-gradient-amber">for business momentum.</span>
+              </>
+            }
+            body="We help organisations design, build, and grow digital experiences that are reliable, useful, and built to scale."
+            align="left"
+            maxWidthClass="max-w-2xl"
+          />
         </motion.div>
 
-        {/* Service cards */}
+        {/* Featured + grid layout */}
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
+          viewport={{ once: true, amount: 0.08 }}
           variants={gridVariants}
-          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
         >
-          {SERVICES.map((service) => {
-            const Icon = service.icon;
-            return (
-              <motion.div
-                key={service.title}
-                variants={cardVariants}
-                whileHover={shouldReduceMotion ? undefined : { y: -6, scale: 1.015 }}
-                transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                className="group relative h-full"
-              >
-                {/* Glow / gradient border layer */}
-                <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-70" />
+          {/* Featured card — spans 2 columns */}
+          <motion.div
+            variants={cardVariants}
+            whileHover={shouldReduceMotion ? undefined : { y: -3 }}
+            transition={{ duration: 0.2 }}
+            className="sm:col-span-2"
+          >
+            <ServiceCard service={featured} featured />
+          </motion.div>
 
-                {/* Card body */}
-                <div className="relative flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-xl transition-colors duration-500 group-hover:border-transparent">
-                  <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB]/20 via-[#7C3AED]/20 to-[#00D4FF]/20 ring-1 ring-white/10 transition-transform duration-500 group-hover:scale-110">
-                    <Icon className="h-7 w-7 text-[#00D4FF]" strokeWidth={1.75} />
-                  </div>
+          {/* Rest of services */}
+          {rest.map((service) => (
+            <motion.div
+              key={service.title}
+              variants={cardVariants}
+              whileHover={shouldReduceMotion ? undefined : { y: -3 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ServiceCard service={service} />
+            </motion.div>
+          ))}
+        </motion.div>
 
-                  <h3 className="mb-3 text-xl font-semibold text-white">
-                    {service.title}
-                  </h3>
-
-                  <p className="mb-6 flex-1 text-sm leading-relaxed text-slate-400">
-                    {service.description}
-                  </p>
-
-                  <Link
-                    href={service.href}
-                    className="inline-flex items-center gap-2 text-sm font-medium text-[#00D4FF] hover:gap-3 transition-all"
-                  >
-                    Learn More
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </div>
-              </motion.div>
-            );
-          })}
+        {/* Bottom CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="mt-10 flex justify-center"
+        >
+          <Link
+            href="/services"
+            className="inline-flex items-center gap-2 rounded-full border border-[#303030] px-6 py-2.5 text-sm font-semibold text-[#a1a1aa] transition-all hover:border-[rgba(232,160,100,0.4)] hover:text-[#e8a064]"
+          >
+            View All Services
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </motion.div>
       </div>
     </section>

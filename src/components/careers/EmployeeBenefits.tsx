@@ -26,10 +26,10 @@ import {
 /* ------------------------------------------------------------------ */
 
 const COLORS = {
-  bg: "#050816",
-  blue: "#2563EB",
-  purple: "#7C3AED",
-  cyan: "#00D4FF",
+  bg: "#0f0f0f",
+  blue: "#e8a064",
+  purple: "#c9922a",
+  cyan: "#d4915c",
 } as const;
 
 /* ------------------------------------------------------------------ */
@@ -401,7 +401,7 @@ function BenefitCard({ benefit }: { benefit: Benefit }) {
           ? undefined
           : { rotateX, rotateY, transformStyle: "preserve-3d" }
       }
-      className="group relative rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+      className="group relative rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-[#d4915c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]"
     >
       {/* rotating border beam, visible on hover/focus */}
       <div
@@ -423,7 +423,7 @@ function BenefitCard({ benefit }: { benefit: Benefit }) {
       </div>
 
       {/* glass body */}
-      <div className="relative h-full rounded-2xl border border-white/[0.08] bg-white/[0.025] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-shadow duration-500 group-hover:shadow-[0_8px_40px_rgba(0,0,0,0.6)]">
+      <div className="relative h-full rounded-2xl border border-white/[0.08] bg-[#141414]/[0.025] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-shadow duration-500 group-hover:shadow-[0_8px_40px_rgba(0,0,0,0.6)]">
         {/* inset card to sit just inside the rotating beam */}
         <div
           className="absolute inset-[1px] -z-10 rounded-[15px] bg-[#070b1a]"
@@ -446,7 +446,7 @@ function BenefitCard({ benefit }: { benefit: Benefit }) {
 
         <div style={{ transform: "translateZ(40px)" }} className="relative">
           <div
-            className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] transition-transform duration-500 group-hover:scale-110"
+            className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl border border-white/10 bg-[#141414]/[0.04] transition-transform duration-500 group-hover:scale-110"
             style={{ boxShadow: `0 0 24px -8px ${benefit.accent}80` }}
           >
             <Icon
@@ -478,7 +478,7 @@ export default function EmployeeBenefits() {
   return (
     <section
       aria-labelledby="employee-benefits-heading"
-      className="relative isolate overflow-hidden bg-[#050816] px-6 py-28 sm:py-32 lg:px-8"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] px-6 py-28 sm:py-32 lg:px-8"
     >
       <AuroraBackground />
       <PerspectiveGrid />
@@ -495,7 +495,7 @@ export default function EmployeeBenefits() {
         >
           <motion.span
             variants={fadeUpVariants}
-            className="mb-6 inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 backdrop-blur-sm"
+            className="mb-6 inline-flex items-center rounded-full border border-white/10 bg-[#141414]/[0.04] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 backdrop-blur-sm"
           >
             Employee Benefits
           </motion.span>
