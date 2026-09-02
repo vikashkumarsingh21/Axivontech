@@ -87,12 +87,12 @@ export default function ContactInfo() {
         <section
             id="contact-info"
             aria-labelledby="contact-info-heading"
-            className="relative isolate overflow-hidden bg-[#050816] px-6 py-24 sm:py-32"
+            className="relative isolate overflow-hidden bg-[#0f0f0f] px-6 py-24 sm:py-32"
         >
             {/* Floating gradient blobs */}
             <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden={true}>
                 <motion.div
-                    className="absolute -left-32 top-10 h-[26rem] w-[26rem] rounded-full bg-blue-600/20 blur-[120px]"
+                    className="absolute -left-32 top-10 h-[26rem] w-[26rem] rounded-full bg-[#e8a064]/20 blur-[120px]"
                     animate={{
                         y: [0, 30, 0],
                         x: [0, 20, 0],
@@ -126,7 +126,7 @@ export default function ContactInfo() {
                     viewport={{ once: true, amount: 0.3 }}
                     variants={sectionVariants}
                 >
-                    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold tracking-[0.2em] text-cyan-300 backdrop-blur-sm">
+                    <span className="inline-flex items-center rounded-full border border-white/10 bg-[#141414]/5 px-4 py-1.5 text-xs font-semibold tracking-[0.2em] text-[#e8a064] backdrop-blur-sm">
                         GET IN TOUCH
                     </span>
 
@@ -135,7 +135,7 @@ export default function ContactInfo() {
                         className="mt-6 text-balance text-4xl font-bold tracking-tight text-white sm:text-5xl"
                     >
                         Let&apos;s Start A{" "}
-                        <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-300 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-[#e8a064] via-[#d4915c] to-[#c9922a] bg-clip-text text-transparent">
                             Conversation
                         </span>
                     </h2>
@@ -169,16 +169,16 @@ export default function ContactInfo() {
                                 whileHover={{ y: -8, scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                className="group relative flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+                                className="group relative flex flex-col rounded-2xl border border-white/10 bg-[#141414]/[0.03] p-6 backdrop-blur-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]"
                             >
                                 {/* Gradient border glow on hover */}
-                                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-cyan-400/0 opacity-0 transition-opacity duration-500 group-hover:from-blue-500/20 group-hover:via-purple-500/10 group-hover:to-cyan-400/20 group-hover:opacity-100" />
-                                <div className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 shadow-[0_0_40px_-10px_rgba(99,102,241,0.5)] transition-opacity duration-500 group-hover:opacity-100" />
+                                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-[#e8a064]/0 via-purple-500/0 to-cyan-400/0 opacity-0 transition-opacity duration-500 group-hover:from-[#e8a064]/20 group-hover:via-purple-500/10 group-hover:to-cyan-400/20 group-hover:opacity-100" />
+                                <div className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 shadow-[0_0_40px_-10px_rgba(232,160,100,0.5)] transition-opacity duration-500 group-hover:opacity-100" />
 
                                 <div className="relative z-10 flex flex-col">
                                     {/* Icon box */}
-                                    <div className="relative mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400 shadow-lg shadow-purple-500/20 transition-transform duration-500 group-hover:scale-110">
-                                        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-400 opacity-60 blur-md transition-opacity duration-500 group-hover:opacity-90" />
+                                    <div className="relative mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#e8a064] via-purple-500 to-cyan-400 shadow-lg shadow-purple-500/20 transition-transform duration-500 group-hover:scale-110">
+                                        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#e8a064] via-purple-500 to-cyan-400 opacity-60 blur-md transition-opacity duration-500 group-hover:opacity-90" />
                                         <Icon className="relative h-5 w-5 text-white" strokeWidth={2} aria-hidden={true} />
                                     </div>
 
@@ -193,7 +193,7 @@ export default function ContactInfo() {
                                     <p className="mt-3 text-sm leading-relaxed text-slate-400">
                                         {card.description}
                                     </p>
-                                    <span className="mt-4 inline-flex items-center text-sm font-semibold text-[#00D4FF] transition-all duration-300 group-hover:translate-x-1">
+                                    <span className="mt-4 inline-flex items-center text-sm font-semibold text-[#d4915c] transition-all duration-300 group-hover:translate-x-1">
                                         {card.cta}
                                     </span>
                                 </div>

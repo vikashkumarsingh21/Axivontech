@@ -54,24 +54,24 @@ export default function ContactHero() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden bg-[#050816] pt-32 pb-20 sm:pt-40 sm:pb-28">
+    <section className="relative overflow-hidden bg-[#0f0f0f] pt-32 pb-20 sm:pt-40 sm:pb-28">
       {/* Floating gradient background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <motion.div
           aria-hidden
-          className="absolute -left-32 top-10 h-[28rem] w-[28rem] rounded-full bg-[#2563EB]/25 blur-[130px]"
+          className="absolute -left-32 top-10 h-[28rem] w-[28rem] rounded-full bg-[#e8a064]/25 blur-[130px]"
           animate={shouldReduceMotion ? undefined : { x: [0, 35, 0], y: [0, 25, 0] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           aria-hidden
-          className="absolute -right-24 top-1/3 h-[30rem] w-[30rem] rounded-full bg-[#7C3AED]/25 blur-[140px]"
+          className="absolute -right-24 top-1/3 h-[30rem] w-[30rem] rounded-full bg-[#c9922a]/25 blur-[140px]"
           animate={shouldReduceMotion ? undefined : { x: [0, -30, 0], y: [0, 30, 0] }}
           transition={{ duration: 17, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           aria-hidden
-          className="absolute bottom-0 left-1/3 h-[24rem] w-[24rem] rounded-full bg-[#00D4FF]/15 blur-[120px]"
+          className="absolute bottom-0 left-1/3 h-[24rem] w-[24rem] rounded-full bg-[#d4915c]/15 blur-[120px]"
           animate={shouldReduceMotion ? undefined : { x: [0, 20, 0], y: [0, -20, 0] }}
           transition={{ duration: 19, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -87,15 +87,15 @@ export default function ContactHero() {
           >
             <motion.span
               variants={itemVariants}
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#00D4FF] backdrop-blur-md"
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#141414]/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[#d4915c] backdrop-blur-md"
             >
               <span className="relative flex h-2 w-2">
                 <motion.span
-                  className="absolute inline-flex h-full w-full rounded-full bg-[#00D4FF]"
+                  className="absolute inline-flex h-full w-full rounded-full bg-[#d4915c]"
                   animate={shouldReduceMotion ? undefined : { scale: [1, 1.8, 1], opacity: [0.8, 0, 0.8] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#d4915c]" />
               </span>
               Contact Us
             </motion.span>
@@ -105,7 +105,7 @@ export default function ContactHero() {
               className="text-balance text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl"
             >
               Let&apos;s Build Something{" "}
-              <span className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#e8a064] via-[#c9922a] to-[#d4915c] bg-clip-text text-transparent">
                 Amazing
               </span>{" "}
               Together
@@ -129,7 +129,7 @@ export default function ContactHero() {
                 aria-label="Get a free consultation"
                 whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] px-8 py-4 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)_inset,0_10px_30px_-8px_rgba(124,58,237,0.7)] transition-shadow duration-300 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.14)_inset,0_14px_40px_-6px_rgba(0,212,255,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] sm:w-auto"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#e8a064] via-[#c9922a] to-[#d4915c] px-8 py-4 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)_inset,0_10px_30px_-8px_rgba(201,146,42,0.7)] transition-shadow duration-300 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.14)_inset,0_14px_40px_-6px_rgba(212,145,92,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d4915c]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] sm:w-auto"
               >
                 Get Free Consultation
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -142,9 +142,9 @@ export default function ContactHero() {
                 aria-label="Chat with us on WhatsApp"
                 whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-                className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-xl transition-colors duration-300 hover:border-white/30 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] sm:w-auto"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-[#141414]/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-xl transition-colors duration-300 hover:border-white/30 hover:bg-[#141414]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] sm:w-auto"
               >
-                <MessageCircle className="h-4 w-4 text-[#00D4FF]" />
+                <MessageCircle className="h-4 w-4 text-[#d4915c]" />
                 Chat on WhatsApp
               </motion.a>
             </motion.div>
@@ -157,9 +157,9 @@ export default function ContactHero() {
             variants={cardVariants}
             className="relative"
           >
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] opacity-30 blur-xl" />
+            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-[#e8a064] via-[#c9922a] to-[#d4915c] opacity-30 blur-xl" />
 
-            <div className="relative rounded-3xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur-2xl sm:p-10">
+            <div className="relative rounded-3xl border border-white/10 bg-[#141414]/[0.04] p-8 backdrop-blur-2xl sm:p-10">
               <h2 className="mb-8 text-lg font-semibold text-white">
                 Contact Information
               </h2>
@@ -169,8 +169,8 @@ export default function ContactHero() {
                   const Icon = item.icon;
                   return (
                     <li key={item.label} className="flex items-start gap-4">
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB]/20 via-[#7C3AED]/20 to-[#00D4FF]/20 ring-1 ring-white/10">
-                        <Icon className="h-5 w-5 text-[#00D4FF]" strokeWidth={1.75} />
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#e8a064]/20 via-[#c9922a]/20 to-[#d4915c]/20 ring-1 ring-white/10">
+                        <Icon className="h-5 w-5 text-[#d4915c]" strokeWidth={1.75} />
                       </span>
                       <div>
                         <p className="text-xs font-medium uppercase tracking-[0.15em] text-slate-500">
@@ -179,7 +179,7 @@ export default function ContactHero() {
                         {item.href ? (
                           <a
                             href={item.href}
-                            className="mt-1 inline-block text-base font-medium text-white transition-colors duration-300 hover:text-[#00D4FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] rounded-sm"
+                            className="mt-1 inline-block text-base font-medium text-white transition-colors duration-300 hover:text-[#d4915c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d4915c]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] rounded-sm"
                           >
                             {item.value}
                           </a>

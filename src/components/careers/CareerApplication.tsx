@@ -36,10 +36,10 @@ const POSITIONS = [
 ];
 
 const STATS = [
-  { label: "Active Hiring", value: "14", unit: "Open Positions", icon: Briefcase, color: "#2563EB" },
-  { label: "Applications Reviewed", value: "2,400+", unit: "This Year", icon: CheckCircle, color: "#7C3AED" },
-  { label: "Success Rate", value: "97%", unit: "Placement Rate", icon: Zap, color: "#00D4FF" },
-  { label: "Remote Opportunities", value: "100%", unit: "Fully Remote", icon: Globe2, color: "#2563EB" },
+  { label: "Active Hiring", value: "14", unit: "Open Positions", icon: Briefcase, color: "#e8a064" },
+  { label: "Applications Reviewed", value: "2,400+", unit: "This Year", icon: CheckCircle, color: "#c9922a" },
+  { label: "Success Rate", value: "97%", unit: "Placement Rate", icon: Zap, color: "#d4915c" },
+  { label: "Remote Opportunities", value: "100%", unit: "Fully Remote", icon: Globe2, color: "#e8a064" },
 ];
 
 const BENEFITS = [
@@ -57,7 +57,7 @@ function Particle({ x, y, size, delay, duration }: { x: number; y: number; size:
   return (
     <motion.div
       className="absolute rounded-full pointer-events-none"
-      style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, background: "rgba(37,99,235,0.4)" }}
+      style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, background: "rgba(232,160,100,0.4)" }}
       animate={{ y: [-20, 20, -20], opacity: [0.2, 0.8, 0.2], scale: [1, 1.3, 1] }}
       transition={{ duration, delay, repeat: Infinity, ease: "easeInOut" }}
     />
@@ -87,19 +87,19 @@ function FloatingInput({ label, name, type = "text", icon, value, onChange, requ
         animate={{ opacity: focused ? 1 : 0 }}
         transition={{ duration: 0.2 }}
         style={{
-          background: "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.15))",
-          boxShadow: focused ? "0 0 0 1px rgba(37,99,235,0.5), 0 0 20px rgba(37,99,235,0.2), 0 0 40px rgba(124,58,237,0.1)" : "none",
+          background: "linear-gradient(135deg, rgba(232,160,100,0.15), rgba(201,146,42,0.15))",
+          boxShadow: focused ? "0 0 0 1px rgba(232,160,100,0.5), 0 0 20px rgba(232,160,100,0.2), 0 0 40px rgba(201,146,42,0.1)" : "none",
         }}
       />
       <div
         className="relative flex items-center rounded-xl border transition-all duration-300"
         style={{
           background: "rgba(255,255,255,0.03)",
-          borderColor: focused ? "rgba(37,99,235,0.6)" : "rgba(255,255,255,0.08)",
+          borderColor: focused ? "rgba(232,160,100,0.6)" : "rgba(255,255,255,0.08)",
           backdropFilter: "blur(12px)",
         }}
       >
-        <div className="pl-4 flex-shrink-0" style={{ color: focused ? "#2563EB" : "rgba(255,255,255,0.3)", transition: "color 0.3s" }}>
+        <div className="pl-4 flex-shrink-0" style={{ color: focused ? "#e8a064" : "rgba(255,255,255,0.3)", transition: "color 0.3s" }}>
           {icon}
         </div>
         <div className="relative flex-1 px-3 py-4">
@@ -110,7 +110,7 @@ function FloatingInput({ label, name, type = "text", icon, value, onChange, requ
               top: active ? "4px" : "50%",
               y: active ? "0%" : "-50%",
               fontSize: active ? "10px" : "13px",
-              color: active ? (focused ? "#2563EB" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
+              color: active ? (focused ? "#e8a064" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
             }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
@@ -125,7 +125,7 @@ function FloatingInput({ label, name, type = "text", icon, value, onChange, requ
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             className="w-full bg-transparent outline-none mt-3 text-white text-sm"
-            style={{ caretColor: "#2563EB" }}
+            style={{ caretColor: "#e8a064" }}
             autoComplete="off"
           />
         </div>
@@ -157,8 +157,8 @@ function FloatingSelect({ value, onChange }: { value: string; onChange: (name: k
         animate={{ opacity: focused ? 1 : 0 }}
         transition={{ duration: 0.2 }}
         style={{
-          background: "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.15))",
-          boxShadow: focused ? "0 0 0 1px rgba(37,99,235,0.5), 0 0 20px rgba(37,99,235,0.2)" : "none",
+          background: "linear-gradient(135deg, rgba(232,160,100,0.15), rgba(201,146,42,0.15))",
+          boxShadow: focused ? "0 0 0 1px rgba(232,160,100,0.5), 0 0 20px rgba(232,160,100,0.2)" : "none",
         }}
       />
       <button
@@ -167,11 +167,11 @@ function FloatingSelect({ value, onChange }: { value: string; onChange: (name: k
         className="relative w-full flex items-center rounded-xl border transition-all duration-300 text-left"
         style={{
           background: "rgba(255,255,255,0.03)",
-          borderColor: focused ? "rgba(37,99,235,0.6)" : "rgba(255,255,255,0.08)",
+          borderColor: focused ? "rgba(232,160,100,0.6)" : "rgba(255,255,255,0.08)",
           backdropFilter: "blur(12px)",
         }}
       >
-        <div className="pl-4 flex-shrink-0" style={{ color: focused ? "#2563EB" : "rgba(255,255,255,0.3)", transition: "color 0.3s" }}>
+        <div className="pl-4 flex-shrink-0" style={{ color: focused ? "#e8a064" : "rgba(255,255,255,0.3)", transition: "color 0.3s" }}>
           <Briefcase size={16} />
         </div>
         <div className="relative flex-1 px-3 py-4">
@@ -181,7 +181,7 @@ function FloatingSelect({ value, onChange }: { value: string; onChange: (name: k
               top: active ? "4px" : "50%",
               y: active ? "0%" : "-50%",
               fontSize: active ? "10px" : "13px",
-              color: active ? (focused ? "#2563EB" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
+              color: active ? (focused ? "#e8a064" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
             }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
@@ -204,9 +204,9 @@ function FloatingSelect({ value, onChange }: { value: string; onChange: (name: k
             className="absolute z-50 w-full mt-2 rounded-xl overflow-hidden"
             style={{
               background: "rgba(10,12,30,0.96)",
-              border: "1px solid rgba(37,99,235,0.3)",
+              border: "1px solid rgba(232,160,100,0.3)",
               backdropFilter: "blur(20px)",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(37,99,235,0.1)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(232,160,100,0.1)",
             }}
           >
             {POSITIONS.map((pos) => (
@@ -215,11 +215,11 @@ function FloatingSelect({ value, onChange }: { value: string; onChange: (name: k
                 type="button"
                 onClick={() => { onChange("position", pos); setOpen(false); setFocused(false); }}
                 className="w-full px-4 py-3 text-left text-sm transition-all duration-150 group flex items-center gap-3"
-                style={{ color: value === pos ? "#2563EB" : "rgba(255,255,255,0.7)" }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(37,99,235,0.1)"; }}
+                style={{ color: value === pos ? "#e8a064" : "rgba(255,255,255,0.7)" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(232,160,100,0.1)"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ""; }}
               >
-                <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: value === pos ? "#2563EB" : "rgba(255,255,255,0.2)" }} />
+                <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: value === pos ? "#e8a064" : "rgba(255,255,255,0.2)" }} />
                 {pos}
               </button>
             ))}
@@ -243,15 +243,15 @@ function FloatingTextarea({ value, onChange }: { value: string; onChange: (name:
         animate={{ opacity: focused ? 1 : 0 }}
         transition={{ duration: 0.2 }}
         style={{
-          background: "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.15))",
-          boxShadow: focused ? "0 0 0 1px rgba(37,99,235,0.5), 0 0 20px rgba(37,99,235,0.2)" : "none",
+          background: "linear-gradient(135deg, rgba(232,160,100,0.15), rgba(201,146,42,0.15))",
+          boxShadow: focused ? "0 0 0 1px rgba(232,160,100,0.5), 0 0 20px rgba(232,160,100,0.2)" : "none",
         }}
       />
       <div
         className="relative rounded-xl border transition-all duration-300"
         style={{
           background: "rgba(255,255,255,0.03)",
-          borderColor: focused ? "rgba(37,99,235,0.6)" : "rgba(255,255,255,0.08)",
+          borderColor: focused ? "rgba(232,160,100,0.6)" : "rgba(255,255,255,0.08)",
           backdropFilter: "blur(12px)",
         }}
       >
@@ -261,7 +261,7 @@ function FloatingTextarea({ value, onChange }: { value: string; onChange: (name:
             className="pointer-events-none font-medium tracking-wide block"
             animate={{
               fontSize: active ? "10px" : "13px",
-              color: active ? (focused ? "#2563EB" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
+              color: active ? (focused ? "#e8a064" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
               marginBottom: active ? "4px" : "0px",
             }}
             transition={{ duration: 0.2, ease: "easeOut" }}
@@ -277,7 +277,7 @@ function FloatingTextarea({ value, onChange }: { value: string; onChange: (name:
             onBlur={() => setFocused(false)}
             rows={4}
             className="w-full bg-transparent outline-none text-white text-sm resize-none"
-            style={{ caretColor: "#2563EB" }}
+            style={{ caretColor: "#e8a064" }}
             placeholder={focused ? "Tell us about yourself, your passion, and why you want to join Axivon Technologies..." : ""}
           />
         </div>
@@ -343,9 +343,9 @@ function BenefitCard({ benefit, index }: { benefit: typeof BENEFITS[0]; index: n
         className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100"
         transition={{ duration: 0.3 }}
         style={{
-          background: "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.1))",
-          border: "1px solid rgba(37,99,235,0.3)",
-          boxShadow: "0 0 20px rgba(37,99,235,0.15)",
+          background: "linear-gradient(135deg, rgba(232,160,100,0.15), rgba(201,146,42,0.1))",
+          border: "1px solid rgba(232,160,100,0.3)",
+          boxShadow: "0 0 20px rgba(232,160,100,0.15)",
         }}
       />
       <div
@@ -397,9 +397,20 @@ function Spotlight() {
   const y = useMotionValue(0);
 
   useEffect(() => {
-    function move(e: MouseEvent) { x.set(e.clientX); y.set(e.clientY); }
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
+    let frameId: number | null = null;
+    function move(e: MouseEvent) {
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = null;
+        x.set(e.clientX);
+        y.set(e.clientY);
+      });
+    }
+    window.addEventListener("mousemove", move, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", move);
+      if (frameId) cancelAnimationFrame(frameId);
+    };
   }, [x, y]);
 
   return (
@@ -408,7 +419,7 @@ function Spotlight() {
       style={{
         background: useTransform(
           [x, y],
-          ([lx, ly]) => `radial-gradient(600px circle at ${lx}px ${ly}px, rgba(37,99,235,0.04), transparent 70%)`
+          ([lx, ly]) => `radial-gradient(600px circle at ${lx}px ${ly}px, rgba(232,160,100,0.04), transparent 70%)`
         ),
       }}
     />
@@ -508,7 +519,7 @@ if (!emailRegex.test(form.email)) {
   return (
     <section
       className="relative min-h-screen py-24 overflow-hidden"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
     >
       <Spotlight />
 
@@ -516,19 +527,19 @@ if (!emailRegex.test(form.email)) {
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
           className="absolute w-[600px] h-[600px] rounded-full"
-          style={{ left: "-10%", top: "-10%", background: "radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%)" }}
+          style={{ left: "-10%", top: "-10%", background: "radial-gradient(circle, rgba(232,160,100,0.12) 0%, transparent 70%)" }}
           animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           className="absolute w-[500px] h-[500px] rounded-full"
-          style={{ right: "-5%", bottom: "10%", background: "radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%)" }}
+          style={{ right: "-5%", bottom: "10%", background: "radial-gradient(circle, rgba(201,146,42,0.1) 0%, transparent 70%)" }}
           animate={{ scale: [1.2, 1, 1.2], opacity: [0.6, 0.3, 0.6] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           className="absolute w-[300px] h-[300px] rounded-full"
-          style={{ left: "40%", top: "30%", background: "radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%)" }}
+          style={{ left: "40%", top: "30%", background: "radial-gradient(circle, rgba(212,145,92,0.06) 0%, transparent 70%)" }}
           animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -557,9 +568,9 @@ if (!emailRegex.test(form.email)) {
           <motion.div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-xs font-semibold tracking-[0.15em] uppercase"
             style={{
-              background: "rgba(37,99,235,0.1)",
-              border: "1px solid rgba(37,99,235,0.3)",
-              color: "#00D4FF",
+              background: "rgba(232,160,100,0.1)",
+              border: "1px solid rgba(232,160,100,0.3)",
+              color: "#d4915c",
             }}
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -575,7 +586,7 @@ if (!emailRegex.test(form.email)) {
             <motion.span
               className="inline-block"
               style={{
-                backgroundImage: "linear-gradient(135deg, #2563EB, #7C3AED, #00D4FF, #2563EB)",
+                backgroundImage: "linear-gradient(135deg, #e8a064, #c9922a, #d4915c, #e8a064)",
                 backgroundSize: "300% 100%",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
@@ -627,14 +638,14 @@ if (!emailRegex.test(form.email)) {
               >
                 <div
                   className="w-full h-full rounded-3xl"
-                  style={{ background: "linear-gradient(135deg, rgba(37,99,235,0.2), transparent, rgba(124,58,237,0.2))" }}
+                  style={{ background: "linear-gradient(135deg, rgba(232,160,100,0.2), transparent, rgba(201,146,42,0.2))" }}
                 />
               </motion.div>
 
               <div className="relative">
                 <div className="flex items-center gap-3 mb-8">
-                  <div className="p-2.5 rounded-xl" style={{ background: "linear-gradient(135deg, rgba(37,99,235,0.2), rgba(124,58,237,0.2))", border: "1px solid rgba(37,99,235,0.3)" }}>
-                    <Send size={18} style={{ color: "#2563EB" }} />
+                  <div className="p-2.5 rounded-xl" style={{ background: "linear-gradient(135deg, rgba(232,160,100,0.2), rgba(201,146,42,0.2))", border: "1px solid rgba(232,160,100,0.3)" }}>
+                    <Send size={18} style={{ color: "#e8a064" }} />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-white">Your Application</h3>
@@ -683,10 +694,10 @@ if (!emailRegex.test(form.email)) {
                     style={{
                       background: status === "success"
                         ? "linear-gradient(135deg, #059669, #10b981)"
-                        : "linear-gradient(135deg, #2563EB, #7C3AED)",
+                        : "linear-gradient(135deg, #e8a064, #c9922a)",
                       boxShadow: status === "success"
                         ? "0 0 40px rgba(16,185,129,0.4)"
-                        : "0 0 40px rgba(37,99,235,0.4), 0 0 80px rgba(124,58,237,0.2)",
+                        : "0 0 40px rgba(232,160,100,0.4), 0 0 80px rgba(201,146,42,0.2)",
                       cursor: status === "idle" ? "pointer" : "default",
                     }}
                   >
@@ -731,21 +742,21 @@ if (!emailRegex.test(form.email)) {
               <div
                 className="relative rounded-3xl p-6 overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, rgba(37,99,235,0.12) 0%, rgba(124,58,237,0.08) 50%, rgba(0,212,255,0.06) 100%)",
-                  border: "1px solid rgba(37,99,235,0.25)",
+                  background: "linear-gradient(135deg, rgba(232,160,100,0.12) 0%, rgba(201,146,42,0.08) 50%, rgba(212,145,92,0.06) 100%)",
+                  border: "1px solid rgba(232,160,100,0.25)",
                   backdropFilter: "blur(20px)",
-                  boxShadow: "0 30px 60px rgba(0,0,0,0.4), 0 0 60px rgba(37,99,235,0.08)",
+                  boxShadow: "0 30px 60px rgba(0,0,0,0.4), 0 0 60px rgba(232,160,100,0.08)",
                   transformStyle: "preserve-3d",
                 }}
               >
                 {/* Reflective surface */}
                 <div className="absolute inset-x-6 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)" }} />
-                <div className="absolute top-6 right-6 w-20 h-20 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(37,99,235,0.15), transparent)" }} />
+                <div className="absolute top-6 right-6 w-20 h-20 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(232,160,100,0.15), transparent)" }} />
 
                 <div className="relative">
                   <div className="flex items-center justify-between mb-5">
                     <div>
-                      <div className="text-xs font-semibold tracking-widest uppercase mb-1" style={{ color: "#00D4FF" }}>Hiring Dashboard</div>
+                      <div className="text-xs font-semibold tracking-widest uppercase mb-1" style={{ color: "#d4915c" }}>Hiring Dashboard</div>
                       <h3 className="text-lg font-bold text-white">Active Recruitment</h3>
                     </div>
                     <motion.div
@@ -776,7 +787,7 @@ if (!emailRegex.test(form.email)) {
               }}
             >
               <div className="flex items-center gap-2 mb-4">
-                <Trophy size={14} style={{ color: "#7C3AED" }} />
+                <Trophy size={14} style={{ color: "#c9922a" }} />
                 <span className="text-sm font-semibold text-white">Why Axivon?</span>
               </div>
               <div className="grid grid-cols-3 gap-2">
@@ -789,8 +800,8 @@ if (!emailRegex.test(form.email)) {
               whileHover={{ scale: 1.01 }}
               className="relative rounded-2xl p-5 overflow-hidden cursor-pointer"
               style={{
-                background: "linear-gradient(135deg, rgba(37,99,235,0.2), rgba(124,58,237,0.15))",
-                border: "1px solid rgba(37,99,235,0.3)",
+                background: "linear-gradient(135deg, rgba(232,160,100,0.2), rgba(201,146,42,0.15))",
+                border: "1px solid rgba(232,160,100,0.3)",
                 backdropFilter: "blur(12px)",
               }}
             >
@@ -799,13 +810,13 @@ if (!emailRegex.test(form.email)) {
                 animate={{ backgroundPosition: ["0% 0%", "100% 100%"] }}
                 transition={{ duration: 6, repeat: Infinity, repeatType: "reverse" }}
                 style={{
-                  background: "linear-gradient(135deg, rgba(37,99,235,0.1), rgba(0,212,255,0.05))",
+                  background: "linear-gradient(135deg, rgba(232,160,100,0.1), rgba(212,145,92,0.05))",
                   backgroundSize: "200% 200%",
                 }}
               />
               <div className="relative flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-xs font-semibold mb-1" style={{ color: "#00D4FF" }}>Questions?</div>
+                  <div className="text-xs font-semibold mb-1" style={{ color: "#d4915c" }}>Questions?</div>
                   <p className="text-sm font-medium text-white">Chat with our talent team before applying.</p>
                   <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>info@axivontech.in</p>
                 </div>

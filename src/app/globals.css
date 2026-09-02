@@ -1,26 +1,181 @@
 @import "tailwindcss";
 
+/* ============================================================
+   AXIVON TECHNOLOGIES — PREMIUM DARK EDITORIAL DESIGN SYSTEM
+   Direction B: Dark base · Warm amber accent · Editorial type
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ── Backgrounds ─────────────────────────────────────────── */
+  --bg-base:        #0f0f0f;   /* Page base */
+  --bg-surface:     #141414;   /* Subtle alt section */
+  --bg-panel:       #1c1c1e;   /* Card / panel surface */
+  --bg-panel-2:     #242424;   /* Elevated panel */
+  --bg-panel-hover: #2a2a2a;   /* Panel hover state */
+
+  /* Light contrast sections */
+  --bg-light:       #ffffff;
+  --bg-light-alt:   #f9f9f8;
+  --bg-light-soft:  #f3f3f1;
+
+  /* ── Brand Accent — Warm Amber ───────────────────────────── */
+  --accent:         #e8a064;
+  --accent-hover:   #f0b07a;
+  --accent-dark:    #c47a3a;
+  --accent-soft:    rgba(232, 160, 100, 0.12);
+  --accent-softer:  rgba(232, 160, 100, 0.07);
+  --accent-border:  rgba(232, 160, 100, 0.25);
+  --accent-bg:      #2a1f14;   /* Very dark amber bg for badges */
+
+  /* ── Text ────────────────────────────────────────────────── */
+  --text-1:   #f4f4f5;    /* Primary — on dark bg */
+  --text-2:   #a1a1aa;    /* Secondary */
+  --text-3:   #71717a;    /* Muted */
+  --text-4:   #52525b;    /* Disabled / placeholder */
+
+  /* Text on light sections */
+  --text-dark-1:  #111111;
+  --text-dark-2:  #404040;
+  --text-dark-3:  #737373;
+
+  /* ── Borders ─────────────────────────────────────────────── */
+  --border-1:  #262626;
+  --border-2:  #303030;
+  --border-3:  #3f3f46;
+
+  /* Light section borders */
+  --border-light-1: #e5e5e3;
+  --border-light-2: #d4d4d2;
+
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.35);
+  --shadow-md:  0 8px 24px rgba(0,0,0,0.40);
+  --shadow-lg:  0 20px 48px rgba(0,0,0,0.50);
+  --shadow-accent: 0 8px 24px rgba(232,160,100,0.15);
+
+  /* ── Status ──────────────────────────────────────────────── */
+  --success: #4ade80;
+  --error:   #f87171;
+  --warning: #fbbf24;
+  --info:    #60a5fa;
+
+  /* ── Spacing scale ───────────────────────────────────────── */
+  --section-y:     6rem;    /* py-24 */
+  --section-y-lg:  7rem;    /* py-28 */
+  --section-y-xl:  8rem;    /* py-32 */
+  --container-px:  1.5rem;
+  --container-max: 80rem;   /* max-w-7xl */
 }
 
+/* ── Tailwind theme bridge ───────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-1);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base ────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-1);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Subtle hero ambient glow — single, restrained */
+  background-image: radial-gradient(
+    ellipse 80% 40% at 15% 0%,
+    rgba(232, 160, 100, 0.07),
+    transparent 70%
+  );
+  background-attachment: fixed;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ── Selection ───────────────────────────────────────────────── */
+::selection {
+  background: rgba(232, 160, 100, 0.22);
+  color: #fff;
+}
+
+/* ── Focus ring ──────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dark);
+}
+
+/* ── Light section utility class ────────────────────────────── */
+.section-light {
+  background-color: var(--bg-light);
+  color: var(--text-dark-1);
+}
+.section-light-alt {
+  background-color: var(--bg-light-alt);
+  color: var(--text-dark-1);
+}
+
+/* ── Container utility ───────────────────────────────────────── */
+.container-axivon {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-px);
+}
+@media (min-width: 640px) {
+  .container-axivon { padding-inline: 1.5rem; }
+}
+@media (min-width: 1024px) {
+  .container-axivon { padding-inline: 2.5rem; }
+}
+
+/* ── Overline / label utility ────────────────────────────────── */
+.overline {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ── Gradient text utility ───────────────────────────────────── */
+.text-gradient-amber {
+  background: linear-gradient(135deg, #f0b07a 0%, #e8a064 50%, #c47a3a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

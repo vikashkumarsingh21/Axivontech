@@ -77,7 +77,7 @@ const STATS: readonly StatDefinition[] = [
     label: "Projects Delivered",
     target: 15,
     suffix: "+",
-    accent: ["#2563EB", "#00D4FF"],
+    accent: ["#e8a064", "#d4915c"],
   },
   {
     id: "domains",
@@ -85,7 +85,7 @@ const STATS: readonly StatDefinition[] = [
     label: "Technology Domains",
     target: 8,
     suffix: "+",
-    accent: ["#7C3AED", "#2563EB"],
+    accent: ["#c9922a", "#e8a064"],
   },
   {
     id: "satisfaction",
@@ -93,7 +93,7 @@ const STATS: readonly StatDefinition[] = [
     label: "Client Satisfaction",
     target: 99,
     suffix: "%",
-    accent: ["#00D4FF", "#2563EB"],
+    accent: ["#d4915c", "#e8a064"],
   },
   {
     id: "support",
@@ -102,7 +102,7 @@ const STATS: readonly StatDefinition[] = [
     target: 24,
     secondaryTarget: 7,
     divider: "/",
-    accent: ["#7C3AED", "#00D4FF"],
+    accent: ["#c9922a", "#d4915c"],
   },
   {
     id: "code",
@@ -110,7 +110,7 @@ const STATS: readonly StatDefinition[] = [
     label: "Lines Of Code",
     target: 50,
     suffix: "K+",
-    accent: ["#2563EB", "#7C3AED"],
+    accent: ["#e8a064", "#c9922a"],
   },
   {
     id: "quality",
@@ -118,7 +118,7 @@ const STATS: readonly StatDefinition[] = [
     label: "Commitment To Quality",
     target: 100,
     suffix: "%",
-    accent: ["#00D4FF", "#7C3AED"],
+    accent: ["#d4915c", "#c9922a"],
   },
 ];
 
@@ -186,7 +186,7 @@ function AuroraBackground({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden={true}>
       <motion.div
-        className="absolute -left-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-blue-600/30 blur-[120px]"
+        className="absolute -left-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-[#e8a064]/30 blur-[120px]"
         animate={reduceMotion ? undefined : { x: [0, 60, -20, 0], y: [0, 40, -30, 0] }}
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -211,7 +211,7 @@ function PerspectiveGrid() {
       aria-hidden={true}
       style={{
         backgroundImage:
-          "linear-gradient(rgba(124,58,237,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,0.18) 1px, transparent 1px)",
+          "linear-gradient(rgba(201,146,42,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(232,160,100,0.18) 1px, transparent 1px)",
         backgroundSize: "56px 56px",
         transform: "perspective(600px) rotateX(55deg) scale(1.4)",
         transformOrigin: "bottom",
@@ -252,7 +252,7 @@ function FloatingParticles({ reduceMotion }: { reduceMotion: boolean }) {
             top: `${particle.top}%`,
             width: particle.size,
             height: particle.size,
-            boxShadow: "0 0 6px 1px rgba(0,212,255,0.55)",
+            boxShadow: "0 0 6px 1px rgba(212,145,92,0.55)",
           }}
           animate={{ y: [0, -26, 0], opacity: [0.1, 0.85, 0.1] }}
           transition={{
@@ -345,7 +345,7 @@ function StatCard({ stat, index, isSectionInView, reduceMotion }: StatCardProps)
       whileHover={reduceMotion ? undefined : { scale: 1.03 }}
       whileFocus={reduceMotion ? undefined : { scale: 1.03 }}
       style={{ perspective: 1000 }}
-      className="group relative rounded-[1.75rem] p-px outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+      className="group relative rounded-[1.75rem] p-px outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]"
     >
       {/* ambient hover glow */}
       <div
@@ -373,7 +373,7 @@ function StatCard({ stat, index, isSectionInView, reduceMotion }: StatCardProps)
           rotateY: reduceMotion ? 0 : rotateY,
           transformStyle: "preserve-3d",
         }}
-        className="relative h-full overflow-hidden rounded-[1.74rem] border border-white/[0.06] bg-white/[0.04] px-7 py-8 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:px-8 sm:py-9 lg:px-9 lg:py-10"
+        className="relative h-full overflow-hidden rounded-[1.74rem] border border-white/[0.06] bg-[#141414]/[0.04] px-7 py-8 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:px-8 sm:py-9 lg:px-9 lg:py-10"
       >
         {/* mouse-follow spotlight */}
         <motion.div
@@ -458,7 +458,7 @@ export default function PortfolioStats() {
 
   const sectionPointerX = useMotionValue(0);
   const sectionPointerY = useMotionValue(0);
-  const sectionSpotlight = useMotionTemplate`radial-gradient(900px circle at ${sectionPointerX}px ${sectionPointerY}px, rgba(0,212,255,0.06), transparent 70%)`;
+  const sectionSpotlight = useMotionTemplate`radial-gradient(900px circle at ${sectionPointerX}px ${sectionPointerY}px, rgba(212,145,92,0.06), transparent 70%)`;
 
   const handleSectionPointerMove = useCallback(
     (event: ReactMouseEvent<HTMLElement>) => {
@@ -488,11 +488,11 @@ export default function PortfolioStats() {
       ref={sectionRef}
       onMouseMove={handleSectionPointerMove}
       aria-label="Axivon Technologies impact statistics"
-      className="relative isolate overflow-hidden bg-[#050816] py-28 sm:py-32 lg:py-40"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] py-28 sm:py-32 lg:py-40"
     >
       <style>{`
         .axv-gradient-text {
-          background-image: linear-gradient(90deg, #2563EB, #7C3AED, #00D4FF, #7C3AED, #2563EB);
+          background-image: linear-gradient(90deg, #e8a064, #c9922a, #d4915c, #c9922a, #e8a064);
           background-size: 200% auto;
           -webkit-background-clip: text;
           background-clip: text;
@@ -508,7 +508,7 @@ export default function PortfolioStats() {
       `}</style>
 
       {/* background layers */}
-      <div className="absolute inset-0 -z-20 bg-[#050816]" aria-hidden={true} />
+      <div className="absolute inset-0 -z-20 bg-[#0f0f0f]" aria-hidden={true} />
       <AuroraBackground reduceMotion={reduceMotion} />
       <PerspectiveGrid />
       <FloatingParticles reduceMotion={reduceMotion} />
@@ -523,7 +523,7 @@ export default function PortfolioStats() {
         aria-hidden={true}
       />
       <div
-        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-transparent to-[#050816]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-transparent to-[#0f0f0f]"
         aria-hidden={true}
       />
 
@@ -537,13 +537,13 @@ export default function PortfolioStats() {
         >
           <motion.div
             variants={headerItemVariants}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 backdrop-blur-sm"
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#141414]/[0.04] px-4 py-1.5 backdrop-blur-sm"
           >
             <span className="relative flex h-2 w-2" aria-hidden={true}>
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400" />
             </span>
-            <Sparkles className="h-3.5 w-3.5 text-cyan-300" aria-hidden={true} />
+            <Sparkles className="h-3.5 w-3.5 text-[#e8a064]" aria-hidden={true} />
             <span className="text-xs font-semibold tracking-[0.2em] text-white/70">OUR IMPACT</span>
           </motion.div>
 

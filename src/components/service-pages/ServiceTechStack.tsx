@@ -70,12 +70,12 @@ interface TechItem {
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
 const ACCENT_CYCLE = [
-  { primary: "#2563EB", secondary: "#00D4FF" },
-  { primary: "#7C3AED", secondary: "#2563EB" },
-  { primary: "#00D4FF", secondary: "#7C3AED" },
-  { primary: "#2563EB", secondary: "#7C3AED" },
-  { primary: "#7C3AED", secondary: "#00D4FF" },
-  { primary: "#00D4FF", secondary: "#2563EB" },
+  { primary: "#e8a064", secondary: "#d4915c" },
+  { primary: "#c9922a", secondary: "#e8a064" },
+  { primary: "#d4915c", secondary: "#c9922a" },
+  { primary: "#e8a064", secondary: "#c9922a" },
+  { primary: "#c9922a", secondary: "#d4915c" },
+  { primary: "#d4915c", secondary: "#e8a064" },
 ];
 
 const ICON_POOL: React.ElementType[] = [
@@ -222,7 +222,7 @@ function BackgroundParticles({ reduced }: { reduced: boolean }) {
           style={{
             left: `${p.x}%`, top: `${p.y}%`,
             width: p.size, height: p.size,
-            background: `radial-gradient(circle, rgba(37,99,235,${p.opacity}) 0%, rgba(124,58,237,${p.opacity * 0.5}) 100%)`,
+            background: `radial-gradient(circle, rgba(232,160,100,${p.opacity}) 0%, rgba(201,146,42,${p.opacity * 0.5}) 100%)`,
           }}
           animate={{ y: [0, -90, 0], x: [0, p.drift, 0], opacity: [0, p.opacity, 0] }}
           transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
@@ -271,8 +271,8 @@ function GridOverlay() {
         className="absolute inset-0"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(37,99,235,0.032) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(37,99,235,0.032) 1px, transparent 1px)
+            linear-gradient(rgba(232,160,100,0.032) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(232,160,100,0.032) 1px, transparent 1px)
           `,
           backgroundSize: "72px 72px",
         }}
@@ -309,7 +309,7 @@ function OrbitRing({
       {/* Dashed ring track */}
       <div
         className="absolute inset-0 rounded-full"
-        style={{ border: "1px dashed rgba(37,99,235,0.18)" }}
+        style={{ border: "1px dashed rgba(232,160,100,0.18)" }}
         aria-hidden
       />
       {items.map((tech, i) => {
@@ -382,7 +382,7 @@ function CentralOrb({ service }: { service: ServiceData }) {
           background: "rgba(255,255,255,0.03)",
           border: "1px solid rgba(255,255,255,0.1)",
           backdropFilter: "blur(20px)",
-          boxShadow: "0 0 40px rgba(37,99,235,0.2), inset 0 1px 0 rgba(255,255,255,0.07)",
+          boxShadow: "0 0 40px rgba(232,160,100,0.2), inset 0 1px 0 rgba(255,255,255,0.07)",
         }}
         animate={{ scale: [1, 1.04, 1] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -391,14 +391,14 @@ function CentralOrb({ service }: { service: ServiceData }) {
         <motion.div
           className="absolute -inset-3 rounded-3xl"
           style={{
-            background: "radial-gradient(ellipse, rgba(37,99,235,0.15) 0%, transparent 70%)",
+            background: "radial-gradient(ellipse, rgba(232,160,100,0.15) 0%, transparent 70%)",
             filter: "blur(10px)",
           }}
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 3, repeat: Infinity }}
           aria-hidden
         />
-        <Code2 size={22} className="mb-1.5" style={{ color: "#2563EB" }} aria-hidden />
+        <Code2 size={22} className="mb-1.5" style={{ color: "#e8a064" }} aria-hidden />
         <div className="text-[10px] font-bold text-white/70 uppercase tracking-widest leading-tight px-2">
           {service.technologies.length}<br />
           <span className="text-white/35 normal-case tracking-normal font-normal">tools</span>
@@ -427,7 +427,7 @@ function DesktopOrbit({ techItems, service, reduced }: { techItems: TechItem[]; 
       <div
         className="absolute inset-0 rounded-full"
         style={{
-          background: "radial-gradient(ellipse, rgba(37,99,235,0.06) 0%, transparent 65%)",
+          background: "radial-gradient(ellipse, rgba(232,160,100,0.06) 0%, transparent 65%)",
           filter: "blur(30px)",
         }}
         aria-hidden
@@ -452,7 +452,7 @@ function DesktopOrbit({ techItems, service, reduced }: { techItems: TechItem[]; 
         className="absolute rounded-full pointer-events-none"
         style={{
           width: 280, height: 280,
-          border: "1px dashed rgba(124,58,237,0.15)",
+          border: "1px dashed rgba(201,146,42,0.15)",
           top: "50%", left: "50%",
           transform: "translate(-50%, -50%)",
         }}
@@ -468,10 +468,10 @@ function DesktopOrbit({ techItems, service, reduced }: { techItems: TechItem[]; 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
 const STATUS_STYLES: Record<TechItem["status"], { bg: string; border: string; color: string }> = {
-  Production: { bg: "rgba(37,99,235,0.12)", border: "rgba(37,99,235,0.3)", color: "#93c5fd" },
-  Stable: { bg: "rgba(0,212,255,0.1)", border: "rgba(0,212,255,0.25)", color: "#67e8f9" },
-  Core: { bg: "rgba(124,58,237,0.12)", border: "rgba(124,58,237,0.3)", color: "#c4b5fd" },
-  Enterprise: { bg: "rgba(37,99,235,0.1)", border: "rgba(0,212,255,0.2)", color: "#a5b4fc" },
+  Production: { bg: "rgba(232,160,100,0.12)", border: "rgba(232,160,100,0.3)", color: "#93c5fd" },
+  Stable: { bg: "rgba(212,145,92,0.1)", border: "rgba(212,145,92,0.25)", color: "#67e8f9" },
+  Core: { bg: "rgba(201,146,42,0.12)", border: "rgba(201,146,42,0.3)", color: "#c4b5fd" },
+  Enterprise: { bg: "rgba(232,160,100,0.1)", border: "rgba(212,145,92,0.2)", color: "#a5b4fc" },
 };
 
 // ─── Tech Card ────────────────────────────────────────────────────────────────
@@ -677,25 +677,25 @@ const PILLARS = [
     icon: Zap,
     label: "Performance",
     description: "Tools chosen for speed and minimal overhead at every layer of the stack.",
-    color: "#00D4FF",
+    color: "#d4915c",
   },
   {
     icon: BarChart3,
     label: "Scalability",
     description: "Architectures that handle 10× growth without a rewrite.",
-    color: "#2563EB",
+    color: "#e8a064",
   },
   {
     icon: Shield,
     label: "Security",
     description: "Security-first defaults baked into every tool we recommend.",
-    color: "#7C3AED",
+    color: "#c9922a",
   },
   {
     icon: Wrench,
     label: "Maintainability",
     description: "Strong typing, documentation, and community support mean longevity.",
-    color: "#00D4FF",
+    color: "#d4915c",
   },
 ];
 
@@ -723,7 +723,7 @@ function BottomPanel({ reduced }: { reduced: boolean }) {
         <motion.div
           className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none"
           style={{
-            background: "linear-gradient(90deg, transparent 0%, #2563EB 25%, #00D4FF 50%, #7C3AED 75%, transparent 100%)",
+            background: "linear-gradient(90deg, transparent 0%, #e8a064 25%, #d4915c 50%, #c9922a 75%, transparent 100%)",
           }}
           animate={{ opacity: [0.3, 0.9, 0.3] }}
           transition={{ duration: 4.5, repeat: Infinity }}
@@ -734,7 +734,7 @@ function BottomPanel({ reduced }: { reduced: boolean }) {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse 65% 55% at 50% 100%, rgba(37,99,235,0.055) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse 65% 55% at 50% 100%, rgba(232,160,100,0.055) 0%, transparent 70%)",
         }}
         aria-hidden
       />
@@ -808,7 +808,7 @@ function BottomPanel({ reduced }: { reduced: boolean }) {
               className="flex items-center gap-1.5 text-xs font-medium"
               style={{ color: "rgba(255,255,255,0.32)" }}
             >
-              <CheckCircle2 size={11} style={{ color: "#00D4FF" }} aria-hidden />
+              <CheckCircle2 size={11} style={{ color: "#d4915c" }} aria-hidden />
               {item}
             </motion.div>
           ))}
@@ -832,14 +832,14 @@ function SectionHeader({ service, inView }: { service: ServiceData; inView: bool
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest"
           style={{
-            background: "rgba(0,212,255,0.08)",
-            border: "1px solid rgba(0,212,255,0.22)",
+            background: "rgba(212,145,92,0.08)",
+            border: "1px solid rgba(212,145,92,0.22)",
             color: "#67e8f9",
           }}
         >
           <motion.div
             className="w-1.5 h-1.5 rounded-full"
-            style={{ background: "#00D4FF" }}
+            style={{ background: "#d4915c" }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
             aria-hidden
@@ -858,7 +858,7 @@ function SectionHeader({ service, inView }: { service: ServiceData; inView: bool
         <br />
         <span
           style={{
-            background: "linear-gradient(135deg, #2563EB 0%, #00D4FF 45%, #7C3AED 100%)",
+            background: "linear-gradient(135deg, #e8a064 0%, #d4915c 45%, #c9922a 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
@@ -906,7 +906,7 @@ export default function ServiceTechStack({ service }: ServiceTechStackProps) {
     <section
       ref={sectionRef}
       className="relative overflow-hidden py-24 lg:py-32"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
       aria-labelledby="techstack-heading"
     >
       {/* Background */}
@@ -977,7 +977,7 @@ export default function ServiceTechStack({ service }: ServiceTechStackProps) {
       {/* Bottom fade */}
       <div
         className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
-        style={{ background: "linear-gradient(to top, #050816 0%, transparent 100%)" }}
+        style={{ background: "linear-gradient(to top, #0f0f0f 0%, transparent 100%)" }}
         aria-hidden
       />
     </section>

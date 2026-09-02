@@ -81,8 +81,8 @@ const CASE_STUDIES: CaseStudy[] = [
     title: "Krishi Drishti",
     category: "Smart Agriculture",
     icon: Sprout,
-    accentPrimary: "#2563EB",
-    accentSecondary: "#00D4FF",
+    accentPrimary: "#e8a064",
+    accentSecondary: "#d4915c",
     challenge:
       "Farmers struggle with inefficient irrigation and lack of real-time crop insights.",
     solution:
@@ -99,8 +99,8 @@ const CASE_STUDIES: CaseStudy[] = [
     title: "JalMitra",
     category: "Environmental Innovation",
     icon: Waves,
-    accentPrimary: "#00D4FF",
-    accentSecondary: "#2563EB",
+    accentPrimary: "#d4915c",
+    accentSecondary: "#e8a064",
     challenge:
       "Water bodies suffer from increasing floating waste and pollution.",
     solution:
@@ -117,8 +117,8 @@ const CASE_STUDIES: CaseStudy[] = [
     title: "AI Business Assistant",
     category: "Artificial Intelligence",
     icon: BrainCircuit,
-    accentPrimary: "#7C3AED",
-    accentSecondary: "#00D4FF",
+    accentPrimary: "#c9922a",
+    accentSecondary: "#d4915c",
     challenge:
       "Businesses spend significant time on repetitive operational tasks.",
     solution:
@@ -156,7 +156,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
       <motion.div
         className="absolute -top-52 -left-36 w-[640px] h-[640px] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(37,99,235,0.16) 0%, transparent 65%)",
+          background: "radial-gradient(circle, rgba(232,160,100,0.16) 0%, transparent 65%)",
           filter: "blur(50px)",
         }}
         animate={reduced ? {} : { x: [0, 70, -35, 0], y: [0, 55, -25, 0], scale: [1, 1.12, 0.93, 1] }}
@@ -165,7 +165,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
       <motion.div
         className="absolute top-1/3 -right-44 w-[560px] h-[560px] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 65%)",
+          background: "radial-gradient(circle, rgba(201,146,42,0.14) 0%, transparent 65%)",
           filter: "blur(50px)",
         }}
         animate={reduced ? {} : { x: [0, -55, 35, 0], y: [0, -65, 40, 0], scale: [1, 0.9, 1.1, 1] }}
@@ -174,7 +174,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
       <motion.div
         className="absolute -bottom-28 left-1/3 w-[480px] h-[380px] rounded-full"
         style={{
-          background: "radial-gradient(ellipse, rgba(0,212,255,0.1) 0%, transparent 65%)",
+          background: "radial-gradient(ellipse, rgba(212,145,92,0.1) 0%, transparent 65%)",
           filter: "blur(60px)",
         }}
         animate={reduced ? {} : { scaleX: [1, 1.15, 0.92, 1], scaleY: [1, 0.85, 1.08, 1] }}
@@ -191,8 +191,8 @@ function PerspectiveGrid() {
         className="absolute inset-0"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(37,99,235,0.035) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(37,99,235,0.035) 1px, transparent 1px)
+            linear-gradient(rgba(232,160,100,0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(232,160,100,0.035) 1px, transparent 1px)
           `,
           backgroundSize: "68px 68px",
           maskImage: "radial-gradient(ellipse 75% 60% at 50% 20%, black 25%, transparent 75%)",
@@ -250,7 +250,7 @@ function BackgroundParticles({ reduced }: { reduced: boolean }) {
             top: `${p.y}%`,
             width: p.size,
             height: p.size,
-            background: `radial-gradient(circle, rgba(0,212,255,${p.opacity}) 0%, rgba(124,58,237,${p.opacity * 0.5}) 100%)`,
+            background: `radial-gradient(circle, rgba(212,145,92,${p.opacity}) 0%, rgba(201,146,42,${p.opacity * 0.5}) 100%)`,
           }}
           animate={{ y: [0, -100, 0], x: [0, p.drift, 0], opacity: [0, p.opacity, 0] }}
           transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
@@ -281,7 +281,7 @@ function TimelineSpine({ reduced }: { reduced: boolean }) {
         className="absolute top-0 left-0 right-0 origin-top"
         style={{
           scaleY: reduced ? 1 : scaleY,
-          background: "linear-gradient(to bottom, #2563EB 0%, #00D4FF 35%, #7C3AED 70%, #2563EB 100%)",
+          background: "linear-gradient(to bottom, #e8a064 0%, #d4915c 35%, #c9922a 70%, #e8a064 100%)",
           backgroundSize: "100% 300%",
         }}
         animate={reduced ? {} : { backgroundPositionY: ["0%", "100%", "0%"] }}
@@ -291,7 +291,7 @@ function TimelineSpine({ reduced }: { reduced: boolean }) {
           <motion.div
             className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full"
             style={{
-              background: "radial-gradient(circle, #00D4FF 0%, rgba(0,212,255,0) 80%)",
+              background: "radial-gradient(circle, #d4915c 0%, rgba(212,145,92,0) 80%)",
               filter: "blur(4px)",
             }}
             animate={{ opacity: [0.6, 1, 0.6] }}
@@ -724,7 +724,7 @@ function CaseStudyCard({
             href={`/portfolio/${study.id}`}
             aria-label={`Read the full case study for ${study.title}`}
             whileHover={reduced ? {} : { x: 4 }}
-            className="inline-flex items-center gap-1.5 mt-6 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] rounded-md"
+            className="inline-flex items-center gap-1.5 mt-6 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] rounded-md"
             style={{ color: study.accentPrimary }}
           >
             Read Full Case Study
@@ -743,7 +743,7 @@ function GradientWord({ children }: { children: React.ReactNode }) {
     <span
       className="inline-block"
       style={{
-        background: "linear-gradient(135deg, #2563EB 0%, #00D4FF 45%, #7C3AED 100%)",
+        background: "linear-gradient(135deg, #e8a064 0%, #d4915c 45%, #c9922a 100%)",
         WebkitBackgroundClip: "text",
         WebkitTextFillColor: "transparent",
         backgroundClip: "text",
@@ -775,14 +775,14 @@ function SectionHeader({ inView }: { inView: boolean }) {
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest"
           style={{
-            background: "linear-gradient(90deg, rgba(37,99,235,0.12), rgba(124,58,237,0.12))",
-            border: "1px solid rgba(124,58,237,0.3)",
-            color: "#a78bfa",
+            background: "linear-gradient(90deg, rgba(232,160,100,0.12), rgba(201,146,42,0.12))",
+            border: "1px solid rgba(201,146,42,0.3)",
+            color: "#e8a064",
           }}
         >
           <motion.div
             className="w-1.5 h-1.5 rounded-full"
-            style={{ background: "#7C3AED" }}
+            style={{ background: "#c9922a" }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
             aria-hidden
@@ -835,7 +835,7 @@ export default function CaseStudies() {
     <section
       ref={sectionRef}
       className="relative overflow-hidden py-24 lg:py-32"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
       aria-labelledby="case-studies-heading"
     >
       {/* Background */}
@@ -877,7 +877,7 @@ export default function CaseStudies() {
       {/* Bottom fade */}
       <div
         className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
-        style={{ background: "linear-gradient(to top, #050816 0%, transparent 100%)" }}
+        style={{ background: "linear-gradient(to top, #0f0f0f 0%, transparent 100%)" }}
         aria-hidden
       />
     </section>

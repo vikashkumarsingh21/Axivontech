@@ -10,21 +10,21 @@ interface ComingSoonProps {
 
 export default function ComingSoon({ title }: ComingSoonProps) {
   return (
-    <section className="min-h-screen bg-[#050816] flex items-center justify-center px-6">
+    <section className="min-h-screen bg-[#0f0f0f] flex items-center justify-center px-6">
       <div className="max-w-2xl text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Rocket className="mx-auto h-16 w-16 text-[#00D4FF]" />
+          <Rocket className="mx-auto h-16 w-16 text-[#d4915c]" />
 
           <h1 className="mt-6 text-5xl font-bold text-white">
             {title}
           </h1>
 
           <div className="mt-8">
-            <h2 className="text-3xl font-semibold bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent">
+            <h2 className="text-3xl font-semibold bg-gradient-to-r from-[#e8a064] via-[#c9922a] to-[#d4915c] bg-clip-text text-transparent">
               🚀 Coming Soon
             </h2>
 
@@ -37,7 +37,7 @@ export default function ComingSoon({ title }: ComingSoonProps) {
             </p>
           </div>
 
-          <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-6">
+          <div className="mt-10 rounded-2xl border border-white/10 bg-[#141414]/5 p-6">
             <h3 className="text-white font-semibold">
               For Business Inquiries
             </h3>
@@ -53,7 +53,7 @@ export default function ComingSoon({ title }: ComingSoonProps) {
 
           <Link
             href="/"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] px-8 py-4 text-white font-semibold shadow-lg"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#e8a064] via-[#c9922a] to-[#d4915c] px-8 py-4 text-white font-semibold shadow-lg"
           >
             <ArrowLeft size={18} />
             Back To Home

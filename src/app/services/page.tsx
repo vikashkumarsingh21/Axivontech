@@ -58,7 +58,7 @@ export const metadata: Metadata = {
 
 export default function ServicesPage() {
   return (
-    <main className="bg-[#050816] overflow-hidden">
+    <main className="bg-[#0f0f0f] overflow-hidden">
       <ServicesHero />
 
       <ServicesGrid />

@@ -12,7 +12,7 @@ export const metadata = {
 
 export default function ContactPage() {
   return (
-    <main className="bg-[#050816] overflow-hidden">
+    <main className="bg-[#0f0f0f] overflow-hidden">
       <ContactHero />
       <ContactInfo />
       <ContactForm />

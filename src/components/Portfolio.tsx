@@ -1,109 +1,123 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { Globe, Sprout, Waves, Radar, ArrowUpRight, type LucideIcon } from "lucide-react";
+import {
+  Globe,
+  Sprout,
+  Waves,
+  Building2,
+  ExternalLink,
+  type LucideIcon,
+} from "lucide-react";
+import { FaGithub } from "react-icons/fa";
+import { SectionHeader } from "@/components/ui";
 
 interface Project {
+  id: string;
   title: string;
   category: string;
   description: string;
+  status: "Completed" | "Live" | "In Development";
+  technologies: string[];
+  liveUrl: string;
+  githubUrl: string;
   icon: LucideIcon;
-  gradient: string;
+  gradientBg: string;
 }
 
 const PROJECTS: Project[] = [
   {
-    title: "Nanitagath Website",
+    id: "axivon-technologies",
+    title: "Axivon Technologies",
     category: "Business Website",
     description:
-      "Professional website designed for business growth and online presence.",
-    icon: Globe,
-    gradient: "from-[#2563EB] via-[#1d4ed8] to-[#00D4FF]",
+      "Modern technology company website showcasing web development, AI solutions, cloud services, and digital transformation capabilities.",
+    status: "Completed",
+    technologies: ["Next.js", "TypeScript", "Node.js", "JavaScript"],
+    liveUrl: "https://axivontech.in/",
+    githubUrl: "https://github.com/vikashkumarsingh21/Axivontech",
+    icon: Building2,
+    gradientBg: "from-[#1f1915] via-[#141414] to-[#1c140f]",
   },
   {
+    id: "krishi-drishti",
     title: "Krishi Drishti",
-    category: "Smart Agriculture Platform",
+    category: "Smart Agriculture",
     description:
-      "AI-powered irrigation and agriculture monitoring solution.",
+      "AI-powered smart irrigation platform with IoT sensor monitoring, weather analytics, automated irrigation control, and real-time agricultural insights.",
+    status: "Completed",
+    technologies: ["HTML", "CSS", "JavaScript", "Firebase", "Node.js", "Bootstrap", "IoT"],
+    liveUrl: "https://krishi-drishti.onrender.com/",
+    githubUrl: "https://github.com/vikashkumarsingh21/KRISHI-DRISHTI",
     icon: Sprout,
-    gradient: "from-emerald-500/70 via-[#2563EB]/60 to-[#7C3AED]/70",
+    gradientBg: "from-[#111f15] via-[#141414] to-[#0f1c14]",
   },
   {
+    id: "jalmitra",
     title: "JalMitra",
-    category: "Environmental Innovation",
+    category: "Environmental Technology",
     description:
-      "Autonomous water-cleaning system for rivers and lakes.",
+      "Smart AI-based solar water cleaning system designed to remove floating waste from water bodies using automation and environmental monitoring.",
+    status: "Completed",
+    technologies: ["HTML", "CSS", "JavaScript", "Firebase", "Node.js", "Bootstrap", "AI", "IoT"],
+    liveUrl: "https://jal-mitraafrontend.onrender.com/",
+    githubUrl: "https://github.com/vikashkumarsingh21/jalmitra",
     icon: Waves,
-    gradient: "from-cyan-400/80 via-[#2563EB]/70 to-[#7C3AED]/60",
+    gradientBg: "from-[#0f1f24] via-[#141414] to-[#0f181c]",
   },
   {
-    title: "IoT Monitoring System",
-    category: "IoT Dashboard",
+    id: "nani-tathagat",
+    title: "Nani Tathagat",
+    category: "Business Automation",
     description:
-      "Real-time monitoring and analytics platform for smart devices.",
-    icon: Radar,
-    gradient: "from-[#7C3AED] via-[#6d28d9] to-[#2563EB]",
+      "Business automation and lead generation platform focused on helping companies streamline operations, marketing, sales, and customer engagement.",
+    status: "Completed",
+    technologies: ["HTML", "CSS", "JavaScript", "Node.js", "SQL", "Bootstrap", "Google Apps Script"],
+    liveUrl: "https://nanitathagat.in/",
+    githubUrl: "https://github.com/vikashkumarsingh21/nanitathagat",
+    icon: Globe,
+    gradientBg: "from-[#1c1324] via-[#141414] to-[#140f1a]",
   },
 ];
 
 const headerVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
 const gridVariants: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
 };
 
 const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
 };
 
 export default function Portfolio() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden bg-[#050816] py-24 sm:py-32">
-      {/* Floating gradient background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <motion.div
-          aria-hidden
-          className="absolute -left-32 top-20 h-[28rem] w-[28rem] rounded-full bg-[#2563EB]/20 blur-[120px]"
-          animate={shouldReduceMotion ? undefined : { x: [0, 30, 0], y: [0, 25, 0] }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          aria-hidden
-          className="absolute -right-24 bottom-10 h-[26rem] w-[26rem] rounded-full bg-[#7C3AED]/20 blur-[130px]"
-          animate={shouldReduceMotion ? undefined : { x: [0, -25, 0], y: [0, -20, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
+    <section className="bg-[#0f0f0f] py-24 sm:py-28 relative">
+      <div className="mx-auto max-w-7xl px-6 lg:px-10">
         {/* Section header */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
           variants={headerVariants}
-          className="mx-auto mb-16 max-w-2xl text-center sm:mb-20"
+          className="mx-auto mb-16 max-w-2xl text-center"
         >
-          <span className="mb-4 inline-block text-xs font-semibold uppercase tracking-[0.25em] text-[#00D4FF]">
-            Our Work
-          </span>
-          <h2 className="text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-            Featured{" "}
-            <span className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent">
-              Projects
-            </span>
-          </h2>
-          <p className="mt-5 text-balance text-base leading-relaxed text-slate-400 sm:text-lg">
-            A showcase of innovative digital solutions built by Axivon
-            Technologies.
-          </p>
+          <SectionHeader
+            overline="Our Work"
+            heading={
+              <>
+                Featured <span className="text-gradient-amber">Projects</span>
+              </>
+            }
+            body="A showcase of real, functional, and highly optimized digital products crafted by our engineering team."
+          />
         </motion.div>
 
         {/* Project cards */}
@@ -118,50 +132,76 @@ export default function Portfolio() {
             const Icon = project.icon;
             return (
               <motion.div
-                key={project.title}
+                key={project.id}
                 variants={cardVariants}
-                whileHover={shouldReduceMotion ? undefined : { y: -6 }}
-                transition={{ type: "spring", stiffness: 280, damping: 22 }}
-                className="group relative"
+                whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+                transition={{ duration: 0.2 }}
+                className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#262626] bg-[#141414] transition-all duration-200 hover:border-[rgba(232,160,100,0.25)] hover:shadow-lg hover:shadow-[rgba(0,0,0,0.5)]"
               >
-                {/* Glow / gradient border layer */}
-                <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-70" />
-
-                {/* Card body */}
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl transition-colors duration-500 group-hover:border-transparent">
-                  {/* Image placeholder area */}
-                  <div className="relative aspect-[16/9] overflow-hidden">
-                    <div
-                      className={`absolute inset-0 bg-gradient-to-br ${project.gradient} transition-transform duration-700 ease-out group-hover:scale-110`}
-                    />
-                    <div className="absolute inset-0 bg-[#050816]/35" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Icon
-                        className="h-16 w-16 text-white/40 transition-transform duration-700 ease-out group-hover:scale-110 group-hover:text-white/60"
-                        strokeWidth={1.2}
-                      />
+                <div>
+                  {/* Visual header preview card */}
+                  <div
+                    className={`relative flex h-48 w-full items-center justify-center bg-gradient-to-br ${project.gradientBg} border-b border-[#262626] p-6`}
+                  >
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[#303030] bg-[#1c1c1e] shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:border-[#e8a064]/30">
+                      <Icon className="h-8 w-8 text-[#e8a064]" strokeWidth={1.5} />
                     </div>
-                    <span className="absolute left-4 top-4 rounded-full border border-white/20 bg-[#050816]/60 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#00D4FF] backdrop-blur-md">
+
+                    {/* Category badge */}
+                    <span className="absolute left-4 top-4 rounded-md border border-[#303030] bg-[#1c1c1e]/90 px-2.5 py-1 text-xs font-medium text-[#a1a1aa] shadow-xs">
                       {project.category}
+                    </span>
+
+                    {/* Status badge */}
+                    <span className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      {project.status}
                     </span>
                   </div>
 
-                  {/* Content */}
-                  <div className="p-7 sm:p-8">
-                    <h3 className="mb-3 text-xl font-semibold text-white">
+                  {/* Content area */}
+                  <div className="p-6 sm:p-7">
+                    <h3 className="mb-2 text-xl font-semibold text-[#f4f4f5] group-hover:text-[#e8a064] transition-colors">
                       {project.title}
                     </h3>
-                    <p className="mb-6 text-sm leading-relaxed text-slate-400">
+                    <p className="mb-6 text-sm leading-relaxed text-[#a1a1aa]">
                       {project.description}
                     </p>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-2 text-sm font-medium text-[#00D4FF] transition-all duration-300 hover:gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] rounded-sm"
-                    >
-                      View Project
-                      <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </button>
+
+                    {/* Tech stack tags */}
+                    <div className="mb-6 flex flex-wrap gap-2">
+                      {project.technologies.map((tech) => (
+                        <span
+                          key={tech}
+                          className="rounded-md border border-[#262626] bg-[#1c1c1e] px-2.5 py-1 text-xs font-medium text-[#71717a]"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
                   </div>
+                </div>
+
+                {/* Footer links */}
+                <div className="flex items-center justify-between border-t border-[#262626] px-6 py-4 sm:px-7 bg-[#1c1c1e]/30">
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-[#e8a064] transition-colors hover:text-[#f0b07a]"
+                  >
+                    <span>Live Demo</span>
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                  <a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-[#71717a] transition-colors hover:text-[#f4f4f5]"
+                  >
+                    <FaGithub className="h-4 w-4" />
+                    <span>Source Code</span>
+                  </a>
                 </div>
               </motion.div>
             );

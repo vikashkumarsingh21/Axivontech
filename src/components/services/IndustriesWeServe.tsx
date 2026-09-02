@@ -26,9 +26,9 @@ import {
   Truck,
   Rocket,
 } from "lucide-react";
-const EASE_INDUSTRY = [0.22, 1, 0.36, 1] as const;
+import { Badge } from "@/components/ui";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+const EASE_INDUSTRY = [0.22, 1, 0.36, 1] as const;
 
 interface Industry {
   id: number;
@@ -42,7 +42,6 @@ interface Industry {
   glow: string;
   glowRgba: string;
   gradient: string;
-  /** Bento span on desktop: "normal" | "wide" | "tall" */
   span: "normal" | "wide" | "tall";
 }
 
@@ -57,8 +56,6 @@ interface Particle {
   opacity: number;
 }
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
 const INDUSTRIES: Industry[] = [
   {
     id: 1,
@@ -66,13 +63,13 @@ const INDUSTRIES: Industry[] = [
     Icon: HeartPulse,
     description:
       "Secure patient portals, telemedicine platforms, and HIPAA-compliant digital infrastructure for modern healthcare providers.",
-    stat: "40+",
+    stat: "10+",
     statLabel: "Health Projects",
     tags: ["Telemedicine", "EHR Systems", "Patient Portals"],
-    color: "#2563EB",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.42)",
-    gradient: "from-[#2563EB] to-[#00D4FF]",
+    color: "#c47a3a",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
+    gradient: "from-[#c47a3a] to-[#e8a064]",
     span: "wide",
   },
   {
@@ -81,13 +78,13 @@ const INDUSTRIES: Industry[] = [
     Icon: GraduationCap,
     description:
       "Interactive LMS platforms and e-learning experiences that engage students and scale with institutions.",
-    stat: "25+",
+    stat: "5+",
     statLabel: "EdTech Products",
     tags: ["LMS", "E-Learning", "EdTech"],
-    color: "#7C3AED",
-    glow: "#7C3AED",
-    glowRgba: "rgba(124,58,237,0.42)",
-    gradient: "from-[#7C3AED] to-[#2563EB]",
+    color: "#e8a064",
+    glow: "#e8a064",
+    glowRgba: "rgba(232,160,100,0.3)",
+    gradient: "from-[#e8a064] to-[#f0b07a]",
     span: "normal",
   },
   {
@@ -96,13 +93,13 @@ const INDUSTRIES: Industry[] = [
     Icon: ShoppingCart,
     description:
       "High-conversion storefronts and headless commerce architectures built for speed and scale.",
-    stat: "60+",
+    stat: "15+",
     statLabel: "Stores Launched",
     tags: ["Shopify", "Headless", "Payments"],
-    color: "#00D4FF",
-    glow: "#00D4FF",
-    glowRgba: "rgba(0,212,255,0.42)",
-    gradient: "from-[#00D4FF] to-[#7C3AED]",
+    color: "#f0b07a",
+    glow: "#f0b07a",
+    glowRgba: "rgba(240,176,122,0.3)",
+    gradient: "from-[#f0b07a] to-[#c47a3a]",
     span: "normal",
   },
   {
@@ -111,13 +108,13 @@ const INDUSTRIES: Industry[] = [
     Icon: Building2,
     description:
       "Property listing portals, virtual tours, and CRM platforms that modernize how agents and buyers connect.",
-    stat: "30+",
+    stat: "8+",
     statLabel: "PropTech Builds",
     tags: ["Listing Portals", "Virtual Tours", "CRM"],
-    color: "#2563EB",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.42)",
-    gradient: "from-[#2563EB] to-[#7C3AED]",
+    color: "#c47a3a",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
+    gradient: "from-[#c47a3a] to-[#f0b07a]",
     span: "normal",
   },
   {
@@ -126,13 +123,13 @@ const INDUSTRIES: Industry[] = [
     Icon: Landmark,
     description:
       "Secure fintech solutions — dashboards, payment flows, and compliance-ready banking interfaces.",
-    stat: "20+",
+    stat: "5+",
     statLabel: "FinTech Products",
     tags: ["Banking", "Payments", "Compliance"],
-    color: "#7C3AED",
-    glow: "#7C3AED",
-    glowRgba: "rgba(124,58,237,0.42)",
-    gradient: "from-[#7C3AED] to-[#00D4FF]",
+    color: "#e8a064",
+    glow: "#e8a064",
+    glowRgba: "rgba(232,160,100,0.3)",
+    gradient: "from-[#e8a064] to-[#c47a3a]",
     span: "normal",
   },
   {
@@ -141,13 +138,13 @@ const INDUSTRIES: Industry[] = [
     Icon: Factory,
     description:
       "Industrial IoT dashboards, ERP integrations, and automation tools that optimize production lines.",
-    stat: "15+",
+    stat: "4+",
     statLabel: "MFG Systems",
     tags: ["IoT", "ERP", "Automation"],
-    color: "#00D4FF",
-    glow: "#00D4FF",
-    glowRgba: "rgba(0,212,255,0.42)",
-    gradient: "from-[#00D4FF] to-[#2563EB]",
+    color: "#f0b07a",
+    glow: "#f0b07a",
+    glowRgba: "rgba(240,176,122,0.3)",
+    gradient: "from-[#f0b07a] to-[#e8a064]",
     span: "normal",
   },
   {
@@ -156,13 +153,13 @@ const INDUSTRIES: Industry[] = [
     Icon: Truck,
     description:
       "Real-time tracking systems, route optimization tools, and supply chain visibility platforms.",
-    stat: "18+",
+    stat: "6+",
     statLabel: "Logistics Platforms",
     tags: ["Tracking", "Route Optimization", "Supply Chain"],
-    color: "#2563EB",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.42)",
-    gradient: "from-[#2563EB] to-[#00D4FF]",
+    color: "#c47a3a",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
+    gradient: "from-[#c47a3a] to-[#e8a064]",
     span: "normal",
   },
   {
@@ -171,18 +168,16 @@ const INDUSTRIES: Industry[] = [
     Icon: Rocket,
     description:
       "From idea to funded — rapid MVP builds, pitch decks, and scalable foundations that attract investors and early adopters.",
-    stat: "50+",
+    stat: "12+",
     statLabel: "Startups Launched",
     tags: ["MVP", "Product Strategy", "Fundraising Ready"],
-    color: "#7C3AED",
-    glow: "#7C3AED",
-    glowRgba: "rgba(124,58,237,0.42)",
-    gradient: "from-[#7C3AED] to-[#2563EB]",
+    color: "#e8a064",
+    glow: "#e8a064",
+    glowRgba: "rgba(232,160,100,0.3)",
+    gradient: "from-[#e8a064] to-[#f0b07a]",
     span: "wide",
   },
 ];
-
-// ─── Border Beam ──────────────────────────────────────────────────────────────
 
 const BorderBeam = memo(function BorderBeam({
   gradient,
@@ -210,8 +205,6 @@ const BorderBeam = memo(function BorderBeam({
     </div>
   );
 });
-
-// ─── Stat Counter ─────────────────────────────────────────────────────────────
 
 function StatCounter({
   stat,
@@ -255,7 +248,15 @@ function StatCounter({
   );
 }
 
-// ─── Industry Card ────────────────────────────────────────────────────────────
+const cardVariants = {
+  hidden: { opacity: 0, y: 44, scale: 0.93 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.62, delay: i * 0.09 + 0.3, ease: EASE_INDUSTRY },
+  }),
+};
 
 const IndustryCard = memo(function IndustryCard({
   industry,
@@ -275,7 +276,6 @@ const IndustryCard = memo(function IndustryCard({
   const springX = useSpring(rotateX, { stiffness: 180, damping: 24 });
   const springY = useSpring(rotateY, { stiffness: 180, damping: 24 });
 
-  // Magnetic effect values
   const magX = useMotionValue(0);
   const magY = useMotionValue(0);
   const magSX = useSpring(magX, { stiffness: 120, damping: 18 });
@@ -289,7 +289,6 @@ const IndustryCard = memo(function IndustryCard({
       const cy = e.clientY - rect.top - rect.height / 2;
       rotateX.set((-cy / (rect.height / 2)) * 5.5);
       rotateY.set((cx / (rect.width / 2)) * 5.5);
-      // Gentle magnetic card nudge
       magX.set((cx / (rect.width / 2)) * 5);
       magY.set((cy / (rect.height / 2)) * 5);
     },
@@ -305,19 +304,11 @@ const IndustryCard = memo(function IndustryCard({
   }, [rotateX, rotateY, magX, magY]);
 
   const delay = reduced ? 0 : index * 0.09 + 0.3;
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 44, scale: 0.93 },
-    visible: {
-      opacity: 1, y: 0, scale: 1,
-      transition: { duration: 0.62, delay, ease: EASE_INDUSTRY },
-    },
-  };
-
   const isWide = industry.span === "wide";
 
   return (
     <motion.article
+      custom={index}
       variants={reduced ? undefined : cardVariants}
       initial={reduced ? undefined : "hidden"}
       animate={visible ? "visible" : "hidden"}
@@ -344,7 +335,7 @@ const IndustryCard = memo(function IndustryCard({
     >
       <div
         ref={cardRef}
-        className="relative h-full flex flex-col gap-5 rounded-[28px] border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-7 overflow-hidden transition-colors duration-400 focus-within:ring-2 focus-within:ring-[#2563EB]/50"
+        className="relative h-full flex flex-col gap-5 rounded-[28px] border border-[#262626] bg-[#141414] p-7 overflow-hidden transition-colors duration-400 focus-within:ring-2 focus-within:ring-[#e8a064]/50"
         style={{
           boxShadow: hovered
             ? `0 0 0 1px ${industry.glowRgba}, 0 8px 56px -8px ${industry.glowRgba}, 0 24px 70px -16px ${industry.glowRgba}50`
@@ -356,7 +347,6 @@ const IndustryCard = memo(function IndustryCard({
           minHeight: 220,
         }}
       >
-        {/* Inner glow splash */}
         <div
           aria-hidden={true}
           className="pointer-events-none absolute -top-14 -left-14 w-44 h-44 rounded-full blur-3xl transition-opacity duration-500"
@@ -366,7 +356,6 @@ const IndustryCard = memo(function IndustryCard({
           }}
         />
 
-        {/* Sweep gradient on hover */}
         <div
           aria-hidden={true}
           className="pointer-events-none absolute inset-0 rounded-[28px] transition-opacity duration-500"
@@ -376,23 +365,11 @@ const IndustryCard = memo(function IndustryCard({
           }}
         />
 
-        {/* Corner accent */}
-        <div
-          aria-hidden={true}
-          className="pointer-events-none absolute bottom-0 right-0 w-32 h-32 rounded-full blur-2xl transition-opacity duration-500"
-          style={{
-            background: `radial-gradient(circle, ${industry.glowRgba}, transparent)`,
-            opacity: hovered ? 0.22 : 0,
-          }}
-        />
-
         <BorderBeam gradient={industry.gradient} active={hovered} reduced={reduced} />
 
-        {/* Top row: icon + stat */}
         <div className="flex items-start justify-between gap-4">
-          {/* Icon */}
           <motion.div
-            className={`w-13 h-13 w-[52px] h-[52px] rounded-2xl bg-gradient-to-br ${industry.gradient} flex items-center justify-center shadow-lg flex-shrink-0`}
+            className="w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-[#c47a3a] to-[#e8a064] flex items-center justify-center shadow-lg flex-shrink-0"
             animate={
               reduced
                 ? {}
@@ -403,10 +380,9 @@ const IndustryCard = memo(function IndustryCard({
             transition={{ duration: 0.35, ease: "easeOut" }}
             aria-hidden={true}
           >
-            <industry.Icon className="w-6 h-6 text-white" strokeWidth={1.8} />
+            <industry.Icon className="w-6 h-6 text-[#0f0f0f]" strokeWidth={1.8} />
           </motion.div>
 
-          {/* Stat */}
           <div className="text-right flex-shrink-0">
             <StatCounter
               stat={industry.stat}
@@ -414,28 +390,26 @@ const IndustryCard = memo(function IndustryCard({
               reduced={reduced}
               color={industry.color}
             />
-            <p className="text-white/35 text-[11px] font-medium tracking-wide mt-0.5">
+            <p className="text-[#71717a] text-[11px] font-medium tracking-wide mt-0.5">
               {industry.statLabel}
             </p>
           </div>
         </div>
 
-        {/* Title */}
         <div className="flex flex-col gap-2">
           <h3 className="text-white font-bold text-xl tracking-tight leading-snug">
             {industry.title}
           </h3>
-          <p className="text-white/45 text-sm leading-relaxed">{industry.description}</p>
+          <p className="text-[#a1a1aa] text-sm leading-relaxed">{industry.description}</p>
         </div>
 
-        {/* Tags */}
         <div className="flex flex-wrap gap-2 mt-auto pt-1">
           {industry.tags.map((tag) => (
             <span
               key={tag}
               className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide border transition-all duration-300"
               style={{
-                color: hovered ? industry.color : "rgba(255,255,255,0.4)",
+                color: hovered ? industry.color : "#71717a",
                 borderColor: hovered
                   ? `${industry.color}50`
                   : "rgba(255,255,255,0.08)",
@@ -447,36 +421,10 @@ const IndustryCard = memo(function IndustryCard({
             </span>
           ))}
         </div>
-
-        {/* Pulse dot indicator */}
-        <div className="absolute top-5 right-5 flex" aria-hidden={true}>
-          <AnimatePresence>
-            {hovered && (
-              <motion.span
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ duration: 0.22 }}
-                className="relative flex"
-              >
-                <span
-                  className="absolute inline-flex h-2 w-2 rounded-full opacity-60 animate-ping"
-                  style={{ background: industry.color }}
-                />
-                <span
-                  className="relative inline-flex rounded-full h-2 w-2"
-                  style={{ background: industry.color }}
-                />
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </div>
       </div>
     </motion.article>
   );
 });
-
-// ─── Bento Grid ───────────────────────────────────────────────────────────────
 
 function BentoGrid({
   visible,
@@ -491,22 +439,14 @@ function BentoGrid({
       role="list"
       aria-label="Industries served by Axivon Technologies"
     >
-      {/*
-        Bento layout (lg, 4 cols):
-        Row 1: Healthcare (wide=2), Education (1), E-Commerce (1)
-        Row 2: Real Estate (1), Finance (1), Manufacturing (1), Logistics (1)
-        Row 3: Startups (wide=2) centered via col-start
-      */}
       {INDUSTRIES.map((industry, i) => (
         <div
           key={industry.id}
           className={
             industry.span === "wide"
-              ? // Healthcare: first wide — cols 1-2
-                i === 0
+              ? i === 0
                 ? "lg:col-span-2"
-                : // Startups: last wide — cols 3-4 (col-start-3)
-                  "lg:col-span-2 lg:col-start-3"
+                : "lg:col-span-2 lg:col-start-3"
               : "lg:col-span-1"
           }
         >
@@ -521,8 +461,6 @@ function BentoGrid({
     </div>
   );
 }
-
-// ─── Section Header ───────────────────────────────────────────────────────────
 
 const SectionHeader = memo(function SectionHeader({
   visible,
@@ -546,16 +484,13 @@ const SectionHeader = memo(function SectionHeader({
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
       >
-        <span
-          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
-          aria-label="Section: Industries We Serve"
-        >
+        <Badge>
           <span aria-hidden={true} className="relative flex">
-            <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#00D4FF] opacity-70 animate-ping" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
+            <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#e8a064] opacity-70 animate-ping" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#e8a064]" />
           </span>
-          Industries We Serve
-        </span>
+          <span className="ml-2">Industries We Serve</span>
+        </Badge>
       </motion.div>
 
       <motion.h2
@@ -567,22 +502,14 @@ const SectionHeader = memo(function SectionHeader({
       >
         Building Solutions For
         <br />
-        <span
-          className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent"
-          style={{
-            backgroundSize: "200% 100%",
-            animation: reduced ? "none" : "gradientShift 5s ease infinite",
-          }}
-        >
-          Every Industry
-        </span>
+        <span className="text-gradient-amber">Every Industry</span>
       </motion.h2>
 
       <motion.p
         variants={reduced ? undefined : v(2)}
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
-        className="text-white/45 text-base sm:text-lg leading-relaxed max-w-xl"
+        className="text-[#a1a1aa] text-base sm:text-lg leading-relaxed max-w-xl"
       >
         From startups to enterprises, we create technology solutions tailored
         for diverse industries worldwide.
@@ -590,8 +517,6 @@ const SectionHeader = memo(function SectionHeader({
     </div>
   );
 });
-
-// ─── Background ───────────────────────────────────────────────────────────────
 
 const Background = memo(function Background({ reduced }: { reduced: boolean }) {
   const particles = useMemo<Particle[]>(
@@ -603,17 +528,16 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
         size: Math.random() * 1.8 + 0.6,
         dur: Math.random() * 14 + 8,
         delay: Math.random() * 9,
-        color: ["#2563EB", "#7C3AED", "#00D4FF"][i % 3],
-        opacity: Math.random() * 0.18 + 0.07,
+        color: ["#c47a3a", "#e8a064", "#f0b07a"][i % 3],
+        opacity: Math.random() * 0.12 + 0.05,
       })),
     []
   );
 
   return (
     <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* Animated grid */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.02]"
         style={{
           backgroundImage: `
             linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
@@ -625,12 +549,11 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
 
       {!reduced && (
         <>
-          {/* Aurora blobs */}
           <motion.div
             className="absolute rounded-full blur-[170px]"
             style={{
               width: 700, height: 420,
-              background: "radial-gradient(ellipse, rgba(37,99,235,0.13), transparent 70%)",
+              background: "radial-gradient(ellipse, rgba(232,160,100,0.05), transparent 70%)",
               top: "0%", left: "-8%",
             }}
             animate={{ x: [0, 70, 0], y: [0, 45, 0] }}
@@ -640,25 +563,13 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
             className="absolute rounded-full blur-[180px]"
             style={{
               width: 600, height: 500,
-              background: "radial-gradient(ellipse, rgba(124,58,237,0.11), transparent 70%)",
+              background: "radial-gradient(ellipse, rgba(196,122,58,0.04), transparent 70%)",
               bottom: "0%", right: "-5%",
             }}
             animate={{ x: [0, -55, 0], y: [0, -35, 0] }}
             transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 5 }}
           />
-          <motion.div
-            className="absolute rounded-full blur-[130px]"
-            style={{
-              width: 500, height: 500,
-              background: "radial-gradient(circle, rgba(0,212,255,0.07), transparent 70%)",
-              top: "45%", left: "50%",
-              translateX: "-50%",
-            }}
-            animate={{ x: [0, 38, -30, 0], y: [0, -26, 26, 0] }}
-            transition={{ duration: 32, repeat: Infinity, ease: "easeInOut", delay: 9 }}
-          />
 
-          {/* Particles */}
           {particles.map((p) => (
             <motion.div
               key={p.id}
@@ -684,8 +595,6 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
   );
 });
 
-// ─── Mouse Spotlight ──────────────────────────────────────────────────────────
-
 function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElement | null> }) {
   const mx = useMotionValue(-1000);
   const my = useMotionValue(-1000);
@@ -693,14 +602,22 @@ function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElemen
   const sy = useSpring(my, { stiffness: 55, damping: 20 });
 
   useEffect(() => {
+    let frameId: number | null = null;
     const move = (e: MouseEvent) => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      mx.set(e.clientX - rect.left);
-      my.set(e.clientY - rect.top);
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = null;
+        if (!sectionRef.current) return;
+        const rect = sectionRef.current.getBoundingClientRect();
+        mx.set(e.clientX - rect.left);
+        my.set(e.clientY - rect.top);
+      });
     };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
+    window.addEventListener("mousemove", move, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", move);
+      if (frameId) cancelAnimationFrame(frameId);
+    };
   }, [mx, my, sectionRef]);
 
   return (
@@ -708,13 +625,11 @@ function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElemen
       aria-hidden={true}
       className="pointer-events-none absolute inset-0 z-0"
       style={{
-        background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(37,99,235,0.055), transparent 55%)`,
+        background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(232,160,100,0.04), transparent 55%)`,
       }}
     />
   );
 }
-
-// ─── Main Export ──────────────────────────────────────────────────────────────
 
 export default function IndustriesWeServe() {
   const reduced = useReducedMotion() ?? false;
@@ -722,37 +637,24 @@ export default function IndustriesWeServe() {
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
 
   return (
-    <>
-      <style>{`
-        @keyframes gradientShift {
-          0%   { background-position: 0% 50%; }
-          50%  { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-      `}</style>
+    <section
+      ref={sectionRef}
+      id="industries-we-serve"
+      aria-labelledby="industries-heading"
+      className="relative w-full overflow-hidden py-24 sm:py-32 bg-[#0f0f0f]"
+    >
+      <Background reduced={reduced} />
+      {!reduced && <MouseSpotlight sectionRef={sectionRef} />}
 
-      <section
-        ref={sectionRef}
-        id="industries-we-serve"
-        aria-labelledby="industries-heading"
-        className="relative w-full overflow-hidden py-24 sm:py-32"
-        style={{ background: "#050816" }}
-      >
-        <Background reduced={reduced} />
-        {!reduced && <MouseSpotlight sectionRef={sectionRef} />}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeader visible={isInView} reduced={reduced} />
+        <BentoGrid visible={isInView} reduced={reduced} />
+      </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeader visible={isInView} reduced={reduced} />
-          <BentoGrid visible={isInView} reduced={reduced} />
-        </div>
-
-        {/* Bottom fade */}
-        <div
-          aria-hidden={true}
-          className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
-          style={{ background: "linear-gradient(to bottom, transparent, #050816)" }}
-        />
-      </section>
-    </>
+      <div
+        aria-hidden={true}
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0f0f0f] to-transparent"
+      />
+    </section>
   );
 }

@@ -3,6 +3,7 @@
 import {
   useRef,
   useState,
+  useEffect,
   useCallback,
   useMemo,
   memo,
@@ -14,7 +15,6 @@ import {
   useReducedMotion,
   useMotionValue,
   useSpring,
-  AnimatePresence,
 } from "framer-motion";
 import {
   Globe,
@@ -25,14 +25,12 @@ import {
   Palette,
   Cloud,
   Settings2,
-  Rocket,
   ArrowRight,
   Check,
 } from "lucide-react";
+import { Badge } from "@/components/ui";
 
 const EASE_SERVICES = [0.22, 1, 0.36, 1] as const;
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Service {
   id: number;
@@ -57,8 +55,6 @@ interface Particle {
   opacity: number;
 }
 
-// ─── Service Data ─────────────────────────────────────────────────────────────
-
 const SERVICES: Service[] = [
   {
     id: 1,
@@ -67,9 +63,9 @@ const SERVICES: Service[] = [
       "Crafting performant, conversion-focused websites that represent your brand with precision.",
     Icon: Globe,
     features: ["Business Websites", "Corporate Portals", "Landing Pages", "E-Commerce Solutions"],
-    gradient: "from-[#2563EB] to-[#00D4FF]",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.4)",
+    gradient: "from-[#c47a3a] to-[#e8a064]",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
     href: "/services/web-development",
   },
   {
@@ -79,9 +75,9 @@ const SERVICES: Service[] = [
       "Native and cross-platform apps engineered for seamless performance across every device.",
     Icon: Smartphone,
     features: ["Android Apps", "iOS Apps", "Cross Platform Apps", "App Maintenance"],
-    gradient: "from-[#7C3AED] to-[#2563EB]",
-    glow: "#7C3AED",
-    glowRgba: "rgba(124,58,237,0.4)",
+    gradient: "from-[#e8a064] to-[#f0b07a]",
+    glow: "#e8a064",
+    glowRgba: "rgba(232,160,100,0.3)",
     href: "/services/mobile-app-development",
   },
   {
@@ -91,9 +87,9 @@ const SERVICES: Service[] = [
       "Intelligent systems that automate workflows, enhance decisions, and unlock new efficiencies.",
     Icon: Bot,
     features: ["AI Automation", "Chatbots", "AI Integrations", "Machine Learning"],
-    gradient: "from-[#00D4FF] to-[#7C3AED]",
-    glow: "#00D4FF",
-    glowRgba: "rgba(0,212,255,0.4)",
+    gradient: "from-[#f0b07a] to-[#c47a3a]",
+    glow: "#f0b07a",
+    glowRgba: "rgba(240,176,122,0.3)",
     href: "/services/ai-solutions",
   },
   {
@@ -103,10 +99,10 @@ const SERVICES: Service[] = [
       "Data-driven search strategies that grow organic visibility and drive qualified traffic.",
     Icon: TrendingUp,
     features: ["Technical SEO", "On-Page SEO", "Off-Page SEO", "SEO Audits"],
-    gradient: "from-[#2563EB] to-[#7C3AED]",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.4)",
-    href: "services/seo-services",
+    gradient: "from-[#c47a3a] to-[#f0b07a]",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
+    href: "/services/seo-services",
   },
   {
     id: 5,
@@ -115,9 +111,9 @@ const SERVICES: Service[] = [
       "Performance marketing campaigns that build awareness, capture leads, and grow revenue.",
     Icon: Megaphone,
     features: ["Social Media Marketing", "PPC Advertising", "Lead Generation", "Brand Awareness"],
-    gradient: "from-[#7C3AED] to-[#00D4FF]",
-    glow: "#7C3AED",
-    glowRgba: "rgba(124,58,237,0.4)",
+    gradient: "from-[#e8a064] to-[#c47a3a]",
+    glow: "#e8a064",
+    glowRgba: "rgba(232,160,100,0.3)",
     href: "/services/digital-marketing",
   },
   {
@@ -127,9 +123,9 @@ const SERVICES: Service[] = [
       "Research-led design systems and interfaces that feel intuitive and leave lasting impressions.",
     Icon: Palette,
     features: ["Wireframing", "Prototyping", "User Research", "Design Systems"],
-    gradient: "from-[#00D4FF] to-[#2563EB]",
-    glow: "#00D4FF",
-    glowRgba: "rgba(0,212,255,0.4)",
+    gradient: "from-[#f0b07a] to-[#e8a064]",
+    glow: "#f0b07a",
+    glowRgba: "rgba(240,176,122,0.3)",
     href: "/services/ui-ux-design",
   },
   {
@@ -139,9 +135,9 @@ const SERVICES: Service[] = [
       "Scalable cloud infrastructure, DevOps pipelines, and managed services built for reliability.",
     Icon: Cloud,
     features: ["Cloud Deployment", "DevOps", "Server Management", "Infrastructure Scaling"],
-    gradient: "from-[#2563EB] to-[#00D4FF]",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.4)",
+    gradient: "from-[#c47a3a] to-[#e8a064]",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
     href: "/services/cloud-solutions",
   },
   {
@@ -151,26 +147,12 @@ const SERVICES: Service[] = [
       "Bespoke software platforms that align perfectly with your operations and business logic.",
     Icon: Settings2,
     features: ["CRM Systems", "ERP Solutions", "Business Automation", "Custom Platforms"],
-    gradient: "from-[#7C3AED] to-[#2563EB]",
-    glow: "#7C3AED",
-    glowRgba: "rgba(124,58,237,0.4)",
-    href: "services/custom-software-development",
+    gradient: "from-[#e8a064] to-[#f0b07a]",
+    glow: "#e8a064",
+    glowRgba: "rgba(232,160,100,0.3)",
+    href: "/services/custom-software-development",
   },
-  // {
-  //   id: 9,
-  //   title: "Startup MVP Development",
-  //   description:
-  //     "Rapid product launches that validate your vision, attract investors, and reach market fast.",
-  //   Icon: Rocket,
-  //   features: ["Product Strategy", "MVP Launch", "Startup Consulting", "Rapid Development"],
-  //   gradient: "from-[#00D4FF] to-[#7C3AED]",
-  //   glow: "#00D4FF",
-  //   glowRgba: "rgba(0,212,255,0.4)",
-  //   href: "/services/mvp-development",
-  // },
 ];
-
-// ─── Border Beam ──────────────────────────────────────────────────────────────
 
 const BorderBeam = memo(function BorderBeam({ gradient, active }: { gradient: string; active: boolean }) {
   if (!active) return null;
@@ -187,8 +169,6 @@ const BorderBeam = memo(function BorderBeam({ gradient, active }: { gradient: st
     </div>
   );
 });
-
-// ─── Service Card ─────────────────────────────────────────────────────────────
 
 const ServiceCard = memo(function ServiceCard({
   service,
@@ -260,7 +240,7 @@ const ServiceCard = memo(function ServiceCard({
     >
       <div
         ref={cardRef}
-        className="relative h-full flex flex-col gap-6 rounded-[28px] border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl p-7 overflow-hidden transition-colors duration-500 group-focus:ring-2 group-focus:ring-[#2563EB]/50"
+        className="relative h-full flex flex-col gap-6 rounded-[28px] border border-[#262626] bg-[#141414]/95 backdrop-blur-xl p-7 overflow-hidden transition-colors duration-500 group-focus:ring-2 group-focus:ring-[#e8a064]/50"
         style={{
           boxShadow: hovered
             ? `0 0 0 1px ${service.glowRgba}, 0 8px 60px -8px ${service.glowRgba}, 0 32px 80px -20px ${service.glowRgba}40`
@@ -269,7 +249,6 @@ const ServiceCard = memo(function ServiceCard({
           transition: "box-shadow 0.4s ease, border-color 0.4s ease",
         }}
       >
-        {/* Inner glow splash */}
         <div
           aria-hidden={true}
           className="pointer-events-none absolute -top-16 -left-16 w-48 h-48 rounded-full blur-3xl transition-opacity duration-500"
@@ -279,7 +258,6 @@ const ServiceCard = memo(function ServiceCard({
           }}
         />
 
-        {/* Spotlight radial */}
         <div
           aria-hidden={true}
           className="pointer-events-none absolute inset-0 rounded-[28px] transition-opacity duration-500"
@@ -289,10 +267,8 @@ const ServiceCard = memo(function ServiceCard({
           }}
         />
 
-        {/* Border beam */}
         <BorderBeam gradient={service.gradient} active={hovered && !reduced} />
 
-        {/* Icon */}
         <div className="flex-shrink-0">
           <motion.div
             className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${service.gradient} flex items-center justify-center shadow-lg`}
@@ -306,21 +282,19 @@ const ServiceCard = memo(function ServiceCard({
             transition={{ duration: 0.35, ease: "easeOut" }}
             aria-hidden={true}
           >
-            <service.Icon className="w-6 h-6 text-white" strokeWidth={1.8} />
+            <service.Icon className="w-6 h-6 text-[#0f0f0f]" strokeWidth={1.8} />
           </motion.div>
         </div>
 
-        {/* Title + description */}
         <div className="flex flex-col gap-2">
           <h3 className="text-white font-bold text-xl tracking-tight leading-snug">
             {service.title}
           </h3>
-          <p className="text-white/45 text-sm leading-relaxed">
+          <p className="text-[#a1a1aa] text-sm leading-relaxed">
             {service.description}
           </p>
         </div>
 
-        {/* Feature list */}
         <ul className="flex flex-col gap-2.5 flex-1" role="list" aria-label={`${service.title} features`}>
           {service.features.map((feat) => (
             <li key={feat} className="flex items-center gap-2.5">
@@ -328,18 +302,17 @@ const ServiceCard = memo(function ServiceCard({
                 className={`flex-shrink-0 w-4 h-4 rounded-full bg-gradient-to-br ${service.gradient} flex items-center justify-center`}
                 aria-hidden={true}
               >
-                <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                <Check className="w-2.5 h-2.5 text-[#0f0f0f]" strokeWidth={3} />
               </span>
-              <span className="text-white/55 text-sm leading-none">{feat}</span>
+              <span className="text-[#a1a1aa] text-sm leading-none">{feat}</span>
             </li>
           ))}
         </ul>
 
-        {/* Learn more */}
         <Link
           href={service.href}
           className="group/btn mt-auto inline-flex items-center gap-2 text-sm font-semibold transition-colors duration-300 focus:outline-none focus:underline"
-          style={{ color: hovered ? service.glow : "rgba(255,255,255,0.45)" }}
+          style={{ color: hovered ? service.glow : "#71717a" }}
           aria-label={`Learn more about ${service.title}`}
           tabIndex={0}
         >
@@ -355,8 +328,6 @@ const ServiceCard = memo(function ServiceCard({
     </motion.article>
   );
 });
-
-// ─── Section Header ───────────────────────────────────────────────────────────
 
 const SectionHeader = memo(function SectionHeader({
   visible,
@@ -380,16 +351,13 @@ const SectionHeader = memo(function SectionHeader({
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
       >
-        <span
-          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
-          aria-label="Section: Our Expertise"
-        >
+        <Badge>
           <span aria-hidden={true} className="relative flex">
-            <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#00D4FF] opacity-70 animate-ping" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
+            <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#e8a064] opacity-70 animate-ping" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#e8a064]" />
           </span>
-          Our Expertise
-        </span>
+          <span className="ml-2">Our Expertise</span>
+        </Badge>
       </motion.div>
 
       <motion.h2
@@ -401,22 +369,14 @@ const SectionHeader = memo(function SectionHeader({
       >
         Solutions Built For
         <br />
-        <span
-          className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent"
-          style={{
-            backgroundSize: "200% 100%",
-            animation: reduced ? "none" : "gradientShift 5s ease infinite",
-          }}
-        >
-          Modern Businesses
-        </span>
+        <span className="text-gradient-amber">Modern Businesses</span>
       </motion.h2>
 
       <motion.p
         variants={reduced ? undefined : stagger(2)}
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
-        className="text-white/45 text-base sm:text-lg leading-relaxed max-w-xl"
+        className="text-[#a1a1aa] text-base sm:text-lg leading-relaxed max-w-xl"
       >
         We provide end-to-end digital solutions designed to help startups,
         businesses, and enterprises scale faster through technology.
@@ -425,29 +385,26 @@ const SectionHeader = memo(function SectionHeader({
   );
 });
 
-// ─── Background ───────────────────────────────────────────────────────────────
-
 const Background = memo(function Background({ reduced }: { reduced: boolean }) {
   const particles = useMemo<Particle[]>(
     () =>
-      Array.from({ length: 32 }, (_, i) => ({
+      Array.from({ length: 24 }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
         size: Math.random() * 2 + 0.8,
         dur: Math.random() * 14 + 8,
         delay: Math.random() * 8,
-        color: ["#2563EB", "#7C3AED", "#00D4FF"][i % 3],
-        opacity: Math.random() * 0.2 + 0.08,
+        color: ["#c47a3a", "#e8a064", "#f0b07a"][i % 3],
+        opacity: Math.random() * 0.12 + 0.05,
       })),
     []
   );
 
   return (
     <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* Grid */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.02]"
         style={{
           backgroundImage: `
             linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
@@ -459,12 +416,11 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
 
       {!reduced && (
         <>
-          {/* Aurora blobs */}
           <motion.div
             className="absolute rounded-full blur-[160px]"
             style={{
               width: 700, height: 400,
-              background: "radial-gradient(ellipse, rgba(37,99,235,0.13), transparent 70%)",
+              background: "radial-gradient(ellipse, rgba(232,160,100,0.05), transparent 70%)",
               top: "5%", left: "-8%",
             }}
             animate={{ x: [0, 70, 0], y: [0, 40, 0] }}
@@ -474,25 +430,13 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
             className="absolute rounded-full blur-[180px]"
             style={{
               width: 600, height: 500,
-              background: "radial-gradient(ellipse, rgba(124,58,237,0.11), transparent 70%)",
+              background: "radial-gradient(ellipse, rgba(196,122,58,0.04), transparent 70%)",
               bottom: "0%", right: "-5%",
             }}
             animate={{ x: [0, -50, 0], y: [0, -35, 0] }}
             transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 4 }}
           />
-          <motion.div
-            className="absolute rounded-full blur-[130px]"
-            style={{
-              width: 450, height: 450,
-              background: "radial-gradient(circle, rgba(0,212,255,0.08), transparent 70%)",
-              top: "45%", left: "50%",
-              translateX: "-50%",
-            }}
-            animate={{ x: [0, 35, -35, 0], y: [0, -25, 25, 0] }}
-            transition={{ duration: 32, repeat: Infinity, ease: "easeInOut", delay: 8 }}
-          />
 
-          {/* Particles */}
           {particles.map((p) => (
             <motion.div
               key={p.id}
@@ -518,45 +462,42 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
   );
 });
 
-// ─── Mouse Spotlight ──────────────────────────────────────────────────────────
-
 function SectionSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElement | null> }) {
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
+  const mx = useMotionValue(-1000);
+  const my = useMotionValue(-1000);
   const sx = useSpring(mx, { stiffness: 55, damping: 18 });
   const sy = useSpring(my, { stiffness: 55, damping: 18 });
 
-  const handleMove = useCallback(
-    (e: MouseEvent) => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      mx.set(e.clientX - rect.left);
-      my.set(e.clientY - rect.top);
-    },
-    [mx, my, sectionRef]
-  );
+  useEffect(() => {
+    let frameId: number | null = null;
+    const handleMove = (e: MouseEvent) => {
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = null;
+        if (!sectionRef.current) return;
+        const rect = sectionRef.current.getBoundingClientRect();
+        mx.set(e.clientX - rect.left);
+        my.set(e.clientY - rect.top);
+      });
+    };
 
-  // Attach on mount
-  const ref = useRef(false);
-  if (!ref.current) {
-    ref.current = true;
-    if (typeof window !== "undefined") {
-      window.addEventListener("mousemove", handleMove);
-    }
-  }
+    window.addEventListener("mousemove", handleMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      if (frameId) cancelAnimationFrame(frameId);
+    };
+  }, [mx, my, sectionRef]);
 
   return (
     <motion.div
       aria-hidden={true}
       className="pointer-events-none absolute inset-0 z-0"
       style={{
-        background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(37,99,235,0.055), transparent 55%)`,
+        background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(232,160,100,0.04), transparent 55%)`,
       }}
     />
   );
 }
-
-// ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ServicesGrid() {
   const reduced = useReducedMotion() ?? false;
@@ -564,52 +505,39 @@ export default function ServicesGrid() {
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
   return (
-    <>
-      <style>{`
-        @keyframes gradientShift {
-          0%   { background-position: 0% 50%; }
-          50%  { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-      `}</style>
+    <section
+      id="services-grid"
+      ref={sectionRef}
+      aria-labelledby="services-grid-heading"
+      className="relative w-full overflow-hidden py-24 sm:py-32 bg-[#0f0f0f]"
+    >
+      <Background reduced={reduced} />
+      {!reduced && <SectionSpotlight sectionRef={sectionRef} />}
 
-      <section
-        id="services-grid"
-        ref={sectionRef}
-        aria-labelledby="services-grid-heading"
-        className="relative w-full overflow-hidden py-24 sm:py-32"
-        style={{ background: "#050816" }}
-      >
-        <Background reduced={reduced} />
-        {!reduced && <SectionSpotlight sectionRef={sectionRef} />}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeader visible={isInView} reduced={reduced} />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeader visible={isInView} reduced={reduced} />
-
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6"
-            role="list"
-            aria-label="Axivon Technologies services"
-          >
-            {SERVICES.map((svc, i) => (
-              <ServiceCard
-                key={svc.id}
-                service={svc}
-                index={i}
-                visible={isInView}
-                reduced={reduced}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom section fade */}
         <div
-          aria-hidden={true}
-          className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
-          style={{ background: "linear-gradient(to bottom, transparent, #050816)" }}
-        />
-      </section>
-    </>
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6"
+          role="list"
+          aria-label="Axivon Technologies services"
+        >
+          {SERVICES.map((svc, i) => (
+            <ServiceCard
+              key={svc.id}
+              service={svc}
+              index={i}
+              visible={isInView}
+              reduced={reduced}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div
+        aria-hidden={true}
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0f0f0f] to-transparent"
+      />
+    </section>
   );
 }

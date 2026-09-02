@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <main className="overflow-hidden bg-[#050816]">
+    <main className="overflow-hidden bg-[#0f0f0f]">
       <TermsHero />
       <TermsContent />
     </main>

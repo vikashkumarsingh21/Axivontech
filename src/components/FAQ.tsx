@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
+import { SectionHeader } from "@/components/ui";
 
 interface FAQItem {
   question: string;
@@ -13,58 +14,58 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "How long does it take to build a website?",
     answer:
-      "Most business websites take between 1–4 weeks depending on complexity and requirements.",
+      "Most business websites take between 1–4 weeks depending on complexity, specifications, and client feedback cycles.",
   },
   {
     question: "Do you provide SEO services?",
     answer:
-      "Yes, we provide SEO optimization, keyword research, technical SEO, and digital marketing services.",
+      "Yes, we provide search engine optimization, keyword research, technical SEO audits, and ongoing digital marketing campaigns.",
   },
   {
     question: "Can you build mobile applications?",
     answer:
-      "Yes, we develop Android, iOS, and cross-platform mobile applications.",
+      "Yes, we develop native iOS and Android apps, as well as cross-platform React Native and Flutter solutions.",
   },
   {
     question: "Do you provide website maintenance?",
     answer:
-      "Yes, we offer ongoing maintenance, security updates, backups, and technical support.",
+      "Yes, we offer monthly maintenance plans including hosting management, security updates, regular backups, and technical support.",
   },
   {
     question: "Can you redesign an existing website?",
     answer:
-      "Absolutely. We can modernize and improve your existing website's design, performance, and user experience.",
+      "Absolutely. We specialize in modernizing outdated sites, improving user experience, site speeds, and conversion rates without losing search engine credibility.",
   },
   {
     question: "What technologies do you use?",
     answer:
-      "We work with Next.js, React, Node.js, TypeScript, Tailwind CSS, MongoDB, AI tools, and modern cloud technologies.",
+      "Our main stack includes Next.js, React, Node.js, TypeScript, Tailwind CSS, MongoDB, and modern cloud hosting environments like Vercel and AWS.",
   },
   {
     question: "Do you provide AI solutions?",
     answer:
-      "Yes, we build AI-powered chatbots, automation systems, and intelligent business solutions.",
+      "Yes, we build custom AI-powered integrations, data-processing automation tools, and smart chatbots based on large language models.",
   },
   {
     question: "How can I get a quotation?",
     answer:
-      "Simply contact us through our website, email, or consultation form and we will provide a customized quotation.",
+      "Simply contact us through our project form, email, or WhatsApp, and we will schedule a brief consultation to provide a tailored quote.",
   },
 ];
 
 const headerVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
 const listVariants: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
 function FAQRow({
@@ -83,15 +84,10 @@ function FAQRow({
   const panelId = `faq-panel-${index}`;
 
   return (
-    <motion.div variants={itemVariants} className="group relative">
+    <motion.div variants={itemVariants}>
       <div
-        className={`absolute -inset-px rounded-2xl bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] blur-md transition-opacity duration-500 ${
-          isOpen ? "opacity-50" : "opacity-0 group-hover:opacity-40"
-        }`}
-      />
-      <div
-        className={`relative overflow-hidden rounded-2xl border bg-white/[0.03] backdrop-blur-xl transition-colors duration-500 ${
-          isOpen ? "border-transparent" : "border-white/10 group-hover:border-white/20"
+        className={`bg-[#141414] border rounded-xl overflow-hidden transition-all duration-200 ${
+          isOpen ? "border-[rgba(232,160,100,0.25)] shadow-md" : "border-[#262626] hover:border-[#303030]"
         }`}
       >
         <h3>
@@ -101,23 +97,23 @@ function FAQRow({
             aria-expanded={isOpen}
             aria-controls={panelId}
             onClick={() => onToggle(index)}
-            className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] sm:px-7 sm:py-6"
+            className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414] sm:px-7 sm:py-6"
           >
             <span
-              className={`text-base font-semibold transition-colors duration-300 sm:text-lg ${
-                isOpen ? "text-white" : "text-slate-200 group-hover:text-white"
+              className={`text-base font-semibold transition-colors duration-200 sm:text-lg ${
+                isOpen ? "text-[#e8a064]" : "text-[#d4d4d4] hover:text-[#e8a064]"
               }`}
             >
               {item.question}
             </span>
-            <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-[#2563EB]/20 via-[#7C3AED]/20 to-[#00D4FF]/20">
+            <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1c1c1e] text-[#a1a1aa] border border-[#262626]">
               <Plus
-                className={`absolute h-4 w-4 text-[#00D4FF] transition-all duration-300 ${
+                className={`absolute h-4 w-4 transition-transform duration-200 ${
                   isOpen ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100"
                 }`}
               />
               <Minus
-                className={`absolute h-4 w-4 text-[#00D4FF] transition-all duration-300 ${
+                className={`absolute h-4 w-4 transition-transform duration-200 ${
                   isOpen ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0"
                 }`}
               />
@@ -135,10 +131,10 @@ function FAQRow({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: "easeInOut" }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: "easeInOut" }}
               className="overflow-hidden"
             >
-              <p className="px-6 pb-6 text-sm leading-relaxed text-slate-400 sm:px-7 sm:pb-7 sm:text-[0.95rem]">
+              <p className="px-6 pb-6 text-base leading-relaxed text-[#a1a1aa] sm:px-7 sm:pb-7">
                 {item.answer}
               </p>
             </motion.div>
@@ -150,7 +146,6 @@ function FAQRow({
 }
 
 export default function FAQ() {
-  const shouldReduceMotion = useReducedMotion();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const handleToggle = (index: number) => {
@@ -158,45 +153,25 @@ export default function FAQ() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-[#050816] py-24 sm:py-32">
-      {/* Floating gradient background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <motion.div
-          aria-hidden
-          className="absolute -left-32 top-10 h-[26rem] w-[26rem] rounded-full bg-[#2563EB]/20 blur-[120px]"
-          animate={shouldReduceMotion ? undefined : { x: [0, 30, 0], y: [0, 25, 0] }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          aria-hidden
-          className="absolute -right-24 bottom-10 h-[26rem] w-[26rem] rounded-full bg-[#7C3AED]/20 blur-[130px]"
-          animate={shouldReduceMotion ? undefined : { x: [0, -25, 0], y: [0, -20, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
+    <section className="bg-[#0f0f0f] py-24 sm:py-32 relative">
+      <div className="mx-auto max-w-7xl px-6 lg:px-10">
         {/* Section header */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
           variants={headerVariants}
-          className="mx-auto mb-16 max-w-2xl text-center sm:mb-20"
+          className="mx-auto mb-16 max-w-2xl text-center"
         >
-          <span className="mb-4 inline-block text-xs font-semibold uppercase tracking-[0.25em] text-[#00D4FF]">
-            Got Questions?
-          </span>
-          <h2 className="text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-            Frequently Asked{" "}
-            <span className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent">
-              Questions
-            </span>
-          </h2>
-          <p className="mt-5 text-balance text-base leading-relaxed text-slate-400 sm:text-lg">
-            Everything you need to know about working with Axivon
-            Technologies.
-          </p>
+          <SectionHeader
+            overline="Got Questions?"
+            heading={
+              <>
+                Frequently Asked <span className="text-gradient-amber">Questions</span>
+              </>
+            }
+            body="Everything you need to know about working with Axivon Technologies."
+          />
         </motion.div>
 
         {/* FAQ accordion */}

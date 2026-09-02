@@ -60,7 +60,7 @@ const POSITIONS: Position[] = [
     experience: "0–1 Years",
     skills: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
     icon: Code2,
-    accent: "#00D4FF",
+    accent: "#d4915c",
     applyHref:
   "mailto:info@axivontech.in?subject=Application%20for%20Frontend%20Developer%20Intern&body=Hello%20Axivon%20Technologies,%0A%0AI%20would%20like%20to%20apply%20for%20the%20Frontend%20Developer%20Intern%20position.%0A%0AName:%20%0APhone:%20%0ALinkedIn:%20%0AGitHub:%20%0APortfolio:%20%0A%0AThank%20You.",
     learnMoreHref: "#position-frontend-developer-intern",
@@ -73,7 +73,7 @@ const POSITIONS: Position[] = [
     experience: "0–1 Years",
     skills: ["Node.js", "Express.js", "PostgreSQL", "REST APIs"],
     icon: ServerCog,
-    accent: "#2563EB",
+    accent: "#e8a064",
     applyHref:
   "mailto:info@axivontech.in?subject=Application%20for%20Backend%20Developer%20Intern&body=Hello%20Axivon%20Technologies,%0A%0AI%20would%20like%20to%20apply%20for%20the%20Backend%20Developer%20Intern%20position.%0A%0AName:%20%0APhone:%20%0ALinkedIn:%20%0AGitHub:%20%0APortfolio:%20%0A%0AThank%20You.",
     learnMoreHref: "#position-backend-developer-intern",
@@ -86,7 +86,7 @@ const POSITIONS: Position[] = [
     experience: "0–1 Years",
     skills: ["Python", "Machine Learning", "TensorFlow", "Data Analysis"],
     icon: BrainCircuit,
-    accent: "#7C3AED",
+    accent: "#c9922a",
     applyHref:
   "mailto:info@axivontech.in?subject=Application%20for%20AI/ML%20Intern&body=Hello%20Axivon%20Technologies,%0A%0AI%20would%20like%20to%20apply%20for%20the%20AI/ML%20Intern%20position.%0A%0AName:%20%0APhone:%20%0ALinkedIn:%20%0AGitHub:%20%0APortfolio:%20%0A%0AThank%20You.",
     learnMoreHref: "#position-ai-ml-intern",
@@ -99,7 +99,7 @@ const POSITIONS: Position[] = [
     experience: "0–1 Years",
     skills: ["Figma", "Wireframing", "Prototyping", "Design Systems"],
     icon: PenTool,
-    accent: "#00D4FF",
+    accent: "#d4915c",
     applyHref:
   "mailto:info@axivontech.in?subject=Application%20for%20UI/UX%20Design%20Intern&body=Hello%20Axivon%20Technologies,%0A%0AI%20would%20like%20to%20apply%20for%20the%20UI/UX%20Design%20Intern%20position.%0A%0AName:%20%0APhone:%20%0ALinkedIn:%20%0AGitHub:%20%0APortfolio:%20%0A%0AThank%20You.",
     learnMoreHref: "#position-ui-ux-design-intern",
@@ -112,7 +112,7 @@ const POSITIONS: Position[] = [
     experience: "0–1 Years",
     skills: ["Next.js", "Node.js", "PostgreSQL", "TypeScript"],
     icon: Layers,
-    accent: "#7C3AED",
+    accent: "#c9922a",
     applyHref:
   "mailto:info@axivontech.in?subject=Application%20for%20Full%20Stack%20Developer%20Intern&body=Hello%20Axivon%20Technologies,%0A%0AI%20would%20like%20to%20apply%20for%20the%20Full%20Stack%20Developer%20Intern%20position.%0A%0AName:%20%0APhone:%20%0ALinkedIn:%20%0AGitHub:%20%0APortfolio:%20%0A%0AThank%20You.",
     learnMoreHref: "#position-full-stack-developer-intern",
@@ -165,19 +165,19 @@ function AuroraLayer({ reduceMotion }: { reduceMotion: boolean }) {
     <div aria-hidden className="absolute inset-0 overflow-hidden">
       <motion.div
         className="absolute -top-44 -left-36 h-[38rem] w-[38rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(37,99,235,0.36), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(232,160,100,0.36), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, 60, 0], y: [0, 40, 0] }}
         transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute top-1/3 -right-40 h-[34rem] w-[34rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(124,58,237,0.34), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(201,146,42,0.34), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, -55, 0], y: [0, -30, 0] }}
         transition={{ duration: 27, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className="absolute bottom-[-12rem] left-1/3 h-[32rem] w-[32rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(0,212,255,0.26), transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(212,145,92,0.26), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, 45, 0], y: [0, -25, 0] }}
         transition={{ duration: 23, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -215,14 +215,14 @@ function NoiseTexture() {
 
 function FloatingParticles({ reduceMotion }: { reduceMotion: boolean }) {
   const particles = [
-    { left: 6, top: 16, size: 3, hue: "#00D4FF", dur: 13 },
-    { left: 16, top: 66, size: 2, hue: "#2563EB", dur: 17 },
-    { left: 28, top: 38, size: 2.5, hue: "#7C3AED", dur: 15 },
-    { left: 42, top: 82, size: 2, hue: "#00D4FF", dur: 19 },
-    { left: 54, top: 12, size: 3, hue: "#2563EB", dur: 14 },
-    { left: 66, top: 56, size: 2, hue: "#7C3AED", dur: 16 },
-    { left: 78, top: 24, size: 2.5, hue: "#00D4FF", dur: 18 },
-    { left: 90, top: 64, size: 3, hue: "#2563EB", dur: 20 },
+    { left: 6, top: 16, size: 3, hue: "#d4915c", dur: 13 },
+    { left: 16, top: 66, size: 2, hue: "#e8a064", dur: 17 },
+    { left: 28, top: 38, size: 2.5, hue: "#c9922a", dur: 15 },
+    { left: 42, top: 82, size: 2, hue: "#d4915c", dur: 19 },
+    { left: 54, top: 12, size: 3, hue: "#e8a064", dur: 14 },
+    { left: 66, top: 56, size: 2, hue: "#c9922a", dur: 16 },
+    { left: 78, top: 24, size: 2.5, hue: "#d4915c", dur: 18 },
+    { left: 90, top: 64, size: 3, hue: "#e8a064", dur: 20 },
   ];
 
   return (
@@ -256,7 +256,7 @@ function GradientPhrase({ children }: { children: ReactNode }) {
     <motion.span
       className="relative inline-block bg-clip-text text-transparent"
       style={{
-        backgroundImage: "linear-gradient(110deg, #00D4FF, #2563EB 35%, #7C3AED 65%, #00D4FF)",
+        backgroundImage: "linear-gradient(110deg, #d4915c, #e8a064 35%, #c9922a 65%, #d4915c)",
         backgroundSize: "300% 100%",
       }}
       animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
@@ -273,9 +273,9 @@ function GradientPhrase({ children }: { children: ReactNode }) {
 
 function Badge({ icon: Icon, label, tone }: { icon?: LucideIcon; label: string; tone: "blue" | "purple" | "cyan" }) {
   const toneMap: Record<typeof tone, string> = {
-    blue: "border-[#2563EB]/30 bg-[#2563EB]/10 text-[#7fa8ff]",
-    purple: "border-[#7C3AED]/30 bg-[#7C3AED]/10 text-[#c4a4ff]",
-    cyan: "border-[#00D4FF]/30 bg-[#00D4FF]/10 text-[#7fe9ff]",
+    blue: "border-[#e8a064]/30 bg-[#e8a064]/10 text-[#7fa8ff]",
+    purple: "border-[#c9922a]/30 bg-[#c9922a]/10 text-[#c4a4ff]",
+    cyan: "border-[#d4915c]/30 bg-[#d4915c]/10 text-[#7fe9ff]",
   };
   return (
     <span
@@ -341,15 +341,15 @@ function MagneticLink({
       whileTap={{ scale: 0.96 }}
       className={[
         "group relative inline-flex flex-1 items-center justify-center gap-1.5 overflow-hidden rounded-full px-4 py-2.5 text-[13px] font-semibold outline-none transition-shadow duration-300",
-        "focus-visible:ring-2 focus-visible:ring-[#00D4FF]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]",
+        "focus-visible:ring-2 focus-visible:ring-[#d4915c]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]",
         isPrimary
-          ? "text-white shadow-[0_8px_28px_-8px_rgba(37,99,235,0.65)] hover:shadow-[0_12px_38px_-8px_rgba(124,58,237,0.75)]"
-          : "border border-white/15 bg-white/[0.04] text-white/85 backdrop-blur-md hover:border-[#00D4FF]/40 hover:bg-white/[0.08]",
+          ? "text-white shadow-[0_8px_28px_-8px_rgba(232,160,100,0.65)] hover:shadow-[0_12px_38px_-8px_rgba(201,146,42,0.75)]"
+          : "border border-white/15 bg-[#141414]/[0.04] text-white/85 backdrop-blur-md hover:border-[#d4915c]/40 hover:bg-[#141414]/[0.08]",
         className,
       ].join(" ")}
     >
       {isPrimary && (
-        <span aria-hidden className="absolute inset-0 -z-10" style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)" }} />
+        <span aria-hidden className="absolute inset-0 -z-10" style={{ background: "linear-gradient(135deg, #e8a064, #c9922a)" }} />
       )}
       {isPrimary && (
         <span
@@ -428,7 +428,7 @@ function PositionCard({ position }: { position: Position }) {
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-2xl"
           style={{
-            background: "conic-gradient(from 0deg, #00D4FF, #2563EB, #7C3AED, #00D4FF)",
+            background: "conic-gradient(from 0deg, #d4915c, #e8a064, #c9922a, #d4915c)",
             padding: 1.5,
             WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
             WebkitMaskComposite: "xor",
@@ -442,7 +442,7 @@ function PositionCard({ position }: { position: Position }) {
         {/* glass body */}
         <div
           className={[
-            "relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/[0.045] p-6 backdrop-blur-xl transition-shadow duration-300 sm:p-7",
+            "relative flex h-full flex-col overflow-hidden rounded-2xl bg-[#141414]/[0.045] p-6 backdrop-blur-xl transition-shadow duration-300 sm:p-7",
             "shadow-[0_10px_40px_-12px_rgba(0,0,0,0.45)] group-hover:shadow-[0_24px_70px_-18px_var(--axv-glow)]",
           ].join(" ")}
           style={{ ["--axv-glow" as string]: `${position.accent}66` }}
@@ -483,7 +483,7 @@ function PositionCard({ position }: { position: Position }) {
             {position.skills.map((skill) => (
               <li
                 key={skill}
-                className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-medium text-white/65"
+                className="rounded-md border border-white/10 bg-[#141414]/[0.04] px-2.5 py-1 text-[11px] font-medium text-white/65"
               >
                 {skill}
               </li>
@@ -552,7 +552,7 @@ export default function OpenPositions() {
       onMouseMove={handleSectionMove}
       aria-label="Open positions at Axivon Technologies"
       className="relative isolate w-full overflow-hidden px-4 py-24 sm:px-6 sm:py-28 lg:px-10 lg:py-32 2xl:px-20"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
     >
       <style>{`
         @keyframes op-spin { to { transform: rotate(360deg); } }
@@ -569,12 +569,12 @@ export default function OpenPositions() {
       <motion.div
         aria-hidden
         className="pointer-events-none absolute left-[8%] top-[14%] h-72 w-72 rounded-full blur-[100px] sm:h-96 sm:w-96"
-        style={{ background: "radial-gradient(circle, rgba(0,212,255,0.26), transparent 70%)", x: orbX, y: orbY }}
+        style={{ background: "radial-gradient(circle, rgba(212,145,92,0.26), transparent 70%)", x: orbX, y: orbY }}
       />
       <motion.div
         aria-hidden
         className="pointer-events-none absolute bottom-[10%] right-[6%] h-80 w-80 rounded-full blur-[110px] sm:h-[26rem] sm:w-[26rem]"
-        style={{ background: "radial-gradient(circle, rgba(37,99,235,0.3), transparent 70%)", x: orbXInverse, y: orbYInverse }}
+        style={{ background: "radial-gradient(circle, rgba(232,160,100,0.3), transparent 70%)", x: orbXInverse, y: orbYInverse }}
       />
 
       <div className="relative mx-auto max-w-[1400px] 2xl:max-w-[1600px]">
@@ -588,7 +588,7 @@ export default function OpenPositions() {
         >
           <motion.span
             variants={fadeUp}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#00D4FF] backdrop-blur-md"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#141414]/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#d4915c] backdrop-blur-md"
           >
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
             Open Opportunities

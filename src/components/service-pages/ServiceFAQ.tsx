@@ -89,7 +89,7 @@ function FloatingParticles() {
         size: 1.5 + Math.random() * 2.5,
         duration: 10 + Math.random() * 14,
         delay: Math.random() * 6,
-        hue: i % 3 === 0 ? "#00D4FF" : i % 3 === 1 ? "#2563EB" : "#7C3AED",
+        hue: i % 3 === 0 ? "#d4915c" : i % 3 === 1 ? "#e8a064" : "#c9922a",
       })),
     []
   );
@@ -135,7 +135,7 @@ function AuroraBackground() {
         className="absolute -top-40 -left-32 h-[34rem] w-[34rem] rounded-full blur-[120px]"
         style={{
           background:
-            "radial-gradient(circle, rgba(37,99,235,0.35), transparent 70%)",
+            "radial-gradient(circle, rgba(232,160,100,0.35), transparent 70%)",
         }}
         animate={{ x: [0, 60, 0], y: [0, 40, 0] }}
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
@@ -144,7 +144,7 @@ function AuroraBackground() {
         className="absolute top-1/3 -right-32 h-[30rem] w-[30rem] rounded-full blur-[120px]"
         style={{
           background:
-            "radial-gradient(circle, rgba(124,58,237,0.32), transparent 70%)",
+            "radial-gradient(circle, rgba(201,146,42,0.32), transparent 70%)",
         }}
         animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
         transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
@@ -153,7 +153,7 @@ function AuroraBackground() {
         className="absolute bottom-0 left-1/3 h-[28rem] w-[28rem] rounded-full blur-[120px]"
         style={{
           background:
-            "radial-gradient(circle, rgba(0,212,255,0.22), transparent 70%)",
+            "radial-gradient(circle, rgba(212,145,92,0.22), transparent 70%)",
         }}
         animate={{ x: [0, 40, 0], y: [0, -20, 0] }}
         transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
@@ -184,7 +184,7 @@ function BorderBeam({ active }: { active: boolean }) {
       className="pointer-events-none absolute inset-0 rounded-2xl"
       style={{
         background:
-          "conic-gradient(from 0deg, #00D4FF, #2563EB, #7C3AED, #00D4FF)",
+          "conic-gradient(from 0deg, #d4915c, #e8a064, #c9922a, #d4915c)",
         opacity: active ? 0.9 : 0,
         padding: 1.5,
         WebkitMask:
@@ -250,10 +250,10 @@ function FAQCard({ item, index, isOpen, onToggle }: FAQCardProps) {
         aria-hidden
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
-          background: `radial-gradient(280px circle at ${glowX.get()}% ${glowY.get()}%, rgba(0,212,255,0.18), transparent 70%)`,
+          background: `radial-gradient(280px circle at ${glowX.get()}% ${glowY.get()}%, rgba(212,145,92,0.18), transparent 70%)`,
         }}
         animate={{
-          background: `radial-gradient(280px circle at ${glowX.get()}% ${glowY.get()}%, rgba(0,212,255,0.18), transparent 70%)`,
+          background: `radial-gradient(280px circle at ${glowX.get()}% ${glowY.get()}%, rgba(212,145,92,0.18), transparent 70%)`,
         }}
       />
 
@@ -261,25 +261,25 @@ function FAQCard({ item, index, isOpen, onToggle }: FAQCardProps) {
       <div
         className={[
           "relative overflow-hidden rounded-2xl backdrop-blur-xl transition-all duration-300",
-          "bg-white/[0.035] shadow-[0_8px_30px_rgba(0,0,0,0.35)]",
+          "bg-[#141414]/[0.035] shadow-[0_8px_30px_rgba(0,0,0,0.35)]",
           isOpen
-            ? "shadow-[0_0_0_1px_rgba(0,212,255,0.25),0_20px_60px_-15px_rgba(37,99,235,0.45)]"
-            : "group-hover:shadow-[0_20px_50px_-20px_rgba(124,58,237,0.35)]",
+            ? "shadow-[0_0_0_1px_rgba(212,145,92,0.25),0_20px_60px_-15px_rgba(232,160,100,0.45)]"
+            : "group-hover:shadow-[0_20px_50px_-20px_rgba(201,146,42,0.35)]",
         ].join(" ")}
       >
         {/* top gradient overlay sheen */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00D4FF]/70 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#d4915c]/70 to-transparent" />
 
         <button
           type="button"
           aria-expanded={isOpen}
           aria-controls={panelId}
           onClick={onToggle}
-          className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left outline-none focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60 sm:px-7 sm:py-6"
+          className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left outline-none focus-visible:ring-2 focus-visible:ring-[#d4915c]/60 sm:px-7 sm:py-6"
         >
           <span className="flex items-start gap-3">
             <span
-              className="mt-0.5 select-none font-mono text-[11px] font-semibold tracking-wider text-[#00D4FF]/70"
+              className="mt-0.5 select-none font-mono text-[11px] font-semibold tracking-wider text-[#d4915c]/70"
               aria-hidden
             >
               {String(index + 1).padStart(2, "0")}
@@ -293,7 +293,7 @@ function FAQCard({ item, index, isOpen, onToggle }: FAQCardProps) {
             animate={{
               rotate: isOpen ? 45 : 0,
               backgroundColor: isOpen
-                ? "rgba(0,212,255,0.16)"
+                ? "rgba(212,145,92,0.16)"
                 : "rgba(255,255,255,0.06)",
             }}
             transition={{ duration: 0.35, ease: EASE_FAQ  }}
@@ -302,7 +302,7 @@ function FAQCard({ item, index, isOpen, onToggle }: FAQCardProps) {
             <Plus
               className={[
                 "h-4 w-4 transition-colors duration-300",
-                isOpen ? "text-[#00D4FF]" : "text-white/60",
+                isOpen ? "text-[#d4915c]" : "text-white/60",
               ].join(" ")}
               strokeWidth={2.25}
             />
@@ -359,25 +359,25 @@ function CTAStrip({
       className="relative mt-16 overflow-hidden rounded-3xl border border-white/10 px-6 py-10 text-center sm:px-12 sm:py-14"
     >
       {/* glassmorphism + gradient overlay */}
-      <div className="absolute inset-0 bg-white/[0.04] backdrop-blur-xl" />
+      <div className="absolute inset-0 bg-[#141414]/[0.04] backdrop-blur-xl" />
       <div
         className="absolute inset-0 opacity-90"
         style={{
           background:
-            "linear-gradient(135deg, rgba(37,99,235,0.18), rgba(124,58,237,0.16) 45%, rgba(0,212,255,0.12))",
+            "linear-gradient(135deg, rgba(232,160,100,0.18), rgba(201,146,42,0.16) 45%, rgba(212,145,92,0.12))",
         }}
       />
       {/* glow pulse */}
       <motion.div
         aria-hidden
         className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-        style={{ background: "rgba(0,212,255,0.25)" }}
+        style={{ background: "rgba(212,145,92,0.25)" }}
         animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.9, 1.05, 0.9] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <div className="relative">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-[#00D4FF]">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#141414]/5 px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-[#d4915c]">
           <Sparkles className="h-3 w-3" />
           Let&apos;s talk
         </span>
@@ -394,9 +394,9 @@ function CTAStrip({
             href={consultationHref}
             whileHover={{ y: -3, scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            className="group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-full px-7 py-3.5 text-sm font-semibold text-white shadow-[0_10px_40px_-10px_rgba(37,99,235,0.7)] sm:w-auto"
+            className="group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-full px-7 py-3.5 text-sm font-semibold text-white shadow-[0_10px_40px_-10px_rgba(232,160,100,0.7)] sm:w-auto"
             style={{
-              background: "linear-gradient(135deg, #2563EB, #7C3AED)",
+              background: "linear-gradient(135deg, #e8a064, #c9922a)",
             }}
           >
             <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
@@ -408,9 +408,9 @@ function CTAStrip({
             href={whatsappHref}
             whileHover={{ y: -3, scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white/90 backdrop-blur-md transition-colors duration-300 hover:border-[#00D4FF]/40 hover:bg-white/10 sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-[#141414]/5 px-7 py-3.5 text-sm font-semibold text-white/90 backdrop-blur-md transition-colors duration-300 hover:border-[#d4915c]/40 hover:bg-[#141414]/10 sm:w-auto"
           >
-            <MessageCircle className="h-4 w-4 text-[#00D4FF]" />
+            <MessageCircle className="h-4 w-4 text-[#d4915c]" />
             WhatsApp Chat
           </motion.a>
         </div>
@@ -443,7 +443,7 @@ export default function ServiceFAQ({ service }: ServiceFAQProps) {
     <section
       ref={sectionRef}
       className="relative w-full overflow-hidden px-4 py-24 sm:px-6 sm:py-28 lg:px-8"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
     >
       <style>{`
         @keyframes axv-spin {
@@ -468,10 +468,10 @@ export default function ServiceFAQ({ service }: ServiceFAQProps) {
           variants={headerVariants}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#00D4FF] backdrop-blur-md">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#141414]/[0.04] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#d4915c] backdrop-blur-md">
             <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00D4FF] opacity-60" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#00D4FF]" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#d4915c] opacity-60" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#d4915c]" />
             </span>
             FAQ
           </span>
@@ -482,7 +482,7 @@ export default function ServiceFAQ({ service }: ServiceFAQProps) {
               className="bg-clip-text text-transparent"
               style={{
                 backgroundImage:
-                  "linear-gradient(135deg, #00D4FF, #2563EB 55%, #7C3AED)",
+                  "linear-gradient(135deg, #d4915c, #e8a064 55%, #c9922a)",
               }}
             >
               Questions

@@ -165,7 +165,7 @@ function BackgroundParticles({ prefersReducedMotion }: { prefersReducedMotion: b
             top: `${p.y}%`,
             width: p.size,
             height: p.size,
-            background: `radial-gradient(circle, rgba(37,99,235,${p.opacity}) 0%, rgba(124,58,237,${p.opacity * 0.5}) 100%)`,
+            background: `radial-gradient(circle, rgba(232,160,100,${p.opacity}) 0%, rgba(201,146,42,${p.opacity * 0.5}) 100%)`,
           }}
           animate={{ y: [0, -90, 0], opacity: [0, p.opacity, 0] }}
           transition={{
@@ -189,7 +189,7 @@ function AuroraBackground({ prefersReducedMotion }: { prefersReducedMotion: bool
         className="absolute -top-64 -left-40 w-[700px] h-[700px] rounded-full"
         style={{
           background:
-            "radial-gradient(circle, rgba(37,99,235,0.13) 0%, transparent 65%)",
+            "radial-gradient(circle, rgba(232,160,100,0.13) 0%, transparent 65%)",
           filter: "blur(48px)",
         }}
         animate={
@@ -203,7 +203,7 @@ function AuroraBackground({ prefersReducedMotion }: { prefersReducedMotion: bool
         className="absolute top-1/2 -right-40 w-[550px] h-[550px] rounded-full"
         style={{
           background:
-            "radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 65%)",
+            "radial-gradient(circle, rgba(201,146,42,0.12) 0%, transparent 65%)",
           filter: "blur(48px)",
         }}
         animate={
@@ -217,7 +217,7 @@ function AuroraBackground({ prefersReducedMotion }: { prefersReducedMotion: bool
         className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[500px] h-[400px] rounded-full"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(0,212,255,0.07) 0%, transparent 65%)",
+            "radial-gradient(ellipse, rgba(212,145,92,0.07) 0%, transparent 65%)",
           filter: "blur(60px)",
         }}
         animate={
@@ -240,8 +240,8 @@ function GridOverlay() {
         className="absolute inset-0"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(37,99,235,0.035) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(37,99,235,0.035) 1px, transparent 1px)
+            linear-gradient(rgba(232,160,100,0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(232,160,100,0.035) 1px, transparent 1px)
           `,
           backgroundSize: "72px 72px",
         }}
@@ -268,7 +268,7 @@ function BorderBeam({ active }: { active: boolean }) {
               className="absolute top-0 left-0 h-[1.5px] w-full"
               style={{
                 background:
-                  "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.9) 30%, rgba(0,212,255,1) 50%, rgba(124,58,237,0.9) 70%, transparent 100%)",
+                  "linear-gradient(90deg, transparent 0%, rgba(232,160,100,0.9) 30%, rgba(212,145,92,1) 50%, rgba(201,146,42,0.9) 70%, transparent 100%)",
               }}
               initial={{ x: "-100%" }}
               animate={{ x: "100%" }}
@@ -280,7 +280,7 @@ function BorderBeam({ active }: { active: boolean }) {
               className="absolute top-0 right-0 w-[1.5px] h-full"
               style={{
                 background:
-                  "linear-gradient(180deg, transparent 0%, rgba(124,58,237,0.9) 30%, rgba(0,212,255,1) 50%, rgba(37,99,235,0.9) 70%, transparent 100%)",
+                  "linear-gradient(180deg, transparent 0%, rgba(201,146,42,0.9) 30%, rgba(212,145,92,1) 50%, rgba(232,160,100,0.9) 70%, transparent 100%)",
               }}
               initial={{ y: "-100%" }}
               animate={{ y: "100%" }}
@@ -304,7 +304,7 @@ function SignalLine({ inView, hovered }: { inView: boolean; hovered: boolean }) 
         className="absolute inset-0 h-full"
         style={{
           background:
-            "linear-gradient(90deg, #2563EB 0%, #00D4FF 50%, #7C3AED 100%)",
+            "linear-gradient(90deg, #e8a064 0%, #d4915c 50%, #c9922a 100%)",
           originX: 0,
         }}
         initial={{ scaleX: 0 }}
@@ -316,7 +316,7 @@ function SignalLine({ inView, hovered }: { inView: boolean; hovered: boolean }) 
           className="absolute inset-0 h-full"
           style={{
             background:
-              "linear-gradient(90deg, transparent 0%, rgba(0,212,255,0.8) 50%, transparent 100%)",
+              "linear-gradient(90deg, transparent 0%, rgba(212,145,92,0.8) 50%, transparent 100%)",
           }}
           animate={{ x: ["-100%", "200%"] }}
           transition={{ duration: 1.2, ease: "easeInOut" }}
@@ -398,9 +398,9 @@ function BenefitCard({
 
   // Per-card accent colour cycling
   const accentColors = [
-    { primary: "#2563EB", secondary: "#00D4FF" },
-    { primary: "#7C3AED", secondary: "#2563EB" },
-    { primary: "#00D4FF", secondary: "#7C3AED" },
+    { primary: "#e8a064", secondary: "#d4915c" },
+    { primary: "#c9922a", secondary: "#e8a064" },
+    { primary: "#d4915c", secondary: "#c9922a" },
   ];
   const accent = accentColors[index % 3];
 
@@ -619,10 +619,10 @@ function StatsPanel({ prefersReducedMotion }: { prefersReducedMotion: boolean })
   const isInView = useInView(ref, { once: true, margin: "-40px" });
 
   const stats = [
-    { value: "99.9%", label: "Reliability", color: "#00D4FF" },
-    { value: "24/7", label: "Support", color: "#2563EB" },
-    { value: "100%", label: "Client Focus", color: "#7C3AED" },
-    { value: "Fast", label: "Delivery", color: "#00D4FF" },
+    { value: "99.9%", label: "Reliability", color: "#d4915c" },
+    { value: "24/7", label: "Support", color: "#e8a064" },
+    { value: "100%", label: "Client Focus", color: "#c9922a" },
+    { value: "Fast", label: "Delivery", color: "#d4915c" },
   ];
 
   return (
@@ -645,7 +645,7 @@ function StatsPanel({ prefersReducedMotion }: { prefersReducedMotion: boolean })
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% 100%, rgba(37,99,235,0.07) 0%, transparent 70%)",
+            "radial-gradient(ellipse 80% 60% at 50% 100%, rgba(232,160,100,0.07) 0%, transparent 70%)",
         }}
         aria-hidden
       />
@@ -656,7 +656,7 @@ function StatsPanel({ prefersReducedMotion }: { prefersReducedMotion: boolean })
           className="absolute top-0 left-0 right-0 h-[1px]"
           style={{
             background:
-              "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.7) 25%, rgba(0,212,255,0.9) 50%, rgba(124,58,237,0.7) 75%, transparent 100%)",
+              "linear-gradient(90deg, transparent 0%, rgba(232,160,100,0.7) 25%, rgba(212,145,92,0.9) 50%, rgba(201,146,42,0.7) 75%, transparent 100%)",
           }}
           animate={{ opacity: [0.4, 1, 0.4] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -732,13 +732,13 @@ function TrustBadges({ prefersReducedMotion }: { prefersReducedMotion: boolean }
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold cursor-default"
           style={{
             background:
-              "linear-gradient(135deg, rgba(37,99,235,0.1) 0%, rgba(124,58,237,0.08) 100%)",
-            border: "1px solid rgba(124,58,237,0.2)",
+              "linear-gradient(135deg, rgba(232,160,100,0.1) 0%, rgba(201,146,42,0.08) 100%)",
+            border: "1px solid rgba(201,146,42,0.2)",
             color: "rgba(255,255,255,0.6)",
             backdropFilter: "blur(8px)",
           }}
         >
-          <CheckCircle2 size={12} style={{ color: "#00D4FF" }} aria-hidden />
+          <CheckCircle2 size={12} style={{ color: "#d4915c" }} aria-hidden />
           {badge}
         </motion.div>
       ))}
@@ -767,13 +767,13 @@ function SectionHeader({
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest"
           style={{
-            background: "rgba(37,99,235,0.1)",
-            border: "1px solid rgba(37,99,235,0.25)",
+            background: "rgba(232,160,100,0.1)",
+            border: "1px solid rgba(232,160,100,0.25)",
             color: "#93c5fd",
           }}
         >
           <motion.div
-            className="w-1.5 h-1.5 rounded-full bg-blue-400"
+            className="w-1.5 h-1.5 rounded-full bg-[#e8a064]"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
             aria-hidden
@@ -794,7 +794,7 @@ function SectionHeader({
         <span
           style={{
             background:
-              "linear-gradient(135deg, #2563EB 0%, #00D4FF 45%, #7C3AED 100%)",
+              "linear-gradient(135deg, #e8a064 0%, #d4915c 45%, #c9922a 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
@@ -850,7 +850,7 @@ export default function ServiceBenefits({ service }: ServiceBenefitsProps) {
     <section
       ref={sectionRef}
       className="relative overflow-hidden py-24 lg:py-32"
-      style={{ background: "#050816" }}
+      style={{ background: "#0f0f0f" }}
       aria-labelledby="benefits-heading"
     >
       {/* Background layers */}
@@ -906,7 +906,7 @@ export default function ServiceBenefits({ service }: ServiceBenefitsProps) {
       <div
         className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
         style={{
-          background: "linear-gradient(to top, #050816 0%, transparent 100%)",
+          background: "linear-gradient(to top, #0f0f0f 0%, transparent 100%)",
         }}
         aria-hidden
       />

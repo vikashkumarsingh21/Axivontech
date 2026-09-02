@@ -24,9 +24,9 @@ import {
   Headphones,
   Sparkles,
 } from "lucide-react";
-const EASE_FAQ = [0.22, 1, 0.36, 1] as const;
+import { Badge } from "@/components/ui";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+const EASE_FAQ = [0.22, 1, 0.36, 1] as const;
 
 interface FAQItem {
   id: number;
@@ -54,99 +54,74 @@ interface Particle {
   opacity: number;
 }
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
 const FAQS: FAQItem[] = [
   {
     id: 1,
     question: "How much does a website cost?",
     answer:
       "Pricing depends on project scope, features, design complexity, and integrations. We provide custom quotations tailored to your specific requirements and business goals.",
-    color: "#2563EB",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.42)",
-    gradient: "from-[#2563EB] to-[#00D4FF]",
+    color: "#c47a3a",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
+    gradient: "from-[#c47a3a] to-[#e8a064]",
   },
   {
     id: 2,
     question: "How long does development take?",
     answer:
       "Most business websites are delivered within 1–4 weeks, while larger platforms and applications may require additional development time depending on complexity and features.",
-    color: "#7C3AED",
-    glow: "#7C3AED",
-    glowRgba: "rgba(124,58,237,0.42)",
-    gradient: "from-[#7C3AED] to-[#2563EB]",
+    color: "#e8a064",
+    glow: "#e8a064",
+    glowRgba: "rgba(232,160,100,0.3)",
+    gradient: "from-[#e8a064] to-[#f0b07a]",
   },
   {
     id: 3,
     question: "Do you provide SEO services?",
     answer:
       "Yes. We offer technical SEO, on-page SEO, keyword research, local SEO, and performance optimization — all designed to increase your organic visibility and rankings.",
-    color: "#00D4FF",
-    glow: "#00D4FF",
-    glowRgba: "rgba(0,212,255,0.42)",
-    gradient: "from-[#00D4FF] to-[#7C3AED]",
+    color: "#f0b07a",
+    glow: "#f0b07a",
+    glowRgba: "rgba(240,176,122,0.3)",
+    gradient: "from-[#f0b07a] to-[#c47a3a]",
   },
   {
     id: 4,
     question: "Can you redesign my existing website?",
     answer:
       "Absolutely. We can modernize your website, improve performance, enhance user experience, and optimize conversion rates while preserving your brand identity.",
-    color: "#2563EB",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.42)",
-    gradient: "from-[#2563EB] to-[#7C3AED]",
+    color: "#c47a3a",
+    glow: "#c47a3a",
+    glowRgba: "rgba(196,122,58,0.3)",
+    gradient: "from-[#c47a3a] to-[#e8a064]",
   },
   {
     id: 5,
     question: "Do you build mobile applications?",
     answer:
-      "Yes. We develop Android, iOS, and cross-platform applications using modern technologies like React Native and Flutter, with full API integration and deployment support.",
-    color: "#7C3AED",
-    glow: "#7C3AED",
-    glowRgba: "rgba(124,58,237,0.42)",
-    gradient: "from-[#7C3AED] to-[#00D4FF]",
+      "Yes. We build native iOS and Android apps, as well as cross-platform solutions like React Native and Flutter, fully integrated with your APIs and backend systems.",
+    color: "#e8a064",
+    glow: "#e8a064",
+    glowRgba: "rgba(232,160,100,0.3)",
+    gradient: "from-[#e8a064] to-[#f0b07a]",
   },
   {
     id: 6,
-    question: "Do you provide support after launch?",
+    question: "What is your development stack?",
     answer:
-      "Yes. We provide ongoing maintenance, monitoring, security updates, feature additions, and long-term support packages tailored to your business needs.",
-    color: "#00D4FF",
-    glow: "#00D4FF",
-    glowRgba: "rgba(0,212,255,0.42)",
-    gradient: "from-[#00D4FF] to-[#2563EB]",
-  },
-  {
-    id: 7,
-    question: "Can you develop AI solutions?",
-    answer:
-      "Yes. We build AI-powered automation systems, intelligent chatbots, business intelligence dashboards, and custom machine learning solutions for modern enterprises.",
-    color: "#2563EB",
-    glow: "#2563EB",
-    glowRgba: "rgba(37,99,235,0.42)",
-    gradient: "from-[#2563EB] to-[#00D4FF]",
-  },
-  {
-    id: 8,
-    question: "How can I get a quotation?",
-    answer:
-      "Simply contact us through the contact page, WhatsApp, or email. Our team will review your requirements and prepare a detailed custom proposal within 24 hours.",
-    color: "#7C3AED",
-    glow: "#7C3AED",
-    glowRgba: "rgba(124,58,237,0.42)",
-    gradient: "from-[#7C3AED] to-[#2563EB]",
+      "We work primarily with Next.js, React, Node.js, TypeScript, Tailwind CSS, MongoDB, and AWS to build fast, secure, and easily scalable digital products.",
+    color: "#f0b07a",
+    glow: "#f0b07a",
+    glowRgba: "rgba(240,176,122,0.3)",
+    gradient: "from-[#f0b07a] to-[#c47a3a]",
   },
 ];
 
 const TRUST_BADGES: TrustBadge[] = [
-  { label: "Free Consultation", Icon: MessageCircle },
-  { label: "Transparent Pricing", Icon: BadgeCheck },
-  { label: "Dedicated Support", Icon: Headphones },
-  { label: "Custom Solutions", Icon: Sparkles },
+  { label: "Expert Support", Icon: Headphones },
+  { label: "Transparent Work", Icon: BadgeCheck },
+  { label: "Consultation Free", Icon: MessageCircle },
 ];
-
-// ─── Border Beam ──────────────────────────────────────────────────────────────
 
 const BorderBeam = memo(function BorderBeam({
   gradient,
@@ -159,218 +134,143 @@ const BorderBeam = memo(function BorderBeam({
 }) {
   if (!active || reduced) return null;
   return (
-    <div
-      aria-hidden={true}
-      className="pointer-events-none absolute inset-0 rounded-[20px] overflow-hidden"
-    >
+    <div aria-hidden={true} className="pointer-events-none absolute inset-0 rounded-[22px] overflow-hidden">
       <motion.div
-        className={`absolute h-[2px] w-24 bg-gradient-to-r ${gradient} blur-[1px] opacity-90`}
+        className={`absolute h-[2px] w-24 bg-gradient-to-r ${gradient} blur-[0.5px] opacity-90`}
         animate={{ offsetDistance: ["0%", "100%"] }}
         style={{
-          offsetPath: `path('M 20 0 L calc(100% - 20px) 0 Q 100% 0 100% 20px L 100% calc(100% - 20px) Q 100% 100% calc(100% - 20px) 100% L 20px 100% Q 0 100% 0 calc(100% - 20px) L 0 20px Q 0 0 20px 0 Z')`,
+          offsetPath: `path('M 22 0 L calc(100% - 22px) 0 Q 100% 0 100% 22px L 100% calc(100% - 22px) Q 100% 100% calc(100% - 22px) 100% L 22px 100% Q 0 100% 0 calc(100% - 22px) L 0 22px Q 0 0 22px 0 Z')`,
         }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 4.2, repeat: Infinity, ease: "linear" }}
       />
     </div>
   );
 });
 
-// ─── FAQ Accordion Item ───────────────────────────────────────────────────────
-
-const FAQAccordionItem = memo(function FAQAccordionItem({
+const FAQRow = memo(function FAQRow({
   faq,
   index,
   isOpen,
   onToggle,
-  visible,
   reduced,
 }: {
   faq: FAQItem;
   index: number;
   isOpen: boolean;
-  onToggle: () => void;
-  visible: boolean;
+  onToggle: (id: number) => void;
   reduced: boolean;
 }) {
-  const itemRef = useRef<HTMLDivElement>(null);
   const [hovered, setHovered] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const qId = `faq-q-${faq.id}`;
+  const aId = `faq-a-${faq.id}`;
 
-  // Magnetic effect
-  const magX = useMotionValue(0);
-  const magY = useMotionValue(0);
-  const magSX = useSpring(magX, { stiffness: 130, damping: 20 });
-  const magSY = useSpring(magY, { stiffness: 130, damping: 20 });
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const springX = useSpring(rotateX, { stiffness: 180, damping: 24 });
+  const springY = useSpring(rotateY, { stiffness: 180, damping: 24 });
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!itemRef.current || reduced) return;
-      const rect = itemRef.current.getBoundingClientRect();
+      if (!triggerRef.current || reduced) return;
+      const rect = triggerRef.current.getBoundingClientRect();
       const cx = e.clientX - rect.left - rect.width / 2;
       const cy = e.clientY - rect.top - rect.height / 2;
-      magX.set((cx / (rect.width / 2)) * 5);
-      magY.set((cy / (rect.height / 2)) * 3);
+      rotateX.set((-cy / (rect.height / 2)) * 3.5);
+      rotateY.set((cx / (rect.width / 2)) * 3.5);
     },
-    [reduced, magX, magY]
+    [reduced, rotateX, rotateY]
   );
 
   const handleMouseLeave = useCallback(() => {
     setHovered(false);
-    magX.set(0);
-    magY.set(0);
-  }, [magX, magY]);
-
-  const delay = reduced ? 0 : index * 0.08 + 0.4;
-  const active = isOpen || hovered;
+    rotateX.set(0);
+    rotateY.set(0);
+  }, [rotateX, rotateY]);
 
   return (
     <motion.div
-      initial={reduced ? undefined : { opacity: 0, x: 30 }}
-      animate={
-        visible
-          ? {
-              opacity: 1,
-              x: 0,
-              transition: { duration: 0.58, delay, ease: EASE_FAQ },
-            }
-          : { opacity: 0, x: 30 }
-      }
-      style={reduced ? undefined : { x: magSX, y: magSY }}
+      initial={reduced ? undefined : { opacity: 0, y: 32 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, delay: index * 0.08, ease: EASE_FAQ }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={handleMouseLeave}
-      className="relative"
+      style={
+        reduced
+          ? undefined
+          : { rotateX: springX, rotateY: springY, transformPerspective: 800 }
+      }
+      className="group relative"
     >
       <div
-        ref={itemRef}
-        className="relative rounded-[20px] border overflow-hidden transition-all duration-400"
+        className={`relative rounded-[22px] border bg-[#141414]/95 border-[#262626] p-1 overflow-hidden transition-all duration-400 focus-within:ring-2 focus-within:ring-[#e8a064]/40 ${
+          isOpen ? "border-[rgba(232,160,100,0.25)] shadow-md" : "hover:border-[#303030]"
+        }`}
         style={{
-          background: isOpen
-            ? "rgba(255,255,255,0.055)"
-            : hovered
-            ? "rgba(255,255,255,0.04)"
-            : "rgba(255,255,255,0.025)",
-          borderColor: isOpen
-            ? `${faq.glow}55`
-            : hovered
-            ? `${faq.glow}30`
-            : "rgba(255,255,255,0.07)",
-          backdropFilter: "blur(20px)",
           boxShadow: isOpen
-            ? `0 0 0 1px ${faq.glowRgba}, 0 8px 48px -8px ${faq.glowRgba}, 0 20px 56px -14px ${faq.glowRgba}44`
+            ? `0 0 0 1px ${faq.glowRgba}, 0 6px 36px -6px ${faq.glowRgba}`
             : hovered
-            ? `0 4px 32px -4px ${faq.glowRgba}50`
-            : "inset 0 1px 0 rgba(255,255,255,0.04)",
-          transition:
-            "background 0.3s ease, border-color 0.3s ease, box-shadow 0.4s ease",
+            ? `0 0 0 1px ${faq.glowRgba}40`
+            : "inset 0 1px 0 rgba(255,255,255,0.03)",
         }}
       >
-        {/* Inner top glow */}
+        <BorderBeam gradient={faq.gradient} active={hovered || isOpen} reduced={reduced} />
+
         <div
           aria-hidden={true}
-          className="pointer-events-none absolute -top-8 -left-8 w-32 h-32 rounded-full blur-3xl transition-opacity duration-500"
-          style={{
-            background: `radial-gradient(circle, ${faq.glowRgba}, transparent)`,
-            opacity: active ? 0.35 : 0.08,
-          }}
+          className="pointer-events-none absolute -top-12 -left-12 w-36 h-36 rounded-full blur-3xl opacity-10"
+          style={{ background: faq.color }}
         />
 
-        {/* Sweep gradient */}
-        <div
-          aria-hidden={true}
-          className="pointer-events-none absolute inset-0 rounded-[20px] transition-opacity duration-500"
-          style={{
-            background: `radial-gradient(ellipse 70% 40% at 50% 0%, ${faq.glow}15, transparent)`,
-            opacity: active ? 1 : 0,
-          }}
-        />
-
-        {/* Pulse glow ring when open */}
-        {isOpen && !reduced && (
-          <motion.div
-            aria-hidden={true}
-            className="pointer-events-none absolute inset-0 rounded-[20px]"
-            animate={{ opacity: [0.3, 0.1, 0.3] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-            style={{ boxShadow: `inset 0 0 30px ${faq.glowRgba}40` }}
-          />
-        )}
-
-        <BorderBeam gradient={faq.gradient} active={active} reduced={reduced} />
-
-        {/* Question button */}
-        <button
-          onClick={onToggle}
-          className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816] group"
-          style={{ focusRingColor: faq.color } as React.CSSProperties}
-          aria-expanded={isOpen}
-          aria-controls={`faq-answer-${faq.id}`}
-          id={`faq-question-${faq.id}`}
-        >
-          <span
-            className="text-sm sm:text-[15px] font-semibold leading-snug tracking-tight transition-colors duration-300"
-            style={{ color: isOpen ? "#fff" : "rgba(255,255,255,0.75)" }}
+        <h3>
+          <button
+            ref={triggerRef}
+            type="button"
+            id={qId}
+            aria-expanded={isOpen}
+            aria-controls={aId}
+            onClick={() => onToggle(faq.id)}
+            className="w-full flex items-center justify-between gap-5 text-left px-6 py-5 cursor-pointer focus:outline-none"
           >
-            {faq.question}
-          </span>
+            <span
+              className={`text-base sm:text-lg font-bold transition-colors duration-300 ${
+                isOpen ? "text-[#e8a064]" : "text-[#d4d4d4] group-hover:text-[#e8a064]"
+              }`}
+            >
+              {faq.question}
+            </span>
 
-          {/* Icon */}
-          <motion.div
-            className={`flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br ${faq.gradient} flex items-center justify-center shadow-md`}
-            animate={
-              reduced
-                ? {}
-                : isOpen
-                ? { rotate: 180, scale: 1.1 }
-                : { rotate: 0, scale: 1 }
-            }
-            transition={{ duration: 0.35, ease: EASE_FAQ }}
-            aria-hidden={true}
-          >
-            {isOpen ? (
-              <Minus className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
-            ) : (
-              <Plus className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
-            )}
-          </motion.div>
-        </button>
+            <span
+              className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#262626] bg-[#1c1c1e] text-[#a1a1aa] transition-colors duration-300 ${
+                isOpen ? "border-[#e8a064]/30 text-[#e8a064]" : "group-hover:border-[#e8a064]/20 group-hover:text-[#e8a064]"
+              }`}
+            >
+              {isOpen ? (
+                <Minus className="w-4 h-4" strokeWidth={2.2} />
+              ) : (
+                <Plus className="w-4 h-4" strokeWidth={2.2} />
+              )}
+            </span>
+          </button>
+        </h3>
 
-        {/* Answer */}
         <AnimatePresence initial={false}>
           {isOpen && (
             <motion.div
-              id={`faq-answer-${faq.id}`}
+              key="content"
+              id={aId}
               role="region"
-              aria-labelledby={`faq-question-${faq.id}`}
+              aria-labelledby={qId}
               initial={{ height: 0, opacity: 0 }}
-              animate={{
-                height: "auto",
-                opacity: 1,
-                transition: {
-                  height: { duration: reduced ? 0 : 0.38, ease: EASE_FAQ },
-                  opacity: { duration: reduced ? 0 : 0.28, delay: 0.08 },
-                },
-              }}
-              exit={{
-                height: 0,
-                opacity: 0,
-                transition: {
-                  height: { duration: reduced ? 0 : 0.3, ease: EASE_FAQ },
-                  opacity: { duration: reduced ? 0 : 0.18 },
-                },
-              }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: reduced ? 0 : 0.28, ease: EASE_FAQ }}
               className="overflow-hidden"
             >
-              {/* Gradient divider */}
-              <div
-                aria-hidden={true}
-                className="mx-6 h-px mb-5"
-                style={{
-                  background: `linear-gradient(to right, transparent, ${faq.color}50, transparent)`,
-                }}
-              />
-              <p className="px-6 pb-6 text-sm leading-relaxed text-white/50">
+              <div className="px-6 pb-6 pt-1 text-[#a1a1aa] text-sm sm:text-base leading-relaxed border-t border-[#262626]/40 mt-1">
                 {faq.answer}
-              </p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -379,151 +279,73 @@ const FAQAccordionItem = memo(function FAQAccordionItem({
   );
 });
 
-// ─── Left Panel ───────────────────────────────────────────────────────────────
-
-const LeftPanel = memo(function LeftPanel({
-  visible,
-  reduced,
-}: {
-  visible: boolean;
-  reduced: boolean;
-}) {
-  const v = (i: number) => ({
-    hidden: { opacity: 0, x: -32, filter: "blur(6px)" },
+function SectionHeader({ visible, reduced }: { visible: boolean; reduced: boolean }) {
+  const stagger = (i: number) => ({
+    hidden: { opacity: 0, y: 28, filter: "blur(6px)" },
     visible: {
-      opacity: 1,
-      x: 0,
-      filter: "blur(0px)",
-      transition: { duration: 0.7, delay: i * 0.13, ease: EASE_FAQ },
+      opacity: 1, y: 0, filter: "blur(0px)",
+      transition: { duration: 0.7, delay: i * 0.12, ease: EASE_FAQ },
     },
   });
 
   return (
-    <div className="flex flex-col gap-8 lg:sticky lg:top-32">
-      {/* Badge */}
+    <div className="text-center max-w-2xl mx-auto mb-20 flex flex-col items-center gap-5">
       <motion.div
-        variants={reduced ? undefined : v(0)}
+        variants={reduced ? undefined : stagger(0)}
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
       >
-        <span
-          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm text-xs font-semibold tracking-[0.18em] uppercase text-[#00D4FF]"
-          aria-label="Section: Frequently Asked Questions"
-        >
-          <span aria-hidden={true} className="relative flex">
-            <span className="absolute inline-flex h-2 w-2 rounded-full bg-[#00D4FF] opacity-70 animate-ping" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00D4FF]" />
-          </span>
-          Frequently Asked Questions
-        </span>
+        <Badge>
+          <Sparkles className="w-3.5 h-3.5 text-[#e8a064]" strokeWidth={2.2} aria-hidden={true} />
+          <span className="ml-1.5">FAQ</span>
+        </Badge>
       </motion.div>
 
-      {/* Heading */}
       <motion.h2
-        variants={reduced ? undefined : v(1)}
+        variants={reduced ? undefined : stagger(1)}
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
-        className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.08]"
+        className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.1]"
         id="faq-heading"
       >
-        Everything You Need
+        Frequently Asked
         <br />
-        <span
-          className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent"
-          style={{
-            backgroundSize: "200% 100%",
-            animation: reduced ? "none" : "gradientShift 5s ease infinite",
-          }}
-        >
-          To Know
-        </span>
+        <span className="text-gradient-amber">Questions</span>
       </motion.h2>
 
-      {/* Description */}
       <motion.p
-        variants={reduced ? undefined : v(2)}
+        variants={reduced ? undefined : stagger(2)}
         initial={reduced ? undefined : "hidden"}
         animate={visible ? "visible" : "hidden"}
-        className="text-white/45 text-base leading-relaxed max-w-sm"
+        className="text-[#a1a1aa] text-base sm:text-lg leading-relaxed max-w-xl"
       >
-        Have questions about our services, pricing, timelines, or development
-        process? Find answers to the most common questions below.
+        Find quick answers to common questions about our services, pricing, and
+        development process.
       </motion.p>
-
-      {/* Trust badges */}
-      <motion.div
-        variants={reduced ? undefined : v(3)}
-        initial={reduced ? undefined : "hidden"}
-        animate={visible ? "visible" : "hidden"}
-        className="flex flex-col gap-3"
-        role="list"
-        aria-label="Trust indicators"
-      >
-        {TRUST_BADGES.map((badge, i) => (
-          <motion.div
-            key={badge.label}
-            initial={reduced ? undefined : { opacity: 0, x: -16 }}
-            animate={
-              visible
-                ? {
-                    opacity: 1,
-                    x: 0,
-                    transition: {
-                      delay: 0.55 + i * 0.09,
-                      duration: 0.45,
-                      ease: EASE_FAQ,
-                    },
-                  }
-                : { opacity: 0, x: -16 }
-            }
-            className="inline-flex items-center gap-3 px-4 py-3 rounded-2xl border border-white/[0.07] bg-white/[0.03] backdrop-blur-sm w-fit"
-            role="listitem"
-          >
-            <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{
-                background: `linear-gradient(135deg, ${["#2563EB", "#7C3AED", "#00D4FF", "#2563EB"][i]}30, ${["#00D4FF", "#2563EB", "#7C3AED", "#7C3AED"][i]}20)`,
-                border: `1px solid ${["#2563EB", "#7C3AED", "#00D4FF", "#2563EB"][i]}35`,
-              }}
-              aria-hidden={true}
-            >
-              <badge.Icon
-                className="w-4 h-4"
-                strokeWidth={1.8}
-                style={{ color: ["#2563EB", "#7C3AED", "#00D4FF", "#2563EB"][i] }}
-              />
-            </div>
-            <span className="text-white/60 text-sm font-medium">{badge.label}</span>
-          </motion.div>
-        ))}
-      </motion.div>
     </div>
   );
-});
+}
 
-// ─── Background ───────────────────────────────────────────────────────────────
-
-const Background = memo(function Background({ reduced }: { reduced: boolean }) {
+function Background({ reduced }: { reduced: boolean }) {
   const particles = useMemo<Particle[]>(
     () =>
-      Array.from({ length: 26 }, (_, i) => ({
+      Array.from({ length: 24 }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
-        size: Math.random() * 1.8 + 0.6,
+        size: Math.random() * 2 + 0.8,
         dur: Math.random() * 14 + 8,
-        delay: Math.random() * 9,
-        color: ["#2563EB", "#7C3AED", "#00D4FF"][i % 3],
-        opacity: Math.random() * 0.17 + 0.07,
+        delay: Math.random() * 8,
+        color: ["#c47a3a", "#e8a064", "#f0b07a"][i % 3],
+        opacity: Math.random() * 0.12 + 0.05,
       })),
     []
   );
 
   return (
     <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* Grid */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.02]"
         style={{
           backgroundImage: `
             linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
@@ -533,47 +355,27 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
         }}
       />
 
-      {/* Noise */}
-      <div
-        className="absolute inset-0 opacity-[0.016]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          backgroundRepeat: "repeat",
-          backgroundSize: "128px",
-        }}
-      />
-
       {!reduced && (
         <>
           <motion.div
             className="absolute rounded-full blur-[160px]"
             style={{
-              width: 650, height: 400,
-              background: "radial-gradient(ellipse, rgba(37,99,235,0.12), transparent 70%)",
-              top: "5%", left: "-6%",
+              width: 700, height: 400,
+              background: "radial-gradient(ellipse, rgba(232,160,100,0.05), transparent 70%)",
+              top: "5%", left: "-8%",
             }}
-            animate={{ x: [0, 65, 0], y: [0, 40, 0] }}
-            transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ x: [0, 70, 0], y: [0, 40, 0] }}
+            transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
             className="absolute rounded-full blur-[180px]"
             style={{
-              width: 560, height: 480,
-              background: "radial-gradient(ellipse, rgba(124,58,237,0.10), transparent 70%)",
-              bottom: "0%", right: "-4%",
+              width: 600, height: 500,
+              background: "radial-gradient(ellipse, rgba(196,122,58,0.04), transparent 70%)",
+              bottom: "0%", right: "-5%",
             }}
-            animate={{ x: [0, -50, 0], y: [0, -32, 0] }}
-            transition={{ duration: 28, repeat: Infinity, ease: "easeInOut", delay: 5 }}
-          />
-          <motion.div
-            className="absolute rounded-full blur-[120px]"
-            style={{
-              width: 460, height: 460,
-              background: "radial-gradient(circle, rgba(0,212,255,0.07), transparent 70%)",
-              top: "45%", left: "50%", translateX: "-50%",
-            }}
-            animate={{ x: [0, 36, -28, 0], y: [0, -24, 24, 0] }}
-            transition={{ duration: 32, repeat: Infinity, ease: "easeInOut", delay: 9 }}
+            animate={{ x: [0, -50, 0], y: [0, -35, 0] }}
+            transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 4 }}
           />
 
           {particles.map((p) => (
@@ -588,9 +390,9 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
                 boxShadow: `0 0 ${p.size * 5}px ${p.color}`,
               }}
               animate={{
-                y: [0, -20, 0],
-                x: [0, Math.sin(p.id * 1.4) * 10, 0],
-                opacity: [p.opacity, p.opacity * 2.2, p.opacity],
+                y: [0, -24, 0],
+                x: [0, Math.sin(p.id * 1.3) * 12, 0],
+                opacity: [p.opacity, p.opacity * 2, p.opacity],
               }}
               transition={{ duration: p.dur, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
             />
@@ -599,25 +401,32 @@ const Background = memo(function Background({ reduced }: { reduced: boolean }) {
       )}
     </div>
   );
-});
+}
 
-// ─── Mouse Spotlight ──────────────────────────────────────────────────────────
-
-function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElement | null> }) {
+function SectionSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElement | null> }) {
   const mx = useMotionValue(-1000);
   const my = useMotionValue(-1000);
-  const sx = useSpring(mx, { stiffness: 55, damping: 20 });
-  const sy = useSpring(my, { stiffness: 55, damping: 20 });
+  const sx = useSpring(mx, { stiffness: 55, damping: 18 });
+  const sy = useSpring(my, { stiffness: 55, damping: 18 });
 
   useEffect(() => {
-    const move = (e: MouseEvent) => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      mx.set(e.clientX - rect.left);
-      my.set(e.clientY - rect.top);
+    let frameId: number | null = null;
+    const handleMove = (e: MouseEvent) => {
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = null;
+        if (!sectionRef.current) return;
+        const rect = sectionRef.current.getBoundingClientRect();
+        mx.set(e.clientX - rect.left);
+        my.set(e.clientY - rect.top);
+      });
     };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
+
+    window.addEventListener("mousemove", handleMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      if (frameId) cancelAnimationFrame(frameId);
+    };
   }, [mx, my, sectionRef]);
 
   return (
@@ -625,78 +434,62 @@ function MouseSpotlight({ sectionRef }: { sectionRef: React.RefObject<HTMLElemen
       aria-hidden={true}
       className="pointer-events-none absolute inset-0 z-0"
       style={{
-        background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(37,99,235,0.05), transparent 55%)`,
+        background: `radial-gradient(420px circle at ${sx}px ${sy}px, rgba(232,160,100,0.04), transparent 55%)`,
       }}
     />
   );
 }
 
-// ─── Main Export ──────────────────────────────────────────────────────────────
-
 export default function ServicesFAQ() {
   const reduced = useReducedMotion() ?? false;
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
   const [openId, setOpenId] = useState<number | null>(1);
 
-  const toggle = useCallback((id: number) => {
+  const handleToggle = useCallback((id: number) => {
     setOpenId((prev) => (prev === id ? null : id));
   }, []);
 
   return (
-    <>
-      <style>{`
-        @keyframes gradientShift {
-          0%   { background-position: 0% 50%; }
-          50%  { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-      `}</style>
+    <section
+      id="services-faq"
+      ref={sectionRef}
+      aria-labelledby="faq-heading"
+      className="relative w-full overflow-hidden py-24 sm:py-32 bg-[#0f0f0f]"
+    >
+      <Background reduced={reduced} />
+      {!reduced && <SectionSpotlight sectionRef={sectionRef} />}
 
-      <section
-        ref={sectionRef}
-        id="faq"
-        aria-labelledby="faq-heading"
-        className="relative w-full overflow-hidden py-24 sm:py-32"
-        style={{ background: "#050816" }}
-      >
-        <Background reduced={reduced} />
-        {!reduced && <MouseSpotlight sectionRef={sectionRef} />}
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <SectionHeader visible={isInView} reduced={reduced} />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.35fr] gap-12 lg:gap-20 items-start">
-
-            {/* ── Left panel ── */}
-            <LeftPanel visible={isInView} reduced={reduced} />
-
-            {/* ── Right: FAQ accordion ── */}
-            <div
-              className="flex flex-col gap-3"
-              role="list"
-              aria-label="Frequently asked questions"
-            >
-              {FAQS.map((faq, i) => (
-                <FAQAccordionItem
-                  key={faq.id}
-                  faq={faq}
-                  index={i}
-                  isOpen={openId === faq.id}
-                  onToggle={() => toggle(faq.id)}
-                  visible={isInView}
-                  reduced={reduced}
-                />
-              ))}
-            </div>
-          </div>
+        <div className="flex flex-col gap-4" role="list" aria-label="Services Frequently Asked Questions">
+          {FAQS.map((faq, i) => (
+            <FAQRow
+              key={faq.id}
+              faq={faq}
+              index={i}
+              isOpen={openId === faq.id}
+              onToggle={handleToggle}
+              reduced={reduced}
+            />
+          ))}
         </div>
 
-        {/* Bottom fade */}
-        <div
-          aria-hidden={true}
-          className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
-          style={{ background: "linear-gradient(to bottom, transparent, #050816)" }}
-        />
-      </section>
-    </>
+        <div className="mt-16 flex flex-wrap justify-center items-center gap-6 sm:gap-8 border-t border-[#262626] pt-8">
+          {TRUST_BADGES.map((b, i) => (
+            <div key={i} className="flex items-center gap-2 text-[#a1a1aa] text-sm">
+              <b.Icon className="w-5 h-5 text-[#e8a064]" strokeWidth={1.8} />
+              <span className="font-semibold tracking-wide">{b.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div
+        aria-hidden={true}
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0f0f0f] to-transparent"
+      />
+    </section>
   );
 }

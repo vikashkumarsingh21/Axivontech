@@ -65,7 +65,7 @@ const EASE_PREMIUM = [0.16, 1, 0.3, 1] as const;
 
 function GradientText({ children }: { children: React.ReactNode }) {
   return (
-    <span className="bg-[length:200%_auto] bg-gradient-to-r from-[#2563EB] via-[#00D4FF] to-[#7C3AED] bg-clip-text text-transparent [animation:gradient-shift_5s_ease_infinite]">
+    <span className="bg-[length:200%_auto] bg-gradient-to-r from-[#e8a064] via-[#d4915c] to-[#c9922a] bg-clip-text text-transparent [animation:gradient-shift_5s_ease_infinite]">
       {children}
     </span>
   );
@@ -111,7 +111,7 @@ function TestimonialCard({ entry, index }: { entry: TestimonialEntry; index: num
 
   const spotX = useMotionValue(50);
   const spotY = useMotionValue(50);
-  const spotlightBackground = useMotionTemplate`radial-gradient(380px circle at ${spotX}% ${spotY}%, rgba(0,212,255,0.14), transparent 70%)`;
+  const spotlightBackground = useMotionTemplate`radial-gradient(380px circle at ${spotX}% ${spotY}%, rgba(212,145,92,0.14), transparent 70%)`;
 
   const handleMove = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -150,12 +150,12 @@ function TestimonialCard({ entry, index }: { entry: TestimonialEntry; index: num
         rotateY: reduceMotion ? 0 : springRotateY,
         transformPerspective: 1000,
       }}
-      className="group relative rounded-[32px] border border-white/10 bg-white/[0.03] p-[1px] shadow-[0_0_50px_-20px_rgba(37,99,235,0.5)] outline-none transition-shadow duration-500 hover:shadow-[0_0_90px_-15px_rgba(0,212,255,0.5)] focus-visible:shadow-[0_0_90px_-15px_rgba(0,212,255,0.5)] focus-visible:ring-2 focus-visible:ring-[#00D4FF]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+      className="group relative rounded-[32px] border border-white/10 bg-[#141414]/[0.03] p-[1px] shadow-[0_0_50px_-20px_rgba(232,160,100,0.5)] outline-none transition-shadow duration-500 hover:shadow-[0_0_90px_-15px_rgba(212,145,92,0.5)] focus-visible:shadow-[0_0_90px_-15px_rgba(212,145,92,0.5)] focus-visible:ring-2 focus-visible:ring-[#d4915c]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]"
     >
       {/* dual-speed gradient border beam */}
       <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden rounded-[32px]">
-        <div className="absolute inset-[-50%] [animation:spin-cw_10s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(37,99,235,0.45)_16deg,transparent_55deg)] opacity-50 transition-opacity duration-500 group-hover:opacity-0" />
-        <div className="absolute inset-[-50%] [animation:spin-cw_3s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(0,212,255,0.85)_12deg,transparent_45deg)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+        <div className="absolute inset-[-50%] [animation:spin-cw_10s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(232,160,100,0.45)_16deg,transparent_55deg)] opacity-50 transition-opacity duration-500 group-hover:opacity-0" />
+        <div className="absolute inset-[-50%] [animation:spin-cw_3s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(212,145,92,0.85)_12deg,transparent_45deg)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       </div>
 
       {/* mouse-follow spotlight */}
@@ -177,7 +177,7 @@ function TestimonialCard({ entry, index }: { entry: TestimonialEntry; index: num
             aria-hidden={true}
             animate={reduceMotion ? undefined : { y: [0, -5, 0] }}
             transition={{ duration: 4 + index * 0.3, repeat: Infinity, ease: "easeInOut" }}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] p-[2px]"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#e8a064] via-[#c9922a] to-[#d4915c] p-[2px]"
           >
             <div className="flex h-full w-full items-center justify-center rounded-full bg-[#0a1024] text-sm font-semibold text-white">
               {entry.initials}
@@ -189,12 +189,12 @@ function TestimonialCard({ entry, index }: { entry: TestimonialEntry; index: num
           </div>
         </div>
 
-        <span className="inline-flex w-fit items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-medium tracking-wide text-white/70">
-          <BadgeCheck className="h-3 w-3 text-[#00D4FF]" strokeWidth={2} aria-hidden={true} />
+        <span className="inline-flex w-fit items-center gap-1 rounded-full border border-white/10 bg-[#141414]/[0.03] px-2.5 py-1 text-[10px] font-medium tracking-wide text-white/70">
+          <BadgeCheck className="h-3 w-3 text-[#d4915c]" strokeWidth={2} aria-hidden={true} />
           Verified Feedback
         </span>
 
-        <Quote aria-hidden={true} strokeWidth={1.5} className="h-6 w-6 text-[#00D4FF]/40" />
+        <Quote aria-hidden={true} strokeWidth={1.5} className="h-6 w-6 text-[#d4915c]/40" />
 
         <p className="flex-1 text-sm leading-relaxed text-white/65">{entry.feedback}</p>
 
@@ -211,9 +211,9 @@ function TestimonialCard({ entry, index }: { entry: TestimonialEntry; index: num
 function AuroraBackground() {
   return (
     <div aria-hidden={true} className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className="absolute left-[-6%] top-[-10%] h-[560px] w-[560px] rounded-full bg-[#2563EB]/20 blur-[120px] [animation:aurora-drift_19s_ease-in-out_infinite]" />
-      <div className="absolute right-[-6%] top-[18%] h-[480px] w-[480px] rounded-full bg-[#7C3AED]/20 blur-[120px] [animation:aurora-drift_24s_ease-in-out_infinite_reverse]" />
-      <div className="absolute bottom-[-14%] left-[28%] h-[500px] w-[500px] rounded-full bg-[#00D4FF]/14 blur-[130px] [animation:aurora-drift_28s_ease-in-out_infinite]" />
+      <div className="absolute left-[-6%] top-[-10%] h-[560px] w-[560px] rounded-full bg-[#e8a064]/20 blur-[120px] [animation:aurora-drift_19s_ease-in-out_infinite]" />
+      <div className="absolute right-[-6%] top-[18%] h-[480px] w-[480px] rounded-full bg-[#c9922a]/20 blur-[120px] [animation:aurora-drift_24s_ease-in-out_infinite_reverse]" />
+      <div className="absolute bottom-[-14%] left-[28%] h-[500px] w-[500px] rounded-full bg-[#d4915c]/14 blur-[130px] [animation:aurora-drift_28s_ease-in-out_infinite]" />
     </div>
   );
 }
@@ -228,7 +228,7 @@ function PerspectiveGrid() {
         className="absolute inset-0 [animation:grid-scroll_12s_linear_infinite] [transform:perspective(600px)_rotateX(62deg)] [transform-origin:bottom]"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(0,212,255,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.16) 1px, transparent 1px)",
+            "linear-gradient(rgba(212,145,92,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(212,145,92,0.16) 1px, transparent 1px)",
           backgroundSize: "56px 56px",
         }}
       />
@@ -281,7 +281,7 @@ function ParticlesField() {
       {particles.map((particle) => (
         <span
           key={particle.id}
-          className="absolute rounded-full bg-[#00D4FF]/30"
+          className="absolute rounded-full bg-[#d4915c]/30"
           style={{
             left: `${particle.left}%`,
             top: `${particle.top}%`,
@@ -307,7 +307,7 @@ export default function ClientTestimonials() {
     <section
       id="client-testimonials"
       aria-labelledby="testimonials-heading"
-      className="relative isolate overflow-hidden bg-[#050816] py-24 sm:py-32 2xl:py-36"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] py-24 sm:py-32 2xl:py-36"
     >
       <div aria-hidden={true} className="absolute inset-0">
         <AuroraBackground />
@@ -325,8 +325,8 @@ export default function ClientTestimonials() {
           transition={{ duration: 0.7, ease: EASE_PREMIUM }}
           className="mx-auto max-w-3xl text-center"
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-xs font-medium tracking-[0.2em] text-[#00D4FF] backdrop-blur-md">
-            <span aria-hidden={true} className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#00D4FF]" />
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#141414]/[0.03] px-4 py-1.5 text-xs font-medium tracking-[0.2em] text-[#d4915c] backdrop-blur-md">
+            <span aria-hidden={true} className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#d4915c]" />
             TESTIMONIALS
           </span>
 

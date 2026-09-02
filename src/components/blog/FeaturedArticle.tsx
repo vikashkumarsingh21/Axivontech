@@ -28,10 +28,10 @@ import {
 /* ------------------------------------------------------------------ */
 
 const COLORS = {
-  bg: "#050816",
-  blue: "#2563EB",
-  purple: "#7C3AED",
-  cyan: "#00D4FF",
+  bg: "#0f0f0f",
+  blue: "#e8a064",
+  purple: "#c9922a",
+  cyan: "#d4915c",
 } as const;
 
 /* ------------------------------------------------------------------ */
@@ -399,7 +399,7 @@ function GlassCube({
   return (
     <div className={`absolute ${className}`} style={{ perspective: 400 }} aria-hidden={true}>
       <motion.div
-        className="rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md"
+        className="rounded-lg border border-white/10 bg-[#141414]/[0.03] backdrop-blur-md"
         style={{
           width: size,
           height: size,
@@ -437,7 +437,7 @@ function FloatingContentPanel({
       <motion.div
         animate={reduceMotion ? undefined : { y: [0, -12, 0] }}
         transition={reduceMotion ? undefined : { duration: 5 + delay, repeat: Infinity, ease: "easeInOut", delay }}
-        className="relative rounded-xl border border-white/10 bg-white/[0.04] p-3 backdrop-blur-xl"
+        className="relative rounded-xl border border-white/10 bg-[#141414]/[0.04] p-3 backdrop-blur-xl"
         style={{ width, boxShadow: "0 18px 40px -16px rgba(0,0,0,0.6)" }}
       >
         <div
@@ -449,10 +449,10 @@ function FloatingContentPanel({
             className="h-2 w-2 rounded-full"
             style={{ backgroundColor: accent, boxShadow: `0 0 8px ${accent}` }}
           />
-          <span className="h-1.5 w-10 rounded-full bg-white/20" />
+          <span className="h-1.5 w-10 rounded-full bg-[#141414]/20" />
         </div>
-        <span className="block h-1.5 w-full rounded-full bg-white/10" />
-        <span className="mt-1.5 block h-1.5 w-2/3 rounded-full bg-white/10" />
+        <span className="block h-1.5 w-full rounded-full bg-[#141414]/10" />
+        <span className="mt-1.5 block h-1.5 w-2/3 rounded-full bg-[#141414]/10" />
       </motion.div>
     </motion.div>
   );
@@ -599,7 +599,7 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
         />
       </div>
 
-      <article className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-white/[0.025] p-6 shadow-[0_10px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-shadow duration-500 group-hover:shadow-[0_10px_55px_rgba(0,0,0,0.65)] sm:p-8">
+      <article className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#141414]/[0.025] p-6 shadow-[0_10px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-shadow duration-500 group-hover:shadow-[0_10px_55px_rgba(0,0,0,0.65)] sm:p-8">
         <div className="pointer-events-none absolute inset-[1px] -z-10 rounded-[27px] bg-[#070b1a]" aria-hidden={true} />
 
         <motion.div
@@ -609,7 +609,7 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
         />
 
         {/* media / placeholder area */}
-        <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+        <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-2xl border border-white/10 bg-[#141414]/[0.03]">
           {isLive && article ? (
             <Image
               src={article.image}
@@ -648,7 +648,7 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
           )}
 
           <span
-            className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#050816]/80 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-white/80 backdrop-blur-md"
+            className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#0f0f0f]/80 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-white/80 backdrop-blur-md"
             style={isLive ? undefined : { borderColor: `${COLORS.cyan}55`, color: COLORS.cyan }}
           >
             {isLive ? (
@@ -682,7 +682,7 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
             {isLive ? (
               article!.author
             ) : (
-              <span className="h-1.5 w-16 rounded-full bg-white/10" aria-hidden={true} />
+              <span className="h-1.5 w-16 rounded-full bg-[#141414]/10" aria-hidden={true} />
             )}
           </span>
           <span className="inline-flex items-center gap-1.5">
@@ -690,7 +690,7 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
             {isLive ? (
               article!.publishedDate
             ) : (
-              <span className="h-1.5 w-20 rounded-full bg-white/10" aria-hidden={true} />
+              <span className="h-1.5 w-20 rounded-full bg-[#141414]/10" aria-hidden={true} />
             )}
           </span>
         </div>
@@ -699,7 +699,7 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
           {isLive && article ? (
             <Link
               href={`/blog/${article.slug}`}
-              className="group/cta inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white outline-none transition-transform duration-300 focus-visible:ring-2 focus-visible:ring-[#00D4FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+              className="group/cta inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white outline-none transition-transform duration-300 focus-visible:ring-2 focus-visible:ring-[#d4915c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]"
               style={{
                 background: `linear-gradient(135deg, ${COLORS.blue}, ${COLORS.purple})`,
                 boxShadow: `0 8px 26px -8px ${COLORS.purple}90`,
@@ -711,7 +711,7 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
           ) : (
             <span
               aria-disabled="true"
-              className="inline-flex cursor-not-allowed items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-6 py-3 text-sm font-medium text-white/40"
+              className="inline-flex cursor-not-allowed items-center gap-2 rounded-full border border-white/10 bg-[#141414]/[0.03] px-6 py-3 text-sm font-medium text-white/40"
             >
               <Lock className="h-3.5 w-3.5" aria-hidden={true} />
               Available Soon
@@ -762,7 +762,7 @@ export default function FeaturedArticle({ article }: FeaturedArticleProps) {
       aria-labelledby="featured-article-heading"
       onMouseMove={handlePointerMove}
       onMouseLeave={handlePointerLeave}
-      className="relative isolate overflow-hidden bg-[#050816] px-6 py-28 sm:py-32 lg:px-8"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] px-6 py-28 sm:py-32 lg:px-8"
     >
       <AuroraBackground />
       <PerspectiveGrid smx={smx} smy={smy} />
@@ -780,7 +780,7 @@ export default function FeaturedArticle({ article }: FeaturedArticleProps) {
         >
           <motion.span
             variants={fadeUpVariants}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 backdrop-blur-sm"
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#141414]/[0.04] px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 backdrop-blur-sm"
           >
             <Sparkles className="h-3.5 w-3.5" style={{ color: COLORS.cyan }} aria-hidden={true} />
             Featured Insight
@@ -827,7 +827,7 @@ export default function FeaturedArticle({ article }: FeaturedArticleProps) {
           whileInView="visible"
           viewport={{ once: true, amount: 0.5 }}
           variants={fadeUpVariants}
-          className="mx-auto mt-16 flex max-w-xl items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-5 py-2.5 text-center text-xs text-white/50 backdrop-blur-sm sm:mt-20"
+          className="mx-auto mt-16 flex max-w-xl items-center justify-center gap-2 rounded-full border border-white/10 bg-[#141414]/[0.03] px-5 py-2.5 text-center text-xs text-white/50 backdrop-blur-sm sm:mt-20"
         >
           <Sparkles className="h-3.5 w-3.5 shrink-0" style={{ color: COLORS.purple }} aria-hidden={true} />
           Future articles will be published through the Axivon CMS.

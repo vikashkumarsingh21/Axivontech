@@ -11,9 +11,7 @@ import {
   Headset,
   type LucideIcon,
 } from "lucide-react";
-
-
-import Link from "next/link";
+import { SectionHeader } from "@/components/ui";
 
 interface Feature {
   icon: LucideIcon;
@@ -32,7 +30,7 @@ const FEATURES: Feature[] = [
     icon: Users,
     title: "Experienced Development Team",
     description:
-      "Senior engineers and designers who've shipped products for startups and enterprises alike, not junior hires learning on your budget.",
+      "Senior engineers and designers who've shipped products for startups and enterprises — not junior hires learning on your budget.",
   },
   {
     icon: Layers,
@@ -50,7 +48,7 @@ const FEATURES: Feature[] = [
     icon: TrendingUp,
     title: "SEO & Growth Focused",
     description:
-      "Every website and application is built with SEO best practices, performance optimization, and scalable architecture to help businesses attract more customers online.",
+      "Every website and application is built with SEO best practices, performance optimisation, and scalable architecture.",
   },
   {
     icon: ShieldCheck,
@@ -67,69 +65,76 @@ const FEATURES: Feature[] = [
 ];
 
 const STATS: Stat[] = [
-  { end: 10, suffix: "+", label: "Projects Completed" },
-  { end: 5, suffix: "+", label: "Services Offered" },
-  { end: 24, suffix: "/7", label: "Technical Support" },
-  { end: 100, suffix: "%", label: "Commitment to Quality" },
+  { end: 10,  suffix: "+",  label: "Projects Completed" },
+  { end: 8,   suffix: "+",  label: "Services Offered" },
+  { end: 24,  suffix: "/7", label: "Technical Support" },
+  { end: 100, suffix: "%",  label: "Commitment to Quality" },
 ];
 
 const headerVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
 const gridVariants: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.08 } },
 };
 
 const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" } },
 };
 
-const panelVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-};
+// ── Count-up ──────────────────────────────────────────────────────
 
 function useCountUp(end: number, startWhen: boolean, duration = 1.6) {
   const [value, setValue] = useState(0);
-
   useEffect(() => {
     if (!startWhen) return;
     let startTime: number | null = null;
     let raf = 0;
-
-    const step = (timestamp: number) => {
-      if (startTime === null) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
+    const step = (ts: number) => {
+      if (startTime === null) startTime = ts;
+      const progress = Math.min((ts - startTime) / (duration * 1000), 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setValue(Math.floor(eased * end));
-      if (progress < 1) {
-        raf = requestAnimationFrame(step);
-      } else {
-        setValue(end);
-      }
+      if (progress < 1) { raf = requestAnimationFrame(step); }
+      else { setValue(end); }
     };
-
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
   }, [startWhen, end, duration]);
-
   return value;
 }
 
 function StatItem({ end, suffix, label, isInView }: Stat & { isInView: boolean }) {
   const count = useCountUp(end, isInView);
-
   return (
-    <div className="flex flex-col items-center justify-center px-4 py-8 text-center">
-      <span className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">
-        {count}
-        {suffix}
+    <div className="flex flex-col items-center justify-center gap-1 px-6 py-8 text-center">
+      <span className="text-3xl font-bold text-[#e8a064]">
+        {count}{suffix}
       </span>
-      <span className="mt-2 text-sm font-medium text-slate-400">{label}</span>
+      <span className="text-xs font-medium uppercase tracking-[0.14em] text-[#71717a]">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+// ── Feature card ──────────────────────────────────────────────────
+
+function FeatureCard({ feature }: { feature: Feature }) {
+  const Icon = feature.icon;
+  return (
+    <div className="group flex h-full flex-col rounded-2xl border border-[#262626] bg-[#141414] p-6 transition-all duration-200 hover:border-[rgba(232,160,100,0.25)] hover:bg-[#1c1c1e]">
+      <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-[#1c1c1e] text-[#71717a] transition-colors duration-200 group-hover:bg-[#2a1f14] group-hover:text-[#e8a064]">
+        <Icon className="h-5 w-5" strokeWidth={1.8} />
+      </div>
+      <h3 className="mb-2 text-base font-semibold text-[#d4d4d4] group-hover:text-[#f4f4f5] transition-colors">
+        {feature.title}
+      </h3>
+      <p className="text-sm leading-6 text-[#71717a]">{feature.description}</p>
     </div>
   );
 }
@@ -140,101 +145,73 @@ export default function WhyChooseUs() {
   const isStatsInView = useInView(statsRef, { once: true, amount: 0.4 });
 
   return (
-    <section className="relative overflow-hidden bg-[#050816] py-24 sm:py-32">
-      {/* Floating gradient background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <motion.div
-          aria-hidden
-          className="absolute -right-32 top-0 h-[26rem] w-[26rem] rounded-full bg-[#7C3AED]/20 blur-[120px]"
-          animate={shouldReduceMotion ? undefined : { x: [0, -30, 0], y: [0, 30, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          aria-hidden
-          className="absolute -left-24 bottom-0 h-[24rem] w-[24rem] rounded-full bg-[#2563EB]/20 blur-[120px]"
-          animate={shouldReduceMotion ? undefined : { x: [0, 30, 0], y: [0, -20, 0] }}
-          transition={{ duration: 17, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
+    <section className="bg-[#0f0f0f] py-24 sm:py-28">
+      {/* Horizontal rule */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+        <div className="mb-24 h-px w-full bg-gradient-to-r from-transparent via-[#262626] to-transparent" />
 
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
-        {/* Section header */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.4 }}
-          variants={headerVariants}
-          className="mx-auto mb-16 max-w-2xl text-center sm:mb-20"
-        >
-          <span className="mb-4 inline-block text-xs font-semibold uppercase tracking-[0.25em] text-[#00D4FF]">
-            Why Axivon
-          </span>
-          <h2 className="text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-            Why Choose{" "}
-            <span className="bg-gradient-to-r from-[#2563EB] via-[#7C3AED] to-[#00D4FF] bg-clip-text text-transparent">
-              Axivon Technologies
-            </span>
-          </h2>
-          <p className="mt-5 text-balance text-base leading-relaxed text-slate-400 sm:text-lg">
-            Axivon Technologies delivers professional website development, mobile app development, AI solutions, and custom software services with a strong focus on quality, innovation, performance, and long-term business growth.
-          </p>
-        </motion.div>
+        {/* Two-column layout: left heading, right features */}
+        <div className="grid grid-cols-1 gap-16 lg:grid-cols-[0.85fr_1.15fr]">
+          {/* Left: sticky header */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.4 }}
+            variants={headerVariants}
+            className="flex flex-col items-start"
+          >
+            <SectionHeader
+              overline="Why Axivon"
+              heading={
+                <>
+                  Built for businesses that
+                  {" "}
+                  <span className="text-gradient-amber">demand results.</span>
+                </>
+              }
+              body="We combine modern engineering with business clarity — so every product we ship is fast, usable, and built to grow."
+              align="left"
+              maxWidthClass="max-w-sm"
+            />
 
-        {/* Feature cards */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-          variants={gridVariants}
-          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
-        >
-          {FEATURES.map((feature) => {
-            const Icon = feature.icon;
-            return (
+            {/* Stats panel */}
+            <motion.div
+              ref={statsRef}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+              className="mt-12 w-full overflow-hidden rounded-2xl border border-[#262626] bg-[#141414]"
+            >
+              <div className="grid grid-cols-2 divide-x divide-y divide-[#262626]">
+                {STATS.map((stat) => (
+                  <StatItem key={stat.label} {...stat} isInView={isStatsInView} />
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Right: feature grid */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.08 }}
+            variants={gridVariants}
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+          >
+            {FEATURES.map((feature) => (
               <motion.div
                 key={feature.title}
                 variants={cardVariants}
-                whileHover={shouldReduceMotion ? undefined : { y: -6, scale: 1.015 }}
-                transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                className="group relative h-full"
+                whileHover={shouldReduceMotion ? undefined : { y: -3 }}
+                transition={{ duration: 0.2 }}
+                className="h-full"
               >
-                {/* Glow / gradient border layer */}
-                <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-[#2563EB] via-[#7C3AED] to-[#00D4FF] opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-70" />
-
-                {/* Card body */}
-                <div className="relative flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-xl transition-colors duration-500 group-hover:border-transparent">
-                  <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB]/20 via-[#7C3AED]/20 to-[#00D4FF]/20 ring-1 ring-white/10 transition-transform duration-500 group-hover:scale-110">
-                    <Icon className="h-7 w-7 text-[#00D4FF]" strokeWidth={1.75} />
-                  </div>
-
-                  <h3 className="mb-3 text-xl font-semibold text-white">
-                    {feature.title}
-                  </h3>
-
-                  <p className="text-sm leading-relaxed text-slate-400">
-                    {feature.description}
-                  </p>
-                </div>
+                <FeatureCard feature={feature} />
               </motion.div>
-            );
-          })}
-        </motion.div>
-
-        {/* Statistics panel */}
-        <motion.div
-          ref={statsRef}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={panelVariants}
-          className="relative mt-16 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl sm:mt-20"
-        >
-          <div className="grid grid-cols-2 divide-y divide-white/10 sm:grid-cols-4 sm:divide-y-0 sm:divide-x">
-            {STATS.map((stat) => (
-              <StatItem key={stat.label} {...stat} isInView={isStatsInView} />
             ))}
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
