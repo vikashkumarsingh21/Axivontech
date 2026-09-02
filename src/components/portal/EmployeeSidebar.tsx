@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { 
   LayoutDashboard, 
   CalendarCheck, 
@@ -28,7 +29,7 @@ export function EmployeeSidebar() {
   return (
     <div className="flex flex-col h-full bg-[#0a0a0a] border-r border-white/5 w-64 pt-6">
       <div className="px-6 pb-6 border-b border-white/5">
-        <h2 className="text-xl font-bold text-white tracking-tight">Axivon Portal</h2>
+        <Image src="/assets/logo/logo-full.png" alt="Axivon Technologies" width={160} height={40} className="h-8 w-auto brightness-0 invert" priority />
       </div>
 
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">

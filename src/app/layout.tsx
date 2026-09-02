@@ -21,60 +21,52 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  
-  
+  metadataBase: new URL("https://axivontech.in"),
   icons: {
-  icon: "/favicon.png",
-  shortcut: "/favicon.png",
-  apple: "/favicon.png",
-},
-
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
   title: {
-  default:
-    "Website Development & Mobile App Development Company | Axivon Technologies",
-  template: "%s | Axivon Technologies",
-},
-
+    default:
+      "Website Development & Mobile App Development Company | Axivon Technologies",
+    template: "%s | Axivon Technologies",
+  },
   description:
-"Axivon Technologies is a professional Website Development, Mobile App Development, AI Solutions, UI/UX Design, SEO Services and Custom Software Development Company helping startups and businesses across India build fast, secure and scalable digital products.",
-
+    "Axivon Technologies is a professional Website Development, Mobile App Development, AI Solutions, UI/UX Design, SEO Services and Custom Software Development Company helping startups and businesses across India build fast, secure and scalable digital products.",
   keywords: [
-  "Website Development Company",
-  "Web Development Company",
-  "Website Design Company",
-  "Website Designer",
-  "Website Developer",
-  "Mobile App Development Company",
-  "Android App Development",
-  "iOS App Development",
-  "AI Development Company",
-  "Software Development Company",
-  "Custom Software Development",
-  "SEO Services",
-  "Digital Marketing",
-  "Cloud Solutions",
-  "UI UX Design",
-  "React Development",
-  "Next.js Development",
-  "Ecommerce Website Development",
-  "Startup Website Development",
-  "Axivon Technologies",
-],
-
+    "Website Development Company",
+    "Web Development Company",
+    "Website Design Company",
+    "Website Designer",
+    "Website Developer",
+    "Mobile App Development Company",
+    "Android App Development",
+    "iOS App Development",
+    "AI Development Company",
+    "Software Development Company",
+    "Custom Software Development",
+    "SEO Services",
+    "Digital Marketing",
+    "Cloud Solutions",
+    "UI UX Design",
+    "React Development",
+    "Next.js Development",
+    "Ecommerce Website Development",
+    "Startup Website Development",
+    "Axivon Technologies",
+  ],
   authors: [
     {
       name: "Vikas Kumar",
     },
   ],
-
   creator: "Axivon Technologies",
-
   publisher: "Axivon Technologies",
-
   alternates: {
     canonical: "https://axivontech.in",
   },
-
   openGraph: {
     title: "Axivon Technologies",
     description:
@@ -83,15 +75,22 @@ export const metadata: Metadata = {
     siteName: "Axivon Technologies",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/assets/logo/logo-full.png",
+        width: 1200,
+        height: 630,
+        alt: "Axivon Technologies",
+      },
+    ],
   },
-
   twitter: {
     card: "summary_large_image",
     title: "Axivon Technologies",
     description:
       "Future-Ready Technology Solutions for Modern Businesses.",
+    images: ["/assets/logo/logo-full.png"],
   },
-
   robots: {
     index: true,
     follow: true,

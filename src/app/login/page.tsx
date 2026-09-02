@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import Image from "next/image";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,7 +45,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-4">
+      <Link href="/">
+        <Image src="/assets/logo/logo-full.png" alt="Axivon Technologies" width={220} height={60} className="mb-8 h-12 w-auto brightness-0 invert" />
+      </Link>
       <div className="w-full max-w-md bg-[#111111] border border-white/10 rounded-2xl p-8 shadow-2xl">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>

@@ -79,7 +79,7 @@ export default function Navbar() {
           aria-label="Axivon Technologies Home"
         >
           <Image
-            src="/images/logo/logo.png"
+            src="/assets/logo/logo-full.png"
             alt="Axivon Technologies Logo"
             width={220}
             height={60}

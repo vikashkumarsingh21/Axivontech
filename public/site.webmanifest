@@ -1,0 +1,20 @@
+{
+  "name": "Axivon Technologies",
+  "short_name": "Axivon",
+  "icons": [
+    {
+      "src": "/assets/logo/logo-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/logo/logo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#183B2D",
+  "background_color": "#0a0a0a",
+  "display": "standalone",
+  "start_url": "/"
+}

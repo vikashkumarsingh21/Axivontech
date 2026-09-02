@@ -73,7 +73,7 @@ export default function Footer() {
           <motion.div variants={itemVariants} className="sm:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-block">
               <Image
-                src="/images/logo/logo.png"
+                src="/assets/logo/logo-full.png"
                 alt="Axivon Technologies Logo"
                 width={220}
                 height={60}
