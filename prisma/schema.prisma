@@ -16,20 +16,39 @@ model Organization {
 }
 
 model User {
-  id             String        @id @default(cuid())
-  email          String        @unique
-  name           String
-  passwordHash   String
-  organizationId String?
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  sessions       Session[]
-  auditLogs      AuditLog[]
+  id               String        @id @default(cuid())
+  email            String        @unique
+  name             String
+  passwordHash     String
+  phone            String?
+  avatarUrl        String?
+  employeeId       String?       @unique
+  department       String?
+  designation      String?
+  address          String?
+  emergencyContact String?
+  status           String        @default("ACTIVE")
+  joiningDate      DateTime      @default(now())
+
+  organizationId   String?
+  organization     Organization? @relation(fields: [organizationId], references: [id])
+  sessions         Session[]
+  auditLogs        AuditLog[]
 
   // Roles and Permissions
-  userRoles      UserRole[]
+  userRoles        UserRole[]
   
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  // Phase 2: Employee Portal Relations
+  attendances      Attendance[]
+  tasks            Task[]
+  taskComments     TaskComment[]
+  workReports      WorkReport[]
+  leaveRequests    LeaveRequest[]
+  notifications    Notification[]
+  uploadedDocs     Document[]     @relation("DocumentUploader")
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 }
 
 model Role {
@@ -91,4 +110,152 @@ model AuditLog {
   ipAddress String?
   userAgent String?
   createdAt DateTime @default(now())
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 2: EMPLOYEE PORTAL MODELS
+// -----------------------------------------------------------------------------
+
+model Attendance {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date         DateTime  @db.Date
+  checkInAt    DateTime
+  checkOutAt   DateTime?
+  totalMinutes Int?
+  status       String    @default("PRESENT") // PRESENT, HALF_DAY, LATE
+  notes        String?
+  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([userId, date]) // Prevent duplicate attendance for the same day
+  @@index([userId])
+  @@index([date])
+}
+
+model Task {
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  projectId    String?
+  priority     String    @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  status       String    @default("TODO")   // TODO, IN_PROGRESS, BLOCKED, COMPLETED
+  dueDate      DateTime?
+  assignedDate DateTime  @default(now())
+  
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  comments     TaskComment[]
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  content   String
+  
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  
+  @@index([taskId])
+  @@index([userId])
+}
+
+model WorkReport {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date            DateTime @db.Date
+  
+  summary         String
+  tasksCompleted  String?
+  workPerformed   String
+  challenges      String?
+  nextSteps       String?
+  hoursWorked     Float?
+  
+  status          String   @default("SUBMITTED") // SUBMITTED, REVIEWED
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+}
+
+model LeaveRequest {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  leaveType    String   // SICK, CASUAL, ANNUAL, UNPAID
+  startDate    DateTime @db.Date
+  endDate      DateTime @db.Date
+  reason       String
+  
+  status       String   @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type      String   // TASK_ASSIGNED, LEAVE_APPROVED, ANNOUNCEMENT, SYSTEM
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?  // Optional URL to redirect to
+  
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  priority    String   @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  publishedAt DateTime @default(now())
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([publishedAt])
+}
+
+model Document {
+  id           String   @id @default(cuid())
+  title        String
+  category     String   // COMPANY_POLICY, GUIDELINE, FORM
+  fileUrl      String
+  
+  uploadedById String
+  uploadedBy   User     @relation("DocumentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([category])
 }
