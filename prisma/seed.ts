@@ -248,6 +248,30 @@ async function main() {
   console.log(`  Password is hash:  ${isHash ? "YES ✅" : "NO ❌"}`);
 
   console.log("\n🎉 Seed completed successfully!\n");
+
+  // Admin Seed
+  const adminPasswordHash = await bcrypt.hash(process.env.ADMIN_SEED_PASSWORD || 'AxivonAdmin@2024', 10);
+  const adminRole = await prisma.role.findUnique({ where: { name: 'ADMIN' } });
+  const adminUser = await prisma.user.upsert({
+    where: { email: 'admin@axivon.dev' },
+    update: {},
+    create: {
+      email: 'admin@axivon.dev',
+      name: 'Admin User',
+      passwordHash: adminPasswordHash,
+      department: 'Management',
+      designation: 'Administrator',
+      status: 'ACTIVE',
+      organizationId: 'axivon-org-001'
+    }
+  });
+  
+  await prisma.userRole.upsert({
+    where: { userId_roleId: { userId: adminUser.id, roleId: adminRole!.id } },
+    update: {},
+    create: { userId: adminUser.id, roleId: adminRole!.id }
+  });
+  console.log('Seeded Admin account: admin@axivon.dev');
 }
 
 main()

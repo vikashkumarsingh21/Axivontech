@@ -15,12 +15,13 @@ export async function middleware(req: NextRequest) {
   
   // Protect /admin routes (Phase 3 placeholder)
   const isAdminRoute = pathname.startsWith("/admin");
+  const isAdminApiRoute = pathname.startsWith("/api/v1/admin");
 
-  if (isEmployeeRoute || isEmployeeApiRoute || isAdminRoute) {
+  if (isEmployeeRoute || isEmployeeApiRoute || isAdminRoute || isAdminApiRoute) {
     const sessionCookie = req.cookies.get("axivon_session")?.value;
 
     if (!sessionCookie) {
-      if (isEmployeeApiRoute) {
+      if (isEmployeeApiRoute || isAdminApiRoute) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
       return NextResponse.redirect(new URL("/login", req.url));
@@ -35,7 +36,10 @@ export async function middleware(req: NextRequest) {
       // Role based basic checks
       const role = payload.role as string;
       
-      if (isAdminRoute && role !== "ADMIN" && role !== "FOUNDER") {
+      if ((isAdminRoute || isAdminApiRoute) && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
+        if (isAdminApiRoute) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
         return NextResponse.redirect(new URL("/employee/dashboard", req.url));
       }
 
@@ -51,7 +55,7 @@ export async function middleware(req: NextRequest) {
       });
     } catch (error) {
       // Invalid token
-      const response = isEmployeeApiRoute
+      const response = (isEmployeeApiRoute || isAdminApiRoute)
         ? NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         : NextResponse.redirect(new URL("/login", req.url));
       
@@ -68,5 +72,6 @@ export const config = {
     "/employee/:path*",
     "/api/v1/employee/:path*",
     "/admin/:path*",
+    "/api/v1/admin/:path*",
   ],
 };
