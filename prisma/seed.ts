@@ -105,6 +105,27 @@ async function main() {
     // Admin
     { name: "admin:access", description: "Access admin panel" },
     { name: "admin:settings", description: "Manage platform settings" },
+
+    // Phase 4 Executive Permissions
+    { name: "executive.dashboard.view", description: "View executive dashboard" },
+    { name: "executive.company.view", description: "View company overview" },
+    { name: "executive.analytics.view", description: "View executive analytics" },
+    { name: "people.view", description: "View executive people directory" },
+    { name: "people.sensitive.view", description: "View sensitive employee HR info" },
+    { name: "people.manage", description: "Executive management of people" },
+    { name: "people.role.manage", description: "Manage high-privilege user roles" },
+    { name: "attendance.company.view", description: "View company-wide attendance" },
+    { name: "leave.company.view", description: "View company-wide leave" },
+    { name: "work_reports.company.view", description: "View company-wide work reports" },
+    { name: "tasks.company.view", description: "View company-wide tasks" },
+    { name: "projects.company.view", description: "View company-wide projects" },
+    { name: "governance.role_changes.approve", description: "Approve high-privilege role changes" },
+    { name: "governance.settings.approve", description: "Approve organizational setting changes" },
+    { name: "governance.audit.view", description: "View governance audit log" },
+    { name: "governance.security.view", description: "View governance security events" },
+    { name: "reports.executive.view", description: "View executive reports" },
+    { name: "reports.executive.export", description: "Export executive reports" },
+    { name: "reports.sensitive.export", description: "Export sensitive executive reports" },
   ];
 
   const permissions: Record<string, string> = {};
@@ -156,26 +177,27 @@ async function main() {
     EMPLOYEE: employeePermissions,
   };
 
-  let totalRolePermissions = 0;
+  const rolePermissionsToCreate: { roleId: string; permissionId: string }[] = [];
   for (const [roleName, permNames] of Object.entries(rolePermissionMap)) {
     const roleId = roles[roleName];
     for (const permName of permNames) {
       const permissionId = permissions[permName];
-      if (!roleId || !permissionId) continue;
-
-      // Upsert via raw findFirst + create to handle composite PK
-      const existing = await prisma.rolePermission.findFirst({
-        where: { roleId, permissionId },
-      });
-      if (!existing) {
-        await prisma.rolePermission.create({
-          data: { roleId, permissionId },
-        });
+      if (roleId && permissionId) {
+        rolePermissionsToCreate.push({ roleId, permissionId });
       }
-      totalRolePermissions++;
     }
   }
-  console.log(`✅ RolePermission mappings: ${totalRolePermissions} verified`);
+
+  // Insert in small chunks to prevent pooler timeouts
+  const CHUNK_SIZE = 20;
+  for (let i = 0; i < rolePermissionsToCreate.length; i += CHUNK_SIZE) {
+    const chunk = rolePermissionsToCreate.slice(i, i + CHUNK_SIZE);
+    await prisma.rolePermission.createMany({
+      data: chunk,
+      skipDuplicates: true,
+    });
+  }
+  console.log(`✅ RolePermission mappings: ${rolePermissionsToCreate.length} verified`);
 
   // ─── 5. Development Test Employee ──────────────────────────────────
   //
@@ -272,6 +294,114 @@ async function main() {
     create: { userId: adminUser.id, roleId: adminRole!.id }
   });
   console.log('Seeded Admin account: admin@axivon.dev');
+
+  // ─── 7. Executive Accounts (Founder & Co-Founders) ─────────────────
+  const founderRole = await prisma.role.findUnique({ where: { name: "FOUNDER" } });
+  const coFounderRole = await prisma.role.findUnique({ where: { name: "CO_FOUNDER" } });
+
+  // Seed Founder Account
+  const founderPasswordHash = await bcrypt.hash(process.env.FOUNDER_SEED_PASSWORD || "AxivonFounder@2024", 10);
+  const founderUser = await prisma.user.upsert({
+    where: { email: "founder@axivon.dev" },
+    update: {},
+    create: {
+      email: "founder@axivon.dev",
+      name: "Platform Founder",
+      passwordHash: founderPasswordHash,
+      department: "Executive",
+      designation: "Founder & CEO",
+      status: "ACTIVE",
+      organization: { connect: { id: "axivon-org-001" } },
+    },
+  });
+
+  if (founderRole) {
+    await prisma.userRole.upsert({
+      where: { userId_roleId: { userId: founderUser.id, roleId: founderRole.id } },
+      update: {},
+      create: { userId: founderUser.id, roleId: founderRole.id },
+    });
+  }
+
+  await prisma.executiveProfile.upsert({
+    where: { userId: founderUser.id },
+    update: {},
+    create: {
+      userId: founderUser.id,
+      responsibilityProfile: "FULL",
+    },
+  });
+  console.log('✅ Seeded Founder account: founder@axivon.dev');
+
+  // Seed Tech Co-Founder Account
+  const coFounderPasswordHash = await bcrypt.hash(process.env.COFOUNDER_SEED_PASSWORD || "AxivonCoFounder@2024", 10);
+  const techCoFounder = await prisma.user.upsert({
+    where: { email: "tech.cofounder@axivon.dev" },
+    update: {},
+    create: {
+      email: "tech.cofounder@axivon.dev",
+      name: "Tech Co-Founder",
+      passwordHash: coFounderPasswordHash,
+      department: "Engineering",
+      designation: "Co-Founder & CTO",
+      status: "ACTIVE",
+      organization: { connect: { id: "axivon-org-001" } },
+    },
+  });
+
+  if (coFounderRole) {
+    await prisma.userRole.upsert({
+      where: { userId_roleId: { userId: techCoFounder.id, roleId: coFounderRole.id } },
+      update: {},
+      create: { userId: techCoFounder.id, roleId: coFounderRole.id },
+    });
+  }
+
+  await prisma.executiveProfile.upsert({
+    where: { userId: techCoFounder.id },
+    update: {},
+    create: {
+      userId: techCoFounder.id,
+      responsibilityProfile: "TECHNOLOGY",
+      departmentScope: "Engineering,IT",
+    },
+  });
+  console.log('✅ Seeded Tech Co-Founder account: tech.cofounder@axivon.dev');
+
+  // Seed Ops Co-Founder Account
+  const opsCoFounder = await prisma.user.upsert({
+    where: { email: "ops.cofounder@axivon.dev" },
+    update: {},
+    create: {
+      email: "ops.cofounder@axivon.dev",
+      name: "Ops Co-Founder",
+      passwordHash: coFounderPasswordHash,
+      department: "Operations",
+      designation: "Co-Founder & COO",
+      status: "ACTIVE",
+      organization: { connect: { id: "axivon-org-001" } },
+    },
+  });
+
+  if (coFounderRole) {
+    await prisma.userRole.upsert({
+      where: { userId_roleId: { userId: opsCoFounder.id, roleId: coFounderRole.id } },
+      update: {},
+      create: { userId: opsCoFounder.id, roleId: coFounderRole.id },
+    });
+  }
+
+  await prisma.executiveProfile.upsert({
+    where: { userId: opsCoFounder.id },
+    update: {},
+    create: {
+      userId: opsCoFounder.id,
+      responsibilityProfile: "OPERATIONS",
+      departmentScope: "Operations,HR",
+    },
+  });
+  console.log('✅ Seeded Ops Co-Founder account: ops.cofounder@axivon.dev');
+
 }
 
 main()

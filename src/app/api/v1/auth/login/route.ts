@@ -35,14 +35,16 @@ export async function POST(req: NextRequest) {
       throw new ApiError(401, "Invalid email or password");
     }
 
-    // Identify primary role for session (defaults to "USER" if none found)
-    const role = user.userRoles.length > 0 ? user.userRoles[0].role.name : "USER";
+    // Identify primary role for session based on role hierarchy
+    const roleHierarchy = ["FOUNDER", "CO_FOUNDER", "ADMIN", "EMPLOYEE"];
+    const userRoleNames = user.userRoles.map((ur) => ur.role.name);
+    const role = roleHierarchy.find((r) => userRoleNames.includes(r)) || userRoleNames[0] || "EMPLOYEE";
 
     // Generate Session
     const sessionToken = await signSession({
       userId: user.id,
       role: role,
-      sessionId: crypto.randomUUID(), // Optional: can be stored in DB to track active sessions
+      sessionId: crypto.randomUUID(),
     });
 
     // Create session record in database
@@ -58,14 +60,15 @@ export async function POST(req: NextRequest) {
     await db.auditLog.create({
       data: {
         userId: user.id,
-        action: "employee.login",
+        action: "user.login",
         resource: "Auth",
         ipAddress: req.headers.get("x-forwarded-for") || "unknown",
         userAgent: req.headers.get("user-agent"),
       },
     });
 
-    // Set cookie
+    // Set cookie (only set secure: true when running over HTTPS)
+    const isHttps = req.nextUrl.protocol === "https:";
     const response = NextResponse.json({
       user: {
         id: user.id,
@@ -79,7 +82,7 @@ export async function POST(req: NextRequest) {
       name: "axivon_session",
       value: sessionToken,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production" && isHttps,
       sameSite: "lax",
       maxAge: 60 * 60 * 24, // 1 day
       path: "/",

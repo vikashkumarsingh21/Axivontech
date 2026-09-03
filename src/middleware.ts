@@ -13,15 +13,19 @@ export async function middleware(req: NextRequest) {
   const isEmployeeRoute = pathname.startsWith("/employee");
   const isEmployeeApiRoute = pathname.startsWith("/api/v1/employee");
   
-  // Protect /admin routes (Phase 3 placeholder)
+  // Protect /admin routes
   const isAdminRoute = pathname.startsWith("/admin");
   const isAdminApiRoute = pathname.startsWith("/api/v1/admin");
 
-  if (isEmployeeRoute || isEmployeeApiRoute || isAdminRoute || isAdminApiRoute) {
+  // Protect /executive routes (Phase 4)
+  const isExecutiveRoute = pathname.startsWith("/executive");
+  const isExecutiveApiRoute = pathname.startsWith("/api/v1/executive");
+
+  if (isEmployeeRoute || isEmployeeApiRoute || isAdminRoute || isAdminApiRoute || isExecutiveRoute || isExecutiveApiRoute) {
     const sessionCookie = req.cookies.get("axivon_session")?.value;
 
     if (!sessionCookie) {
-      if (isEmployeeApiRoute || isAdminApiRoute) {
+      if (isEmployeeApiRoute || isAdminApiRoute || isExecutiveApiRoute) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
       return NextResponse.redirect(new URL("/login", req.url));
@@ -43,6 +47,13 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/employee/dashboard", req.url));
       }
 
+      if ((isExecutiveRoute || isExecutiveApiRoute) && role !== "FOUNDER" && role !== "CO_FOUNDER") {
+        if (isExecutiveApiRoute) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+        return NextResponse.redirect(new URL("/employee/dashboard", req.url));
+      }
+
       // Add user info to headers for downstream consumption
       const requestHeaders = new Headers(req.headers);
       requestHeaders.set("x-user-id", payload.userId as string);
@@ -55,7 +66,7 @@ export async function middleware(req: NextRequest) {
       });
     } catch (error) {
       // Invalid token
-      const response = (isEmployeeApiRoute || isAdminApiRoute)
+      const response = (isEmployeeApiRoute || isAdminApiRoute || isExecutiveApiRoute)
         ? NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         : NextResponse.redirect(new URL("/login", req.url));
       
@@ -73,5 +84,7 @@ export const config = {
     "/api/v1/employee/:path*",
     "/admin/:path*",
     "/api/v1/admin/:path*",
+    "/executive/:path*",
+    "/api/v1/executive/:path*",
   ],
 };

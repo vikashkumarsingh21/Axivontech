@@ -31,8 +31,11 @@ export default function LoginPage() {
         throw new Error(data.error || "Login failed");
       }
 
-      // Success, route based on role
-      if (data.user.role === "ADMIN" || data.user.role === "FOUNDER") {
+      // Success, route based on user role
+      const userRole = data.user.role;
+      if (userRole === "FOUNDER" || userRole === "CO_FOUNDER") {
+        router.push("/executive/dashboard");
+      } else if (userRole === "ADMIN") {
         router.push("/admin/dashboard");
       } else {
         router.push("/employee/dashboard");

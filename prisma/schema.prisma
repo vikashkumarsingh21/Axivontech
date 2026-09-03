@@ -48,6 +48,17 @@ model User {
   uploadedDocs     Document[]     @relation("DocumentUploader")
   projectMembers   ProjectMember[]
 
+  // Phase 4: Executive Relations
+  executiveProfile   ExecutiveProfile?
+  requestedApprovals ApprovalRequest[] @relation("ApprovalRequester")
+  decidedApprovals   ApprovalRequest[] @relation("ApprovalDecider")
+  securityEvents     SecurityEvent[]
+
+  // Phase 6: Shared System Relations
+  reminders          Reminder[]
+  createdAutomations AutomationWorkflow[]
+  userPreference     UserPreference?
+
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 }
@@ -288,4 +299,179 @@ model ProjectMember {
 
   @@id([projectId, userId])
 }
+
+// -----------------------------------------------------------------------------
+// PHASE 4: EXECUTIVE & GOVERNANCE MODELS
+// -----------------------------------------------------------------------------
+
+model ExecutiveProfile {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  responsibilityProfile String   // TECHNOLOGY, OPERATIONS, BUSINESS_GROWTH, FULL
+  departmentScope       String?  // Optional JSON array or comma-separated string
+  projectScope          String?  // Optional JSON array or comma-separated string
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model ApprovalRequest {
+  id            String    @id @default(cuid())
+  requestType   String    // HIGH_PRIVILEGE_ROLE_ASSIGNMENT, SENSITIVE_PERMISSION_CHANGE, EMPLOYEE_STATUS_EXCEPTION, HIGH_IMPACT_PROJECT_CHANGE, SENSITIVE_EXPORT, ORGANIZATIONAL_SETTING_CHANGE
+  requestedById String
+  requestedBy   User      @relation("ApprovalRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+  
+  decidedById   String?
+  decidedBy     User?     @relation("ApprovalDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  
+  status        String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  reason        String?
+  metadata      Json?
+  
+  createdAt     DateTime  @default(now())
+  decidedAt     DateTime?
+
+  @@index([status])
+  @@index([requestedById])
+}
+
+model SecurityEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventType String   // LOGIN_SUCCESS, LOGIN_FAILED, ROLE_CHANGED, PERMISSION_CHANGED, SENSITIVE_EXPORT, SUSPICIOUS_ACCESS
+  ipAddress String?
+  userAgent String?
+  details   Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+model OrganizationSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  updatedById String?
+
+  updatedAt   DateTime @updatedAt
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 6: SHARED ADVANCED INFRASTRUCTURE MODELS
+// -----------------------------------------------------------------------------
+
+model EmailLog {
+  id          String   @id @default(cuid())
+  toEmail     String
+  templateKey String
+  subject     String
+  status      String   @default("SENT") // SENT, FAILED
+  error       String?
+  metadata    Json?
+
+  sentAt      DateTime @default(now())
+
+  @@index([toEmail])
+  @@index([templateKey])
+}
+
+model EmailTemplate {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  subject     String
+  htmlBody    String
+  textBody    String
+  variables   Json?    // Array of allowed variable names
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Reminder {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          String    @default("CUSTOM") // TASK, LEAVE, APPROVAL, DOCUMENT, CUSTOM
+  title         String
+  description   String?
+  dueAt         DateTime
+  status        String    @default("PENDING") // PENDING, COMPLETED
+  relatedEntity Json?
+  completedAt   DateTime?
+
+  createdAt     DateTime  @default(now())
+
+  @@index([userId])
+  @@index([dueAt])
+  @@index([status])
+}
+
+model BackgroundJob {
+  id          String    @id @default(cuid())
+  jobType     String    // NOTIFICATION_SEND, EMAIL_RETRY, REMINDER_DELIVERY, ANNOUNCEMENT_SCHEDULE, DOCUMENT_EXPIRY
+  status      String    @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  payload     Json?
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3)
+  scheduledAt DateTime  @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+  error       String?
+
+  createdAt   DateTime  @default(now())
+
+  @@index([status])
+  @@index([jobType])
+}
+
+model AutomationWorkflow {
+  id          String    @id @default(cuid())
+  name        String
+  triggerType String    // TASK_OVERDUE, LEAVE_SUBMITTED, DOCUMENT_EXPIRING
+  conditions  Json?
+  actions     Json?
+  isActive    Boolean   @default(true)
+  createdById String?
+  createdBy   User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  executions  AutomationExecution[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model AutomationExecution {
+  id           String             @id @default(cuid())
+  automationId String
+  automation   AutomationWorkflow @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  triggerEvent String
+  status       String             @default("SUCCESS") // SUCCESS, FAILED
+  dedupKey     String?
+  result       Json?
+
+  executedAt   DateTime           @default(now())
+
+  @@index([automationId])
+  @@index([dedupKey])
+}
+
+model UserPreference {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailNotifications Boolean  @default(true)
+  inAppNotifications Boolean  @default(true)
+  timezone           String   @default("UTC")
+  theme              String   @default("dark")
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+
 
