@@ -191,22 +191,22 @@ async function main() {
     where: { email: testEmployeeEmail },
     update: {
       name: "Dev Test Employee",
-      organizationId: org.id,
       status: "ACTIVE",
       department: "Engineering",
       designation: "Software Developer",
       employeeId: "EMP-DEV-001",
+      organization: { connect: { id: org.id } },
     },
     create: {
       email: testEmployeeEmail,
       name: "Dev Test Employee",
       passwordHash: hashedPassword,
-      organizationId: org.id,
       status: "ACTIVE",
       department: "Engineering",
       designation: "Software Developer",
       employeeId: "EMP-DEV-001",
       joiningDate: new Date("2024-01-15"),
+      organization: { connect: { id: org.id } },
     },
   });
   console.log(`✅ Test Employee: "${testEmployee.name}" <${testEmployee.email}> (${testEmployee.id})`);
@@ -262,7 +262,7 @@ async function main() {
       department: 'Management',
       designation: 'Administrator',
       status: 'ACTIVE',
-      organizationId: 'axivon-org-001'
+      organization: { connect: { id: 'axivon-org-001' } }
     }
   });
   
