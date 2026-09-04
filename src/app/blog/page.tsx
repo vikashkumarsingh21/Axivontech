@@ -50,6 +50,10 @@ export const metadata: Metadata = {
     description:
       "Technology insights, AI innovations, development guides, and startup knowledge from Axivon Technologies.",
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function BlogPage() {

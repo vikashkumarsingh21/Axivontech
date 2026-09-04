@@ -4,11 +4,10 @@ import {
   FaLinkedin,
   FaInstagram,
   FaFacebook,
-  FaYoutube,
   FaWhatsapp,
 } from "react-icons/fa";
 
-import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { Mail, Globe } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,6 +23,7 @@ const COMPANY_LINKS: FooterLink[] = [
   { label: "Portfolio", href: "/portfolio" },
   { label: "Careers", href: "/careers" },
   { label: "Contact", href: "/contact" },
+  { label: "Team Login", href: "/login" },
 ];
 
 const LEGAL_LINKS: FooterLink[] = [
@@ -41,10 +41,21 @@ const SERVICE_LINKS: FooterLink[] = [
 ];
 
 const SOCIAL_LINKS = [
-  { label: "LinkedIn", href: "https://linkedin.com", icon: FaLinkedin },
-  { label: "Instagram", href: "https://instagram.com", icon: FaInstagram },
-  { label: "Facebook", href: "https://facebook.com", icon: FaFacebook },
-  { label: "YouTube", href: "https://youtube.com", icon: FaYoutube },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/company/axivon-technologies",
+    icon: FaLinkedin,
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/axivontechnology/",
+    icon: FaInstagram,
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/profile.php?id=100088604305929",
+    icon: FaFacebook,
+  },
 ];
 
 const containerVariants: Variants = {
@@ -58,7 +69,6 @@ const itemVariants: Variants = {
 };
 
 export default function Footer() {
-  const shouldReduceMotion = useReducedMotion();
 
   return (
     <footer className="border-t border-[#262626] bg-[#0c0c0d] py-16 text-[#a1a1aa]">

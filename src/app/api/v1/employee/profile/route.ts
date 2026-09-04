@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getEmployeeProfile, updateEmployeeProfile } from "@/lib/services/profile.service";
+import { validateActiveUser } from '@/lib/auth/permissions';
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { verifySession } from "@/lib/auth/session";
 

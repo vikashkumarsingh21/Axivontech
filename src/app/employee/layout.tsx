@@ -1,5 +1,19 @@
+import type { Metadata } from "next";
 import { EmployeeSidebar } from "@/components/portal/EmployeeSidebar";
 import { EmployeeNavbar } from "@/components/portal/EmployeeNavbar";
+
+export const metadata: Metadata = {
+  title: "Employee Portal",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+};
 
 export default function EmployeeLayout({
   children,

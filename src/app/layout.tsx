@@ -7,8 +7,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import OrganizationSchema from "@/components/seo/OrganizationSchema";
 import LocalBusinessSchema from "@/components/seo/LocalBusinessSchema";
+import WebSiteSchema from "@/components/seo/WebSiteSchema";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import ChatWidget from "@/components/chatbot/ChatWidget";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,82 +22,67 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import { SITE_URL, SITE_NAME, DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE } from "@/lib/seo/config";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://axivontech.in"),
+  metadataBase: new URL(SITE_URL),
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
-  manifest: "/site.webmanifest",
+  manifest: "/manifest.json",
   title: {
-    default:
-      "Website Development & Mobile App Development Company | Axivon Technologies",
-    template: "%s | Axivon Technologies",
+    default: DEFAULT_TITLE,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Axivon Technologies is a professional Website Development, Mobile App Development, AI Solutions, UI/UX Design, SEO Services and Custom Software Development Company helping startups and businesses across India build fast, secure and scalable digital products.",
+  description: DEFAULT_DESCRIPTION,
   keywords: [
-    "Website Development Company",
     "Web Development Company",
-    "Website Design Company",
-    "Website Designer",
-    "Website Developer",
-    "Mobile App Development Company",
-    "Android App Development",
-    "iOS App Development",
-    "AI Development Company",
-    "Software Development Company",
+    "Mobile App Development",
+    "AI Solutions",
     "Custom Software Development",
-    "SEO Services",
-    "Digital Marketing",
-    "Cloud Solutions",
     "UI UX Design",
-    "React Development",
-    "Next.js Development",
-    "Ecommerce Website Development",
-    "Startup Website Development",
-    "Axivon Technologies",
+    SITE_NAME,
   ],
   authors: [
     {
-      name: "Vikas Kumar",
+      name: "Vikash Kumar",
     },
   ],
-  creator: "Axivon Technologies",
-  publisher: "Axivon Technologies",
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
   alternates: {
-    canonical: "https://axivontech.in",
+    canonical: SITE_URL,
   },
   openGraph: {
-    title: "Axivon Technologies",
-    description:
-      "Future-Ready Technology Solutions for Modern Businesses.",
-    url: "https://axivontech.in",
-    siteName: "Axivon Technologies",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "/assets/logo/logo-full.png",
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Axivon Technologies",
+        alt: SITE_NAME,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Axivon Technologies",
-    description:
-      "Future-Ready Technology Solutions for Modern Businesses.",
-    images: ["/assets/logo/logo-full.png"],
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE],
   },
   robots: {
     index: true,
     follow: true,
   },
 };
+
 
 export default function RootLayout({
   children,
@@ -111,6 +98,7 @@ export default function RootLayout({
 
   <OrganizationSchema />
   <LocalBusinessSchema />
+  <WebSiteSchema />
   <Navbar />
 
   <main className="flex-1">

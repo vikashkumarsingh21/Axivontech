@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { validateActiveUser } from '@/lib/auth/permissions';
 import { handleApiError, ApiError } from "@/lib/api-error";
 
 export async function GET(req: NextRequest) {

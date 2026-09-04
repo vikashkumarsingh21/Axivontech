@@ -15,7 +15,7 @@ const updateEmployeeSchema = z.object({
   phone: z.string().optional().nullable(),
   status: z.enum(["ACTIVE", "INACTIVE", "ARCHIVED"]).optional(),
   requiredDailyHours: z
-    .number({ invalid_type_error: "Required daily hours must be a number" })
+    .number({ message: "Required daily hours must be a number" })
     .positive("Required daily hours must be greater than 0")
     .max(24, "Required daily hours cannot exceed 24")
     .optional()

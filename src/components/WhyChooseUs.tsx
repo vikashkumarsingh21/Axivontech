@@ -12,6 +12,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { SectionHeader } from "@/components/ui";
+import Image from "next/image";
 
 interface Feature {
   icon: LucideIcon;
@@ -187,6 +188,28 @@ export default function WhyChooseUs() {
                 {STATS.map((stat) => (
                   <StatItem key={stat.label} {...stat} isInView={isStatsInView} />
                 ))}
+              </div>
+            </motion.div>
+
+            {/* Authentic Engineering Team Visual */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 }}
+              className="relative mt-6 aspect-[16/10] w-full overflow-hidden rounded-2xl border border-[#262626] bg-[#141414]"
+            >
+              <Image
+                src="/assets/images/agency/team-collaboration.jpg"
+                alt="Axivon Technologies software engineering and architecture team"
+                fill
+                sizes="(max-width: 1024px) 100vw, 450px"
+                className="object-cover object-center opacity-80 transition-opacity duration-300 hover:opacity-95"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-lg bg-[#0f0f0f]/80 px-3 py-2 text-[11px] font-medium text-[#a1a1aa] backdrop-blur-md">
+                <span>Human-Led Digital Craft</span>
+                <span className="text-[#e8a064]">Dedicated Squads</span>
               </div>
             </motion.div>
           </motion.div>

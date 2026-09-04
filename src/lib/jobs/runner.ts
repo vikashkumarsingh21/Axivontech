@@ -1,12 +1,14 @@
 import { db } from "@/lib/db";
 import { cleanupInactiveUsers } from "./cleanup-inactive-users";
 
+import { Prisma } from "@prisma/client";
+
 export class JobRunner {
   static async enqueue(jobType: string, payload?: unknown, scheduledAt?: Date) {
     return db.backgroundJob.create({
       data: {
         jobType,
-        payload: (payload as Record<string, unknown>) || null,
+        payload: (payload as Prisma.InputJsonValue) ?? Prisma.JsonNull,
         scheduledAt: scheduledAt || new Date(),
         status: "PENDING",
       },

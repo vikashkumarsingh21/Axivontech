@@ -69,7 +69,7 @@ export const servicesData: ServiceData[] = [
     icon: "Globe",
     metaTitle: "Website Development Company | Custom Web Development Services | Axivon Technologies",
     metaDescription:
-      "Axivon Technologies delivers high-performance web development — from marketing sites to enterprise SaaS platforms. Next.js, React, TypeScript. Looking for a professional Website Development Company? Axivon Technologies builds fast, SEO-friendly, secure and scalable business websites using Next.js, React and modern technologies. Contact us today.",
+      "Axivon Technologies builds fast, secure, and SEO-friendly websites and web applications using Next.js, React, and TypeScript. Get a free consultation today.",
     benefits: [
       {
         title: "Blazing-Fast Performance",

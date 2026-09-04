@@ -54,6 +54,10 @@ export const metadata: Metadata = {
     description:
       "Explore exciting opportunities and build the future with Axivon Technologies.",
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function CareersPage() {

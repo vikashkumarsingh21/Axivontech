@@ -6,21 +6,18 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-      },
-
-      {
-        userAgent: "Googlebot",
-        allow: "/",
-      },
-
-      {
-        userAgent: "Bingbot",
-        allow: "/",
+        disallow: [
+          "/api/",
+          "/admin/",
+          "/employee/",
+          "/executive/",
+          "/login",
+          "/preferences",
+          "/reminders",
+        ],
       },
     ],
-
     sitemap: "https://axivontech.in/sitemap.xml",
-
     host: "https://axivontech.in",
   };
 }

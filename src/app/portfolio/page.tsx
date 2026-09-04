@@ -39,6 +39,16 @@ export const metadata: Metadata = {
     url: "https://axivontech.in/portfolio",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Portfolio | Axivon Technologies",
+    description:
+      "Explore our portfolio of innovative digital products, websites, mobile applications, AI solutions, and cloud platforms.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function PortfolioPage() {

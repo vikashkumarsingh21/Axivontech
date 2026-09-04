@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -9,7 +10,6 @@ import {
   FolderKanban,
   Headphones,
   type LucideIcon,
-  Rocket,
   Sparkles,
   Users,
 } from "lucide-react";
@@ -181,78 +181,67 @@ export default function AboutHero() {
           </motion.ul>
         </motion.div>
 
-        {/* Right column — glass stat card */}
+        {/* Right column — editorial workspace image + floating stats */}
         <motion.div
-          initial={{ opacity: 0, y: 48, scale: 0.94 }}
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.8, ease: EASE_ABOUT }}
-          className="relative mx-auto w-full max-w-md"
+          transition={{ duration: 0.75, ease: EASE_ABOUT }}
+          className="relative mx-auto w-full max-w-lg"
         >
-          {/* Floating glow behind card */}
-          <motion.div
+          {/* Glow behind image */}
+          <div
             aria-hidden={true}
-            className="pointer-events-none absolute -right-10 -top-10 h-56 w-56 rounded-full bg-[radial-gradient(circle,_rgba(232,160,100,0.04),_transparent_70%)] blur-[90px]"
-            animate={{ x: [0, 18, 0], y: [0, -14, 0] }}
-            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+            className="pointer-events-none absolute -inset-6 rounded-[2.5rem] bg-[radial-gradient(ellipse,_rgba(232,160,100,0.07),_transparent_70%)] blur-2xl"
           />
 
-          {/* Card body */}
-          <div className="relative rounded-3xl border border-[#262626] bg-[#141414] p-8 shadow-[0_16px_40px_rgba(0,0,0,0.5)] backdrop-blur-2xl sm:p-10">
-            <div className="mb-8 flex items-center gap-3">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2a1f14] border border-[#e8a064]/20 text-[#e8a064]">
-                <Rocket className="h-5 w-5" strokeWidth={2.5} />
-              </span>
-              <div>
-                <p className="text-base font-bold text-[#f4f4f5] sm:text-lg">
-                  Axivon Technologies
-                </p>
-                <p className="text-xs text-[#71717a] sm:text-sm">
-                  Technology Partner For Growth
-                </p>
-              </div>
-            </div>
+          {/* Photo card */}
+          <div className="relative overflow-hidden rounded-[2rem] border border-[#262626] shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
+            <Image
+              src="/assets/images/developer-workspace.jpg"
+              alt="Developer workspace with code on screens"
+              width={640}
+              height={420}
+              className="w-full object-cover object-center"
+              sizes="(max-width: 768px) 100vw, 512px"
+              priority={false}
+            />
+            {/* Dark gradient overlay at bottom */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f]/85 via-[#0f0f0f]/20 to-transparent" />
 
-            <div className="grid grid-cols-3 gap-3">
+            {/* Floating stats overlay */}
+            <div className="absolute bottom-4 left-4 right-4 flex gap-3">
               {STATS.map((stat) => (
-                <motion.div
+                <div
                   key={stat.label}
-                  whileHover={{ y: -4, scale: 1.05 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="flex flex-col items-center gap-2 rounded-2xl border border-[#262626] bg-[#1c1c1e] px-2 py-4 text-center"
+                  className="flex flex-1 flex-col items-center gap-1 rounded-xl border border-[#262626]/80 bg-[#141414]/85 px-2 py-3 text-center backdrop-blur-md"
                 >
                   <stat.icon
                     className="h-4 w-4 text-[#e8a064]"
-                    strokeWidth={2.25}
+                    strokeWidth={2}
                     aria-hidden={true}
                   />
-                  <span className="text-lg font-bold text-[#f4f4f5] sm:text-xl">
+                  <span className="text-base font-bold text-[#f4f4f5]">
                     {stat.value}
                   </span>
-                  <span className="text-[11px] uppercase tracking-wide text-[#71717a]">
+                  <span className="text-[10px] uppercase tracking-wide text-[#71717a]">
                     {stat.label}
                   </span>
-                </motion.div>
+                </div>
               ))}
             </div>
+          </div>
 
-            <div className="my-7 h-px w-full bg-[#262626]" />
-
-            <div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#71717a]">
-                Technology Stack
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {TECH_STACK.map((tech) => (
-                  <span
-                    key={tech}
-                    className="rounded-full border border-[#262626] bg-[#1c1c1e] px-3.5 py-1.5 text-xs font-medium text-[#d4d4d4] transition-colors duration-300 hover:border-[#e8a064]/40 hover:text-[#f4f4f5]"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
+          {/* Tech stack tags below image */}
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            {TECH_STACK.map((tech) => (
+              <span
+                key={tech}
+                className="rounded-full border border-[#262626] bg-[#141414] px-3 py-1 text-xs font-medium text-[#a1a1aa] transition-colors hover:border-[#e8a064]/30 hover:text-[#f4f4f5]"
+              >
+                {tech}
+              </span>
+            ))}
           </div>
         </motion.div>
       </div>

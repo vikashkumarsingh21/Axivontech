@@ -26,6 +26,25 @@ export const metadata: Metadata = {
     "Business Automation",
     "Axivon Technologies",
   ],
+  alternates: {
+    canonical: "https://axivontech.in/services/ai-solutions",
+  },
+  openGraph: {
+    title: service.metaTitle,
+    description: service.metaDescription,
+    url: "https://axivontech.in/services/ai-solutions",
+    siteName: "Axivon Technologies",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: service.metaTitle,
+    description: service.metaDescription,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function AISolutionsPage() {

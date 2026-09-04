@@ -20,6 +20,35 @@ if (!service) {
 export const metadata: Metadata = {
   title: service.metaTitle,
   description: service.metaDescription,
+  keywords: [
+    "Mobile App Development",
+    "Android App Development",
+    "iOS App Development",
+    "Flutter App Development",
+    "React Native App",
+    "Cross-Platform Apps",
+    "Mobile App Company India",
+    "Axivon Technologies",
+  ],
+  alternates: {
+    canonical: "https://axivontech.in/services/mobile-app-development",
+  },
+  openGraph: {
+    title: service.metaTitle,
+    description: service.metaDescription,
+    url: "https://axivontech.in/services/mobile-app-development",
+    siteName: "Axivon Technologies",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: service.metaTitle,
+    description: service.metaDescription,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function MobileAppDevelopmentPage() {

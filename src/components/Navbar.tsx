@@ -94,13 +94,13 @@ export default function Navbar() {
         >
           {NAV_LINKS.map((link) => (
             <li key={link.href} className="relative">
-              <a
+              <Link
                 href={link.href}
                 onMouseEnter={() => setHovered(link.href)}
                 className="relative z-10 block rounded-full px-4 py-2 text-sm font-medium text-[#a1a1aa] transition-colors duration-200 hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
               >
                 {link.label}
-              </a>
+              </Link>
               {hovered === link.href && (
                 <motion.span
                   layoutId="nav-hover-pill"
@@ -117,6 +117,13 @@ export default function Navbar() {
         </ul>
 
         <div className="flex items-center gap-3">
+          <Link
+            href="/login"
+            className="hidden items-center gap-1.5 rounded-full border border-transparent px-3.5 py-2 text-xs font-medium uppercase tracking-[0.12em] text-[#a1a1aa] transition-all hover:border-[#262626] hover:bg-[#141414] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 lg:inline-flex"
+          >
+            Login
+          </Link>
+
           <motion.a
             href="/contact#contact-form"
             whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
@@ -177,23 +184,30 @@ export default function Navbar() {
             >
               {NAV_LINKS.map((link) => (
                 <motion.li key={link.href} variants={linkItemVariants}>
-                  <a
+                  <Link
                     href={link.href}
                     onClick={() => setIsOpen(false)}
                     className="block rounded-2xl px-3 py-3 text-sm font-medium text-[#a1a1aa] transition-colors hover:bg-[#1c1c1e] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </motion.li>
               ))}
-              <motion.li variants={linkItemVariants} className="mt-2">
-                <a
+              <motion.li variants={linkItemVariants} className="mt-3 flex flex-col gap-2">
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="block rounded-full border border-[#262626] bg-[#1c1c1e] px-5 py-2.5 text-center text-xs font-medium uppercase tracking-[0.14em] text-[#a1a1aa] transition-colors hover:bg-[#262626] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
+                >
+                  Portal Login
+                </Link>
+                <Link
                   href="/contact#contact-form"
                   onClick={() => setIsOpen(false)}
                   className="block rounded-full bg-[#e8a064] px-5 py-3 text-center text-sm font-semibold text-[#0f0f0f] transition-colors hover:bg-[#f0b07a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
                 >
                   Book Consultation
-                </a>
+                </Link>
               </motion.li>
             </motion.ul>
           </motion.div>

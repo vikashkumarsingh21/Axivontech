@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 import {
@@ -385,6 +386,19 @@ export default function OurStory() {
                 — The Axivon Founding Team
               </footer>
             </motion.blockquote>
+
+            {/* Editorial image — workspace */}
+            <motion.div variants={fadeUp} className="mt-8 overflow-hidden rounded-2xl border border-[#262626]">
+              <Image
+                src="/assets/images/office-workspace.jpg"
+                alt="Modern technology office workspace"
+                width={600}
+                height={280}
+                className="w-full object-cover object-center"
+                sizes="(max-width: 1024px) 100vw, 560px"
+                priority={false}
+              />
+            </motion.div>
 
             {/* CTA */}
             <motion.div variants={fadeUp} className="mt-8">

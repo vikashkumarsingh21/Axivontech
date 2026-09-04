@@ -7,9 +7,9 @@ export default function LocalBusinessSchema() {
 
     url: "https://axivontech.in",
 
-    logo: "https://axivontech.in/logo.png",
+    logo: "https://axivontech.in/assets/logo/logo-full.png",
 
-    image: "https://axivontech.in/og-image.jpg",
+    image: "https://axivontech.in/assets/logo/logo-full.png",
 
     telephone: "+91-9473263768",
 

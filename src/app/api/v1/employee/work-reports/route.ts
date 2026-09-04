@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { validateActiveUser } from '@/lib/auth/permissions';
 import { handleApiError, ApiError } from '@/lib/api-error';
 
 export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get('x-user-id');
-    if (!userId) throw new ApiError(401, 'Unauthorized');
+    const user = await validateActiveUser(userId);
     const reports = await db.workReport.findMany({ where: { userId }, orderBy: { date: 'desc' } });
     return NextResponse.json({ success: true, reports });
   } catch(e) { return handleApiError(e); }
@@ -14,7 +15,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const userId = req.headers.get('x-user-id');
-    if (!userId) throw new ApiError(401, 'Unauthorized');
+    const user = await validateActiveUser(userId);
     const { date, summary, tasksCompleted, workPerformed, hoursWorked } = await req.json();
     
     const reportDate = new Date(date);
