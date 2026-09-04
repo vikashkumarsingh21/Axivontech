@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
+import { getExecutiveScope, isDepartmentAllowed } from "@/lib/auth/executive-scope";
 import { handleApiError } from "@/lib/api-error";
 
 export async function GET(req: Request) {
   try {
-    const adminId = req.headers.get("x-user-id");
-    await requirePermission(adminId, "attendance.view_all");
+    const executiveId = req.headers.get("x-user-id");
+    await requirePermission(executiveId, "attendance.company.view");
+    const scope = await getExecutiveScope(executiveId);
 
     const { searchParams } = new URL(req.url);
-    const employeeIdFilter = searchParams.get("employeeId") || searchParams.get("userId") || undefined;
-    const departmentFilter = searchParams.get("department") || undefined;
-    const statusFilter = searchParams.get("status") || undefined;
     const dateFilterStr = searchParams.get("date") || undefined;
+    const departmentFilter = searchParams.get("department") || undefined;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -21,18 +21,21 @@ export async function GET(req: Request) {
     targetDate.setHours(0, 0, 0, 0);
 
     const employeeWhere: any = {
-      userRoles: { none: { role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] } } } },
+      userRoles: { none: { role: { name: { in: ["FOUNDER", "CO_FOUNDER"] } } } },
     };
 
-    if (departmentFilter) {
-      employeeWhere.department = { equals: departmentFilter, mode: "insensitive" };
+    if (scope.allowedDepartments) {
+      employeeWhere.department = { in: scope.allowedDepartments };
     }
 
-    if (employeeIdFilter) {
-      employeeWhere.OR = [
-        { id: employeeIdFilter },
-        { employeeId: employeeIdFilter },
-      ];
+    if (departmentFilter) {
+      if (!isDepartmentAllowed(scope, departmentFilter)) {
+        return NextResponse.json({
+          data: [],
+          summary: { totalEmployees: 0, currentlyWorking: 0, completedToday: 0, incompleteToday: 0, absentToday: 0 },
+        });
+      }
+      employeeWhere.department = { equals: departmentFilter, mode: "insensitive" };
     }
 
     const employees = await db.user.findMany({
@@ -130,21 +133,19 @@ export async function GET(req: Request) {
       };
     });
 
-    let filteredRecords = records;
-    if (statusFilter) {
-      filteredRecords = records.filter(
-        (r) => r.status.toUpperCase() === statusFilter.toUpperCase()
-      );
-    }
-
     return NextResponse.json({
-      data: filteredRecords,
+      data: records,
       summary: {
         totalEmployees: employees.length,
         currentlyWorking,
         completedToday,
         incompleteToday,
         absentToday,
+      },
+      scope: {
+        role: scope.role,
+        responsibilityProfile: scope.responsibilityProfile,
+        allowedDepartments: scope.allowedDepartments,
       },
     });
   } catch (error: any) {

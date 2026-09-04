@@ -28,6 +28,8 @@ model User {
   address          String?
   emergencyContact String?
   status           String        @default("ACTIVE")
+  inactiveAt       DateTime?
+  requiredDailyMinutes Int       @default(480)
   joiningDate      DateTime      @default(now())
 
   organizationId   String?
@@ -136,7 +138,8 @@ model Attendance {
   checkInAt    DateTime
   checkOutAt   DateTime?
   totalMinutes Int?
-  status       String    @default("PRESENT") // PRESENT, HALF_DAY, LATE
+  requiredDailyMinutes Int?
+  status       String    @default("PRESENT") // PRESENT, HALF_DAY, LATE, NOT_STARTED, IN_PROGRESS, COMPLETE, INCOMPLETE, ABSENT, ON_LEAVE
   notes        String?
   
   createdAt    DateTime  @default(now())

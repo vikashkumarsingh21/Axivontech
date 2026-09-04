@@ -1,11 +1,12 @@
 import { db } from "@/lib/db";
+import { cleanupInactiveUsers } from "./cleanup-inactive-users";
 
 export class JobRunner {
-  static async enqueue(jobType: string, payload?: any, scheduledAt?: Date) {
+  static async enqueue(jobType: string, payload?: unknown, scheduledAt?: Date) {
     return db.backgroundJob.create({
       data: {
         jobType,
-        payload: payload || null,
+        payload: (payload as Record<string, unknown>) || null,
         scheduledAt: scheduledAt || new Date(),
         status: "PENDING",
       },
@@ -29,19 +30,23 @@ export class JobRunner {
       });
 
       try {
-        // Execute job based on jobType
+        if (job.jobType === "INACTIVE_USER_CLEANUP") {
+          await cleanupInactiveUsers();
+        }
+
         await db.backgroundJob.update({
           where: { id: job.id },
           data: { status: "COMPLETED", completedAt: new Date() },
         });
         results.push({ id: job.id, status: "COMPLETED" });
-      } catch (err: any) {
+      } catch (err: unknown) {
         const isFailed = job.attempts + 1 >= job.maxAttempts;
+        const msg = err instanceof Error ? err.message : String(err);
         await db.backgroundJob.update({
           where: { id: job.id },
           data: {
             status: isFailed ? "FAILED" : "PENDING",
-            error: err.message,
+            error: msg,
           },
         });
         results.push({ id: job.id, status: isFailed ? "FAILED" : "RETRY" });

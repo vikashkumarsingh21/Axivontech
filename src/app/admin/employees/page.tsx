@@ -12,6 +12,8 @@ interface Employee {
   department?: string | null;
   designation?: string | null;
   status: "ACTIVE" | "INACTIVE" | "ARCHIVED";
+  inactiveAt?: string | null;
+  requiredDailyHours?: number;
   joiningDate?: string;
   userRoles?: { role: { id: string; name: string } }[];
 }
@@ -46,6 +48,7 @@ export default function EmployeesPage() {
     designation: "",
     phone: "",
     status: "ACTIVE" as "ACTIVE" | "INACTIVE",
+    requiredDailyHours: 8,
   });
 
   // Edit Form Data
@@ -58,6 +61,7 @@ export default function EmployeesPage() {
     designation: "",
     phone: "",
     status: "ACTIVE" as "ACTIVE" | "INACTIVE",
+    requiredDailyHours: 8,
   });
 
   // Fetch Employees from API
@@ -102,6 +106,7 @@ export default function EmployeesPage() {
       designation: "",
       phone: "",
       status: "ACTIVE",
+      requiredDailyHours: 8,
     });
     setFormError("");
     setIsAddOpen(true);
@@ -119,6 +124,7 @@ export default function EmployeesPage() {
       designation: emp.designation || "",
       phone: emp.phone || "",
       status: emp.status === "ACTIVE" ? "ACTIVE" : "INACTIVE",
+      requiredDailyHours: emp.requiredDailyHours || 8,
     });
     setFormError("");
   };
@@ -169,6 +175,7 @@ export default function EmployeesPage() {
         designation: editForm.designation || null,
         phone: editForm.phone || null,
         status: editForm.status,
+        requiredDailyHours: editForm.requiredDailyHours,
       };
 
       if (editForm.password) {
@@ -493,7 +500,7 @@ export default function EmployeesPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-300 mb-1">Phone Number</label>
                   <input
@@ -501,6 +508,21 @@ export default function EmployeesPage() {
                     value={addForm.phone}
                     onChange={(e) => setAddForm({ ...addForm, phone: e.target.value })}
                     placeholder="e.g. +91 9876543210"
+                    className="w-full bg-[#1e1e1e] border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-red-500/50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">Daily Work Hours</label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0.5"
+                    max="24"
+                    required
+                    value={addForm.requiredDailyHours}
+                    onChange={(e) => setAddForm({ ...addForm, requiredDailyHours: parseFloat(e.target.value) || 8 })}
+                    placeholder="8"
                     className="w-full bg-[#1e1e1e] border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-red-500/50"
                   />
                 </div>
@@ -644,13 +666,27 @@ export default function EmployeesPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-300 mb-1">Phone Number</label>
                   <input
                     type="text"
                     value={editForm.phone}
                     onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                    className="w-full bg-[#1e1e1e] border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-red-500/50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">Daily Work Hours</label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0.5"
+                    max="24"
+                    required
+                    value={editForm.requiredDailyHours}
+                    onChange={(e) => setEditForm({ ...editForm, requiredDailyHours: parseFloat(e.target.value) || 8 })}
                     className="w-full bg-[#1e1e1e] border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-red-500/50"
                   />
                 </div>

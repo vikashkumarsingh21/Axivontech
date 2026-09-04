@@ -14,12 +14,18 @@ const createEmployeeSchema = z.object({
   employeeId: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
   status: z.enum(["ACTIVE", "INACTIVE"]).optional().default("ACTIVE"),
+  requiredDailyHours: z
+    .number({ invalid_type_error: "Required daily hours must be a number" })
+    .positive("Required daily hours must be greater than 0")
+    .max(24, "Required daily hours cannot exceed 24")
+    .optional()
+    .default(8),
 });
 
 export async function GET(req: Request) {
   try {
     const userId = req.headers.get("x-user-id");
-    await requirePermission(userId, "employee.view").catch(() => {});
+    await requirePermission(userId, "users:read");
 
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") || "";
@@ -57,6 +63,8 @@ export async function GET(req: Request) {
           department: true,
           designation: true,
           status: true,
+          inactiveAt: true,
+          requiredDailyMinutes: true,
           joiningDate: true,
           createdAt: true,
           userRoles: {
@@ -77,8 +85,13 @@ export async function GET(req: Request) {
       db.user.count({ where }),
     ]);
 
+    const formattedEmployees = employees.map((emp) => ({
+      ...emp,
+      requiredDailyHours: Number(((emp.requiredDailyMinutes || 480) / 60).toFixed(2)),
+    }));
+
     return NextResponse.json({
-      data: employees,
+      data: formattedEmployees,
       meta: {
         total,
         page,
@@ -94,12 +107,11 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const adminId = req.headers.get("x-user-id");
-    await requirePermission(adminId, "employee.create").catch(() => {});
+    await requirePermission(adminId, "users:write");
 
     const body = await req.json();
     const validatedData = createEmployeeSchema.parse(body);
 
-    // 1. Check duplicate email
     const existingEmail = await db.user.findUnique({
       where: { email: validatedData.email },
     });
@@ -107,7 +119,6 @@ export async function POST(req: Request) {
       throw new ApiError(409, "An account with this email address already exists.");
     }
 
-    // 2. Check duplicate employee ID if provided
     if (validatedData.employeeId) {
       const existingEmpId = await db.user.findFirst({
         where: { employeeId: validatedData.employeeId },
@@ -117,7 +128,6 @@ export async function POST(req: Request) {
       }
     }
 
-    // 3. Get default organization and EMPLOYEE role
     const org = await db.organization.findFirst();
     if (!org) {
       throw new ApiError(500, "Organization not configured.");
@@ -130,10 +140,11 @@ export async function POST(req: Request) {
       });
     }
 
-    // 4. Hash password securely
     const passwordHash = await bcrypt.hash(validatedData.password, 10);
+    const requiredDailyMinutes = Math.round(validatedData.requiredDailyHours * 60);
+    const status = validatedData.status || "ACTIVE";
+    const inactiveAt = status === "INACTIVE" ? new Date() : null;
 
-    // 5. Create User & UserRole transactionally
     const newEmployee = await db.user.create({
       data: {
         name: validatedData.name,
@@ -143,7 +154,9 @@ export async function POST(req: Request) {
         department: validatedData.department || null,
         designation: validatedData.designation || null,
         employeeId: validatedData.employeeId || null,
-        status: validatedData.status || "ACTIVE",
+        status,
+        inactiveAt,
+        requiredDailyMinutes,
         organization: { connect: { id: org.id } },
         userRoles: {
           create: {
@@ -160,6 +173,8 @@ export async function POST(req: Request) {
         department: true,
         designation: true,
         status: true,
+        inactiveAt: true,
+        requiredDailyMinutes: true,
         joiningDate: true,
         createdAt: true,
         userRoles: {
@@ -170,7 +185,6 @@ export async function POST(req: Request) {
       },
     });
 
-    // 6. Audit Log
     await db.auditLog.create({
       data: {
         userId: adminId,
@@ -181,11 +195,21 @@ export async function POST(req: Request) {
           name: newEmployee.name,
           email: newEmployee.email,
           department: newEmployee.department,
+          requiredDailyHours: validatedData.requiredDailyHours,
+          status,
         },
       },
     });
 
-    return NextResponse.json({ data: newEmployee }, { status: 201 });
+    return NextResponse.json(
+      {
+        data: {
+          ...newEmployee,
+          requiredDailyHours: Number(((newEmployee.requiredDailyMinutes || 480) / 60).toFixed(2)),
+        },
+      },
+      { status: 201 }
+    );
   } catch (error: any) {
     return handleApiError(error);
   }

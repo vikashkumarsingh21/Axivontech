@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
+import { getExecutiveScope, isDepartmentAllowed } from "@/lib/auth/executive-scope";
 import { handleApiError, ApiError } from "@/lib/api-error";
 
 export async function GET(req: Request) {
   try {
-    const adminId = req.headers.get("x-user-id");
-    await requirePermission(adminId, "tasks:read");
+    const executiveId = req.headers.get("x-user-id");
+    await requirePermission(executiveId, "tasks.company.view");
+    const scope = await getExecutiveScope(executiveId);
 
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status") || undefined;
@@ -16,6 +18,10 @@ export async function GET(req: Request) {
 
     const where: any = {};
     if (status) where.status = status;
+
+    if (scope.allowedDepartments) {
+      where.user = { department: { in: scope.allowedDepartments } };
+    }
 
     const [tasks, total] = await Promise.all([
       db.task.findMany({
@@ -34,6 +40,11 @@ export async function GET(req: Request) {
     return NextResponse.json({
       data: tasks,
       meta: { total, page, pages: Math.ceil(total / limit) },
+      scope: {
+        role: scope.role,
+        responsibilityProfile: scope.responsibilityProfile,
+        allowedDepartments: scope.allowedDepartments,
+      },
     });
   } catch (error: any) {
     return handleApiError(error);
@@ -42,8 +53,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const adminId = req.headers.get("x-user-id");
-    const admin = await requirePermission(adminId, "tasks:manage");
+    const executiveId = req.headers.get("x-user-id");
+    const execUser = await requirePermission(executiveId, "tasks:manage");
+    const scope = await getExecutiveScope(executiveId);
 
     const body = await req.json();
     const { title, description, userId, projectId, priority, dueDate } = body;
@@ -54,7 +66,7 @@ export async function POST(req: Request) {
 
     const assignedUser = await db.user.findUnique({
       where: { id: userId },
-      select: { id: true, name: true, email: true, status: true },
+      select: { id: true, name: true, email: true, department: true, status: true },
     });
 
     if (!assignedUser) {
@@ -63,6 +75,16 @@ export async function POST(req: Request) {
 
     if (assignedUser.status === "INACTIVE") {
       throw new ApiError(400, "Cannot assign tasks to an inactive employee");
+    }
+
+    // Check scope if Co-Founder
+    if (!scope.isFounder && scope.allowedDepartments) {
+      if (!isDepartmentAllowed(scope, assignedUser.department)) {
+        throw new ApiError(
+          403,
+          `Forbidden: Cannot assign tasks to employee outside your department scope (${assignedUser.department || "No Department"})`
+        );
+      }
     }
 
     const task = await db.task.create({
@@ -75,7 +97,7 @@ export async function POST(req: Request) {
         dueDate: dueDate ? new Date(dueDate) : null,
       },
       include: {
-        user: { select: { id: true, name: true, email: true } },
+        user: { select: { id: true, name: true, email: true, department: true } },
         project: { select: { id: true, name: true } },
       },
     });
@@ -88,28 +110,32 @@ export async function POST(req: Request) {
         })
       : "No due date";
 
+    const assignerTitle = scope.isFounder ? "Founder" : "Co-Founder";
+
     await db.notification.create({
       data: {
         userId,
         type: "TASK_ASSIGNED",
         title: "NEW TASK ASSIGNED",
-        message: `Task: ${title}\nAssigned By: ${admin.name}\nDue: ${dueDateFormatted}`,
+        message: `Task: ${title}\nAssigned By: ${execUser.name} (${assignerTitle})\nDue: ${dueDateFormatted}`,
         link: "/employee/tasks",
       },
     });
 
     await db.auditLog.create({
       data: {
-        userId: adminId,
-        action: "TASK_ASSIGNED",
+        userId: executiveId,
+        action: "EXECUTIVE_TASK_ASSIGNED",
         resource: "Task",
         details: {
           taskId: task.id,
           taskTitle: title,
           assignedToUserId: userId,
           assignedToName: assignedUser.name,
-          assignedByUserId: adminId,
-          assignedByName: admin.name,
+          assignedByUserId: executiveId,
+          assignedByName: execUser.name,
+          assignedByRole: scope.role,
+          responsibilityProfile: scope.responsibilityProfile,
           priority: task.priority,
           dueDate: task.dueDate,
         },
