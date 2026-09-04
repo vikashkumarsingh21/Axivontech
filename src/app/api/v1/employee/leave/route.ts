@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get('x-user-id');
     const user = await validateActiveUser(userId);
-    const requests = await db.leaveRequest.findMany({ where: { userId }, orderBy: { createdAt: 'desc' } });
+    const requests = await db.leaveRequest.findMany({ where: { userId: user.id }, orderBy: { createdAt: 'desc' } });
     return NextResponse.json({ success: true, requests });
   } catch(e) { return handleApiError(e); }
 }
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     if (new Date(startDate) > new Date(endDate)) throw new ApiError(400, 'Invalid date range');
     
     const request = await db.leaveRequest.create({
-      data: { userId, leaveType, startDate: new Date(startDate), endDate: new Date(endDate), reason }
+      data: { userId: user.id, leaveType, startDate: new Date(startDate), endDate: new Date(endDate), reason }
     });
     return NextResponse.json({ success: true, request });
   } catch(e) { return handleApiError(e); }

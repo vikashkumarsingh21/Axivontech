@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get('x-user-id');
     const user = await validateActiveUser(userId);
-    const notifications = await db.notification.findMany({ where: { userId }, orderBy: { createdAt: 'desc' } });
+    const notifications = await db.notification.findMany({ where: { userId: user.id }, orderBy: { createdAt: 'desc' } });
     return NextResponse.json({ success: true, notifications });
   } catch(e) { return handleApiError(e); }
 }

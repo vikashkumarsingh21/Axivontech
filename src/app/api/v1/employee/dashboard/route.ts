@@ -12,11 +12,11 @@ export async function GET(req: NextRequest) {
     today.setHours(0,0,0,0);
     
     const [attendance, activeTasks, pendingReports, unreadNotifs, todayTasks] = await Promise.all([
-      db.attendance.findFirst({ where: { userId, date: today } }),
-      db.task.count({ where: { userId, status: { in: ['TODO', 'IN_PROGRESS'] } } }),
-      db.workReport.count({ where: { userId, status: 'SUBMITTED' } }),
-      db.notification.count({ where: { userId, isRead: false } }),
-      db.task.findMany({ where: { userId, dueDate: { gte: today } }, take: 5, orderBy: { dueDate: 'asc' } })
+      db.attendance.findFirst({ where: { userId: user.id, date: today } }),
+      db.task.count({ where: { userId: user.id, status: { in: ['TODO', 'IN_PROGRESS'] } } }),
+      db.workReport.count({ where: { userId: user.id, status: 'SUBMITTED' } }),
+      db.notification.count({ where: { userId: user.id, isRead: false } }),
+      db.task.findMany({ where: { userId: user.id, dueDate: { gte: today } }, take: 5, orderBy: { dueDate: 'asc' } })
     ]);
     
     return NextResponse.json({

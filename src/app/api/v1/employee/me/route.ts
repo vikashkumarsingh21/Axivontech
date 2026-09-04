@@ -6,13 +6,10 @@ import { handleApiError, ApiError } from "@/lib/api-error";
 export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
-
-    if (!userId) {
-      throw new ApiError(401, "Unauthorized");
-    }
+    const validatedUser = await validateActiveUser(userId);
 
     const user = await db.user.findUnique({
-      where: { id: userId },
+      where: { id: validatedUser.id },
       select: {
         id: true,
         email: true,

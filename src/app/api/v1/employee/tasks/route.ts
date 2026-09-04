@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get('x-user-id');
     const user = await validateActiveUser(userId);
-    const tasks = await db.task.findMany({ where: { userId }, orderBy: { dueDate: 'asc' } });
+    const tasks = await db.task.findMany({ where: { userId: user.id }, orderBy: { dueDate: 'asc' } });
     return NextResponse.json({ success: true, tasks });
   } catch(e) { return handleApiError(e); }
 }
@@ -20,7 +20,7 @@ export async function PATCH(req: NextRequest) {
     
     const task = await db.task.findUnique({ where: { id: taskId } });
     if (!task) throw new ApiError(404, 'Task not found');
-    if (task.userId !== userId) throw new ApiError(403, 'Forbidden');
+    if (task.userId !== user.id) throw new ApiError(403, 'Forbidden');
     
     const updated = await db.task.update({
       where: { id: taskId },

@@ -150,7 +150,7 @@ export default function IndustriesWeServe() {
             {/* Image */}
             <div className="relative overflow-hidden rounded-[1.75rem] border border-[#262626] shadow-[0_24px_60px_rgba(0,0,0,0.4)]">
               <Image
-                src="/assets/images/portfolio/team-collaboration.jpg"
+                src="/assets/images/agency/team-collaboration.jpg"
                 alt="Cross-industry technology collaboration"
                 width={640}
                 height={520}
