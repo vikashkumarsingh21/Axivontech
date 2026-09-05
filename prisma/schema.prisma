@@ -61,6 +61,14 @@ model User {
   createdAutomations AutomationWorkflow[]
   userPreference     UserPreference?
 
+  // Phase 5: CRM Relations
+  ownedLeads         Lead[]         @relation("LeadOwner")
+  leadActivities     LeadActivity[] @relation("ActivityActor")
+  assignedFollowUps  FollowUp[]     @relation("FollowUpAssignee")
+  ownedOpportunities Opportunity[]  @relation("OpportunityOwner")
+  createdProposals   Proposal[]     @relation("ProposalCreator")
+  ownedClients       CrmClient[]    @relation("ClientOwner")
+
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 }
@@ -474,6 +482,228 @@ model UserPreference {
 
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 5: CRM & LEAD MANAGEMENT MODELS
+// -----------------------------------------------------------------------------
+
+model Lead {
+  id                  String   @id @default(cuid())
+  leadCode            String   @unique
+  name                String
+  email               String
+  phone               String?
+  companyName         String?
+  website             String?
+  serviceInterest     String?
+  message             String?
+  source              String   @default("WEBSITE_CONTACT") // WEBSITE_CONTACT, CONSULTATION, REFERRAL, SOCIAL_MEDIA, CAMPAIGN, MANUAL, PARTNER, OTHER
+  campaign            String?
+  status              String   @default("NEW") // NEW, CONTACTED, QUALIFIED, UNQUALIFIED, CONVERTED, NURTURE
+  qualificationStatus String   @default("UNQUALIFIED") // QUALIFIED, UNQUALIFIED, IN_PROGRESS
+  
+  // Qualification Details
+  budget              Float?
+  timeline            String?
+  businessNeed        String?
+  decisionMakerKnown  Boolean  @default(false)
+  qualificationNotes  String?
+
+  // Duplicate Tracking
+  isDuplicate         Boolean  @default(false)
+  duplicateReason     String?
+
+  ownerId             String?
+  owner               User?    @relation("LeadOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  convertedClientId   String?
+  convertedClient     CrmClient? @relation(fields: [convertedClientId], references: [id], onDelete: SetNull)
+
+  activities          LeadActivity[]
+  followUps           FollowUp[]
+  opportunities       Opportunity[]
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([email])
+  @@index([leadCode])
+}
+
+model LeadActivity {
+  id            String       @id @default(cuid())
+  leadId        String?
+  lead          Lead?        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  clientId      String?
+  client        CrmClient?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  actorId       String?
+  actor         User?        @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
+  
+  type          String       // LEAD_CREATED, LEAD_ASSIGNED, STATUS_CHANGED, NOTE_ADDED, CALL_RECORDED, MEETING_RECORDED, FOLLOWUP_CREATED, FOLLOWUP_COMPLETED, OPPORTUNITY_CREATED, PROPOSAL_SENT, DEAL_WON, DEAL_LOST, CLIENT_CONVERTED
+  title         String
+  notes         String?
+  metadata      Json?
+
+  createdAt     DateTime     @default(now())
+
+  @@index([leadId])
+  @@index([opportunityId])
+  @@index([clientId])
+  @@index([actorId])
+}
+
+model FollowUp {
+  id            String       @id @default(cuid())
+  leadId        String?
+  lead          Lead?        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  clientId      String?
+  client        CrmClient?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  assignedToId  String
+  assignedTo    User         @relation("FollowUpAssignee", fields: [assignedToId], references: [id], onDelete: Cascade)
+
+  dueAt         DateTime
+  type          String       @default("CALL") // CALL, EMAIL, MEETING, WHATSAPP, DEMO, PROPOSAL_FOLLOWUP, GENERAL
+  notes         String?
+  status        String       @default("UPCOMING") // UPCOMING, DUE, OVERDUE, COMPLETED
+  completedAt   DateTime?
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([assignedToId])
+  @@index([leadId])
+  @@index([opportunityId])
+  @@index([status])
+  @@index([dueAt])
+}
+
+model PipelineStage {
+  id          String        @id @default(cuid())
+  name        String
+  key         String        @unique // QUALIFIED, DISCOVERY, PROPOSAL, NEGOTIATION, WON, LOST
+  order       Int           @default(0)
+  probability Int           @default(50)
+  description String?
+
+  opportunities Opportunity[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Opportunity {
+  id                String         @id @default(cuid())
+  opportunityCode   String         @unique
+  leadId            String?
+  lead              Lead?          @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  clientId          String?
+  client            CrmClient?     @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  name              String
+  description       String?
+  value             Float          @default(0)
+  currency          String         @default("INR")
+  probability       Int            @default(50)
+  expectedCloseDate DateTime?
+  stage             String         @default("QUALIFIED") // QUALIFIED, DISCOVERY, PROPOSAL, NEGOTIATION, WON, LOST
+
+  stageId           String?
+  pipelineStage     PipelineStage? @relation(fields: [stageId], references: [id], onDelete: SetNull)
+
+  ownerId           String?
+  owner             User?          @relation("OpportunityOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  lossReason        String?
+
+  proposals         Proposal[]
+  activities        LeadActivity[]
+  followUps         FollowUp[]
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([ownerId])
+  @@index([leadId])
+  @@index([clientId])
+  @@index([stage])
+}
+
+model Proposal {
+  id                String      @id @default(cuid())
+  proposalNumber    String      @unique
+  opportunityId     String
+  opportunity       Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  title             String
+  amount            Float
+  currency          String      @default("INR")
+  status            String      @default("DRAFT") // DRAFT, READY, SENT, ACCEPTED, REJECTED, EXPIRED
+  sentAt            DateTime?
+  validUntil        DateTime?
+  documentReference String?
+
+  createdById       String?
+  createdBy         User?       @relation("ProposalCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@index([opportunityId])
+  @@index([status])
+}
+
+model CrmClient {
+  id          String   @id @default(cuid())
+  clientCode  String   @unique
+  companyName String
+  contactName String
+  email       String
+  phone       String?
+  website     String?
+  industry    String?
+  status      String   @default("ACTIVE") // ACTIVE, INACTIVE, ONBOARDING
+
+  ownerId     String?
+  owner       User?    @relation("ClientOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  leads       Lead[]
+  opportunities Opportunity[]
+  activities  LeadActivity[]
+  followUps   FollowUp[]
+  contacts    ClientContact[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([email])
+  @@index([clientCode])
+}
+
+model ClientContact {
+  id        String    @id @default(cuid())
+  clientId  String
+  client    CrmClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  name      String
+  email     String?
+  phone     String?
+  role      String?
+  isPrimary Boolean   @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([clientId])
 }
 
 

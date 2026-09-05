@@ -126,6 +126,31 @@ async function main() {
     { name: "reports.executive.view", description: "View executive reports" },
     { name: "reports.executive.export", description: "Export executive reports" },
     { name: "reports.sensitive.export", description: "Export sensitive executive reports" },
+
+    // Phase 5 CRM Permissions
+    { name: "crm.dashboard.view", description: "View CRM dashboard and metrics" },
+    { name: "crm.lead.view", description: "View CRM leads list and details" },
+    { name: "crm.lead.create", description: "Create new leads in CRM" },
+    { name: "crm.lead.update", description: "Update lead details and status" },
+    { name: "crm.lead.assign", description: "Assign lead owners" },
+    { name: "crm.lead.convert", description: "Convert leads to clients and opportunities" },
+    { name: "crm.opportunity.view", description: "View sales opportunities" },
+    { name: "crm.opportunity.create", description: "Create sales opportunities" },
+    { name: "crm.opportunity.update", description: "Update opportunity details" },
+    { name: "crm.opportunity.stage", description: "Change opportunity pipeline stage" },
+    { name: "crm.opportunity.close", description: "Mark opportunity as Won or Lost" },
+    { name: "crm.followup.view", description: "View scheduled follow-ups" },
+    { name: "crm.followup.create", description: "Create follow-ups" },
+    { name: "crm.followup.update", description: "Update/complete follow-ups" },
+    { name: "crm.client.view", description: "View CRM client records" },
+    { name: "crm.client.create", description: "Create CRM clients" },
+    { name: "crm.client.update", description: "Update CRM client details" },
+    { name: "crm.proposal.view", description: "View proposals" },
+    { name: "crm.proposal.create", description: "Create proposals" },
+    { name: "crm.proposal.send", description: "Mark proposal as sent" },
+    { name: "crm.report.view", description: "View CRM reports and funnels" },
+    { name: "crm.export", description: "Export CRM data" },
+    { name: "crm.audit.view", description: "View CRM audit logs" },
   ];
 
   const permissions: Record<string, string> = {};
@@ -401,6 +426,25 @@ async function main() {
     },
   });
   console.log('✅ Seeded Ops Co-Founder account: ops.cofounder@axivon.dev');
+
+  // ─── 8. Seed CRM Pipeline Stages ──────────────────────────────────
+  const pipelineStages = [
+    { key: "QUALIFIED", name: "Qualified", order: 1, probability: 20, description: "Lead has passed initial qualification criteria" },
+    { key: "DISCOVERY", name: "Discovery", order: 2, probability: 40, description: "Technical and business requirement discovery in progress" },
+    { key: "PROPOSAL", name: "Proposal", order: 3, probability: 60, description: "Formal technical and commercial proposal submitted" },
+    { key: "NEGOTIATION", name: "Negotiation", order: 4, probability: 80, description: "Contract negotiation and pricing discussion" },
+    { key: "WON", name: "Closed Won", order: 5, probability: 100, description: "Deal successfully won and converted" },
+    { key: "LOST", name: "Closed Lost", order: 6, probability: 0, description: "Deal lost or cancelled" },
+  ];
+
+  for (const stage of pipelineStages) {
+    await prisma.pipelineStage.upsert({
+      where: { key: stage.key },
+      update: { name: stage.name, order: stage.order, probability: stage.probability, description: stage.description },
+      create: stage,
+    });
+  }
+  console.log('✅ Seeded CRM Pipeline Stages (6 stages)');
 
 }
 
