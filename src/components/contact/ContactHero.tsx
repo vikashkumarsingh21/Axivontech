@@ -20,7 +20,7 @@ const CONTACT_ITEMS: ContactItem[] = [
   {
     icon: Phone,
     label: "Phone",
-    value: "+91 9473263738",
+    value: "+91 9473263768",
     href: "tel:+919473263768",
   },
   {
