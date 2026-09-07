@@ -20,8 +20,8 @@ const CONTACT_ITEMS: ContactItem[] = [
   {
     icon: Phone,
     label: "Phone",
-    value: "+91 943263768",
-    href: "tel:+91943263768",
+    value: "+91 9473263738",
+    href: "tel:+919473263768",
   },
   {
     icon: MapPin,
