@@ -58,8 +58,8 @@ export class JobRunner {
             const now = new Date();
             const upcomingReminders = await db.reminder.findMany({
               where: {
-                remindAt: { gte: now, lte: new Date(now.getTime() + 60 * 60_000) },
-                isCompleted: false,
+                dueAt: { gte: now, lte: new Date(now.getTime() + 60 * 60_000) },
+                status: "PENDING",
               },
               include: { user: true },
             });
@@ -72,8 +72,8 @@ export class JobRunner {
                   type: "REMINDER",
                   title: `Reminder: ${reminder.title}`,
                   message: reminder.description || reminder.title,
-                  entityType: reminder.entityType || "REMINDER",
-                  entityId: reminder.entityId || reminder.id,
+                  entityType: "REMINDER",
+                  entityId: reminder.id,
                   dedupKey: `REMINDER::${reminder.id}::${now.toISOString().slice(0, 13)}`,
                 });
               } catch (e: any) {
