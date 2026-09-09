@@ -231,6 +231,12 @@ export default function EmployeeProfilePage() {
           </div>
 
           <div className="flex flex-wrap gap-2 text-xs">
+            <a
+              href="/employee/attendance"
+              className="px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 font-semibold hover:bg-green-500/20 transition-colors flex items-center gap-1.5"
+            >
+              <Calendar className="w-3.5 h-3.5" /> View Attendance & Work Hours →
+            </a>
             <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 text-gray-300">
               ID: <span className="font-mono text-white">{profile?.employeeId}</span>
             </div>

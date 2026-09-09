@@ -33,6 +33,8 @@ export default function EmployeesPage() {
   // Modals state
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [deletingEmployee, setDeletingEmployee] = useState<Employee | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Form State
   const [formLoading, setFormLoading] = useState(false);
@@ -246,6 +248,26 @@ export default function EmployeesPage() {
         </div>
       )}
 
+      {/* Department Categorization Tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-2 border-b border-white/10">
+        {["All", "Engineering", "Frontend", "Backend", "Fullstack", "Design", "Operations", "Management"].map((dept) => (
+          <button
+            key={dept}
+            onClick={() => {
+              setSearch(dept === "All" ? "" : dept);
+              setPage(1);
+            }}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors border ${
+              (dept === "All" && !search) || (search.toLowerCase() === dept.toLowerCase())
+                ? "bg-red-600 border-red-600 text-white shadow-lg shadow-red-600/20"
+                : "bg-[#111111] border-white/10 text-gray-400 hover:text-white hover:border-white/20"
+            }`}
+          >
+            {dept === "All" ? "🏢 All Departments & Roles" : `⚡ ${dept}`}
+          </button>
+        ))}
+      </div>
+
       {/* Table Container */}
       <div className="bg-[#111111] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
         {/* Filter / Search Bar */}
@@ -259,7 +281,7 @@ export default function EmployeesPage() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              placeholder="Search by name, email, employee ID, or department..."
+              placeholder="Search by name, email, employee ID, role, or department..."
               className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-red-500/50 transition-colors"
             />
           </div>
@@ -295,8 +317,8 @@ export default function EmployeesPage() {
               <tr>
                 <th className="px-5 py-3.5">Employee</th>
                 <th className="px-5 py-3.5">Code / ID</th>
-                <th className="px-5 py-3.5">Department & Title</th>
-                <th className="px-5 py-3.5">Role</th>
+                <th className="px-5 py-3.5">Department & Role</th>
+                <th className="px-5 py-3.5">System Role</th>
                 <th className="px-5 py-3.5">Status</th>
                 <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
@@ -334,11 +356,16 @@ export default function EmployeesPage() {
                       )}
                     </td>
                     <td className="px-5 py-4">
-                      <div className="text-white text-sm">{emp.department || "Unassigned"}</div>
-                      <div className="text-xs text-gray-500">{emp.designation || "Employee"}</div>
+                      <div className="text-white text-sm font-medium flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                        {emp.department || "General"}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-0.5">{emp.designation || "Team Member"}</div>
                     </td>
                     <td className="px-5 py-4 text-xs font-medium">
-                      {emp.userRoles?.map((ur) => ur.role.name).join(", ") || "EMPLOYEE"}
+                      <span className="bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded-full">
+                        {emp.userRoles?.map((ur) => ur.role.name).join(", ") || "EMPLOYEE"}
+                      </span>
                     </td>
                     <td className="px-5 py-4">
                       <span
@@ -352,13 +379,29 @@ export default function EmployeesPage() {
                       </span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <button
-                        onClick={() => openEditModal(emp)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 bg-[#1a1a1a] hover:bg-white/10 text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                        Edit
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <a
+                          href={`/admin/attendance?search=${encodeURIComponent(emp.name)}`}
+                          title="View Attendance History"
+                          className="px-2.5 py-1.5 rounded-lg border border-white/10 bg-[#1a1a1a] hover:bg-white/10 text-green-400 hover:text-green-300 text-xs font-medium transition-colors"
+                        >
+                          Attendance
+                        </a>
+                        <button
+                          onClick={() => openEditModal(emp)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 bg-[#1a1a1a] hover:bg-white/10 text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => setDeletingEmployee(emp)}
+                          title="Permanently Delete User"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -366,6 +409,7 @@ export default function EmployeesPage() {
             </tbody>
           </table>
         </div>
+
 
         {/* Pagination Footer */}
         {totalPages > 1 && (
@@ -723,6 +767,74 @@ export default function EmployeesPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* DELETE EMPLOYEE CONFIRMATION MODAL */}
+      {/* ============================================================ */}
+      {deletingEmployee && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#141414] border border-red-500/30 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-red-500/10">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-red-500" />
+                <h2 className="text-lg font-bold text-white">Permanently Delete User</h2>
+              </div>
+              <button
+                onClick={() => setDeletingEmployee(null)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-gray-300">
+                Are you sure you want to permanently delete <strong className="text-white">{deletingEmployee.name}</strong> ({deletingEmployee.email})?
+              </p>
+              <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-xl">
+                ⚠️ <strong>WARNING:</strong> This action cannot be undone. All attendance, tasks, reports, leave requests, sessions, and roles associated with this account will be completely removed from the database.
+              </p>
+
+              <div className="pt-2 flex items-center justify-end gap-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setDeletingEmployee(null)}
+                  className="px-4 py-2 rounded-xl text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={deleteLoading}
+                  onClick={async () => {
+                    setDeleteLoading(true);
+                    try {
+                      const res = await fetch(`/api/v1/admin/employees/${deletingEmployee.id}`, {
+                        method: "DELETE",
+                      });
+                      const data = await res.json();
+                      if (!res.ok) {
+                        throw new Error(data.error || "Failed to delete employee");
+                      }
+                      setDeletingEmployee(null);
+                      setFeedback({ type: "success", message: data.message || "User permanently deleted." });
+                      fetchEmployees();
+                    } catch (err: any) {
+                      setFeedback({ type: "error", message: err.message || "Deletion failed" });
+                      setDeletingEmployee(null);
+                    } finally {
+                      setDeleteLoading(false);
+                    }
+                  }}
+                  className="px-5 py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-red-600/20 disabled:opacity-50"
+                >
+                  {deleteLoading ? "Deleting..." : "Permanently Delete"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

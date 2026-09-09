@@ -134,6 +134,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Emit EventBus event
+    const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
+    if (EventBus) {
+      EventBus.emit({
+        eventType: "NEW_LEAD",
+        actorId: user.id,
+        recipientId: lead.ownerId || undefined,
+        entityType: "LEAD",
+        entityId: lead.id,
+        title: "New Lead Created",
+        message: `Lead ${lead.name} (${lead.leadCode}) was created.`,
+        metadata: { leadId: lead.id, leadCode: lead.leadCode },
+      }).catch(() => {});
+    }
+
     return NextResponse.json({ success: true, data: lead }, { status: 201 });
   } catch (error) {
     return handleApiError(error);

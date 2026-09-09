@@ -57,9 +57,13 @@ model User {
   securityEvents     SecurityEvent[]
 
   // Phase 6: Shared System Relations
-  reminders          Reminder[]
-  createdAutomations AutomationWorkflow[]
-  userPreference     UserPreference?
+  reminders            Reminder[]
+  createdAutomations   AutomationWorkflow[]
+  userPreference       UserPreference?
+  activities           Activity[]           @relation("ActivityActor")
+  createdAnnouncements Announcement[]       @relation("AnnouncementCreator")
+  uploadedDocVersions  DocumentVersion[]    @relation("VersionUploader")
+  documentPermissions  DocumentPermission[] @relation("UserDocumentPermissions")
 
   // Phase 5: CRM Relations
   ownedLeads         Lead[]         @relation("LeadOwner")
@@ -241,48 +245,78 @@ model LeaveRequest {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  type      String   // TASK_ASSIGNED, LEAVE_APPROVED, ANNOUNCEMENT, SYSTEM
-  title     String
-  message   String
-  isRead    Boolean  @default(false)
-  link      String?  // Optional URL to redirect to
+  type       String    // TASK_ASSIGNED, TASK_UPDATED, LEAVE_UPDATED, WORK_REPORT_REVIEWED, NEW_LEAD, FOLLOW_UP_DUE, PROPOSAL_UPDATED, ANNOUNCEMENT, DOCUMENT_SHARED, SECURITY_EVENT, SYSTEM_EVENT
+  title      String
+  message    String
+  isRead     Boolean   @default(false)
+  readAt     DateTime?
+  link       String?   // Optional URL to redirect to
+  entityType String?
+  entityId   String?
+  priority   String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  dedupKey   String?
   
-  createdAt DateTime @default(now())
+  createdAt  DateTime  @default(now())
 
   @@index([userId])
   @@index([isRead])
+  @@index([dedupKey])
 }
 
 model Announcement {
-  id          String   @id @default(cuid())
-  title       String
-  content     String
-  priority    String   @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
-  publishedAt DateTime @default(now())
+  id            String    @id @default(cuid())
+  title         String
+  content       String
+  priority      String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  status        String    @default("PUBLISHED") // DRAFT, SCHEDULED, PUBLISHED, ARCHIVED, EXPIRED
+  audienceType  String    @default("ALL") // ALL, DEPARTMENT, ROLE, PROJECT, USERS
+  audienceScope String?   // department name, role name, project id, or json array
+  publishAt     DateTime  @default(now())
+  publishedAt   DateTime  @default(now())
+  expiresAt     DateTime?
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdById   String?
+  createdBy     User?     @relation("AnnouncementCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([publishedAt])
+  @@index([status])
+  @@index([audienceType])
 }
 
 model Document {
-  id           String   @id @default(cuid())
-  title        String
-  category     String   // COMPANY_POLICY, GUIDELINE, FORM
-  fileUrl      String
+  id              String               @id @default(cuid())
+  title           String
+  description     String?
+  category        String               // COMPANY_POLICY, GUIDELINE, FORM, HR_DOCUMENT, PROJECT_DOCUMENT, CLIENT_DOCUMENT, TEMPLATE, INTERNAL_RESOURCE
+  fileUrl         String
+  storageKey      String?
+  mimeType        String?
+  size            Int?
+  visibility      String               @default("COMPANY") // COMPANY, DEPARTMENT, ROLE, PROJECT, PRIVATE, USERS
+  visibilityScope String?
+  currentVersion  Int                  @default(1)
+  isArchived      Boolean              @default(false)
   
-  uploadedById String
-  uploadedBy   User     @relation("DocumentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+  uploadedById    String
+  uploadedBy      User                 @relation("DocumentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
   
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  versions        DocumentVersion[]
+  permissions     DocumentPermission[]
+
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 
   @@index([category])
+  @@index([visibility])
+  @@index([uploadedById])
+  @@index([isArchived])
 }
 
 model Project {
@@ -705,6 +739,84 @@ model ClientContact {
 
   @@index([clientId])
 }
+
+// -----------------------------------------------------------------------------
+// PHASE 6: ADVANCED COMMUNICATION & DOCUMENT EXPANSIONS
+// -----------------------------------------------------------------------------
+
+model DocumentVersion {
+  id           String   @id @default(cuid())
+  documentId   String
+  document     Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  versionNumber Int     @default(1)
+  fileUrl      String
+  storageKey   String?
+  size         Int?
+  mimeType     String?
+  changeNotes  String?
+  
+  uploadedById String
+  uploadedBy   User     @relation("VersionUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime @default(now())
+
+  @@unique([documentId, versionNumber])
+  @@index([documentId])
+  @@index([uploadedById])
+}
+
+model DocumentPermission {
+  id          String   @id @default(cuid())
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  userId      String?
+  user        User?    @relation("UserDocumentPermissions", fields: [userId], references: [id], onDelete: Cascade)
+  role        String?  // FOUNDER, CO_FOUNDER, ADMIN, EMPLOYEE
+  accessLevel String   @default("VIEW") // VIEW, EDIT, ADMIN
+
+  createdAt   DateTime @default(now())
+
+  @@index([documentId])
+  @@index([userId])
+}
+
+model Activity {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
+  
+  action     String   // CREATED, UPDATED, DELETED, ASSIGNED, APPROVED, REJECTED, PUBLISHED, ARCHIVED, UPLOADED, EXPORTED, CONVERTED
+  entityType String   // TASK, LEAVE, REPORT, PROJECT, ANNOUNCEMENT, DOCUMENT, LEAD, OPPORTUNITY, CLIENT, USER, SYSTEM
+  entityId   String?
+  summary    String
+  metadata   Json?
+
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+model CommunicationTemplate {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  category  String   @default("EMAIL") // EMAIL, NOTIFICATION, ANNOUNCEMENT, REPORT
+  name      String
+  subject   String?
+  content   String
+  variables Json?    // Array of allowed variable names
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([key])
+}
+
 
 
 

@@ -151,6 +151,24 @@ async function main() {
     { name: "crm.report.view", description: "View CRM reports and funnels" },
     { name: "crm.export", description: "Export CRM data" },
     { name: "crm.audit.view", description: "View CRM audit logs" },
+
+    // Phase 6 Advanced Platform Permissions
+    { name: "notification.view", description: "View personal and system notifications" },
+    { name: "notification.manage", description: "Manage system-wide notifications" },
+    { name: "announcement.view", description: "View targeted and published announcements" },
+    { name: "announcement.create", description: "Create new draft announcements" },
+    { name: "announcement.publish", description: "Publish and schedule company announcements" },
+    { name: "announcement.archive", description: "Archive or expire announcements" },
+    { name: "document.view", description: "View and download authorized documents" },
+    { name: "document.upload", description: "Upload new documents and versions" },
+    { name: "document.manage", description: "Manage document permissions and categories" },
+    { name: "document.share", description: "Share documents with users or teams" },
+    { name: "activity.view", description: "View human-readable activity feeds" },
+    { name: "audit.view", description: "View security and audit event logs" },
+    { name: "automation.view", description: "View automation workflows and history" },
+    { name: "automation.manage", description: "Create and modify automation rules" },
+    { name: "search.use", description: "Use global system search" },
+    { name: "template.manage", description: "Manage communication and email templates" },
   ];
 
   const permissions: Record<string, string> = {};
@@ -177,6 +195,10 @@ async function main() {
     "notifications:read",
     "announcements:read",
     "documents:read",
+    "notification.view",
+    "announcement.view",
+    "document.view",
+    "search.use",
   ];
 
   // ADMIN gets everything EMPLOYEE has + management permissions
@@ -190,6 +212,18 @@ async function main() {
     "announcements:manage",
     "documents:manage",
     "admin:access", "admin:settings",
+    "notification.manage",
+    "announcement.create",
+    "announcement.publish",
+    "announcement.archive",
+    "document.upload",
+    "document.manage",
+    "document.share",
+    "activity.view",
+    "audit.view",
+    "automation.view",
+    "automation.manage",
+    "template.manage",
   ];
 
   // FOUNDER / CO_FOUNDER get all permissions
@@ -446,6 +480,72 @@ async function main() {
   }
   console.log('✅ Seeded CRM Pipeline Stages (6 stages)');
 
+  // ─── 9. Seed Default Communication & Email Templates ───────────────
+  const defaultTemplates = [
+    {
+      key: "WELCOME_EMAIL",
+      category: "EMAIL",
+      name: "Employee Welcome & Account Credentials",
+      subject: "Welcome to Axivon Technologies, {{name}}!",
+      content: "<p>Hello <strong>{{name}}</strong>,</p><p>Welcome to the Axivon Technologies team. Your portal account has been provisioned.</p><p>Role: {{role}}<br/>Department: {{department}}</p><p>Best regards,<br/>Axivon Operations</p>",
+      variables: ["name", "role", "department", "email"],
+    },
+    {
+      key: "TASK_ASSIGNED",
+      category: "EMAIL",
+      name: "New Task Assignment Notification",
+      subject: "New Task Assigned: {{taskTitle}}",
+      content: "<p>Hello {{name}},</p><p>You have been assigned a new task: <strong>{{taskTitle}}</strong>.</p><p>Priority: {{priority}}<br/>Due Date: {{dueDate}}</p><p>Please log in to the employee portal to review details.</p>",
+      variables: ["name", "taskTitle", "priority", "dueDate"],
+    },
+    {
+      key: "LEAVE_DECISION",
+      category: "EMAIL",
+      name: "Leave Request Decision Notification",
+      subject: "Leave Request {{status}}: {{leaveType}} Leave",
+      content: "<p>Hello {{name}},</p><p>Your leave request for <strong>{{leaveType}}</strong> from {{startDate}} to {{endDate}} has been <strong>{{status}}</strong>.</p><p>Notes: {{notes}}</p>",
+      variables: ["name", "leaveType", "startDate", "endDate", "status", "notes"],
+    },
+    {
+      key: "LEAD_ASSIGNED",
+      category: "EMAIL",
+      name: "CRM Lead Assigned Notification",
+      subject: "New CRM Lead Assigned: {{leadName}} ({{companyName}})",
+      content: "<p>Hello {{ownerName}},</p><p>A new lead <strong>{{leadName}}</strong> from <em>{{companyName}}</em> has been assigned to you in the CRM.</p><p>Service Interest: {{serviceInterest}}<br/>Budget: {{budget}}</p>",
+      variables: ["ownerName", "leadName", "companyName", "serviceInterest", "budget"],
+    },
+    {
+      key: "FOLLOWUP_REMINDER",
+      category: "EMAIL",
+      name: "CRM Follow-up Reminder",
+      subject: "Reminder: Follow-up with {{clientName}} is due today",
+      content: "<p>Hello {{assigneeName}},</p><p>This is a reminder that your scheduled follow-up with <strong>{{clientName}}</strong> is due at {{dueTime}}.</p><p>Notes: {{notes}}</p>",
+      variables: ["assigneeName", "clientName", "dueTime", "notes"],
+    },
+    {
+      key: "IMPORTANT_ANNOUNCEMENT",
+      category: "EMAIL",
+      name: "Company Announcement Broadcast",
+      subject: "[Announcement] {{title}}",
+      content: "<h2>{{title}}</h2><p>{{content}}</p><p style='color:#888; font-size:12px;'>Published by Axivon Management on {{publishDate}}</p>",
+      variables: ["title", "content", "publishDate"],
+    },
+  ];
+
+  for (const tmpl of defaultTemplates) {
+    await prisma.emailTemplate.upsert({
+      where: { key: tmpl.key },
+      update: { subject: tmpl.subject, htmlBody: tmpl.content, textBody: tmpl.content, variables: tmpl.variables },
+      create: { key: tmpl.key, subject: tmpl.subject, htmlBody: tmpl.content, textBody: tmpl.content, variables: tmpl.variables },
+    });
+
+    await prisma.communicationTemplate.upsert({
+      where: { key: tmpl.key },
+      update: { name: tmpl.name, category: tmpl.category, subject: tmpl.subject, content: tmpl.content, variables: tmpl.variables },
+      create: { key: tmpl.key, name: tmpl.name, category: tmpl.category, subject: tmpl.subject, content: tmpl.content, variables: tmpl.variables },
+    });
+  }
+  console.log(`✅ Seeded ${defaultTemplates.length} default communication & email templates`);
 }
 
 main()

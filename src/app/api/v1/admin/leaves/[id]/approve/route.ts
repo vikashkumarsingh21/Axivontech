@@ -16,9 +16,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       data: { userId: leave.userId, type: "LEAVE_APPROVED", title: "Leave Approved", message: "Your leave request has been approved.", link: "/employee/leave" },
     });
 
-    await db.auditLog.create({
-      data: { userId: adminId, action: "LEAVE_APPROVED", resource: "LeaveRequest", details: { leaveId: id } },
-    });
+    const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
+    if (EventBus) {
+      EventBus.emit({
+        eventType: "LEAVE_UPDATED",
+        actorId: adminId || undefined,
+        recipientId: leave.userId,
+        entityType: "LEAVE",
+        entityId: id,
+        title: "Leave Approved",
+        message: "Your leave request has been approved.",
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

@@ -17,6 +17,11 @@ export async function validateActiveUser(userId: string | null) {
       department: true,
       designation: true,
       organizationId: true,
+      userRoles: {
+        include: {
+          role: true,
+        },
+      },
     },
   });
 

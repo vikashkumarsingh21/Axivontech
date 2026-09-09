@@ -116,6 +116,21 @@ export async function POST(req: Request) {
       },
     });
 
+    // Emit platform event
+    const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
+    if (EventBus) {
+      EventBus.emit({
+        eventType: "TASK_ASSIGNED",
+        actorId: adminId || undefined,
+        recipientId: userId,
+        entityType: "TASK",
+        entityId: task.id,
+        title: "NEW TASK ASSIGNED",
+        message: `Task: ${title} assigned by ${admin.name}. Due: ${dueDateFormatted}`,
+        metadata: { taskId: task.id, priority: task.priority },
+      }).catch(() => {});
+    }
+
     return NextResponse.json({ data: task }, { status: 201 });
   } catch (error: any) {
     return handleApiError(error);

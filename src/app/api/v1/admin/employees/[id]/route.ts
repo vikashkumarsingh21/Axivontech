@@ -199,3 +199,76 @@ export async function PATCH(
     return handleApiError(error);
   }
 }
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const adminId = req.headers.get("x-user-id");
+    await requirePermission(adminId, "users:delete");
+
+    const { id } = await params;
+
+    if (adminId === id) {
+      throw new ApiError(400, "You cannot delete your own account.");
+    }
+
+    const targetUser = await db.user.findUnique({
+      where: { id },
+      include: {
+        userRoles: {
+          include: { role: true },
+        },
+      },
+    });
+
+    if (!targetUser) {
+      throw new ApiError(404, "Employee not found");
+    }
+
+    const isFounder = targetUser.userRoles.some(
+      (ur) => ur.role.name === "FOUNDER" || ur.role.name === "CO_FOUNDER"
+    );
+    if (isFounder) {
+      throw new ApiError(403, "Forbidden: Cannot delete Founder or Co-Founder accounts");
+    }
+
+    // Clean up all user dependencies in a transaction
+    await db.$transaction([
+      db.session.deleteMany({ where: { userId: id } }),
+      db.userPreference.deleteMany({ where: { userId: id } }),
+      db.notification.deleteMany({ where: { userId: id } }),
+      db.reminder.deleteMany({ where: { userId: id } }),
+      db.attendance.deleteMany({ where: { userId: id } }),
+      db.taskComment.deleteMany({ where: { userId: id } }),
+      db.task.deleteMany({ where: { userId: id } }),
+      db.workReport.deleteMany({ where: { userId: id } }),
+      db.leaveRequest.deleteMany({ where: { userId: id } }),
+      db.projectMember.deleteMany({ where: { userId: id } }),
+      db.userRole.deleteMany({ where: { userId: id } }),
+      db.user.delete({ where: { id } }),
+    ]);
+
+    // Audit log
+    await db.auditLog.create({
+      data: {
+        userId: adminId,
+        action: "EMPLOYEE_PERMANENTLY_DELETED",
+        resource: "User",
+        details: {
+          deletedUserId: id,
+          deletedUserName: targetUser.name,
+          deletedUserEmail: targetUser.email,
+        },
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Employee ${targetUser.name} (${targetUser.email}) and all associated data permanently deleted.`,
+    });
+  } catch (error: any) {
+    return handleApiError(error);
+  }
+}

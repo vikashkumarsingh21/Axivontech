@@ -7,12 +7,12 @@ export async function POST(req: Request) {
     const userId = req.headers.get("x-user-id");
     if (!userId) throw new ApiError(401, "Unauthorized");
 
-    await db.notification.updateMany({
+    const result = await db.notification.updateMany({
       where: { userId, isRead: false },
-      data: { isRead: true },
+      data: { isRead: true, readAt: new Date() },
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, count: result.count });
   } catch (error: any) {
     return handleApiError(error);
   }

@@ -242,32 +242,35 @@ export default function AdminTasksPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1">Assign To <span className="text-red-500">*</span></label>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">Assign To Employee <span className="text-red-500">*</span></label>
                   <select
                     required value={form.userId}
                     onChange={e => setForm({ ...form, userId: e.target.value })}
                     className="w-full bg-[#1e1e1e] border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-red-500/50"
                   >
-                    <option value="">Select employee...</option>
+                    <option value="">Select active employee...</option>
                     {employees.filter(emp => emp.status === "ACTIVE").map(emp => (
-                      <option key={emp.id} value={emp.id}>{emp.name} ({emp.department || "No dept"})</option>
+                      <option key={emp.id} value={emp.id}>
+                        {emp.name} — {emp.designation || emp.department || "Employee"}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1">Project</label>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">Project Pipeline</label>
                   <select
                     value={form.projectId}
                     onChange={e => setForm({ ...form, projectId: e.target.value })}
                     className="w-full bg-[#1e1e1e] border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-red-500/50"
                   >
-                    <option value="">No project</option>
+                    <option value="">General (No specific project)</option>
                     {projects.map((p: any) => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
+                      <option key={p.id} value={p.id}>{p.name} ({p.status})</option>
                     ))}
                   </select>
                 </div>
               </div>
+
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
