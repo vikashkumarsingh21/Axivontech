@@ -145,6 +145,15 @@ export class JobRunner {
             break;
           }
 
+          // ─── Attendance: EOD Incomplete Hours Reconciliation & Alerts ───
+          case "ATTENDANCE_CUTOFF_CHECK": {
+            const p = job.payload as any;
+            const targetDate = p?.date ? new Date(p.date) : new Date();
+            const { AttendanceService } = await import("@/lib/services/attendance.service");
+            await AttendanceService.processCutoffAlerts(targetDate);
+            break;
+          }
+
           default:
             console.warn(`[JobRunner] Unknown job type: ${job.jobType}`);
         }

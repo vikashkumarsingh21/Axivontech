@@ -5,6 +5,19 @@ import { JobRunner } from "../src/lib/jobs/runner";
 // Mock database
 vi.mock("@/lib/db", () => ({
   db: {
+    communicationTemplate: {
+      findFirst: vi.fn().mockImplementation(({ where }: any) => {
+        if (where.key === "WELCOME_EMAIL") {
+          return Promise.resolve({
+            key: "WELCOME_EMAIL",
+            subject: "Welcome {{name}} to Axivon",
+            content: "<p>Hello {{name}}, welcome to Axivon Technologies!</p>",
+            isActive: true,
+          });
+        }
+        return Promise.resolve(null);
+      }),
+    },
     emailTemplate: {
       findUnique: vi.fn().mockImplementation(({ where }: any) => {
         if (where.key === "WELCOME_EMAIL") {

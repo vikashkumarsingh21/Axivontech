@@ -1,0 +1,53 @@
+name: Axivon Technologies CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, staging ]
+  pull_request:
+    branches: [ main, staging ]
+
+jobs:
+  audit-and-test:
+    name: Build & Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Check Environment Template
+        run: |
+          if [ ! -f .env.example ]; then
+            echo "❌ Missing .env.example file!"
+            exit 1
+          fi
+          echo "✅ .env.example template verified."
+
+      - name: Run Prisma Client Generation
+        run: npx prisma generate
+
+      - name: Check ESLint & Code Formatting
+        run: npm run lint
+
+      - name: Run TypeScript Type Check
+        run: npx tsc --noEmit
+
+      - name: Security Vulnerability Audit
+        run: npm audit --audit-level=high --production
+        continue-on-error: true
+
+      - name: Next.js Production Build Verification
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy?sslmode=require"
+          SESSION_SECRET: "ci_pipeline_dummy_session_secret_at_least_32_chars_long"
+          NODE_ENV: "production"
+        run: npm run build

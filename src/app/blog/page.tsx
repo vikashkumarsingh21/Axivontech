@@ -1,34 +1,19 @@
 import type { Metadata } from "next";
-
-import BlogHero from "@/components/blog/BlogHero";
-
-// Future Sections
-import FeaturedArticle from "@/components/blog/FeaturedArticle";
-import BlogCategories from "@/components/blog/BlogCategories";
-import LatestArticles from "@/components/blog/LatestArticles";
-import TrendingTopics from "@/components/blog/TrendingTopics";
+import BlogClientView from "@/components/blog/BlogClientView";
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Blog & Insights | Axivon Technologies",
   description:
-    "Explore insights, technology trends, AI innovations, web development guides, startup strategies, cloud computing, and digital transformation articles from Axivon Technologies.",
+    "Expert technical articles, technology evaluation guides, AI automation blueprints, custom software insights, and comprehensive robotics project guides from Axivon Technologies in Gujarat.",
 
   keywords: [
-    "Axivon Blog",
-    "Technology Blog",
-    "Web Development",
-    "Next.js",
-    "React",
-    "Artificial Intelligence",
-    "Machine Learning",
-    "Cloud Computing",
-    "Digital Transformation",
-    "Startup Growth",
-    "SEO",
-    "Software Development",
-    "Technology Insights",
-    "Programming",
-    "Axivon Technologies",
+    "Axivon Technology Blog",
+    "Software Development Gujarat",
+    "Robotics Projects Guide",
+    "AI Business Automation",
+    "App Development Company Rajkot",
+    "Custom Software Ahmedabad",
+    "IoT Devices Gujarat",
   ],
 
   alternates: {
@@ -36,9 +21,9 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "Blog | Axivon Technologies",
+    title: "Blog & Insights | Axivon Technologies",
     description:
-      "Read technology insights, development guides, AI innovations, startup strategies, and digital transformation articles from Axivon Technologies.",
+      "Expert technology guides, AI automation blueprints, custom software insights, and robotics guides for Gujarat businesses, startups, and institutions.",
     url: "https://axivontech.in/blog",
     siteName: "Axivon Technologies",
     type: "website",
@@ -46,9 +31,9 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Blog | Axivon Technologies",
+    title: "Blog & Insights | Axivon Technologies",
     description:
-      "Technology insights, AI innovations, development guides, and startup knowledge from Axivon Technologies.",
+      "Expert technology guides, AI automation blueprints, and robotics guides from Axivon Technologies.",
   },
   robots: {
     index: true,
@@ -58,21 +43,8 @@ export const metadata: Metadata = {
 
 export default function BlogPage() {
   return (
-    <main className="overflow-hidden bg-[#0f0f0f]">
-      {/* Hero Section */}
-      <BlogHero />
-
-      {/* Featured Article */}
-      <FeaturedArticle />
-
-      {/* Blog Categories */}
-      <BlogCategories />
-
-      {/* Latest Articles */}
-      <LatestArticles />
-
-      {/* Trending Topics */}
-      <TrendingTopics />
+    <main className="min-h-screen bg-[#0a0a0c] text-white">
+      <BlogClientView />
     </main>
   );
 }

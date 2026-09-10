@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { BLOG_POSTS } from "@/data/blog-posts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://axivontech.in";
@@ -6,7 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // which causes unnecessary recrawling. 
   const lastModified = "2024-03-01";
 
-  return [
+  const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified, changeFrequency: "weekly", priority: 1 },
     { url: `${baseUrl}/about`, lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: `${baseUrl}/services`, lastModified, changeFrequency: "weekly", priority: 0.9 },
@@ -28,4 +29,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/cookie-policy`, lastModified, changeFrequency: "yearly", priority: 0.3 },
     { url: `${baseUrl}/terms-and-conditions`, lastModified, changeFrequency: "yearly", priority: 0.3 },
   ];
+
+  const blogPages: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.updatedDate || post.publishedDate).toISOString().split("T")[0],
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  return [...staticPages, ...blogPages];
 }

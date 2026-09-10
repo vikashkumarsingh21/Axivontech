@@ -75,8 +75,11 @@ async function main() {
 
     // Attendance
     { name: "attendance:read", description: "View own attendance" },
-    { name: "attendance:write", description: "Check in / check out" },
+    { name: "attendance:write", description: "Check in / check out and breaks" },
     { name: "attendance:manage", description: "Manage all attendance records" },
+    { name: "attendance.policy.manage", description: "Configure company attendance window and policies" },
+    { name: "attendance.regularization.review", description: "Review attendance regularization requests" },
+    { name: "attendance.regularization.submit", description: "Submit attendance regularization requests" },
 
     // Tasks
     { name: "tasks:read", description: "View assigned tasks" },
@@ -530,6 +533,82 @@ async function main() {
       content: "<h2>{{title}}</h2><p>{{content}}</p><p style='color:#888; font-size:12px;'>Published by Axivon Management on {{publishDate}}</p>",
       variables: ["title", "content", "publishDate"],
     },
+    {
+      key: "ATTENDANCE_INCOMPLETE_ALERT",
+      category: "EMAIL",
+      name: "Attendance Incomplete Hours Alert",
+      subject: "Axivon Attendance Alert — Required Working Hours Not Completed ({{date}})",
+      content: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #27272a; border-radius: 12px; background-color: #09090b; color: #f4f4f5;">
+          <div style="border-bottom: 1px solid #27272a; padding-bottom: 16px; margin-bottom: 20px;">
+            <h2 style="color: #ef4444; margin: 0 0 6px 0; font-size: 20px;">Attendance Working Hours Notice</h2>
+            <p style="margin: 0; color: #a1a1aa; font-size: 13px;">Axivon Technologies Workforce Management System</p>
+          </div>
+
+          <p style="font-size: 14px; line-height: 1.6; color: #e4e4e7;">
+            Dear <strong>{{employeeName}}</strong> (ID: {{employeeId}}),
+          </p>
+
+          <p style="font-size: 14px; line-height: 1.6; color: #d4d4d8;">
+            Our daily attendance reconciliation for <strong>{{date}}</strong> indicates that your required working hours were not completed within the official company attendance window.
+          </p>
+
+          <div style="background-color: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 16px; margin: 20px 0;">
+            <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 6px 0; color: #a1a1aa;">Company Window:</td>
+                <td style="padding: 6px 0; font-weight: 600; text-align: right; color: #f4f4f5;">{{companyWindow}}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #a1a1aa;">Required Target:</td>
+                <td style="padding: 6px 0; font-weight: 600; text-align: right; color: #60a5fa;">{{requiredHours}}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #a1a1aa;">Net Worked Time:</td>
+                <td style="padding: 6px 0; font-weight: 600; text-align: right; color: #f59e0b;">{{workedHours}}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #a1a1aa;">Unpaid Break Time:</td>
+                <td style="padding: 6px 0; font-weight: 600; text-align: right; color: #a1a1aa;">{{breakHours}}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #a1a1aa;">Shortfall Time:</td>
+                <td style="padding: 6px 0; font-weight: 600; text-align: right; color: #ef4444;">{{shortfallHours}}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #a1a1aa;">Check-in / Check-out:</td>
+                <td style="padding: 6px 0; font-weight: 600; text-align: right; color: #f4f4f5;">{{checkInTime}} → {{checkOutTime}}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #a1a1aa;">Day Status:</td>
+                <td style="padding: 6px 0; font-weight: 600; text-align: right; color: #f87171;">{{status}}</td>
+              </tr>
+            </table>
+          </div>
+
+          <p style="font-size: 13px; line-height: 1.5; color: #a1a1aa;">
+            If you experienced an untracked shift, technical issue, or work-related field duty, you may submit an <strong>Attendance Regularization Request</strong> via the Axivon Employee Portal for Admin/Manager review.
+          </p>
+
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #27272a; font-size: 12px; color: #71717a;">
+            This is an automated system notification from Axivon Technologies internal attendance engine. Please do not reply directly to this email.
+          </div>
+        </div>
+      `,
+      variables: [
+        "employeeName",
+        "employeeId",
+        "date",
+        "companyWindow",
+        "requiredHours",
+        "workedHours",
+        "breakHours",
+        "shortfallHours",
+        "checkInTime",
+        "checkOutTime",
+        "status",
+      ],
+    },
   ];
 
   for (const tmpl of defaultTemplates) {
@@ -546,6 +625,24 @@ async function main() {
     });
   }
   console.log(`✅ Seeded ${defaultTemplates.length} default communication & email templates`);
+
+  // ─── 10. Seed Default Attendance Policy ──────────────────────────
+  const policy = await prisma.attendancePolicy.findFirst();
+  if (!policy) {
+    await prisma.attendancePolicy.create({
+      data: {
+        workWindowStart: "08:00",
+        workWindowEnd: "19:00",
+        defaultRequiredMinutes: 480, // 8 Hours
+        graceMinutes: 15,
+        cutoffTime: "19:00",
+        weeklyOffDays: [0], // Sunday
+        enableIncompleteAlerts: true,
+        allowRemoteRegularization: true,
+      },
+    });
+    console.log('✅ Seeded Default Attendance Policy (08:00 AM - 07:00 PM, 480 mins)');
+  }
 }
 
 main()

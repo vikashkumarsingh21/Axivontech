@@ -46,6 +46,8 @@ model User {
   taskComments     TaskComment[]
   workReports      WorkReport[]
   leaveRequests    LeaveRequest[]
+  regularizations  RegularizationRequest[]
+  reviewedRegularizations RegularizationRequest[] @relation("RegularizationReviewer")
   notifications    Notification[]
   uploadedDocs     Document[]     @relation("DocumentUploader")
   projectMembers   ProjectMember[]
@@ -143,22 +145,107 @@ model AuditLog {
 // -----------------------------------------------------------------------------
 
 model Attendance {
-  id           String    @id @default(cuid())
-  userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date         DateTime  @db.Date
-  checkInAt    DateTime
-  checkOutAt   DateTime?
-  totalMinutes Int?
-  requiredDailyMinutes Int?
-  status       String    @default("PRESENT") // PRESENT, HALF_DAY, LATE, NOT_STARTED, IN_PROGRESS, COMPLETE, INCOMPLETE, ABSENT, ON_LEAVE
-  notes        String?
+  id                  String    @id @default(cuid())
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date                DateTime  @db.Date
+  checkInAt           DateTime
+  checkOutAt          DateTime?
+  grossMinutes        Int?      @default(0)
+  breakMinutes        Int?      @default(0)
+  netMinutes          Int?      @default(0)
+  totalMinutes        Int?      // Legacy alias for netMinutes
+  requiredDailyMinutes Int?     @default(480)
+  remainingMinutes    Int?      @default(0)
+  lateMinutes         Int?      @default(0)
+  earlyExitMinutes    Int?      @default(0)
+  isLate              Boolean   @default(false)
+  isEarlyExit         Boolean   @default(false)
+  status              String    @default("PRESENT") // PRESENT, HALF_DAY, LATE, NOT_STARTED, IN_PROGRESS, COMPLETE, INCOMPLETE, ABSENT, ON_LEAVE, HOLIDAY, WEEKLY_OFF
+  completionStatus    String    @default("INCOMPLETE") // COMPLETE, INCOMPLETE, ON_LEAVE, HOLIDAY, WEEKLY_OFF, HALF_DAY
+  emailAlertSent      Boolean   @default(false)
+  notes               String?
   
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  breaks              AttendanceBreak[]
+  regularization      RegularizationRequest?
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   @@unique([userId, date]) // Prevent duplicate attendance for the same day
   @@index([userId])
+  @@index([date])
+  @@index([status])
+  @@index([completionStatus])
+}
+
+model AttendanceBreak {
+  id           String     @id @default(cuid())
+  attendanceId String
+  attendance   Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+  startTime    DateTime
+  endTime      DateTime?
+  durationMinutes Int?    @default(0)
+  type         String     @default("LUNCH") // LUNCH, TEA, PERSONAL, SHORT_BREAK, OTHER
+  notes        String?
+  
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([attendanceId])
+}
+
+model AttendancePolicy {
+  id                          String   @id @default(cuid())
+  workWindowStart             String   @default("08:00") // 08:00 AM
+  workWindowEnd               String   @default("19:00") // 07:00 PM
+  defaultRequiredMinutes      Int      @default(480)    // 8 Hours = 480 Mins
+  graceMinutes                Int      @default(15)
+  cutoffTime                  String   @default("19:00") // 07:00 PM
+  weeklyOffDays               Json?    // e.g. [0, 6] (Sunday, Saturday)
+  enableIncompleteAlerts      Boolean  @default(true)
+  allowRemoteRegularization   Boolean  @default(true)
+  updatedById                 String?
+
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+}
+
+model RegularizationRequest {
+  id                 String      @id @default(cuid())
+  attendanceId       String?     @unique
+  attendance         Attendance? @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
+  userId             String
+  user               User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date               DateTime    @db.Date
+  requestedCheckIn   DateTime
+  requestedCheckOut  DateTime
+  requestedBreaks    Json?
+  reason             String
+  status             String      @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  reviewedById       String?
+  reviewedBy         User?       @relation("RegularizationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewNotes        String?
+  reviewedAt         DateTime?
+
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([date])
+}
+
+model Holiday {
+  id          String   @id @default(cuid())
+  name        String
+  date        DateTime @unique @db.Date
+  isOptional  Boolean  @default(false)
+  description String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   @@index([date])
 }
 

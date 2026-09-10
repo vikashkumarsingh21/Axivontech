@@ -200,8 +200,8 @@ export default function WhyChooseUs() {
               className="relative mt-6 aspect-[16/10] w-full overflow-hidden rounded-2xl border border-[#262626] bg-[#141414]"
             >
               <Image
-                src="/assets/images/agency/team-collaboration.jpg"
-                alt="Axivon Technologies software engineering and architecture team"
+                src="/assets/images/why-choose-us/engineering-team-workspace.jpg"
+                alt="Axivon Technologies authentic engineering team collaborating"
                 fill
                 sizes="(max-width: 1024px) 100vw, 450px"
                 className="object-cover object-center opacity-80 transition-opacity duration-300 hover:opacity-95"
