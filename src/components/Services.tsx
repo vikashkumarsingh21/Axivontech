@@ -14,6 +14,7 @@ import {
   Terminal,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { SectionHeader } from "@/components/ui";
 
 interface FlagshipService {
@@ -26,6 +27,7 @@ interface FlagshipService {
   stack: string[];
   deliverables: string[];
   highlight: string;
+  image: string;
 }
 
 const FLAGSHIP_SERVICES: FlagshipService[] = [
@@ -44,6 +46,7 @@ const FLAGSHIP_SERVICES: FlagshipService[] = [
       "Full API & database integrations",
     ],
     highlight: "99.9% Uptime & Lighthouse 95+",
+    image: "/assets/images/services/web-engineering.jpg",
   },
   {
     id: "mobile-dev",
@@ -60,6 +63,7 @@ const FLAGSHIP_SERVICES: FlagshipService[] = [
       "Biometric security & hardware integrations",
     ],
     highlight: "Multi-Platform Fluidity",
+    image: "/assets/images/services/mobile-app-design.jpg",
   },
   {
     id: "ai-solutions",
@@ -76,6 +80,7 @@ const FLAGSHIP_SERVICES: FlagshipService[] = [
       "Real-time sentiment and predictive analytics",
     ],
     highlight: "Practical AI Integration",
+    image: "/assets/images/services/ai-machine-learning.jpg",
   },
   {
     id: "ui-ux",
@@ -92,6 +97,7 @@ const FLAGSHIP_SERVICES: FlagshipService[] = [
       "Accessibility-first WCAG 2.1 compliance",
     ],
     highlight: "Human-Centered Design",
+    image: "/assets/images/services/ui-ux-design-workspace.jpg",
   },
 ];
 
@@ -170,6 +176,18 @@ export default function Services() {
                     <span className="rounded-full border border-[#2e2e2e] bg-[#1a1a1a] px-3 py-1 font-mono text-[11px] font-medium text-[#a1a1aa]">
                       {srv.badge}
                     </span>
+                  </div>
+
+                  {/* Feature Image */}
+                  <div className="relative mb-6 w-full overflow-hidden rounded-xl border border-[#262626] aspect-[16/9]">
+                    <Image
+                      src={srv.image}
+                      alt={srv.title}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/80 to-transparent mix-blend-multiply" />
                   </div>
 
                   {/* Title & Description */}

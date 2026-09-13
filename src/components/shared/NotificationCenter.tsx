@@ -28,9 +28,20 @@ export function NotificationCenter() {
   };
 
   useEffect(() => {
-    fetchUnread();
-    const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
+    let active = true;
+    const getUnread = async () => {
+      try {
+        const res = await fetch("/api/v1/notifications/unread-count");
+        const d = await res.json();
+        if (res.ok && active) setUnreadCount(d.unreadCount || 0);
+      } catch (e) {}
+    };
+    getUnread();
+    const interval = setInterval(getUnread, 30000);
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const toggleOpen = () => {

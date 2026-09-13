@@ -74,11 +74,11 @@ export default function AdminAttendancePage() {
 
   // Policy form state
   const [policyForm, setPolicyForm] = useState({
-    workWindowStart: "08:00",
-    workWindowEnd: "19:00",
+    workWindowStart: "06:00",
+    workWindowEnd: "23:00",
     defaultRequiredMinutes: 480,
     graceMinutes: 15,
-    cutoffTime: "19:00",
+    cutoffTime: "23:00",
     enableIncompleteAlerts: true,
   });
   const [policySaving, setPolicySaving] = useState(false);
@@ -100,11 +100,11 @@ export default function AdminAttendancePage() {
       if (data.policy) {
         setPolicy(data.policy);
         setPolicyForm({
-          workWindowStart: data.policy.workWindowStart || "08:00",
-          workWindowEnd: data.policy.workWindowEnd || "19:00",
+          workWindowStart: data.policy.workWindowStart || "06:00",
+          workWindowEnd: data.policy.workWindowEnd || "23:00",
           defaultRequiredMinutes: data.policy.defaultRequiredMinutes || 480,
           graceMinutes: data.policy.graceMinutes ?? 15,
-          cutoffTime: data.policy.cutoffTime || "19:00",
+          cutoffTime: data.policy.cutoffTime || "23:00",
           enableIncompleteAlerts: data.policy.enableIncompleteAlerts ?? true,
         });
       }
@@ -201,7 +201,7 @@ export default function AdminAttendancePage() {
             <Clock className="w-6 h-6 text-green-500" /> Remote Attendance & Work Hours Center
           </h1>
           <p className="text-gray-400 text-sm mt-1">
-            Company work window ({policy?.workWindowStart || "08:00 AM"} → {policy?.workWindowEnd || "07:00 PM"}), net hours calculations, break tracking, and automated cutoff alerts.
+            Company work window ({policy?.workWindowStart || "06:00 AM"} → {policy?.workWindowEnd || "11:00 PM"}), net hours calculations, break tracking, and automated cutoff alerts.
           </p>
         </div>
 
@@ -620,28 +620,28 @@ export default function AdminAttendancePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-300 mb-1">
-                  Company Work Window Start (Default: 08:00 AM)
+                  Company Work Window Start (Default: 06:00 AM)
                 </label>
                 <input
                   type="text"
                   required
                   value={policyForm.workWindowStart}
                   onChange={(e) => setPolicyForm({ ...policyForm, workWindowStart: e.target.value })}
-                  placeholder="08:00"
+                  placeholder="06:00"
                   className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-gray-300 mb-1">
-                  Company Work Window End (Default: 07:00 PM)
+                  Company Work Window End (Default: 11:00 PM)
                 </label>
                 <input
                   type="text"
                   required
                   value={policyForm.workWindowEnd}
                   onChange={(e) => setPolicyForm({ ...policyForm, workWindowEnd: e.target.value })}
-                  placeholder="19:00"
+                  placeholder="23:00"
                   className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-green-500"
                 />
               </div>
@@ -684,7 +684,7 @@ export default function AdminAttendancePage() {
                 className="w-4 h-4 rounded border-gray-700 text-green-600 focus:ring-green-500"
               />
               <label htmlFor="enableIncompleteAlerts" className="text-xs text-gray-300">
-                Enable automated 07:00 PM cutoff email notification for incomplete required working hours
+                Enable automated 11:00 PM cutoff email notification for incomplete required working hours
               </label>
             </div>
 

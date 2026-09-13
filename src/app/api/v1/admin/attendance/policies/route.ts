@@ -78,11 +78,11 @@ export async function PATCH(req: NextRequest) {
     } else {
       updatedPolicy = await db.attendancePolicy.create({
         data: {
-          workWindowStart: workWindowStart || "08:00",
-          workWindowEnd: workWindowEnd || "19:00",
+          workWindowStart: workWindowStart || "06:00",
+          workWindowEnd: workWindowEnd || "23:00",
           defaultRequiredMinutes: defaultRequiredMinutes || 480,
           graceMinutes: graceMinutes ?? 15,
-          cutoffTime: cutoffTime || "19:00",
+          cutoffTime: cutoffTime || "23:00",
           weeklyOffDays: weeklyOffDays || [0],
           enableIncompleteAlerts: enableIncompleteAlerts ?? true,
           allowRemoteRegularization: allowRemoteRegularization ?? true,

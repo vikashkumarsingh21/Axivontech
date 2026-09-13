@@ -13,20 +13,19 @@ export default function LocalBusinessSchema() {
 
     telephone: "+91-9473263768",
 
-    email: "info@axivontech.in",
+    email: "contact@axivontech.in",
 
     description:
-      "Axivon Technologies is a Website Development, Mobile App Development, AI Solutions, SEO, UI/UX Design and Software Development Company.",
+      "Axivon Technologies is a Website Development, Mobile App Development, AI Solutions, SEO, UI/UX Design and Software Development Company based in Rajkot, Gujarat.",
 
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Patna",
-      addressRegion: "Bihar",
-      postalCode: "800001",
+      addressLocality: "Rajkot",
+      addressRegion: "Gujarat",
       addressCountry: "IN",
     },
 
-    areaServed: "India",
+    areaServed: ["Rajkot", "Ahmedabad", "Gujarat", "India"],
 
     priceRange: "$$",
 

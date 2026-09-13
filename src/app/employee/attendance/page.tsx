@@ -211,7 +211,7 @@ export default function AttendancePage() {
             <div className="flex items-center gap-2">
               <span className="text-xs uppercase tracking-wider text-blue-400 font-semibold">Company Attendance Window</span>
               <span className="px-2 py-0.5 rounded text-[10px] bg-blue-500/20 text-blue-300 font-mono">
-                {policy?.workWindowStart || "08:00 AM"} → {policy?.workWindowEnd || "07:00 PM"}
+                {policy?.workWindowStart || "06:00 AM"} → {policy?.workWindowEnd || "11:00 PM"}
               </span>
             </div>
             <p className="text-xs text-gray-400 mt-0.5">
@@ -221,7 +221,7 @@ export default function AttendancePage() {
         </div>
         <div className="flex items-center gap-2 text-xs text-gray-400">
           <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>Grace Time: <strong>{policy?.graceMinutes || 15} mins</strong> • Cutoff: <strong>{policy?.cutoffTime || "07:00 PM"}</strong></span>
+          <span>Grace Time: <strong>{policy?.graceMinutes || 15} mins</strong> • Cutoff: <strong>{policy?.cutoffTime || "11:00 PM"}</strong></span>
         </div>
       </div>
 

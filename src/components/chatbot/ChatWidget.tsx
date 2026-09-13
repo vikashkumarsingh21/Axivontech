@@ -17,12 +17,14 @@ import {
   ArrowRight,
   ShieldCheck,
 } from "lucide-react";
+import { LeadCapture } from "./LeadCapture";
 
 interface Message {
   id: string;
   sender: "user" | "bot";
   text: string;
   timestamp: string;
+  isLeadCapture?: boolean;
 }
 
 const INITIAL_MESSAGES: Message[] = [
@@ -95,6 +97,7 @@ export default function ChatWidget() {
         sender: "bot",
         text: data.reply || "Thank you for reaching out! Please contact us at contact@axivontech.in.",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        isLeadCapture: !!data.showLeadCapture,
       };
 
       setMessages((prev) => [...prev, botMsg]);
@@ -200,21 +203,39 @@ export default function ChatWidget() {
                     </div>
                   )}
 
-                  <div
-                    className={`group relative max-w-[82%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed ${
-                      msg.sender === "user"
-                        ? "bg-[#e8a064] text-[#0f0f0f] font-medium rounded-br-xs"
-                        : "bg-[#1c1c1e] text-[#f4f4f5] border border-[#262626] rounded-bl-xs"
-                    }`}
-                  >
-                    <div className="whitespace-pre-wrap">{msg.text}</div>
+                  <div className="flex flex-col gap-2 max-w-[82%]">
                     <div
-                      className={`mt-1.5 text-[9px] ${
-                        msg.sender === "user" ? "text-[#0f0f0f]/70 text-right" : "text-[#71717a]"
+                      className={`group relative rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed ${
+                        msg.sender === "user"
+                          ? "bg-[#e8a064] text-[#0f0f0f] font-medium rounded-br-xs"
+                          : "bg-[#1c1c1e] text-[#f4f4f5] border border-[#262626] rounded-bl-xs"
                       }`}
                     >
-                      {msg.timestamp}
+                      <div className="whitespace-pre-wrap">{msg.text}</div>
+                      <div
+                        className={`mt-1.5 text-[9px] ${
+                          msg.sender === "user" ? "text-[#0f0f0f]/70 text-right" : "text-[#71717a]"
+                        }`}
+                      >
+                        {msg.timestamp}
+                      </div>
                     </div>
+                    {msg.isLeadCapture && (
+                      <LeadCapture 
+                        onComplete={(name) => {
+                          const botMsg: Message = {
+                            id: Date.now().toString(),
+                            sender: "bot",
+                            text: `Thank you, ${name}! Your project requirements have been sent to our team. We'll be in touch very soon.`,
+                            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+                          };
+                          setMessages((prev) => prev.map(m => m.id === msg.id ? { ...m, isLeadCapture: false } : m).concat(botMsg));
+                        }} 
+                        onCancel={() => {
+                          setMessages((prev) => prev.map(m => m.id === msg.id ? { ...m, isLeadCapture: false } : m));
+                        }} 
+                      />
+                    )}
                   </div>
 
                   {msg.sender === "user" && (

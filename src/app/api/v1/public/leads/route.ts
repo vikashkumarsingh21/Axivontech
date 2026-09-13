@@ -123,6 +123,38 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Try to send email
+    try {
+      const { EmailService } = await import("@/lib/email/service");
+      await EmailService.send({
+        to: process.env.COMPANY_CONTACT_EMAIL || "info@axivontech.in",
+        templateKey: "NEW_WEBSITE_LEAD",
+        variables: {
+          name: lead.name,
+          email: lead.email,
+          phone: lead.phone || "N/A",
+          company: lead.companyName || "N/A",
+          service: lead.serviceInterest || "N/A",
+          message: lead.message || "N/A",
+          source: lead.source,
+          leadCode: lead.leadCode,
+          link: `${process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in"}/admin/crm/leads/${lead.id}`,
+        }
+      });
+    } catch (emailError) {
+      console.error("[Email Error] Failed to send new lead email:", emailError);
+      // Lead is still safely stored in CRM. Log the failure activity.
+      await db.leadActivity.create({
+        data: {
+          leadId: lead.id,
+          type: "SYSTEM_ERROR",
+          title: "Email Notification Failed",
+          notes: "Failed to send the new lead notification email to the company address.",
+          metadata: { error: String(emailError) },
+        },
+      });
+    }
+
     return NextResponse.json(
       {
         success: true,

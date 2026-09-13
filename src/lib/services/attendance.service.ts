@@ -3,22 +3,22 @@ import { EmailService } from "@/lib/email/service";
 import { NotificationService } from "@/lib/events/bus";
 
 export interface AttendancePolicyConfig {
-  workWindowStart: string; // e.g. "08:00"
-  workWindowEnd: string;   // e.g. "19:00"
+  workWindowStart: string; // e.g. "06:00"
+  workWindowEnd: string;   // e.g. "23:00"
   defaultRequiredMinutes: number; // e.g. 480
   graceMinutes: number;    // e.g. 15
-  cutoffTime: string;      // e.g. "19:00"
+  cutoffTime: string;      // e.g. "23:00"
   weeklyOffDays: number[]; // [0] = Sunday, [0, 6] = Sun, Sat
   enableIncompleteAlerts: boolean;
   allowRemoteRegularization: boolean;
 }
 
 export const DEFAULT_ATTENDANCE_POLICY: AttendancePolicyConfig = {
-  workWindowStart: "08:00",
-  workWindowEnd: "19:00",
+  workWindowStart: "06:00",
+  workWindowEnd: "23:00",
   defaultRequiredMinutes: 480,
   graceMinutes: 15,
-  cutoffTime: "19:00",
+  cutoffTime: "23:00",
   weeklyOffDays: [0], // Sunday
   enableIncompleteAlerts: true,
   allowRemoteRegularization: true,
@@ -190,7 +190,7 @@ export class AttendanceService {
     const netMinutes = Math.max(0, grossMinutes - breakMinutes);
     const remainingMinutes = Math.max(0, requiredDailyMinutes - netMinutes);
 
-    // Calculate Lateness based on Company Work Window Start (08:00 AM) + grace period
+    // Calculate Lateness based on Company Work Window Start (06:00 AM) + grace period
     let lateMinutes = 0;
     let isLate = false;
 
@@ -242,7 +242,7 @@ export class AttendanceService {
   }
 
   /**
-   * Run the end-of-day cutoff check (07:00 PM cutoff) to identify incomplete hours and dispatch alerts
+   * Run the end-of-day cutoff check (11:00 PM cutoff) to identify incomplete hours and dispatch alerts
    */
   static async processCutoffAlerts(targetDate?: Date): Promise<{
     date: string;

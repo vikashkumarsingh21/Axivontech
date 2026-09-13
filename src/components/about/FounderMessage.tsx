@@ -11,6 +11,7 @@ import {
   useTransform,
 } from "framer-motion";
 import { BadgeCheck, CheckCircle2, Quote, Rocket, Target, Award, Users } from "lucide-react";
+import Image from "next/image";
 import { Badge } from "@/components/ui";
 
 const MESSAGE_PARAGRAPHS: string[] = [
@@ -36,6 +37,8 @@ const LEADERSHIP_TEAM = [
     status: "Leading Technical Vision",
     gradient: "from-[#c47a3a] via-[#e8a064] to-[#f0b07a]",
     quote: "Building purposeful digital solutions that turn ambitious ideas into market leadership.",
+    image: "/assets/images/team/vikas-kumar-founder.jpg",
+    alt: "Vikas Kumar, Founder of Axivon Technologies",
   },
   {
     name: "Pathan Rokhiya Khanam",
@@ -46,6 +49,8 @@ const LEADERSHIP_TEAM = [
     status: "Driving Operational Scale",
     gradient: "from-[#d4915c] via-[#e8a064] to-[#c9922a]",
     quote: "Ensuring every client engagement achieves real business results and flawless execution.",
+    image: "/assets/images/team/rokhiya-khanam-cofounder.jpg",
+    alt: "Rokhiya Khanam, Co-Founder of Axivon Technologies",
   },
 ];
 
@@ -242,10 +247,17 @@ function LeaderCard({ leader, index }: { leader: (typeof LEADERSHIP_TEAM)[0]; in
           <motion.div
             animate={reduceMotion ? undefined : { scale: hovered ? [1, 1.05, 1] : 1 }}
             transition={{ duration: 1.6, repeat: hovered && !reduceMotion ? Infinity : 0, ease: "easeInOut" }}
-            className={`relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br ${leader.gradient} p-[3px] sm:h-28 sm:w-28`}
+            className={`relative flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br ${leader.gradient} p-[3px] sm:h-32 sm:w-32`}
           >
-            <div className="flex h-full w-full items-center justify-center rounded-full bg-[#141414] text-2xl font-bold tracking-wide text-[#f4f4f5] sm:text-3xl">
-              {leader.initials}
+            <div className="relative h-full w-full overflow-hidden rounded-full bg-[#141414]">
+              <Image
+                src={leader.image}
+                alt={leader.alt}
+                fill
+                sizes="(max-width: 640px) 112px, 128px"
+                className="object-cover object-top"
+                priority={true}
+              />
             </div>
           </motion.div>
 

@@ -34,7 +34,7 @@ const AXIVON_KNOWLEDGE_BASE = [
   {
     keywords: ["price", "cost", "pricing", "quote", "budget", "estimate"],
     answer:
-      "Our project pricing is customized based on scope, features, and timeline:\n• **Starter Websites**: From ₹25,000\n• **Custom Web Apps**: From ₹60,000\n• **Mobile Apps**: From ₹85,000\n• **AI & Enterprise Solutions**: Custom quote.\n\nYou can also click 'Book a Call' or message us directly on WhatsApp at +91 94732 63768 for an exact estimate!",
+      "Projects at Axivon Technologies start from ₹5,000. The final cost depends on the project scope, features, design, technology, integrations, and requirements. For an accurate estimate, please connect with our team.",
   },
   {
     keywords: ["founder", "ceo", "team", "who", "vikash", "pathan", "rokhiya", "owner"],
@@ -62,17 +62,29 @@ export async function POST(req: Request) {
     }
 
     // Match keywords from knowledge base
+    let reply = "";
+    let showLeadCapture = false;
+
     for (const item of AXIVON_KNOWLEDGE_BASE) {
       if (item.keywords.some((kw) => lastUserMessage.includes(kw))) {
-        return NextResponse.json({ reply: item.answer });
+        reply = item.answer;
+        break;
       }
     }
 
-    // Default fallback response
-    return NextResponse.json({
-      reply:
-        "Thank you for reaching out! Axivon Technologies is a premier Website & Mobile App Development, AI Solutions, and Custom Software company.\n\nWould you like to discuss a project with our team or get a free estimate? You can also message us directly on WhatsApp at **+91 94732 63768**.",
-    });
+    if (!reply) {
+      const intentKeywords = ["project", "idea", "build", "create", "need", "hire", "want", "develop"];
+      const hasIntent = intentKeywords.some((kw) => lastUserMessage.includes(kw));
+      
+      if (hasIntent) {
+        reply = "That sounds like an exciting project! Would you like to share your project requirements with the Axivon Technologies team?";
+        showLeadCapture = true;
+      } else {
+        reply = "Thank you for reaching out! Axivon Technologies is a premier Website & Mobile App Development, AI Solutions, and Custom Software company.\n\nWould you like to discuss a project with our team or get a free estimate? You can also message us directly on WhatsApp at **+91 94732 63768**.";
+      }
+    }
+
+    return NextResponse.json({ reply, showLeadCapture });
   } catch (error) {
     console.error("Chat API error:", error);
     return NextResponse.json(
