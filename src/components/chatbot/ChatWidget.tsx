@@ -15,6 +15,7 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -54,20 +55,24 @@ export default function ChatWidget() {
     setIsTyping(true);
 
     try {
+      const payload: any = { message: text };
+      if (conversationId) payload.conversationId = conversationId;
+
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
+      if (data.conversationId) setConversationId(data.conversationId);
       
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
         sender: "bot",
         text: data.reply || "I'm having trouble connecting to the server.",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        isLeadCapture: data.requireLeadCapture || false,
+        isLeadCapture: data.showLeadCapture || data.requireLeadCapture || false,
       };
 
       setMessages((prev) => [...prev, botMsg]);

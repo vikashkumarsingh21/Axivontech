@@ -158,7 +158,6 @@ export default function IndustriesWeServe() {
                 height={520}
                 className="w-full object-cover object-center"
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                priority={false}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f]/75 via-transparent to-transparent" />
 

@@ -1,3 +1,4 @@
+import { db } from '@/lib/db';
 export type ChatIntent =
   | "GENERAL_INFORMATION"
   | "SERVICE_INFORMATION"
@@ -375,4 +376,19 @@ export function generateConversationSummary(
   return parts.length > 0
     ? parts.join(". ") + "."
     : `Chatbot inquiry with ${messages.length} messages exchanged.`;
+}
+
+export async function getDynamicPortfolioKnowledge(): Promise<string> {
+  try {
+    const projects = await db.portfolioProject.findMany({
+      where: { status: 'PUBLISHED' },
+      select: { title: true, category: true, industry: true, shortDescription: true, technologies: true, slug: true }
+    });
+    if (projects.length === 0) return '';
+    return projects.map(p => 
+      `Project: ${p.title} (${p.category} / ${p.industry})\nDescription: ${p.shortDescription}\nTech: ${p.technologies.join(", ")}\nURL: /portfolio/${p.slug}`
+    ).join("\n\n");
+  } catch (e) {
+    return '';
+  }
 }

@@ -9,7 +9,9 @@ import OrganizationSchema from "@/components/seo/OrganizationSchema";
 import LocalBusinessSchema from "@/components/seo/LocalBusinessSchema";
 import WebSiteSchema from "@/components/seo/WebSiteSchema";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import ChatWidget from "@/components/chatbot/ChatWidget";
+import dynamic from 'next/dynamic';
+
+const ChatWidget = dynamic(() => import('@/components/chatbot/ChatWidget'));
 
 
 const geistSans = Geist({

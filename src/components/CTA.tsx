@@ -43,7 +43,6 @@ export default function CTA() {
               fill
               className="object-cover object-center"
               sizes="(max-width: 1280px) 100vw, 1152px"
-              priority={false}
               aria-hidden
             />
             {/* Dark overlay so text is readable */}

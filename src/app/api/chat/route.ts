@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  searchKnowledge,
+  AXIVON_KNOWLEDGE,
+  getDynamicPortfolioKnowledge,
   generateConversationSummary,
   scoreLead,
 } from "@/lib/chatbot/knowledge-base";
@@ -12,7 +13,7 @@ import {
 import { generateResponse } from "@/lib/chatbot/ai-engine";
 import { createChatbotLead } from "@/lib/chatbot/crm-integration";
 
-// ── Rate limiting: 30 messages per IP per 15 minutes ─────────────────────────
+// "?"? Rate limiting: 30 messages per IP per 15 minutes
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function checkRateLimit(ip: string): boolean {
@@ -27,7 +28,7 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-// ── Prompt injection protection ───────────────────────────────────────────────
+// "?"? Prompt injection protection
 const INJECTION_PATTERNS = [
   /ignore\s+(all\s+|previous\s+|your\s+)?instructions/i,
   /reveal\s+(your\s+|the\s+|all\s+)?system\s+prompt/i,
@@ -54,81 +55,55 @@ function sanitizeInput(text: string): { safe: boolean; sanitized: string } {
   return { safe: true, sanitized: trimmed };
 }
 
-// ── Unique conversation ID (no external deps needed) ─────────────────────────
 function newId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-// ── POST /api/chat ─────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
-    // Rate limit
-    const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "127.0.0.1";
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "127.0.0.1";
     if (!checkRateLimit(ip)) {
-      return NextResponse.json(
-        {
-          reply:
-            "You're sending messages a little too quickly. Please try again in a moment.",
-          isRateLimited: true,
-        },
-        { status: 429 }
-      );
+      return NextResponse.json({ reply: "You're sending messages a little too quickly. Please try again in a moment.", isRateLimited: true }, { status: 429 });
     }
 
-    // Parse body
     let body: Record<string, unknown> = {};
     try {
       body = await req.json();
-    } catch {
-      /* ignore malformed */
+    } catch {}
+
+    const rawMessages: Array<{ role: string; content: string }> = Array.isArray(body.messages) ? (body.messages as Array<{ role: string; content: string }>) : [];
+    const incomingId = typeof body.conversationId === "string" ? body.conversationId : undefined;
+    const pageContext: { path?: string; title?: string } = typeof body.pageContext === "object" && body.pageContext !== null ? (body.pageContext as { path?: string; title?: string }) : {};
+
+    let lastUserMsg = "";
+    if (typeof body.message === "string" && body.message.trim()) {
+      lastUserMsg = body.message;
+    } else {
+      lastUserMsg = rawMessages.filter((m) => m.role === "user").pop()?.content ?? "";
     }
-
-    const rawMessages: Array<{ role: string; content: string }> =
-      Array.isArray(body.messages) ? (body.messages as Array<{ role: string; content: string }>) : [];
-    const incomingId =
-      typeof body.conversationId === "string" ? body.conversationId : undefined;
-    const pageContext: { path?: string; title?: string } =
-      typeof body.pageContext === "object" && body.pageContext !== null
-        ? (body.pageContext as { path?: string; title?: string })
-        : {};
-
-    // Get last user message
-    const lastUserMsg =
-      rawMessages.filter((m) => m.role === "user").pop()?.content ?? "";
 
     if (!lastUserMsg.trim()) {
-      return NextResponse.json({
-        reply:
-          "👋 Hi! Welcome to Axivon Technologies. How can I help you today?",
-        conversationId: incomingId ?? newId(),
-      });
+      return NextResponse.json({ reply: "Hi! Welcome to Axivon Technologies. How can I help you today?", conversationId: incomingId ?? newId() });
     }
 
-    // Prompt injection check
     const { safe, sanitized } = sanitizeInput(lastUserMsg);
-    const userMessage = safe ? sanitized : sanitized; // sanitized already has safe response if injected
+    const userMessage = safe ? sanitized : sanitized;
 
-    // Get or create conversation state
     const conversationId = incomingId ?? newId();
     const existingState = getConversation(conversationId);
     const state = existingState ?? createConversation(conversationId);
 
-    // RAG: augment query with page context
-    const searchQuery = pageContext.title
-      ? `${userMessage} ${pageContext.title}`
-      : userMessage;
-    const knowledgeContext = searchKnowledge(searchQuery, 3);
+    // Fetch dynamic knowledge
+    const dynamicPortfolio = await getDynamicPortfolioKnowledge();
 
-    // Generate response
     const { reply, stateUpdates, showLeadCapture, leadScore, isHumanHandoff } =
       await generateResponse(
-        safe ? userMessage : lastUserMsg, // for injected, use our safe reply
+        safe ? userMessage : lastUserMsg,
         state,
-        knowledgeContext
+        AXIVON_KNOWLEDGE,
+        dynamicPortfolio
       );
 
-    // Update conversation state with new messages
     const updatedMessages = [
       ...state.messages,
       { role: "user" as const, content: userMessage },
@@ -139,26 +114,13 @@ export async function POST(req: NextRequest) {
       messages: updatedMessages,
     });
 
-    // Auto-create CRM lead when name + email available
     let leadCreated = false;
     let leadCode: string | undefined;
 
-    if (
-      updatedState.collectedData.email &&
-      updatedState.collectedData.name &&
-      updatedState.stage !== "COMPLETED"
-    ) {
-      const summary = generateConversationSummary(
-        updatedState.collectedData,
-        updatedState.messages
-      );
+    if (updatedState.collectedData.email && updatedState.collectedData.name && updatedState.stage !== "COMPLETED") {
+      const summary = generateConversationSummary(updatedState.collectedData, updatedState.messages);
       const score = scoreLead(updatedState.collectedData);
-      const result = await createChatbotLead(
-        updatedState.collectedData,
-        summary,
-        score,
-        conversationId
-      );
+      const result = await createChatbotLead(updatedState.collectedData, summary, score, conversationId);
       if (result.success) {
         leadCreated = true;
         leadCode = result.leadCode;
@@ -178,10 +140,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("[Chat API] Unhandled error:", error);
     return NextResponse.json(
-      {
-        reply:
-          "I'm having trouble responding right now. Please contact us at contact@axivontech.in or +91 94732 63768.",
-      },
+      { reply: "I'm having trouble responding right now. Please contact us at contact@axivontech.in or +91 94732 63768." },
       { status: 500 }
     );
   }

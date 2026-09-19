@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Hero from "@/components/Hero";
-import Services from "@/components/Services";
-import WhyChooseUs from "@/components/WhyChooseUs";
-import IndustriesWeServe from "@/components/IndustriesWeServe";
-import Portfolio from "@/components/Portfolio";
-import Process from "@/components/Process";
-import FAQ from "@/components/FAQ";
-import CTA from "@/components/CTA";
 import HomeFAQSchema from "@/components/seo/HomeFAQSchema";
 import { createPageMetadata } from "@/lib/seo/metadata";
+
+const Services = dynamic(() => import("@/components/Services"));
+const WhyChooseUs = dynamic(() => import("@/components/WhyChooseUs"));
+const IndustriesWeServe = dynamic(() => import("@/components/IndustriesWeServe"));
+const Portfolio = dynamic(() => import("@/components/Portfolio"));
+const Process = dynamic(() => import("@/components/Process"));
+const FAQ = dynamic(() => import("@/components/FAQ"));
+const CTA = dynamic(() => import("@/components/CTA"));
 
 export const metadata: Metadata = createPageMetadata({
   title: "Axivon Technologies — We Build Digital Products That Move Businesses Forward",

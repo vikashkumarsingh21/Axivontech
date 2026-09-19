@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
+import dynamic from "next/dynamic";
 import ServicesHero from "@/components/services/ServicesHero";
-import SolutionAreas from "@/components/services/SolutionAreas";
-import CoreServices from "@/components/services/CoreServices";
-import ServiceExplorer from "@/components/services/ServiceExplorer";
-import TechnologyCapabilities from "@/components/services/TechnologyCapabilities";
-import HowWeWork from "@/components/services/HowWeWork";
-import ServicesByNeed from "@/components/services/ServicesByNeed";
-import RelatedWork from "@/components/services/RelatedWork";
-import ServicesFAQ from "@/components/services/ServicesFAQ";
-import ServicesCTA from "@/components/services/ServicesCTA";
+
+const SolutionAreas = dynamic(() => import("@/components/services/SolutionAreas"));
+const CoreServices = dynamic(() => import("@/components/services/CoreServices"));
+const ServiceExplorer = dynamic(() => import("@/components/services/ServiceExplorer"));
+const TechnologyCapabilities = dynamic(() => import("@/components/services/TechnologyCapabilities"));
+const HowWeWork = dynamic(() => import("@/components/services/HowWeWork"));
+const ServicesByNeed = dynamic(() => import("@/components/services/ServicesByNeed"));
+const RelatedWork = dynamic(() => import("@/components/services/RelatedWork"));
+const ServicesFAQ = dynamic(() => import("@/components/services/ServicesFAQ"));
+const ServicesCTA = dynamic(() => import("@/components/services/ServicesCTA"));
 
 export const metadata: Metadata = createPageMetadata({
   title: "Website Development, Mobile App Development & Software Services",

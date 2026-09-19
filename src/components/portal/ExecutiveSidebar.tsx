@@ -41,7 +41,6 @@ export function ExecutiveSidebar() {
             width={150}
             height={36}
             className="h-8 w-auto brightness-0 invert"
-            priority
           />
         </Link>
         <div className="mt-2 flex items-center justify-between">

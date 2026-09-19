@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import IndustriesHero from "@/components/industries/IndustriesHero";
-import IndustriesGrid from "@/components/industries/IndustriesGrid";
-import CTA from "@/components/CTA";
+
+const IndustriesGrid = dynamic(() => import("@/components/industries/IndustriesGrid"));
+const CTA = dynamic(() => import("@/components/CTA"));
 
 export const metadata: Metadata = {
   title: "Industries We Serve | Axivon Technologies",

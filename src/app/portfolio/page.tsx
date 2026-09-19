@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-
+import dynamic from "next/dynamic";
 import PortfolioHero from "@/components/portfolio/PortfolioHero";
-import FeaturedWork from "@/components/portfolio/FeaturedWork";
-import ProjectGrid from "@/components/portfolio/ProjectGrid";
-import HowWeBuild from "@/components/portfolio/HowWeBuild";
-import TechCapabilities from "@/components/portfolio/TechCapabilities";
-import RelatedInsights from "@/components/portfolio/RelatedInsights";
-import PortfolioCTA from "@/components/portfolio/PortfolioCTA";
+
+const FeaturedWork = dynamic(() => import("@/components/portfolio/FeaturedWork"));
+const ProjectGrid = dynamic(() => import("@/components/portfolio/ProjectGrid"));
+const HowWeBuild = dynamic(() => import("@/components/portfolio/HowWeBuild"));
+const TechCapabilities = dynamic(() => import("@/components/portfolio/TechCapabilities"));
+const RelatedInsights = dynamic(() => import("@/components/portfolio/RelatedInsights"));
+const PortfolioCTA = dynamic(() => import("@/components/portfolio/PortfolioCTA"));
 
 export const metadata: Metadata = {
   title: "Portfolio",

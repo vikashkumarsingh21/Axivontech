@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import CareerApplication from "@/components/careers/CareerApplication";
-
+import dynamic from "next/dynamic";
 import CareersHero from "@/components/careers/CareersHero";
 
-// Future Sections
-import WhyWorkWithUs from "@/components/careers/WhyWorkWithUs";
-import OpenPositions from "@/components/careers/OpenPositions";
-import HiringProcess from "@/components/careers/HiringProcess";
-import EmployeeBenefits from "@/components/careers/EmployeeBenefits";
-import CareersFAQ from "@/components/careers/CareersFAQ";
+const CareerApplication = dynamic(() => import("@/components/careers/CareerApplication"));
+const WhyWorkWithUs = dynamic(() => import("@/components/careers/WhyWorkWithUs"));
+const OpenPositions = dynamic(() => import("@/components/careers/OpenPositions"));
+const HiringProcess = dynamic(() => import("@/components/careers/HiringProcess"));
+const EmployeeBenefits = dynamic(() => import("@/components/careers/EmployeeBenefits"));
+const CareersFAQ = dynamic(() => import("@/components/careers/CareersFAQ"));
 // import CareersCTA from "@/components/CTA";
 
-import CTA from "@/components/CTA";
+const CTA = dynamic(() => import("@/components/CTA"));
 
 export const metadata: Metadata = {
   title: "Careers",

@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
+import dynamic from "next/dynamic";
 import ContactHero from "@/components/contact/ContactHero";
 import ContactOptions from "@/components/contact/ContactOptions";
 import ContactForm from "@/components/contact/ContactForm";
-import ContactTrust from "@/components/contact/ContactTrust";
-import ContactPresence from "@/components/contact/ContactPresence";
-import ContactFAQ from "@/components/contact/ContactFAQ";
-import ContactCTA from "@/components/contact/ContactCTA";
+
+const ContactTrust = dynamic(() => import("@/components/contact/ContactTrust"));
+const ContactPresence = dynamic(() => import("@/components/contact/ContactPresence"));
+const ContactFAQ = dynamic(() => import("@/components/contact/ContactFAQ"));
+const ContactCTA = dynamic(() => import("@/components/contact/ContactCTA"));
 
 export const metadata: Metadata = createPageMetadata({
   title: "Contact Us",

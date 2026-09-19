@@ -256,7 +256,6 @@ function LeaderCard({ leader, index }: { leader: (typeof LEADERSHIP_TEAM)[0]; in
                 fill
                 sizes="(max-width: 640px) 112px, 128px"
                 className="object-cover object-top"
-                priority={true}
               />
             </div>
           </motion.div>

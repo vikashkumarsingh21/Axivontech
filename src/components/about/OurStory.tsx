@@ -396,7 +396,6 @@ export default function OurStory() {
                 height={280}
                 className="w-full object-cover object-center"
                 sizes="(max-width: 1024px) 100vw, 560px"
-                priority={false}
               />
             </motion.div>
 
