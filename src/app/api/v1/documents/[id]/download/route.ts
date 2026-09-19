@@ -40,7 +40,7 @@ export async function GET(
         entityType: "DOCUMENT",
         entityId: doc.id,
         summary: `${user.name} downloaded document "${doc.title}"`,
-      }).catch(() => {});
+      });
     }
 
     // In a production system, this could redirect to signed S3 URL or return direct fileUrl
@@ -55,3 +55,4 @@ export async function GET(
     return handleApiError(e);
   }
 }
+

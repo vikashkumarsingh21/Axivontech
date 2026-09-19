@@ -138,7 +138,7 @@ export async function POST(req: Request) {
         entityId: document.id,
         title: "New Document Uploaded",
         message: `Document "${title}" has been uploaded in category ${category}.`,
-      }).catch(() => {});
+      });
     }
 
     return NextResponse.json({ data: document }, { status: 201 });
@@ -146,3 +146,4 @@ export async function POST(req: Request) {
     return handleApiError(error);
   }
 }
+

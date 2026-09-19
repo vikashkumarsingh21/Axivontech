@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
         title: "New Lead Created",
         message: `Lead ${lead.name} (${lead.leadCode}) was created.`,
         metadata: { leadId: lead.id, leadCode: lead.leadCode },
-      }).catch(() => {});
+      });
     }
 
     return NextResponse.json({ success: true, data: lead }, { status: 201 });
@@ -154,3 +154,4 @@ export async function POST(req: NextRequest) {
     return handleApiError(error);
   }
 }
+

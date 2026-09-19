@@ -97,7 +97,7 @@ export async function POST(req: Request) {
           entityId: announcement.id,
           title: "New Announcement Published",
           message: title,
-        }).catch(() => {});
+        });
       }
     }
 
@@ -106,3 +106,4 @@ export async function POST(req: Request) {
     return handleApiError(error);
   }
 }
+

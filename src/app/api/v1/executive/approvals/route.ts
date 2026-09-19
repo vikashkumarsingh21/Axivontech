@@ -6,7 +6,7 @@ import { handleApiError } from "@/lib/api-error";
 export async function GET(req: Request) {
   try {
     const userId = req.headers.get("x-user-id");
-    await requirePermission(userId, "governance.role_changes.approve").catch(() => {});
+    await requirePermission(userId, "governance.role_changes.approve");
 
     const approvals = await db.approvalRequest.findMany({
       include: {
@@ -21,3 +21,4 @@ export async function GET(req: Request) {
     return handleApiError(error);
   }
 }
+

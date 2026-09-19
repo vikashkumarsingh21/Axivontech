@@ -107,11 +107,9 @@ export const naniProject: PortfolioProject = {
   // Images
   // ===============================
 
-  thumbnail:
-    "/portfolio/nani/thumbnail.webp",
+  thumbnail: "/assets/portfolio/projects/portfolio-business-automation.jpg",
 
-  heroImage:
-    "/portfolio/nani/hero.webp",
+  heroImage: "/assets/portfolio/projects/portfolio-business-automation.jpg",
 
   gallery: [
     "/portfolio/nani/home.webp",

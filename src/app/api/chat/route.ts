@@ -1,94 +1,187 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import {
+  searchKnowledge,
+  generateConversationSummary,
+  scoreLead,
+} from "@/lib/chatbot/knowledge-base";
+import {
+  createConversation,
+  getConversation,
+  updateConversation,
+} from "@/lib/chatbot/conversation-manager";
+import { generateResponse } from "@/lib/chatbot/ai-engine";
+import { createChatbotLead } from "@/lib/chatbot/crm-integration";
 
-interface ChatMessage {
-  role: "user" | "assistant" | "system";
-  content: string;
+// ── Rate limiting: 30 messages per IP per 15 minutes ─────────────────────────
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+  if (!record || now > record.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 15 * 60 * 1000 });
+    return true;
+  }
+  if (record.count >= 30) return false;
+  record.count += 1;
+  return true;
 }
 
-const AXIVON_KNOWLEDGE_BASE = [
-  {
-    keywords: ["web", "website", "react", "next.js", "frontend", "backend"],
-    answer:
-      "We specialize in high-performance Web Development using Next.js 16, React 19, TypeScript, and Tailwind CSS. We build enterprise websites, SaaS platforms, and e-commerce portals. Would you like to see our portfolio or request a free quote?",
-  },
-  {
-    keywords: ["mobile", "app", "android", "ios", "react native", "flutter"],
-    answer:
-      "Our Mobile App Development team builds native and cross-platform apps for iOS and Android using React Native and Flutter, complete with cloud backend integrations, intuitive UI/UX, and App Store publishing.",
-  },
-  {
-    keywords: ["ai", "machine learning", "bot", "llm", "automation"],
-    answer:
-      "Axivon Technologies delivers custom AI Solutions including AI chatbots, workflow automation, predictive analytics, and custom LLM integrations tailored for startups and enterprises.",
-  },
-  {
-    keywords: ["cloud", "aws", "devops", "server", "deployment"],
-    answer:
-      "We offer Cloud & DevOps solutions including AWS/GCP cloud infrastructure setup, Docker containerization, CI/CD pipeline automation, and 99.9% uptime SLA management.",
-  },
-  {
-    keywords: ["seo", "digital marketing", "ranking", "google"],
-    answer:
-      "Our SEO & Digital Marketing services help your business rank #1 on Google through technical SEO audits, strategic content marketing, high-authority link building, and targeted growth marketing.",
-  },
-  {
-    keywords: ["price", "cost", "pricing", "quote", "budget", "estimate"],
-    answer:
-      "Projects at Axivon Technologies start from ₹5,000. The final cost depends on the project scope, features, design, technology, integrations, and requirements. For an accurate estimate, please connect with our team.",
-  },
-  {
-    keywords: ["founder", "ceo", "team", "who", "vikash", "pathan", "rokhiya", "owner"],
-    answer:
-      "Axivon Technologies is led by:\n👨‍💻 **Vikash Kumar** — Founder & CEO (Strategic & Technical Visionary)\n👩‍💼 **Pathan Rokhiya Khanam** — Co-Founder (Operations & Client Growth)\n\nTogether with a team of expert engineers and designers based in India.",
-  },
-  {
-    keywords: ["contact", "email", "phone", "whatsapp", "location", "address", "reach"],
-    answer:
-      "You can reach Axivon Technologies directly via:\n📱 **WhatsApp/Call**: +91 94732 63768\n📧 **Email**: contact@axivontech.in\n🌐 **Website**: https://axivontech.in/contact",
-  },
+// ── Prompt injection protection ───────────────────────────────────────────────
+const INJECTION_PATTERNS = [
+  /ignore\s+(all\s+|previous\s+|your\s+)?instructions/i,
+  /reveal\s+(your\s+|the\s+|all\s+)?system\s+prompt/i,
+  /show\s+me\s+(the\s+)?(api|secret|database|internal|password|key)/i,
+  /act\s+as\s+(a\s+different|an\s+unrestricted|dan|jailbreak)/i,
+  /you\s+are\s+now\s+/i,
+  /disregard\s+(all|previous|your)/i,
+  /override\s+(your\s+)?(instructions|rules|limits)/i,
+  /pretend\s+you\s+(are|have|can)/i,
+  /\[system\]/i,
+  /\[instruction\]/i,
 ];
 
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    const messages: ChatMessage[] = body.messages || [];
-    const lastUserMessage =
-      messages.filter((m) => m.role === "user").pop()?.content.toLowerCase() || "";
+function sanitizeInput(text: string): { safe: boolean; sanitized: string } {
+  const trimmed = text.trim().slice(0, 500);
+  for (const pattern of INJECTION_PATTERNS) {
+    if (pattern.test(trimmed)) {
+      return {
+        safe: false,
+        sanitized: "I can only help with questions about Axivon Technologies and your project needs.",
+      };
+    }
+  }
+  return { safe: true, sanitized: trimmed };
+}
 
-    if (!lastUserMessage.trim()) {
+// ── Unique conversation ID (no external deps needed) ─────────────────────────
+function newId(): string {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+// ── POST /api/chat ─────────────────────────────────────────────────────────────
+export async function POST(req: NextRequest) {
+  try {
+    // Rate limit
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "127.0.0.1";
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        {
+          reply:
+            "You're sending messages a little too quickly. Please try again in a moment.",
+          isRateLimited: true,
+        },
+        { status: 429 }
+      );
+    }
+
+    // Parse body
+    let body: Record<string, unknown> = {};
+    try {
+      body = await req.json();
+    } catch {
+      /* ignore malformed */
+    }
+
+    const rawMessages: Array<{ role: string; content: string }> =
+      Array.isArray(body.messages) ? (body.messages as Array<{ role: string; content: string }>) : [];
+    const incomingId =
+      typeof body.conversationId === "string" ? body.conversationId : undefined;
+    const pageContext: { path?: string; title?: string } =
+      typeof body.pageContext === "object" && body.pageContext !== null
+        ? (body.pageContext as { path?: string; title?: string })
+        : {};
+
+    // Get last user message
+    const lastUserMsg =
+      rawMessages.filter((m) => m.role === "user").pop()?.content ?? "";
+
+    if (!lastUserMsg.trim()) {
       return NextResponse.json({
-        reply: "Hello! How can Axivon Technologies assist you with your digital project today?",
+        reply:
+          "👋 Hi! Welcome to Axivon Technologies. How can I help you today?",
+        conversationId: incomingId ?? newId(),
       });
     }
 
-    // Match keywords from knowledge base
-    let reply = "";
-    let showLeadCapture = false;
+    // Prompt injection check
+    const { safe, sanitized } = sanitizeInput(lastUserMsg);
+    const userMessage = safe ? sanitized : sanitized; // sanitized already has safe response if injected
 
-    for (const item of AXIVON_KNOWLEDGE_BASE) {
-      if (item.keywords.some((kw) => lastUserMessage.includes(kw))) {
-        reply = item.answer;
-        break;
+    // Get or create conversation state
+    const conversationId = incomingId ?? newId();
+    const existingState = getConversation(conversationId);
+    const state = existingState ?? createConversation(conversationId);
+
+    // RAG: augment query with page context
+    const searchQuery = pageContext.title
+      ? `${userMessage} ${pageContext.title}`
+      : userMessage;
+    const knowledgeContext = searchKnowledge(searchQuery, 3);
+
+    // Generate response
+    const { reply, stateUpdates, showLeadCapture, leadScore, isHumanHandoff } =
+      await generateResponse(
+        safe ? userMessage : lastUserMsg, // for injected, use our safe reply
+        state,
+        knowledgeContext
+      );
+
+    // Update conversation state with new messages
+    const updatedMessages = [
+      ...state.messages,
+      { role: "user" as const, content: userMessage },
+      { role: "assistant" as const, content: reply },
+    ];
+    const updatedState = updateConversation(conversationId, {
+      ...stateUpdates,
+      messages: updatedMessages,
+    });
+
+    // Auto-create CRM lead when name + email available
+    let leadCreated = false;
+    let leadCode: string | undefined;
+
+    if (
+      updatedState.collectedData.email &&
+      updatedState.collectedData.name &&
+      updatedState.stage !== "COMPLETED"
+    ) {
+      const summary = generateConversationSummary(
+        updatedState.collectedData,
+        updatedState.messages
+      );
+      const score = scoreLead(updatedState.collectedData);
+      const result = await createChatbotLead(
+        updatedState.collectedData,
+        summary,
+        score,
+        conversationId
+      );
+      if (result.success) {
+        leadCreated = true;
+        leadCode = result.leadCode;
+        updateConversation(conversationId, { stage: "COMPLETED" });
       }
     }
 
-    if (!reply) {
-      const intentKeywords = ["project", "idea", "build", "create", "need", "hire", "want", "develop"];
-      const hasIntent = intentKeywords.some((kw) => lastUserMessage.includes(kw));
-      
-      if (hasIntent) {
-        reply = "That sounds like an exciting project! Would you like to share your project requirements with the Axivon Technologies team?";
-        showLeadCapture = true;
-      } else {
-        reply = "Thank you for reaching out! Axivon Technologies is a premier Website & Mobile App Development, AI Solutions, and Custom Software company.\n\nWould you like to discuss a project with our team or get a free estimate? You can also message us directly on WhatsApp at **+91 94732 63768**.";
-      }
-    }
-
-    return NextResponse.json({ reply, showLeadCapture });
+    return NextResponse.json({
+      reply,
+      conversationId,
+      showLeadCapture,
+      leadScore,
+      isHumanHandoff,
+      leadCreated,
+      ...(leadCode ? { leadCode } : {}),
+    });
   } catch (error) {
-    console.error("Chat API error:", error);
+    console.error("[Chat API] Unhandled error:", error);
     return NextResponse.json(
-      { reply: "Sorry, I encountered an issue. Please reach out to us at contact@axivontech.in or +91 94732 63768." },
+      {
+        reply:
+          "I'm having trouble responding right now. Please contact us at contact@axivontech.in or +91 94732 63768.",
+      },
       { status: 500 }
     );
   }

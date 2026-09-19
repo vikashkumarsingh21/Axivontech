@@ -31,6 +31,14 @@ export interface PortfolioProject {
 
   solution: string;
 
+  // ==========================
+  // Additional Case Study Fields
+  // ==========================
+
+  challenge?: string;
+  outcome?: string;
+  relatedProjects?: string[];
+
   // ==========================================
   // Features & Technologies
   // ==========================================

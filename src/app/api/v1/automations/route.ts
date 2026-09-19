@@ -16,7 +16,7 @@ const createAutomationSchema = z.object({
 export async function GET(req: Request) {
   try {
     const userId = req.headers.get("x-user-id");
-    await requirePermission(userId, "automation.view").catch(() => {});
+    await requirePermission(userId, "automation.view");
 
     const workflows = await db.automationWorkflow.findMany({
       include: { createdBy: { select: { name: true, email: true } } },
@@ -59,3 +59,4 @@ export async function POST(req: Request) {
     return handleApiError(error);
   }
 }
+

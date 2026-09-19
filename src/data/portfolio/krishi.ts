@@ -110,10 +110,10 @@ export const krishiProject: PortfolioProject = {
   // ===============================
 
   thumbnail:
-    "/portfolio/krishi/thumbnail.webp",
+    "/assets/portfolio/projects/portfolio-smart-agriculture.jpg",
 
   heroImage:
-    "/portfolio/krishi/hero.webp",
+    "/assets/portfolio/projects/portfolio-smart-agriculture.jpg",
 
   gallery: [
     "/portfolio/krishi/home.webp",

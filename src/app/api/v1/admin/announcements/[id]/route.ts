@@ -94,7 +94,7 @@ export async function PATCH(
           entityId: updated.id,
           title: "Announcement Published",
           message: updated.title,
-        }).catch(() => {});
+        });
       }
     }
 
@@ -133,3 +133,4 @@ export async function DELETE(
     return handleApiError(error);
   }
 }
+

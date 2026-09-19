@@ -31,7 +31,7 @@ export function LeadCapture({ onComplete, onCancel }: LeadCaptureProps) {
       const res = await fetch("/api/v1/public/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, source: "WEBSITE_CONTACT" }),
+        body: JSON.stringify({ ...formData, source: "WEBSITE_CHATBOT" }),
       });
       const data = await res.json();
       if (res.ok) {

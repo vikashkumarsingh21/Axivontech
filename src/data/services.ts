@@ -10,7 +10,9 @@ export type ServiceSlug =
   | "seo-services"
   | "digital-marketing"
   | "ui-ux-design"
-  | "custom-software-development";
+  | "custom-software-development"
+  | "automation"
+  | "robotics-iot";
 
 export interface ServiceBenefit {
   title: string;
@@ -1049,6 +1051,207 @@ export const servicesData: ServiceData[] = [
       title: "Build Software That Gives You the Edge",
       description:
         "Talk to our team about your requirements. We'll help you evaluate whether custom development is the right choice and provide a detailed estimate within 5 business days.",
+    },
+  },
+  // ── 9. Automation & Intelligent Workflows ──────────────────────
+  {
+    slug: "automation",
+    title: "Automation & Intelligent Workflows",
+    shortDescription:
+      "Automate repetitive tasks and connect your disconnected business tools into one streamlined system.",
+    heroDescription:
+      "We design and build intelligent automation solutions that connect your CRMs, ERPs, emails, and databases. Remove manual data entry, reduce human error, and let your team focus on high-value work.",
+    badge: "Process Efficiency",
+    icon: "Zap",
+    metaTitle: "Business Process Automation Services | Axivon Technologies",
+    metaDescription:
+      "Automate manual business processes with custom integrations, API connections, and intelligent workflows. Save time and reduce operational errors.",
+    benefits: [
+      {
+        title: "Eliminate Manual Data Entry",
+        description:
+          "Stop copying data between Excel, your CRM, and your accounting software. We build automated bridges so systems talk directly to each other.",
+      },
+      {
+        title: "Reduce Human Error",
+        description:
+          "Automated systems don't make typos. By standardizing and automating your data flow, your business operates with much higher accuracy.",
+      },
+      {
+        title: "Accelerate Operations",
+        description:
+          "What used to take hours of administrative work can now happen instantly in the background, accelerating your overall business delivery.",
+      },
+      {
+        title: "Cost Reduction",
+        description:
+          "Automation delivers an immediate ROI by reducing the administrative hours required to run your daily business operations.",
+      },
+    ],
+    process: [
+      {
+        title: "Workflow Audit",
+        description:
+          "We analyze your current manual processes, identify bottlenecks, and map out exactly where automation will deliver the highest ROI.",
+      },
+      {
+        title: "Tool & API Assessment",
+        description:
+          "We review the software you currently use to determine API availability and integration capabilities.",
+      },
+      {
+        title: "Workflow Design",
+        description:
+          "We architect the data flow, defining triggers, conditions, and actions across your systems.",
+      },
+      {
+        title: "Integration & Development",
+        description:
+          "We build the integrations using custom code, webhooks, or middleware platforms, ensuring secure data transfer.",
+      },
+      {
+        title: "Testing & Validation",
+        description:
+          "We run the automated workflow in a sandbox environment to verify edge cases and ensure 100% data integrity.",
+      },
+      {
+        title: "Deployment & Monitoring",
+        description:
+          "Once live, we monitor the automated processes to ensure they run smoothly and handle errors gracefully.",
+      },
+    ],
+    technologies: [
+      { name: "Node.js" },
+      { name: "Python" },
+      { name: "REST APIs" },
+      { name: "GraphQL" },
+      { name: "Webhooks" },
+      { name: "AWS Lambda" },
+      { name: "Google Cloud Functions" },
+      { name: "Zapier / Make" },
+    ],
+    faqs: [
+      {
+        question: "Can you automate processes between legacy systems?",
+        answer:
+          "If your legacy system has an API, database access, or even allows web scraping/RPA, we can likely automate it. We assess feasibility during our discovery phase.",
+      },
+      {
+        question: "Is automated data transfer secure?",
+        answer:
+          "Yes. We use encrypted connections (HTTPS/TLS), secure API key management, and follow best practices for data privacy and compliance.",
+      },
+      {
+        question: "What happens if an automated workflow fails?",
+        answer:
+          "We build robust error handling and alerting into our automation systems. If a step fails (e.g. an external API goes down), the system logs the error, safely retries if appropriate, and alerts your team.",
+      },
+    ],
+    cta: {
+      title: "Stop Doing Manual Work",
+      description:
+        "Tell us about your most frustrating manual process, and we'll show you how we can automate it.",
+    },
+  },
+  // ── 10. Robotics & IoT ──────────────────────
+  {
+    slug: "robotics-iot",
+    title: "Robotics & IoT",
+    shortDescription:
+      "Connecting the physical and digital worlds with smart sensors, automation, and intelligent hardware.",
+    heroDescription:
+      "From student prototypes and smart devices to connected agricultural systems and environmental automation, we help turn physical ideas into working technology. We build the hardware, the software, and the bridge between them.",
+    badge: "Hardware + Software",
+    icon: "Activity",
+    metaTitle: "Robotics & IoT Solutions | Axivon Technologies",
+    metaDescription:
+      "Custom Robotics and Internet of Things (IoT) solutions. We build smart devices, sensor networks, automation systems, and educational prototypes.",
+    benefits: [
+      {
+        title: "Real-Time Physical Insights",
+        description:
+          "Deploy sensors to monitor temperature, humidity, movement, or any physical metric, and view the data instantly on a custom digital dashboard.",
+      },
+      {
+        title: "Automated Physical Responses",
+        description:
+          "Create systems that don't just monitor, but act. Automated irrigation, smart cleaning systems, or security responses based on sensor input.",
+      },
+      {
+        title: "End-to-End Delivery",
+        description:
+          "We don't just write the software or just wire the hardware. We deliver the complete ecosystem — device, firmware, cloud connection, and user app.",
+      },
+      {
+        title: "Educational & Prototype Support",
+        description:
+          "We support engineering students, colleges, and startups in turning theoretical robotics and IoT ideas into functional, demonstrable prototypes.",
+      },
+    ],
+    process: [
+      {
+        title: "Hardware & Component Selection",
+        description:
+          "We identify the right microcontrollers (Arduino, Raspberry Pi, ESP32), sensors, and actuators based on project requirements and budget.",
+      },
+      {
+        title: "Circuit Design & Assembly",
+        description:
+          "We design the schematic, assemble the prototype hardware, and ensure safe and reliable electrical operation.",
+      },
+      {
+        title: "Firmware Development",
+        description:
+          "We write optimized C/C++ or Python code for the microcontrollers to read sensors, control hardware, and manage network connections.",
+      },
+      {
+        title: "Cloud & API Integration",
+        description:
+          "We build the secure cloud bridge (MQTT, WebSockets, REST) allowing the physical device to communicate with internet servers.",
+      },
+      {
+        title: "Dashboard & App Development",
+        description:
+          "We develop the web or mobile application that allows users to monitor data and control the devices remotely.",
+      },
+      {
+        title: "Field Testing & Refinement",
+        description:
+          "We rigorously test the hardware and software in real-world conditions, calibrating sensors and optimizing power consumption.",
+      },
+    ],
+    technologies: [
+      { name: "Arduino" },
+      { name: "Raspberry Pi" },
+      { name: "ESP32 / ESP8266" },
+      { name: "C / C++" },
+      { name: "Python" },
+      { name: "MQTT" },
+      { name: "WebSockets" },
+      { name: "Firebase" },
+      { name: "Node.js" },
+    ],
+    faqs: [
+      {
+        question: "Do you help with college or school robotics projects?",
+        answer:
+          "Yes, we frequently support students and educational institutions in building functional IoT and robotics prototypes for demonstrations and competitions.",
+      },
+      {
+        question: "Can you build the hardware and the software?",
+        answer:
+          "Absolutely. Our strength is that we provide full-stack IoT development — from wiring the sensors and programming the microcontrollers to building the cloud database and user-facing mobile app.",
+      },
+      {
+        question: "What kind of sensors can you integrate?",
+        answer:
+          "We can integrate almost any environmental or mechanical sensor: temperature, humidity, soil moisture, ultrasonic distance, motion (PIR), light, water quality, GPS, and more.",
+      },
+    ],
+    cta: {
+      title: "Bring Your Hardware Idea to Life",
+      description:
+        "Whether you need an industrial IoT system or a functional prototype, our hardware and software engineers can build it.",
     },
   },
 ];

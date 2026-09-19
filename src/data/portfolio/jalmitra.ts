@@ -110,10 +110,10 @@ export const jalmitraProject: PortfolioProject = {
   // ===============================
 
   thumbnail:
-    "/portfolio/jalmitra/thumbnail.webp",
+    "/assets/portfolio/projects/portfolio-environmental-technology.jpg",
 
   heroImage:
-    "/portfolio/jalmitra/hero.webp",
+    "/assets/portfolio/projects/portfolio-environmental-technology.jpg",
 
   gallery: [
     "/portfolio/jalmitra/home.webp",

@@ -128,7 +128,7 @@ export async function POST(req: Request) {
         title: "NEW TASK ASSIGNED",
         message: `Task: ${title} assigned by ${admin.name}. Due: ${dueDateFormatted}`,
         metadata: { taskId: task.id, priority: task.priority },
-      }).catch(() => {});
+      });
     }
 
     return NextResponse.json({ data: task }, { status: 201 });
@@ -136,3 +136,4 @@ export async function POST(req: Request) {
     return handleApiError(error);
   }
 }
+

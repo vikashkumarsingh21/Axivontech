@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 
 import PortfolioHero from "@/components/portfolio/PortfolioHero";
-
-// Future Sections
-import FeaturedProjects from "@/components/portfolio/FeaturedProjects";
-// import ProjectFilters from "@/components/portfolio/ProjectFilters";
-import CaseStudies from "@/components/portfolio/CaseStudies";
-import PortfolioStats from "@/components/portfolio/PortfolioStats";
-import ClientTestimonials from "@/components/portfolio/ClientTestimonials";
-
-import CTA from "@/components/CTA";
+import FeaturedWork from "@/components/portfolio/FeaturedWork";
+import ProjectGrid from "@/components/portfolio/ProjectGrid";
+import HowWeBuild from "@/components/portfolio/HowWeBuild";
+import TechCapabilities from "@/components/portfolio/TechCapabilities";
+import RelatedInsights from "@/components/portfolio/RelatedInsights";
+import PortfolioCTA from "@/components/portfolio/PortfolioCTA";
 
 export const metadata: Metadata = {
   title: "Portfolio",
@@ -53,27 +50,27 @@ export const metadata: Metadata = {
 
 export default function PortfolioPage() {
   return (
-    <main className="overflow-hidden bg-[#0f0f0f]">
-      {/* Hero Section */}
+    <main className="bg-[#0f0f0f]">
+      {/* Clean editorial hero */}
       <PortfolioHero />
 
-      {/* Featured Projects */}
-      <FeaturedProjects />
+      {/* Asymmetric featured project showcase */}
+      <FeaturedWork />
 
-      {/* Project Categories Filter */}
-      {/* <ProjectFilters /> */}
+      {/* Filterable project grid with all projects */}
+      <ProjectGrid />
 
-      {/* Detailed Case Studies */}
-      <CaseStudies />
+      {/* Process / approach timeline */}
+      <HowWeBuild />
 
-      {/* Company / Portfolio Statistics */}
-      <PortfolioStats />
+      {/* Technology capabilities grouped by domain */}
+      <TechCapabilities />
 
-      {/* Testimonials */}
-      <ClientTestimonials />
+      {/* Related blog posts */}
+      <RelatedInsights />
 
-      {/* CTA */}
-      <CTA />
+      {/* Final call to action */}
+      <PortfolioCTA />
     </main>
   );
 }

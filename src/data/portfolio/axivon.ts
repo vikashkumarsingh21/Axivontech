@@ -110,9 +110,9 @@ export const axivonProject: PortfolioProject = {
   // Images
   // ===============================
 
-  thumbnail: "/portfolio/axivon/thumbnail.webp",
+  thumbnail: "/assets/portfolio/projects/portfolio-web-development.jpg",
 
-  heroImage: "/portfolio/axivon/hero.webp",
+  heroImage: "/assets/portfolio/projects/portfolio-web-development.jpg",
 
   gallery: [
     "/portfolio/axivon/home.webp",

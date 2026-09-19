@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import {
   School,
@@ -15,6 +16,7 @@ import {
   ShoppingBag,
   Building2,
   Lightbulb,
+  ArrowRight,
   type LucideIcon,
 } from "lucide-react";
 import { SectionHeader } from "@/components/ui";
@@ -186,6 +188,17 @@ export default function IndustriesWeServe() {
                   <span className="text-[10px] uppercase tracking-wide text-[#71717a]">{label}</span>
                 </div>
               ))}
+            </div>
+
+            {/* View All Industries CTA */}
+            <div className="mt-6 flex justify-center lg:justify-start">
+               <Link
+                 href="/industries"
+                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1c1c1e] border border-[#303030] text-[#f4f4f5] text-sm font-semibold hover:border-[#e8a064]/50 hover:text-[#e8a064] transition-all duration-200"
+               >
+                 View All Industry Solutions
+                 <ArrowRight className="w-4 h-4" />
+               </Link>
             </div>
           </motion.div>
         </div>

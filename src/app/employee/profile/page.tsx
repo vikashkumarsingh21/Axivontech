@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
+import { ChangePasswordForm } from "@/components/employee/ChangePasswordForm";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import {
@@ -299,6 +300,26 @@ export default function EmployeeProfilePage() {
                   <p className="font-medium text-white">
                     {profile?.joiningDate ? new Date(profile.joiningDate).toLocaleDateString() : "N/A"}
                   </p>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Security Section */}
+          <Card className="p-6 bg-[#0a0a0a] border-white/5 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-white/5">
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 flex items-center gap-2">
+                <Lock className="w-4 h-4 text-gray-500" />
+                Security
+              </h3>
+            </div>
+            <div className="space-y-4 text-sm">
+              <div className="flex items-start gap-3 text-gray-300">
+                <Lock className="w-4 h-4 text-gray-500 mt-0.5 shrink-0" />
+                <div className="w-full">
+                  <p className="text-xs text-gray-500 mb-1">Password</p>
+                  <p className="font-mono text-white text-lg tracking-widest leading-none mb-3">••••••••</p>
+                  <ChangePasswordForm />
                 </div>
               </div>
             </div>

@@ -49,7 +49,7 @@ const LEADERSHIP_TEAM = [
     status: "Driving Operational Scale",
     gradient: "from-[#d4915c] via-[#e8a064] to-[#c9922a]",
     quote: "Ensuring every client engagement achieves real business results and flawless execution.",
-    image: "/assets/images/team/rokhiya-khanam-cofounder.jpg",
+    image: "/assets/images/team/rokhiya-khanam-co-founder.jpg",
     alt: "Rokhiya Khanam, Co-Founder of Axivon Technologies",
   },
 ];

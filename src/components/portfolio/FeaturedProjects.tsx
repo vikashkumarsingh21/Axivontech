@@ -549,26 +549,35 @@ function ProjectCard({ project, index, reduced }: { project: PortfolioProject; i
 
         {/* ── Preview / image placeholder area ── */}
         <div
-          className="relative h-44 flex-shrink-0 overflow-hidden"
-          style={{
-            background: `linear-gradient(160deg, ${project.accentPrimary}14 0%, rgba(255,255,255,0.02) 60%, transparent 100%)`,
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
-          }}
+          className="relative h-48 flex-shrink-0 overflow-hidden bg-[#0c0c0c] border-b border-white/5"
         >
-          {/* Animated category motif */}
-          <ProjectVisual
-            visual={project.visual}
-            accentPrimary={project.accentPrimary}
-            accentSecondary={project.accentSecondary}
-            reduced={reduced}
-            hovered={hovered}
+          {/* Real Project Thumbnail */}
+          <div className="absolute inset-0 transition-transform duration-500 ease-out" style={{ transform: hovered ? "scale(1.05)" : "scale(1)" }}>
+             <img
+               src={project.thumbnail || project.heroImage || "/assets/images/placeholder.jpg"}
+               alt={project.title}
+               className="w-full h-full object-cover object-top opacity-85 group-hover:opacity-100 transition-opacity duration-300"
+               loading="lazy"
+             />
+          </div>
+
+          {/* Vignette Gradient Overlay for Text Legibility */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: "linear-gradient(to top, rgba(15,15,15,1) 0%, rgba(15,15,15,0.2) 40%, transparent 100%)" }}
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0 pointer-events-none opacity-40 mix-blend-overlay"
+            style={{ background: `linear-gradient(to bottom right, ${project.accentPrimary}, transparent)` }}
+            aria-hidden
           />
 
           {/* Status badge — top left */}
           <div
-            className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold z-20"
+            className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold z-20 shadow-md"
             style={{
-              background: statusStyle.bg,
+              background: "rgba(15, 15, 15, 0.7)",
               border: `1px solid ${statusStyle.border}`,
               color: statusStyle.color,
               backdropFilter: "blur(8px)",
@@ -580,24 +589,17 @@ function ProjectCard({ project, index, reduced }: { project: PortfolioProject; i
 
           {/* Floating icon badge — top right */}
           <motion.div
-            className="absolute top-3 right-3 w-9 h-9 rounded-xl flex items-center justify-center z-20"
+            className="absolute top-3 right-3 w-9 h-9 rounded-xl flex items-center justify-center z-20 shadow-md"
             style={{
-              background: `linear-gradient(135deg, ${project.accentPrimary}28 0%, ${project.accentSecondary}1c 100%)`,
-              border: `1px solid ${project.accentPrimary}40`,
+              background: `linear-gradient(135deg, rgba(15, 15, 15, 0.8) 0%, rgba(15, 15, 15, 0.6) 100%)`,
+              border: `1px solid ${project.accentPrimary}60`,
               backdropFilter: "blur(10px)",
             }}
             animate={reduced ? {} : { y: [0, -3, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 }}
           >
-            <Icon size={16} style={{ color: project.accentPrimary }} strokeWidth={1.8} aria-hidden />
+            <Icon size={16} style={{ color: project.accentPrimary }} strokeWidth={2} aria-hidden />
           </motion.div>
-
-          {/* Bottom fade into card body */}
-          <div
-            className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
-            style={{ background: "linear-gradient(to top, rgba(5,8,22,0.5), transparent)" }}
-            aria-hidden
-          />
         </div>
 
         {/* ── Card body ── */}

@@ -8,49 +8,50 @@ datasource db {
 }
 
 model Organization {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  users     User[]
+  id                String             @id @default(cuid())
+  name              String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  users             User[]
+  portfolioProjects PortfolioProject[]
 }
 
 model User {
-  id               String        @id @default(cuid())
-  email            String        @unique
-  name             String
-  passwordHash     String
-  phone            String?
-  avatarUrl        String?
-  employeeId       String?       @unique
-  department       String?
-  designation      String?
-  address          String?
-  emergencyContact String?
-  status           String        @default("ACTIVE")
-  inactiveAt       DateTime?
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  name                 String
+  passwordHash         String
+  phone                String?
+  avatarUrl            String?
+  employeeId           String?   @unique
+  department           String?
+  designation          String?
+  address              String?
+  emergencyContact     String?
+  status               String    @default("ACTIVE")
+  inactiveAt           DateTime?
   requiredDailyMinutes Int       @default(480)
-  joiningDate      DateTime      @default(now())
+  joiningDate          DateTime  @default(now())
 
-  organizationId   String?
-  organization     Organization? @relation(fields: [organizationId], references: [id])
-  sessions         Session[]
-  auditLogs        AuditLog[]
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  sessions       Session[]
+  auditLogs      AuditLog[]
 
   // Roles and Permissions
-  userRoles        UserRole[]
-  
+  userRoles UserRole[]
+
   // Phase 2: Employee Portal Relations
-  attendances      Attendance[]
-  tasks            Task[]
-  taskComments     TaskComment[]
-  workReports      WorkReport[]
-  leaveRequests    LeaveRequest[]
-  regularizations  RegularizationRequest[]
+  attendances             Attendance[]
+  tasks                   Task[]
+  taskComments            TaskComment[]
+  workReports             WorkReport[]
+  leaveRequests           LeaveRequest[]
+  regularizations         RegularizationRequest[]
   reviewedRegularizations RegularizationRequest[] @relation("RegularizationReviewer")
-  notifications    Notification[]
-  uploadedDocs     Document[]     @relation("DocumentUploader")
-  projectMembers   ProjectMember[]
+  notifications           Notification[]
+  uploadedDocs            Document[]              @relation("DocumentUploader")
+  projectMembers          ProjectMember[]
 
   // Phase 4: Executive Relations
   executiveProfile   ExecutiveProfile?
@@ -68,37 +69,40 @@ model User {
   documentPermissions  DocumentPermission[] @relation("UserDocumentPermissions")
 
   // Phase 5: CRM Relations
-  ownedLeads         Lead[]         @relation("LeadOwner")
-  leadActivities     LeadActivity[] @relation("ActivityActor")
-  assignedFollowUps  FollowUp[]     @relation("FollowUpAssignee")
-  ownedOpportunities Opportunity[]  @relation("OpportunityOwner")
-  createdProposals   Proposal[]     @relation("ProposalCreator")
-  ownedClients       CrmClient[]    @relation("ClientOwner")
+  ownedLeads               Lead[]              @relation("LeadOwner")
+  leadActivities           LeadActivity[]      @relation("ActivityActor")
+  assignedFollowUps        FollowUp[]          @relation("FollowUpAssignee")
+  ownedOpportunities       Opportunity[]       @relation("OpportunityOwner")
+  createdProposals         Proposal[]          @relation("ProposalCreator")
+  knowledgeCreated         KnowledgeDocument[] @relation("KnowledgeCreator")
+  knowledgeUpdated         KnowledgeDocument[] @relation("KnowledgeUpdater")
+  ownedClients             CrmClient[]         @relation("ClientOwner")
+  createdPortfolioProjects PortfolioProject[]  @relation("PortfolioCreator")
 
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Role {
-  id          String   @id @default(cuid())
-  name        String   @unique
+  id          String  @id @default(cuid())
+  name        String  @unique
   description String?
-  
+
   userRoles       UserRole[]
   rolePermissions RolePermission[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Permission {
-  id          String   @id @default(cuid())
-  name        String   @unique // e.g., "users:read", "users:write"
+  id          String  @id @default(cuid())
+  name        String  @unique // e.g., "users:read", "users:write"
   description String?
 
   rolePermissions RolePermission[]
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model UserRole {
@@ -145,32 +149,32 @@ model AuditLog {
 // -----------------------------------------------------------------------------
 
 model Attendance {
-  id                  String    @id @default(cuid())
-  userId              String
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date                DateTime  @db.Date
-  checkInAt           DateTime
-  checkOutAt          DateTime?
-  grossMinutes        Int?      @default(0)
-  breakMinutes        Int?      @default(0)
-  netMinutes          Int?      @default(0)
-  totalMinutes        Int?      // Legacy alias for netMinutes
-  requiredDailyMinutes Int?     @default(480)
-  remainingMinutes    Int?      @default(0)
-  lateMinutes         Int?      @default(0)
-  earlyExitMinutes    Int?      @default(0)
-  isLate              Boolean   @default(false)
-  isEarlyExit         Boolean   @default(false)
-  status              String    @default("PRESENT") // PRESENT, HALF_DAY, LATE, NOT_STARTED, IN_PROGRESS, COMPLETE, INCOMPLETE, ABSENT, ON_LEAVE, HOLIDAY, WEEKLY_OFF
-  completionStatus    String    @default("INCOMPLETE") // COMPLETE, INCOMPLETE, ON_LEAVE, HOLIDAY, WEEKLY_OFF, HALF_DAY
-  emailAlertSent      Boolean   @default(false)
-  notes               String?
-  
-  breaks              AttendanceBreak[]
-  regularization      RegularizationRequest?
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date                 DateTime  @db.Date
+  checkInAt            DateTime
+  checkOutAt           DateTime?
+  grossMinutes         Int?      @default(0)
+  breakMinutes         Int?      @default(0)
+  netMinutes           Int?      @default(0)
+  totalMinutes         Int? // Legacy alias for netMinutes
+  requiredDailyMinutes Int?      @default(480)
+  remainingMinutes     Int?      @default(0)
+  lateMinutes          Int?      @default(0)
+  earlyExitMinutes     Int?      @default(0)
+  isLate               Boolean   @default(false)
+  isEarlyExit          Boolean   @default(false)
+  status               String    @default("PRESENT") // PRESENT, HALF_DAY, LATE, NOT_STARTED, IN_PROGRESS, COMPLETE, INCOMPLETE, ABSENT, ON_LEAVE, HOLIDAY, WEEKLY_OFF
+  completionStatus     String    @default("INCOMPLETE") // COMPLETE, INCOMPLETE, ON_LEAVE, HOLIDAY, WEEKLY_OFF, HALF_DAY
+  emailAlertSent       Boolean   @default(false)
+  notes                String?
 
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  breaks         AttendanceBreak[]
+  regularization RegularizationRequest?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, date]) // Prevent duplicate attendance for the same day
   @@index([userId])
@@ -180,56 +184,56 @@ model Attendance {
 }
 
 model AttendanceBreak {
-  id           String     @id @default(cuid())
-  attendanceId String
-  attendance   Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
-  startTime    DateTime
-  endTime      DateTime?
-  durationMinutes Int?    @default(0)
-  type         String     @default("LUNCH") // LUNCH, TEA, PERSONAL, SHORT_BREAK, OTHER
-  notes        String?
-  
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id              String     @id @default(cuid())
+  attendanceId    String
+  attendance      Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+  startTime       DateTime
+  endTime         DateTime?
+  durationMinutes Int?       @default(0)
+  type            String     @default("LUNCH") // LUNCH, TEA, PERSONAL, SHORT_BREAK, OTHER
+  notes           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([attendanceId])
 }
 
 model AttendancePolicy {
-  id                          String   @id @default(cuid())
-  workWindowStart             String   @default("08:00") // 08:00 AM
-  workWindowEnd               String   @default("19:00") // 07:00 PM
-  defaultRequiredMinutes      Int      @default(480)    // 8 Hours = 480 Mins
-  graceMinutes                Int      @default(15)
-  cutoffTime                  String   @default("19:00") // 07:00 PM
-  weeklyOffDays               Json?    // e.g. [0, 6] (Sunday, Saturday)
-  enableIncompleteAlerts      Boolean  @default(true)
-  allowRemoteRegularization   Boolean  @default(true)
-  updatedById                 String?
+  id                        String  @id @default(cuid())
+  workWindowStart           String  @default("08:00") // 08:00 AM
+  workWindowEnd             String  @default("19:00") // 07:00 PM
+  defaultRequiredMinutes    Int     @default(480) // 8 Hours = 480 Mins
+  graceMinutes              Int     @default(15)
+  cutoffTime                String  @default("19:00") // 07:00 PM
+  weeklyOffDays             Json? // e.g. [0, 6] (Sunday, Saturday)
+  enableIncompleteAlerts    Boolean @default(true)
+  allowRemoteRegularization Boolean @default(true)
+  updatedById               String?
 
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model RegularizationRequest {
-  id                 String      @id @default(cuid())
-  attendanceId       String?     @unique
-  attendance         Attendance? @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
-  userId             String
-  user               User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date               DateTime    @db.Date
-  requestedCheckIn   DateTime
-  requestedCheckOut  DateTime
-  requestedBreaks    Json?
-  reason             String
-  status             String      @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
-  reviewedById       String?
-  reviewedBy         User?       @relation("RegularizationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
-  reviewNotes        String?
-  reviewedAt         DateTime?
+  id                String      @id @default(cuid())
+  attendanceId      String?     @unique
+  attendance        Attendance? @relation(fields: [attendanceId], references: [id], onDelete: SetNull)
+  userId            String
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date              DateTime    @db.Date
+  requestedCheckIn  DateTime
+  requestedCheckOut DateTime
+  requestedBreaks   Json?
+  reason            String
+  status            String      @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  reviewedById      String?
+  reviewedBy        User?       @relation("RegularizationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewNotes       String?
+  reviewedAt        DateTime?
 
-  createdAt          DateTime    @default(now())
-  updatedAt          DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
@@ -243,8 +247,8 @@ model Holiday {
   isOptional  Boolean  @default(false)
   description String?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([date])
 }
@@ -256,17 +260,17 @@ model Task {
   projectId    String?
   project      Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
   priority     String    @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
-  status       String    @default("TODO")   // TODO, IN_PROGRESS, BLOCKED, COMPLETED
+  status       String    @default("TODO") // TODO, IN_PROGRESS, BLOCKED, COMPLETED
   dueDate      DateTime?
   assignedDate DateTime  @default(now())
-  
-  userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  comments     TaskComment[]
 
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  comments TaskComment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([projectId])
@@ -274,38 +278,38 @@ model Task {
 }
 
 model TaskComment {
-  id        String   @id @default(cuid())
-  content   String
-  
-  taskId    String
-  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id      String @id @default(cuid())
+  content String
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
-  
+
   @@index([taskId])
   @@index([userId])
 }
 
 model WorkReport {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date            DateTime @db.Date
-  
-  summary         String
-  tasksCompleted  String?
-  workPerformed   String
-  challenges      String?
-  nextSteps       String?
-  hoursWorked     Float?
-  
-  status          String   @default("SUBMITTED") // SUBMITTED, REVIEWED
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id     String   @id @default(cuid())
+  userId String
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date   DateTime @db.Date
+
+  summary        String
+  tasksCompleted String?
+  workPerformed  String
+  challenges     String?
+  nextSteps      String?
+  hoursWorked    Float?
+
+  status String @default("SUBMITTED") // SUBMITTED, REVIEWED
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, date])
   @@index([userId])
@@ -313,41 +317,41 @@ model WorkReport {
 }
 
 model LeaveRequest {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  leaveType    String   // SICK, CASUAL, ANNUAL, UNPAID
-  startDate    DateTime @db.Date
-  endDate      DateTime @db.Date
-  reason       String
-  
-  status       String   @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  leaveType String // SICK, CASUAL, ANNUAL, UNPAID
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
+  reason    String
+
+  status String @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
 }
 
 model Notification {
-  id         String    @id @default(cuid())
-  userId     String
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  type       String    // TASK_ASSIGNED, TASK_UPDATED, LEAVE_UPDATED, WORK_REPORT_REVIEWED, NEW_LEAD, FOLLOW_UP_DUE, PROPOSAL_UPDATED, ANNOUNCEMENT, DOCUMENT_SHARED, SECURITY_EVENT, SYSTEM_EVENT
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type       String // TASK_ASSIGNED, TASK_UPDATED, LEAVE_UPDATED, WORK_REPORT_REVIEWED, NEW_LEAD, FOLLOW_UP_DUE, PROPOSAL_UPDATED, ANNOUNCEMENT, DOCUMENT_SHARED, SECURITY_EVENT, SYSTEM_EVENT
   title      String
   message    String
   isRead     Boolean   @default(false)
   readAt     DateTime?
-  link       String?   // Optional URL to redirect to
+  link       String? // Optional URL to redirect to
   entityType String?
   entityId   String?
   priority   String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
   dedupKey   String?
-  
-  createdAt  DateTime  @default(now())
+
+  createdAt DateTime @default(now())
 
   @@index([userId])
   @@index([isRead])
@@ -361,16 +365,16 @@ model Announcement {
   priority      String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
   status        String    @default("PUBLISHED") // DRAFT, SCHEDULED, PUBLISHED, ARCHIVED, EXPIRED
   audienceType  String    @default("ALL") // ALL, DEPARTMENT, ROLE, PROJECT, USERS
-  audienceScope String?   // department name, role name, project id, or json array
+  audienceScope String? // department name, role name, project id, or json array
   publishAt     DateTime  @default(now())
   publishedAt   DateTime  @default(now())
   expiresAt     DateTime?
-  
-  createdById   String?
-  createdBy     User?     @relation("AnnouncementCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdById String?
+  createdBy   User?   @relation("AnnouncementCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([publishedAt])
   @@index([status])
@@ -378,27 +382,27 @@ model Announcement {
 }
 
 model Document {
-  id              String               @id @default(cuid())
+  id              String  @id @default(cuid())
   title           String
   description     String?
-  category        String               // COMPANY_POLICY, GUIDELINE, FORM, HR_DOCUMENT, PROJECT_DOCUMENT, CLIENT_DOCUMENT, TEMPLATE, INTERNAL_RESOURCE
+  category        String // COMPANY_POLICY, GUIDELINE, FORM, HR_DOCUMENT, PROJECT_DOCUMENT, CLIENT_DOCUMENT, TEMPLATE, INTERNAL_RESOURCE
   fileUrl         String
   storageKey      String?
   mimeType        String?
   size            Int?
-  visibility      String               @default("COMPANY") // COMPANY, DEPARTMENT, ROLE, PROJECT, PRIVATE, USERS
+  visibility      String  @default("COMPANY") // COMPANY, DEPARTMENT, ROLE, PROJECT, PRIVATE, USERS
   visibilityScope String?
-  currentVersion  Int                  @default(1)
-  isArchived      Boolean              @default(false)
-  
-  uploadedById    String
-  uploadedBy      User                 @relation("DocumentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
-  
-  versions        DocumentVersion[]
-  permissions     DocumentPermission[]
+  currentVersion  Int     @default(1)
+  isArchived      Boolean @default(false)
 
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
+  uploadedById String
+  uploadedBy   User   @relation("DocumentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  versions    DocumentVersion[]
+  permissions DocumentPermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([category])
   @@index([visibility])
@@ -407,27 +411,27 @@ model Document {
 }
 
 model Project {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   description String?
-  status      String   @default("ACTIVE") // ACTIVE, COMPLETED, ON_HOLD
+  status      String    @default("ACTIVE") // ACTIVE, COMPLETED, ON_HOLD
   startDate   DateTime?
   endDate     DateTime?
 
-  members     ProjectMember[]
-  tasks       Task[]
+  members ProjectMember[]
+  tasks   Task[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProjectMember {
   projectId String
   userId    String
-  role      String   @default("MEMBER") // MANAGER, MEMBER
+  role      String @default("MEMBER") // MANAGER, MEMBER
 
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([projectId, userId])
 }
@@ -437,42 +441,42 @@ model ProjectMember {
 // -----------------------------------------------------------------------------
 
 model ExecutiveProfile {
-  id                    String   @id @default(cuid())
-  userId                String   @unique
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  responsibilityProfile String   // TECHNOLOGY, OPERATIONS, BUSINESS_GROWTH, FULL
-  departmentScope       String?  // Optional JSON array or comma-separated string
-  projectScope          String?  // Optional JSON array or comma-separated string
+  id                    String  @id @default(cuid())
+  userId                String  @unique
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  responsibilityProfile String // TECHNOLOGY, OPERATIONS, BUSINESS_GROWTH, FULL
+  departmentScope       String? // Optional JSON array or comma-separated string
+  projectScope          String? // Optional JSON array or comma-separated string
 
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ApprovalRequest {
-  id            String    @id @default(cuid())
-  requestType   String    // HIGH_PRIVILEGE_ROLE_ASSIGNMENT, SENSITIVE_PERMISSION_CHANGE, EMPLOYEE_STATUS_EXCEPTION, HIGH_IMPACT_PROJECT_CHANGE, SENSITIVE_EXPORT, ORGANIZATIONAL_SETTING_CHANGE
+  id            String @id @default(cuid())
+  requestType   String // HIGH_PRIVILEGE_ROLE_ASSIGNMENT, SENSITIVE_PERMISSION_CHANGE, EMPLOYEE_STATUS_EXCEPTION, HIGH_IMPACT_PROJECT_CHANGE, SENSITIVE_EXPORT, ORGANIZATIONAL_SETTING_CHANGE
   requestedById String
-  requestedBy   User      @relation("ApprovalRequester", fields: [requestedById], references: [id], onDelete: Cascade)
-  
-  decidedById   String?
-  decidedBy     User?     @relation("ApprovalDecider", fields: [decidedById], references: [id], onDelete: SetNull)
-  
-  status        String    @default("PENDING") // PENDING, APPROVED, REJECTED
-  reason        String?
-  metadata      Json?
-  
-  createdAt     DateTime  @default(now())
-  decidedAt     DateTime?
+  requestedBy   User   @relation("ApprovalRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+
+  decidedById String?
+  decidedBy   User?   @relation("ApprovalDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+
+  status   String  @default("PENDING") // PENDING, APPROVED, REJECTED
+  reason   String?
+  metadata Json?
+
+  createdAt DateTime  @default(now())
+  decidedAt DateTime?
 
   @@index([status])
   @@index([requestedById])
 }
 
 model SecurityEvent {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  eventType String   // LOGIN_SUCCESS, LOGIN_FAILED, ROLE_CHANGED, PERMISSION_CHANGED, SENSITIVE_EXPORT, SUSPICIOUS_ACCESS
+  user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventType String // LOGIN_SUCCESS, LOGIN_FAILED, ROLE_CHANGED, PERMISSION_CHANGED, SENSITIVE_EXPORT, SUSPICIOUS_ACCESS
   ipAddress String?
   userAgent String?
   details   Json?
@@ -484,12 +488,12 @@ model SecurityEvent {
 }
 
 model OrganizationSetting {
-  id          String   @id @default(cuid())
-  key         String   @unique
+  id          String  @id @default(cuid())
+  key         String  @unique
   value       Json
   updatedById String?
 
-  updatedAt   DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 // -----------------------------------------------------------------------------
@@ -497,31 +501,31 @@ model OrganizationSetting {
 // -----------------------------------------------------------------------------
 
 model EmailLog {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   toEmail     String
   templateKey String
   subject     String
-  status      String   @default("SENT") // SENT, FAILED
+  status      String  @default("SENT") // SENT, FAILED
   error       String?
   metadata    Json?
 
-  sentAt      DateTime @default(now())
+  sentAt DateTime @default(now())
 
   @@index([toEmail])
   @@index([templateKey])
 }
 
 model EmailTemplate {
-  id          String   @id @default(cuid())
-  key         String   @unique
-  subject     String
-  htmlBody    String
-  textBody    String
-  variables   Json?    // Array of allowed variable names
-  isActive    Boolean  @default(true)
+  id        String  @id @default(cuid())
+  key       String  @unique
+  subject   String
+  htmlBody  String
+  textBody  String
+  variables Json? // Array of allowed variable names
+  isActive  Boolean @default(true)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Reminder {
@@ -536,7 +540,7 @@ model Reminder {
   relatedEntity Json?
   completedAt   DateTime?
 
-  createdAt     DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId])
   @@index([dueAt])
@@ -545,7 +549,7 @@ model Reminder {
 
 model BackgroundJob {
   id          String    @id @default(cuid())
-  jobType     String    // NOTIFICATION_SEND, EMAIL_RETRY, REMINDER_DELIVERY, ANNOUNCEMENT_SCHEDULE, DOCUMENT_EXPIRY
+  jobType     String // NOTIFICATION_SEND, EMAIL_RETRY, REMINDER_DELIVERY, ANNOUNCEMENT_SCHEDULE, DOCUMENT_EXPIRY
   status      String    @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
   payload     Json?
   attempts    Int       @default(0)
@@ -555,26 +559,26 @@ model BackgroundJob {
   completedAt DateTime?
   error       String?
 
-  createdAt   DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   @@index([status])
   @@index([jobType])
 }
 
 model AutomationWorkflow {
-  id          String    @id @default(cuid())
+  id          String  @id @default(cuid())
   name        String
-  triggerType String    // TASK_OVERDUE, LEAVE_SUBMITTED, DOCUMENT_EXPIRING
+  triggerType String // TASK_OVERDUE, LEAVE_SUBMITTED, DOCUMENT_EXPIRING
   conditions  Json?
   actions     Json?
-  isActive    Boolean   @default(true)
+  isActive    Boolean @default(true)
   createdById String?
-  createdBy   User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
 
-  executions  AutomationExecution[]
+  executions AutomationExecution[]
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model AutomationExecution {
@@ -586,23 +590,23 @@ model AutomationExecution {
   dedupKey     String?
   result       Json?
 
-  executedAt   DateTime           @default(now())
+  executedAt DateTime @default(now())
 
   @@index([automationId])
   @@index([dedupKey])
 }
 
 model UserPreference {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  emailNotifications Boolean  @default(true)
-  inAppNotifications Boolean  @default(true)
-  timezone           String   @default("UTC")
-  theme              String   @default("dark")
+  id                 String  @id @default(cuid())
+  userId             String  @unique
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailNotifications Boolean @default(true)
+  inAppNotifications Boolean @default(true)
+  timezone           String  @default("UTC")
+  theme              String  @default("dark")
 
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // -----------------------------------------------------------------------------
@@ -610,8 +614,8 @@ model UserPreference {
 // -----------------------------------------------------------------------------
 
 model Lead {
-  id                  String   @id @default(cuid())
-  leadCode            String   @unique
+  id                  String  @id @default(cuid())
+  leadCode            String  @unique
   name                String
   email               String
   phone               String?
@@ -619,34 +623,34 @@ model Lead {
   website             String?
   serviceInterest     String?
   message             String?
-  source              String   @default("WEBSITE_CONTACT") // WEBSITE_CONTACT, CONSULTATION, REFERRAL, SOCIAL_MEDIA, CAMPAIGN, MANUAL, PARTNER, OTHER
+  source              String  @default("WEBSITE_CONTACT") // WEBSITE_CONTACT, CONSULTATION, REFERRAL, SOCIAL_MEDIA, CAMPAIGN, MANUAL, PARTNER, OTHER
   campaign            String?
-  status              String   @default("NEW") // NEW, CONTACTED, QUALIFIED, UNQUALIFIED, CONVERTED, NURTURE
-  qualificationStatus String   @default("UNQUALIFIED") // QUALIFIED, UNQUALIFIED, IN_PROGRESS
-  
+  status              String  @default("NEW") // NEW, CONTACTED, QUALIFIED, UNQUALIFIED, CONVERTED, NURTURE
+  qualificationStatus String  @default("UNQUALIFIED") // QUALIFIED, UNQUALIFIED, IN_PROGRESS
+
   // Qualification Details
-  budget              Float?
-  timeline            String?
-  businessNeed        String?
-  decisionMakerKnown  Boolean  @default(false)
-  qualificationNotes  String?
+  budget             Float?
+  timeline           String?
+  businessNeed       String?
+  decisionMakerKnown Boolean @default(false)
+  qualificationNotes String?
 
   // Duplicate Tracking
-  isDuplicate         Boolean  @default(false)
-  duplicateReason     String?
+  isDuplicate     Boolean @default(false)
+  duplicateReason String?
 
-  ownerId             String?
-  owner               User?    @relation("LeadOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId String?
+  owner   User?   @relation("LeadOwner", fields: [ownerId], references: [id], onDelete: SetNull)
 
-  convertedClientId   String?
-  convertedClient     CrmClient? @relation(fields: [convertedClientId], references: [id], onDelete: SetNull)
+  convertedClientId String?
+  convertedClient   CrmClient? @relation(fields: [convertedClientId], references: [id], onDelete: SetNull)
 
-  activities          LeadActivity[]
-  followUps           FollowUp[]
-  opportunities       Opportunity[]
+  activities    LeadActivity[]
+  followUps     FollowUp[]
+  opportunities Opportunity[]
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([ownerId])
   @@index([status])
@@ -662,16 +666,16 @@ model LeadActivity {
   opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
   clientId      String?
   client        CrmClient?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  
-  actorId       String?
-  actor         User?        @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
-  
-  type          String       // LEAD_CREATED, LEAD_ASSIGNED, STATUS_CHANGED, NOTE_ADDED, CALL_RECORDED, MEETING_RECORDED, FOLLOWUP_CREATED, FOLLOWUP_COMPLETED, OPPORTUNITY_CREATED, PROPOSAL_SENT, DEAL_WON, DEAL_LOST, CLIENT_CONVERTED
-  title         String
-  notes         String?
-  metadata      Json?
 
-  createdAt     DateTime     @default(now())
+  actorId String?
+  actor   User?   @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  type     String // LEAD_CREATED, LEAD_ASSIGNED, STATUS_CHANGED, NOTE_ADDED, CALL_RECORDED, MEETING_RECORDED, FOLLOWUP_CREATED, FOLLOWUP_COMPLETED, OPPORTUNITY_CREATED, PROPOSAL_SENT, DEAL_WON, DEAL_LOST, CLIENT_CONVERTED
+  title    String
+  notes    String?
+  metadata Json?
+
+  createdAt DateTime @default(now())
 
   @@index([leadId])
   @@index([opportunityId])
@@ -688,17 +692,17 @@ model FollowUp {
   clientId      String?
   client        CrmClient?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
-  assignedToId  String
-  assignedTo    User         @relation("FollowUpAssignee", fields: [assignedToId], references: [id], onDelete: Cascade)
+  assignedToId String
+  assignedTo   User   @relation("FollowUpAssignee", fields: [assignedToId], references: [id], onDelete: Cascade)
 
-  dueAt         DateTime
-  type          String       @default("CALL") // CALL, EMAIL, MEETING, WHATSAPP, DEMO, PROPOSAL_FOLLOWUP, GENERAL
-  notes         String?
-  status        String       @default("UPCOMING") // UPCOMING, DUE, OVERDUE, COMPLETED
-  completedAt   DateTime?
+  dueAt       DateTime
+  type        String    @default("CALL") // CALL, EMAIL, MEETING, WHATSAPP, DEMO, PROPOSAL_FOLLOWUP, GENERAL
+  notes       String?
+  status      String    @default("UPCOMING") // UPCOMING, DUE, OVERDUE, COMPLETED
+  completedAt DateTime?
 
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([assignedToId])
   @@index([leadId])
@@ -708,49 +712,49 @@ model FollowUp {
 }
 
 model PipelineStage {
-  id          String        @id @default(cuid())
+  id          String  @id @default(cuid())
   name        String
-  key         String        @unique // QUALIFIED, DISCOVERY, PROPOSAL, NEGOTIATION, WON, LOST
-  order       Int           @default(0)
-  probability Int           @default(50)
+  key         String  @unique // QUALIFIED, DISCOVERY, PROPOSAL, NEGOTIATION, WON, LOST
+  order       Int     @default(0)
+  probability Int     @default(50)
   description String?
 
   opportunities Opportunity[]
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Opportunity {
-  id                String         @id @default(cuid())
-  opportunityCode   String         @unique
-  leadId            String?
-  lead              Lead?          @relation(fields: [leadId], references: [id], onDelete: SetNull)
-  clientId          String?
-  client            CrmClient?     @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  id              String     @id @default(cuid())
+  opportunityCode String     @unique
+  leadId          String?
+  lead            Lead?      @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  clientId        String?
+  client          CrmClient? @relation(fields: [clientId], references: [id], onDelete: SetNull)
 
   name              String
   description       String?
-  value             Float          @default(0)
-  currency          String         @default("INR")
-  probability       Int            @default(50)
+  value             Float     @default(0)
+  currency          String    @default("INR")
+  probability       Int       @default(50)
   expectedCloseDate DateTime?
-  stage             String         @default("QUALIFIED") // QUALIFIED, DISCOVERY, PROPOSAL, NEGOTIATION, WON, LOST
+  stage             String    @default("QUALIFIED") // QUALIFIED, DISCOVERY, PROPOSAL, NEGOTIATION, WON, LOST
 
-  stageId           String?
-  pipelineStage     PipelineStage? @relation(fields: [stageId], references: [id], onDelete: SetNull)
+  stageId       String?
+  pipelineStage PipelineStage? @relation(fields: [stageId], references: [id], onDelete: SetNull)
 
-  ownerId           String?
-  owner             User?          @relation("OpportunityOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId String?
+  owner   User?   @relation("OpportunityOwner", fields: [ownerId], references: [id], onDelete: SetNull)
 
-  lossReason        String?
+  lossReason String?
 
-  proposals         Proposal[]
-  activities        LeadActivity[]
-  followUps         FollowUp[]
+  proposals  Proposal[]
+  activities LeadActivity[]
+  followUps  FollowUp[]
 
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([ownerId])
   @@index([leadId])
@@ -759,51 +763,51 @@ model Opportunity {
 }
 
 model Proposal {
-  id                String      @id @default(cuid())
-  proposalNumber    String      @unique
-  opportunityId     String
-  opportunity       Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  id             String      @id @default(cuid())
+  proposalNumber String      @unique
+  opportunityId  String
+  opportunity    Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
 
   title             String
   amount            Float
-  currency          String      @default("INR")
-  status            String      @default("DRAFT") // DRAFT, READY, SENT, ACCEPTED, REJECTED, EXPIRED
+  currency          String    @default("INR")
+  status            String    @default("DRAFT") // DRAFT, READY, SENT, ACCEPTED, REJECTED, EXPIRED
   sentAt            DateTime?
   validUntil        DateTime?
   documentReference String?
 
-  createdById       String?
-  createdBy         User?       @relation("ProposalCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+  createdBy   User?   @relation("ProposalCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([opportunityId])
   @@index([status])
 }
 
 model CrmClient {
-  id          String   @id @default(cuid())
-  clientCode  String   @unique
+  id          String  @id @default(cuid())
+  clientCode  String  @unique
   companyName String
   contactName String
   email       String
   phone       String?
   website     String?
   industry    String?
-  status      String   @default("ACTIVE") // ACTIVE, INACTIVE, ONBOARDING
+  status      String  @default("ACTIVE") // ACTIVE, INACTIVE, ONBOARDING
 
-  ownerId     String?
-  owner       User?    @relation("ClientOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId String?
+  owner   User?   @relation("ClientOwner", fields: [ownerId], references: [id], onDelete: SetNull)
 
-  leads       Lead[]
+  leads         Lead[]
   opportunities Opportunity[]
-  activities  LeadActivity[]
-  followUps   FollowUp[]
-  contacts    ClientContact[]
+  activities    LeadActivity[]
+  followUps     FollowUp[]
+  contacts      ClientContact[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([ownerId])
   @@index([email])
@@ -811,18 +815,18 @@ model CrmClient {
 }
 
 model ClientContact {
-  id        String    @id @default(cuid())
-  clientId  String
-  client    CrmClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  id       String    @id @default(cuid())
+  clientId String
+  client   CrmClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   name      String
   email     String?
   phone     String?
   role      String?
-  isPrimary Boolean   @default(false)
+  isPrimary Boolean @default(false)
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([clientId])
 }
@@ -832,21 +836,21 @@ model ClientContact {
 // -----------------------------------------------------------------------------
 
 model DocumentVersion {
-  id           String   @id @default(cuid())
-  documentId   String
-  document     Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  
-  versionNumber Int     @default(1)
-  fileUrl      String
-  storageKey   String?
-  size         Int?
-  mimeType     String?
-  changeNotes  String?
-  
-  uploadedById String
-  uploadedBy   User     @relation("VersionUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
-  createdAt    DateTime @default(now())
+  versionNumber Int     @default(1)
+  fileUrl       String
+  storageKey    String?
+  size          Int?
+  mimeType      String?
+  changeNotes   String?
+
+  uploadedById String
+  uploadedBy   User   @relation("VersionUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 
   @@unique([documentId, versionNumber])
   @@index([documentId])
@@ -854,33 +858,33 @@ model DocumentVersion {
 }
 
 model DocumentPermission {
-  id          String   @id @default(cuid())
-  documentId  String
-  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  
-  userId      String?
-  user        User?    @relation("UserDocumentPermissions", fields: [userId], references: [id], onDelete: Cascade)
-  role        String?  // FOUNDER, CO_FOUNDER, ADMIN, EMPLOYEE
-  accessLevel String   @default("VIEW") // VIEW, EDIT, ADMIN
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
+  userId      String?
+  user        User?   @relation("UserDocumentPermissions", fields: [userId], references: [id], onDelete: Cascade)
+  role        String? // FOUNDER, CO_FOUNDER, ADMIN, EMPLOYEE
+  accessLevel String  @default("VIEW") // VIEW, EDIT, ADMIN
+
+  createdAt DateTime @default(now())
 
   @@index([documentId])
   @@index([userId])
 }
 
 model Activity {
-  id         String   @id @default(cuid())
-  actorId    String?
-  actor      User?    @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
-  
-  action     String   // CREATED, UPDATED, DELETED, ASSIGNED, APPROVED, REJECTED, PUBLISHED, ARCHIVED, UPLOADED, EXPORTED, CONVERTED
-  entityType String   // TASK, LEAVE, REPORT, PROJECT, ANNOUNCEMENT, DOCUMENT, LEAD, OPPORTUNITY, CLIENT, USER, SYSTEM
+  id      String  @id @default(cuid())
+  actorId String?
+  actor   User?   @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  action     String // CREATED, UPDATED, DELETED, ASSIGNED, APPROVED, REJECTED, PUBLISHED, ARCHIVED, UPLOADED, EXPORTED, CONVERTED
+  entityType String // TASK, LEAVE, REPORT, PROJECT, ANNOUNCEMENT, DOCUMENT, LEAD, OPPORTUNITY, CLIENT, USER, SYSTEM
   entityId   String?
   summary    String
   metadata   Json?
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([entityType, entityId])
   @@index([actorId])
@@ -888,14 +892,14 @@ model Activity {
 }
 
 model CommunicationTemplate {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  category  String   @default("EMAIL") // EMAIL, NOTIFICATION, ANNOUNCEMENT, REPORT
+  id        String  @id @default(cuid())
+  key       String  @unique
+  category  String  @default("EMAIL") // EMAIL, NOTIFICATION, ANNOUNCEMENT, REPORT
   name      String
   subject   String?
   content   String
-  variables Json?    // Array of allowed variable names
-  isActive  Boolean  @default(true)
+  variables Json? // Array of allowed variable names
+  isActive  Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -904,6 +908,104 @@ model CommunicationTemplate {
   @@index([key])
 }
 
+// -----------------------------------------------------------------------------
+// AI CHATBOT: KNOWLEDGE BASE MODELS  
+// -----------------------------------------------------------------------------
 
+model KnowledgeDocument {
+  id              String   @id @default(cuid())
+  title           String
+  category        String   @default("COMPANY") // COMPANY, SERVICES, PROCESS, PRICING, FAQ, PORTFOLIO, TECHNOLOGY, CONTACT, INDUSTRIES
+  sourceType      String   @default("MANUAL") // MANUAL, WEBSITE_PAGE, DOCUMENT
+  sourceReference String?
+  content         String   @db.Text
+  status          String   @default("DRAFT") // DRAFT, REVIEW, PUBLISHED, ARCHIVED
+  version         Int      @default(1)
+  tags            String[]
 
+  createdById String?
+  createdBy   User?   @relation("KnowledgeCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedById String?
+  updatedBy   User?   @relation("KnowledgeUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([status])
+  @@index([createdById])
+}
+
+model ChatKnowledgeGap {
+  id         String    @id @default(cuid())
+  question   String
+  intent     String    @default("UNKNOWN")
+  frequency  Int       @default(1)
+  status     String    @default("OPEN") // OPEN, ADDRESSED, IGNORED
+  resolvedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([intent])
+}
+
+model ChatFeedback {
+  id             String  @id @default(cuid())
+  conversationId String
+  rating         String // HELPFUL, NOT_HELPFUL
+  comment        String?
+  messageContent String?
+
+  createdAt DateTime @default(now())
+
+  @@index([rating])
+  @@index([conversationId])
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 7: PORTFOLIO CMS MODELS
+// -----------------------------------------------------------------------------
+
+model PortfolioProject {
+  id               String        @id @default(cuid())
+  organizationId   String?
+  organization     Organization? @relation(fields: [organizationId], references: [id])
+  slug             String        @unique
+  title            String
+  category         String
+  industry         String
+  shortDescription String
+  fullDescription  String        @db.Text
+  problem          String        @db.Text
+  solution         String        @db.Text
+  features         String[]
+  technologies     String[]
+  client           String?
+  liveUrl          String?
+  githubUrl        String?
+  thumbnail        String
+  heroImage        String
+  gallery          String[]
+
+  status       String  @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  featured     Boolean @default(false)
+  displayOrder Int     @default(0)
+
+  seoTitle       String?
+  seoDescription String?
+
+  createdById String?
+  createdBy   User?   @relation("PortfolioCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+  archivedAt  DateTime?
+
+  @@index([status])
+  @@index([slug])
+  @@index([organizationId])
+  @@index([featured])
+}

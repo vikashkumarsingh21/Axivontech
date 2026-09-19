@@ -49,6 +49,7 @@ export default function ChatWidget() {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCount, setUnreadCount] = useState(1);
+  const [conversationId, setConversationId] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -82,6 +83,8 @@ export default function ChatWidget() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          conversationId,
+          pageContext: { path: window.location.pathname, title: document.title },
           messages: [...messages, userMsg].map((m) => ({
             role: m.sender === "user" ? "user" : "assistant",
             content: m.text,
@@ -91,6 +94,10 @@ export default function ChatWidget() {
 
       const data = await res.json();
       setIsTyping(false);
+      
+      if (data.conversationId) {
+        setConversationId(data.conversationId);
+      }
 
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),

@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
-import ContactHero from "@/components/contact/ContactHero";
-import ContactInfo from "@/components/contact/ContactInfo";
-import ContactForm from "@/components/contact/ContactForm";
-import ContactFAQ from "@/components/contact/ContactFAQ";
-import CTA from "@/components/CTA";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { createPageMetadata } from "@/lib/seo/metadata";
+
+import ContactHero from "@/components/contact/ContactHero";
+import ContactOptions from "@/components/contact/ContactOptions";
+import ContactForm from "@/components/contact/ContactForm";
+import ContactTrust from "@/components/contact/ContactTrust";
+import ContactPresence from "@/components/contact/ContactPresence";
+import ContactFAQ from "@/components/contact/ContactFAQ";
+import ContactCTA from "@/components/contact/ContactCTA";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Contact Us",
@@ -22,18 +25,34 @@ export const metadata: Metadata = createPageMetadata({
 
 export default function ContactPage() {
   return (
-    <main className="bg-[#0f0f0f] overflow-hidden">
+    <main className="bg-[#0f0f0f]">
       <BreadcrumbSchema
         items={[
           { name: "Home", url: "https://axivontech.in" },
           { name: "Contact", url: "https://axivontech.in/contact" },
         ]}
       />
+      
+      {/* Section 01 */}
       <ContactHero />
-      <ContactInfo />
+      
+      {/* Section 02 */}
+      <ContactOptions />
+      
+      {/* Sections 03 & 04 (Two-column layout) */}
       <ContactForm />
+      
+      {/* Section 05 */}
+      <ContactTrust />
+      
+      {/* Section 06 */}
+      <ContactPresence />
+      
+      {/* Section 07 */}
       <ContactFAQ />
-      <CTA />
+      
+      {/* Section 08 */}
+      <ContactCTA />
     </main>
   );
 }
