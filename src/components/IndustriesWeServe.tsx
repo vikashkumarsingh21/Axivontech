@@ -70,7 +70,7 @@ export default function IndustriesWeServe() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="bg-[#0f0f0f] py-24 sm:py-28 relative">
+    <section className="bg-[#0f0f0f] py-14 sm:py-20 lg:py-28 relative">
       {/* Ambient soft glow */}
       <div
         aria-hidden

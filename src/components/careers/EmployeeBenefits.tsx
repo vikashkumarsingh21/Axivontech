@@ -491,7 +491,7 @@ export default function EmployeeBenefits() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
           variants={containerVariants}
-          className="mx-auto mb-16 max-w-2xl text-center sm:mb-20"
+          className="mx-auto mb-10 sm:mb-16 max-w-2xl text-center sm:mb-20"
         >
           <motion.span
             variants={fadeUpVariants}

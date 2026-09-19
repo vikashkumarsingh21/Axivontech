@@ -905,7 +905,7 @@ export default function ServiceTechStack({ service }: ServiceTechStackProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden py-24 lg:py-32"
+      className="relative overflow-hidden py-14 sm:py-20 lg:py-32"
       style={{ background: "#0f0f0f" }}
       aria-labelledby="techstack-heading"
     >

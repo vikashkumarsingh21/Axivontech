@@ -21,7 +21,7 @@ export default function ContactCTA() {
   };
 
   return (
-    <section ref={sectionRef} className="bg-[#0f0f0f] py-20 sm:py-24 lg:py-32">
+    <section ref={sectionRef} className="bg-[#0f0f0f] py-20 sm:py-14 sm:py-20 lg:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial="hidden"
@@ -70,3 +70,4 @@ export default function ContactCTA() {
     </section>
   );
 }
+

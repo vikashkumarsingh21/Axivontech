@@ -146,14 +146,14 @@ export default function Process() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="bg-[#0f0f0f] py-24 sm:py-28 relative">
+    <section className="bg-[#0f0f0f] py-14 sm:py-20 lg:py-28 relative">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
           variants={headerVariants}
-          className="mx-auto mb-16 max-w-2xl text-center sm:mb-20"
+          className="mx-auto mb-10 sm:mb-16 lg:mb-20 max-w-2xl text-center"
         >
           <SectionHeader
             overline="How We Work"

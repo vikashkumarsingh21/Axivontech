@@ -132,7 +132,7 @@ export default function Services() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section id="services" className="relative bg-[#0a0a0a] py-20 sm:py-28 border-t border-[#1f1f1f]">
+    <section id="services" className="relative bg-[#0a0a0a] py-14 sm:py-20 lg:py-28 border-t border-[#1f1f1f]">
       {/* Background radial accent */}
       <div
         aria-hidden
@@ -141,7 +141,7 @@ export default function Services() {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
         {/* Section Header */}
-        <div className="mx-auto mb-16 max-w-3xl text-center sm:mb-20">
+        <div className="mx-auto mb-10 sm:mb-16 lg:mb-20 max-w-3xl text-center">
           <SectionHeader
             overline="Agency Capabilities"
             heading={
@@ -240,8 +240,8 @@ export default function Services() {
         </div>
 
         {/* ── Complementary Specialized Disciplines ─────────────── */}
-        <div className="mt-14 border-t border-[#1f1f1f] pt-12">
-          <div className="mb-6 flex items-center justify-between">
+        <div className="mt-10 sm:mt-14 border-t border-[#1f1f1f] pt-8 sm:pt-12">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h4 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#71717a]">
               Additional Specialized Capabilities
             </h4>

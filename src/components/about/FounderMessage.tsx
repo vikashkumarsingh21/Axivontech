@@ -322,7 +322,7 @@ export default function FounderMessage() {
       ref={sectionRef}
       id="founder-message"
       aria-labelledby="founder-message-heading"
-      className="relative isolate overflow-hidden bg-[#0f0f0f] py-24 sm:py-32"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] py-14 sm:py-20 lg:py-32"
     >
       <motion.div aria-hidden={true} style={{ y: backgroundParallaxY }} className="absolute inset-0">
         <AuroraBackground />

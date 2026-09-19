@@ -19,7 +19,7 @@ export default function CTA() {
   return (
     <section
       id="contact-cta"
-      className="bg-[#0f0f0f] py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+      className="bg-[#0f0f0f] py-14 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
     >
       {/* Ambient glow */}
       <div
@@ -53,7 +53,7 @@ export default function CTA() {
           </div>
 
           {/* Content */}
-          <div className="relative z-10 grid grid-cols-1 gap-12 p-8 sm:p-12 lg:grid-cols-2 lg:p-16 lg:gap-8 items-center">
+          <div className="relative z-10 grid grid-cols-1 gap-10 p-6 sm:p-10 lg:p-16 lg:gap-12 lg:grid-cols-2 items-center">
             {/* Left — text */}
             <div>
               <div className="mb-6 flex">

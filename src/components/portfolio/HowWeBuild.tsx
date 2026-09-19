@@ -46,7 +46,7 @@ export default function HowWeBuild() {
     <section
       ref={sectionRef}
       id="how-we-build"
-      className="bg-[#111111] py-20 sm:py-24 lg:py-32"
+      className="bg-[#111111] py-20 sm:py-14 sm:py-20 lg:py-32"
       aria-labelledby="how-we-build-heading"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -120,3 +120,4 @@ export default function HowWeBuild() {
     </section>
   );
 }
+

@@ -361,7 +361,7 @@ export default function WhyChooseAxivon() {
       ref={sectionRef}
       id="why-choose-axivon"
       aria-labelledby="why-choose-heading"
-      className="relative isolate overflow-hidden bg-[#0f0f0f] py-24 sm:py-32"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] py-14 sm:py-20 lg:py-32"
     >
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-8">

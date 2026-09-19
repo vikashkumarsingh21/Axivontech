@@ -697,7 +697,7 @@ function GradientWord({ children }: { children: React.ReactNode }) {
 function SectionHeader({ inView }: { inView: boolean }) {
   return (
     <motion.div
-      className="text-center mb-16 max-w-3xl mx-auto"
+      className="text-center mb-10 sm:mb-16 max-w-3xl mx-auto"
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
@@ -769,7 +769,7 @@ export default function FeaturedProjects() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden py-24 lg:py-32"
+      className="relative overflow-hidden py-14 sm:py-20 lg:py-32"
       style={{ background: "#0f0f0f" }}
       aria-labelledby="featured-projects-heading"
     >
@@ -814,3 +814,4 @@ export default function FeaturedProjects() {
     </section>
   );
 }
+

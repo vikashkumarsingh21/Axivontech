@@ -307,7 +307,7 @@ export default function ClientTestimonials() {
     <section
       id="client-testimonials"
       aria-labelledby="testimonials-heading"
-      className="relative isolate overflow-hidden bg-[#0f0f0f] py-24 sm:py-32 2xl:py-36"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] py-14 sm:py-20 lg:py-32 2xl:py-36"
     >
       <div aria-hidden={true} className="absolute inset-0">
         <AuroraBackground />

@@ -18,7 +18,7 @@ export default function ProjectGrid() {
   );
 
   return (
-    <section id="all-projects" className="bg-[#0f0f0f] py-20 sm:py-24 lg:py-32" aria-labelledby="all-projects-heading">
+    <section id="all-projects" className="bg-[#0f0f0f] py-20 sm:py-14 sm:py-20 lg:py-32" aria-labelledby="all-projects-heading">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h2 id="all-projects-heading" className="text-3xl sm:text-4xl font-semibold tracking-tight text-[#f4f4f5] mb-4">All Projects</h2>
         <p className="text-[#a1a1aa] text-lg max-w-xl mb-10">Browse our complete portfolio of work.</p>
@@ -123,3 +123,4 @@ export default function ProjectGrid() {
     </section>
   );
 }
+

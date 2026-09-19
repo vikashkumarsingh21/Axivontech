@@ -86,7 +86,7 @@ export default function AboutPage() {
       </section>
 
       {/* 02 — COMPANY INTRODUCTION */}
-      <section id="story" className="py-24 lg:py-32 border-b border-white/[0.05] bg-[#0a0a0a]">
+      <section id="story" className="py-14 sm:py-20 lg:py-32 border-b border-white/[0.05] bg-[#0a0a0a]">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
             <div className="lg:col-span-4">
@@ -112,7 +112,7 @@ export default function AboutPage() {
       </section>
 
       {/* 03 — WHAT WE BELIEVE / OUR APPROACH */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.05] bg-[#0e0e0e]">
+      <section className="py-14 sm:py-20 lg:py-32 border-b border-white/[0.05] bg-[#0e0e0e]">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
             <div className="lg:col-span-4">
@@ -172,7 +172,7 @@ export default function AboutPage() {
       </section>
 
       {/* 04 & 05 — WHAT WE BUILD & CAPABILITIES */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.05] bg-[#0a0a0a]">
+      <section className="py-14 sm:py-20 lg:py-32 border-b border-white/[0.05] bg-[#0a0a0a]">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="mb-20">
             <h2 className="text-[#e8a064] font-semibold tracking-widest text-xs uppercase mb-6">
@@ -254,7 +254,7 @@ export default function AboutPage() {
       </section>
 
       {/* 06 — HOW WE WORK */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.05] bg-[#0e0e0e]">
+      <section className="py-14 sm:py-20 lg:py-32 border-b border-white/[0.05] bg-[#0e0e0e]">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
             <div className="lg:col-span-4">
@@ -304,7 +304,7 @@ export default function AboutPage() {
       </section>
 
       {/* 08 — HUMAN / FOUNDER SECTION */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.05] bg-[#0a0a0a]">
+      <section className="py-14 sm:py-20 lg:py-32 border-b border-white/[0.05] bg-[#0a0a0a]">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="mb-16 md:mb-24 max-w-2xl">
             <h2 className="text-[#e8a064] font-semibold tracking-widest text-xs uppercase mb-4">
@@ -364,7 +364,7 @@ export default function AboutPage() {
       </section>
 
       {/* 09 — COMPANY JOURNEY / MILESTONES */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.05] bg-[#0e0e0e]">
+      <section className="py-14 sm:py-20 lg:py-32 border-b border-white/[0.05] bg-[#0e0e0e]">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <div>
@@ -402,7 +402,7 @@ export default function AboutPage() {
       </section>
 
       {/* 11 — FAQ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.05] bg-[#0a0a0a]">
+      <section className="py-14 sm:py-20 lg:py-32 border-b border-white/[0.05] bg-[#0a0a0a]">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
             <div className="lg:col-span-4">
@@ -454,7 +454,7 @@ export default function AboutPage() {
       </section>
 
       {/* 12 — FINAL CTA */}
-      <section className="py-32 bg-[#e8a064] text-[#0a0a0a]">
+      <section className="py-20 sm:py-14 sm:py-20 lg:py-32 bg-[#e8a064] text-[#0a0a0a]">
         <div className="container mx-auto px-6 lg:px-12 text-center">
           <h2 className="text-4xl md:text-5xl font-medium mb-8 max-w-2xl mx-auto">
             Have a problem worth solving? Let's talk about what you're building.
@@ -471,3 +471,4 @@ export default function AboutPage() {
     </main>
   );
 }
+

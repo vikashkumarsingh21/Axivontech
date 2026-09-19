@@ -320,7 +320,7 @@ export default function LatestArticles() {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       aria-labelledby="latest-articles-heading"
-      className="relative isolate overflow-hidden bg-[#0f0f0f] py-24 sm:py-28 lg:py-32"
+      className="relative isolate overflow-hidden bg-[#0f0f0f] py-14 sm:py-20 lg:py-28 lg:py-32"
     >
       <BackgroundAtmosphere />
 

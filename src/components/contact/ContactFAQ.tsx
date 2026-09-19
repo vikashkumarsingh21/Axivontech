@@ -33,7 +33,7 @@ export default function ContactFAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section ref={sectionRef} className="bg-[#111111] py-20 sm:py-24 lg:py-32 border-b border-[#1e1e1e]">
+    <section ref={sectionRef} className="bg-[#111111] py-20 sm:py-14 sm:py-20 lg:py-32 border-b border-[#1e1e1e]">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

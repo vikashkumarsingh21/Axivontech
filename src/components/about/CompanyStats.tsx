@@ -407,7 +407,7 @@ export default function CompanyStats() {
     <section
       ref={sectionRef}
       aria-labelledby="stats-heading"
-      className="relative w-full overflow-hidden py-24 sm:py-32 bg-[#0f0f0f]"
+      className="relative w-full overflow-hidden py-14 sm:py-20 lg:py-32 bg-[#0f0f0f]"
     >
       <FloatingParticles reduced={reduced} />
 

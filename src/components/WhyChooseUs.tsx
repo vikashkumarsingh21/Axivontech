@@ -146,10 +146,10 @@ export default function WhyChooseUs() {
   const isStatsInView = useInView(statsRef, { once: true, amount: 0.4 });
 
   return (
-    <section className="bg-[#0f0f0f] py-24 sm:py-28">
+    <section className="bg-[#0f0f0f] py-14 sm:py-20 lg:py-28">
       {/* Horizontal rule */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-        <div className="mb-24 h-px w-full bg-gradient-to-r from-transparent via-[#262626] to-transparent" />
+        <div className="mb-14 sm:mb-20 lg:mb-24 h-px w-full bg-gradient-to-r from-transparent via-[#262626] to-transparent" />
 
         {/* Two-column layout: left heading, right features */}
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-[0.85fr_1.15fr]">

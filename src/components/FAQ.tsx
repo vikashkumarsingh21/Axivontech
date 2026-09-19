@@ -153,7 +153,7 @@ export default function FAQ() {
   };
 
   return (
-    <section className="bg-[#0f0f0f] py-24 sm:py-32 relative">
+    <section className="bg-[#0f0f0f] py-14 sm:py-20 lg:py-32 relative">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         {/* Section header */}
         <motion.div
@@ -161,7 +161,7 @@ export default function FAQ() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
           variants={headerVariants}
-          className="mx-auto mb-16 max-w-2xl text-center"
+          className="mx-auto mb-10 sm:mb-10 sm:mb-16 max-w-2xl text-center"
         >
           <SectionHeader
             overline="Got Questions?"

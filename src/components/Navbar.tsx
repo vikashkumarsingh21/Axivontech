@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   AnimatePresence,
   motion,
@@ -21,6 +22,7 @@ const NAV_LINKS: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Services", href: "/services" },
+  { label: "Industries", href: "/industries" },
   { label: "Portfolio", href: "/portfolio" },
   { label: "Blog", href: "/blog" },
   { label: "Careers", href: "/careers" },
@@ -29,19 +31,37 @@ const NAV_LINKS: NavLink[] = [
 
 const EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
+/* ── Desktop hover-pill variants ─────────────────────────────── */
 const menuVariants: Variants = {
   closed: { opacity: 0, height: 0, transition: { duration: 0.35, ease: EASE } },
   open: { opacity: 1, height: "auto", transition: { duration: 0.4, ease: EASE } },
 };
 
-const linkListVariants: Variants = {
-  closed: {},
-  open: { transition: { staggerChildren: 0.06, delayChildren: 0.08 } },
+/* ── Mobile full-screen overlay variants ─────────────────────── */
+const overlayVariants: Variants = {
+  closed: {
+    opacity: 0,
+    transition: { duration: 0.3, ease: EASE },
+  },
+  open: {
+    opacity: 1,
+    transition: { duration: 0.35, ease: EASE },
+  },
 };
 
-const linkItemVariants: Variants = {
-  closed: { opacity: 0, x: -16 },
-  open: { opacity: 1, x: 0, transition: { duration: 0.3, ease: EASE_NAV } },
+const mobileLinkListVariants: Variants = {
+  closed: {},
+  open: { transition: { staggerChildren: 0.06, delayChildren: 0.12 } },
+};
+
+const mobileLinkItemVariants: Variants = {
+  closed: { opacity: 0, y: 12 },
+  open: { opacity: 1, y: 0, transition: { duration: 0.35, ease: EASE_NAV } },
+};
+
+const mobileActionsVariants: Variants = {
+  closed: { opacity: 0, y: 16 },
+  open: { opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE_NAV, delay: 0.45 } },
 };
 
 export default function Navbar() {
@@ -49,6 +69,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const shouldReduceMotion = useReducedMotion();
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -57,12 +78,42 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    }
     return () => {
       document.body.style.overflow = "";
+      document.body.style.touchAction = "";
     };
   }, [isOpen]);
+
+  // Close menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  // Close on Escape
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape" && isOpen) {
+      setIsOpen(false);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
 
   return (
     <header
@@ -73,9 +124,10 @@ export default function Navbar() {
       }`}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-10">
+        {/* ── Logo ──────────────────────────────────────────────── */}
         <Link
           href="/"
-          className="group flex items-center rounded-md transition-opacity hover:opacity-90"
+          className="group relative z-[60] flex items-center rounded-md transition-opacity hover:opacity-90"
           aria-label="Axivon Technologies Home"
         >
           <Image
@@ -84,10 +136,11 @@ export default function Navbar() {
             width={220}
             height={60}
             priority
-            className="h-12 w-auto sm:h-14 brightness-0 invert"
+            className="h-10 w-auto sm:h-12 lg:h-14 brightness-0 invert"
           />
         </Link>
 
+        {/* ── Desktop Navigation ─────────────────────────────────── */}
         <ul
           className="hidden items-center gap-1 lg:flex"
           onMouseLeave={() => setHovered(null)}
@@ -97,7 +150,11 @@ export default function Navbar() {
               <Link
                 href={link.href}
                 onMouseEnter={() => setHovered(link.href)}
-                className="relative z-10 block rounded-full px-4 py-2 text-sm font-medium text-[#a1a1aa] transition-colors duration-200 hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
+                className={`relative z-10 block rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 ${
+                  isActive(link.href)
+                    ? "text-[#f4f4f5]"
+                    : "text-[#a1a1aa] hover:text-[#f4f4f5]"
+                }`}
               >
                 {link.label}
               </Link>
@@ -116,6 +173,7 @@ export default function Navbar() {
           ))}
         </ul>
 
+        {/* ── Desktop Actions ────────────────────────────────────── */}
         <div className="flex items-center gap-3">
           <Link
             href="/login"
@@ -133,13 +191,14 @@ export default function Navbar() {
             Book Consultation
           </motion.a>
 
+          {/* ── Hamburger Button (mobile / tablet) ───────────────── */}
           <button
             type="button"
             aria-label={isOpen ? "Close menu" : "Open menu"}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
             onClick={() => setIsOpen((v) => !v)}
-            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[#262626] bg-[#141414] text-[#a1a1aa] shadow-sm hover:bg-[#1c1c1e] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 lg:hidden"
+            className="relative z-[60] flex h-11 w-11 items-center justify-center rounded-full border border-[#262626] bg-[#141414] text-[#a1a1aa] shadow-sm hover:bg-[#1c1c1e] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 lg:hidden"
           >
             <span className="relative flex h-3.5 w-4 flex-col justify-between">
               <motion.span
@@ -162,54 +221,111 @@ export default function Navbar() {
         </div>
       </nav>
 
+      {/* ═══════════════════════════════════════════════════════════
+          MOBILE FULL-SCREEN NAVIGATION OVERLAY
+          ═══════════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             key="mobile-menu"
             id="mobile-menu"
             role="navigation"
-            aria-label="Mobile"
+            aria-label="Mobile navigation"
             initial="closed"
             animate="open"
             exit="closed"
-            variants={menuVariants}
-            className="overflow-hidden border-t border-[#262626] bg-[#141414] shadow-[0_16px_40px_rgba(0,0,0,0.5)] lg:hidden"
+            variants={overlayVariants}
+            className="fixed inset-0 top-0 z-50 flex flex-col bg-[#0f0f0f] lg:hidden"
+            style={{ height: "100dvh" }}
           >
+            {/* Subtle ambient glow */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute right-0 top-0 h-80 w-80 rounded-full bg-[radial-gradient(ellipse,_rgba(232,160,100,0.06),_transparent_70%)]"
+            />
+
+            {/* Top bar inside overlay (matches header) */}
+            <div className="flex items-center justify-between px-4 py-3 sm:px-6">
+              <Link
+                href="/"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center"
+                aria-label="Axivon Technologies Home"
+              >
+                <Image
+                  src="/assets/logo/logo-full.png"
+                  alt="Axivon Technologies Logo"
+                  width={180}
+                  height={48}
+                  className="h-10 w-auto sm:h-12 brightness-0 invert"
+                />
+              </Link>
+              <button
+                type="button"
+                aria-label="Close menu"
+                onClick={() => setIsOpen(false)}
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-[#262626] bg-[#141414] text-[#a1a1aa] hover:bg-[#1c1c1e] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="4" y1="4" x2="14" y2="14" />
+                  <line x1="14" y1="4" x2="4" y2="14" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Navigation links */}
             <motion.ul
-              variants={linkListVariants}
+              variants={mobileLinkListVariants}
               initial="closed"
               animate="open"
               exit="closed"
-              className="flex flex-col gap-1 px-5 py-5"
+              className="flex flex-1 flex-col justify-center gap-1 px-6 sm:px-10 -mt-16"
             >
               {NAV_LINKS.map((link) => (
-                <motion.li key={link.href} variants={linkItemVariants}>
+                <motion.li key={link.href} variants={mobileLinkItemVariants}>
                   <Link
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className="block rounded-2xl px-3 py-3 text-sm font-medium text-[#a1a1aa] transition-colors hover:bg-[#1c1c1e] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
+                    className={`group flex items-center justify-between rounded-2xl px-4 py-4 text-2xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 sm:text-3xl ${
+                      isActive(link.href)
+                        ? "text-[#e8a064]"
+                        : "text-[#d4d4d8] hover:text-[#f4f4f5] hover:bg-[#1c1c1e]/50"
+                    }`}
                   >
-                    {link.label}
+                    <span>{link.label}</span>
+                    {isActive(link.href) && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#e8a064]" />
+                    )}
                   </Link>
                 </motion.li>
               ))}
-              <motion.li variants={linkItemVariants} className="mt-3 flex flex-col gap-2">
-                <Link
-                  href="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="block rounded-full border border-[#262626] bg-[#1c1c1e] px-5 py-2.5 text-center text-xs font-medium uppercase tracking-[0.14em] text-[#a1a1aa] transition-colors hover:bg-[#262626] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
-                >
-                  Portal Login
-                </Link>
+            </motion.ul>
+
+            {/* Bottom actions */}
+            <motion.div
+              variants={mobileActionsVariants}
+              initial="closed"
+              animate="open"
+              exit="closed"
+              className="border-t border-[#262626] px-6 py-6 sm:px-10"
+            >
+              <div className="flex flex-col gap-3">
                 <Link
                   href="/contact#contact-form"
                   onClick={() => setIsOpen(false)}
-                  className="block rounded-full bg-[#e8a064] px-5 py-3 text-center text-sm font-semibold text-[#0f0f0f] transition-colors hover:bg-[#f0b07a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
+                  className="flex items-center justify-center gap-2 rounded-full bg-[#e8a064] px-6 py-4 text-base font-semibold text-[#0f0f0f] shadow-[0_4px_16px_rgba(232,160,100,0.25)] transition-colors hover:bg-[#f0b07a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
                 >
                   Book Consultation
                 </Link>
-              </motion.li>
-            </motion.ul>
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-center rounded-full border border-[#262626] bg-[#141414] px-6 py-3.5 text-sm font-medium text-[#a1a1aa] transition-colors hover:bg-[#1c1c1e] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
+                >
+                  Portal Login
+                </Link>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

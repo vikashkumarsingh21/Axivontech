@@ -1,14 +1,21 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { db } from "@/lib/db";
-import { checkExecutiveAccess } from "@/lib/auth/session";
+import { verifySession } from "@/lib/auth/session";
 import { portfolioProjects } from "@/data/portfolio";
 
 export async function POST(req: Request) {
   try {
-    const auth = await checkExecutiveAccess();
-    if (!auth || auth.userRole !== "FOUNDER") {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("axivon_session")?.value;
+    const session = token ? await verifySession(token) : null;
+    
+    if (!session || session.role !== "FOUNDER") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
+    
+    // Create an auth object so the rest of the script continues to work
+    const auth = { userId: session.userId, userRole: session.role };
 
     const migrated = [];
     
