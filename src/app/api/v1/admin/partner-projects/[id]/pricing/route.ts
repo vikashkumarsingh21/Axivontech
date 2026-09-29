@@ -44,29 +44,15 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
     }
 
     const { finalProjectValue } = parsed.data;
-    const advanceAmount = calculateAdvance(finalProjectValue);
-    const remainingAmount = finalProjectValue - advanceAmount;
 
     // Execute as an atomic transaction
     const result = await db.$transaction(async (tx) => {
-      // 1. Create the Payment record to lock in the pricing
-      const payment = await tx.partnerPayment.create({
-        data: {
-          partnerProjectId: project.id,
-          projectPrice: finalProjectValue,
-          advancePercentage: 40,
-          advanceAmount: advanceAmount,
-          remainingAmount: remainingAmount,
-          status: "PENDING", // Ready for Phase 7/8
-        },
-      });
-
       // 2. Update the project status to indicate pricing is finalized (moves to CONTRACT_SENT or PAYMENT_PENDING)
       // Here we just prepare it for the next phase. 
       const updatedProject = await tx.partnerProject.update({
         where: { id: project.id },
         data: {
-          status: "PAYMENT_PENDING", 
+          finalProjectValue,
         },
       });
 
@@ -77,7 +63,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
           action: "PRICING_FINALIZED",
           entityType: "PARTNER_PROJECT",
           entityId: project.id,
-          summary: `Final project value set to ${finalProjectValue} (Advance: ${advanceAmount})`,
+          summary: `Final project value set to ${finalProjectValue}`,
           // Do NOT expose these numbers to public metadata
         }
       });
@@ -93,7 +79,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
         }
       });
 
-      return { project: updatedProject, payment };
+      return { project: updatedProject };
     });
 
     return NextResponse.json({ success: true, data: result });

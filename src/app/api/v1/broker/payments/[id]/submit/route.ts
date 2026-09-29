@@ -41,6 +41,20 @@ export async function POST(req: Request, props: { params: Promise<{ [key: string
     if (!amountPaid || amountPaid <= 0) throw new ApiError(400, "Valid amount is required.");
     if (!transactionId) throw new ApiError(400, "Transaction ID / UTR is required.");
     if (!proofFileUrl) throw new ApiError(400, "Payment screenshot is required.");
+    
+    // Validate exact amount
+    const submittedAmount = parseFloat(amountPaid);
+    if (submittedAmount !== payment.advanceAmount) {
+       throw new ApiError(400, `Submitted amount (${submittedAmount}) does not match the required advance amount (${payment.advanceAmount}).`);
+    }
+    
+    // Duplicate UTR check
+    const existingUtr = await db.partnerPayment.findFirst({
+      where: { transactionId: transactionId.trim(), id: { not: params.id } }
+    });
+    if (existingUtr) {
+      throw new ApiError(400, "This Transaction ID / UTR has already been submitted for another payment.");
+    }
 
     await db.$transaction([
       db.partnerPayment.update({

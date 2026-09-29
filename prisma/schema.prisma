@@ -164,6 +164,7 @@ model PartnerProject {
   detailedRequirement    String  @db.Text
   expectedTimeline       String
   projectBudget          String
+  finalProjectValue      Float?
   additionalRequirements String?
 
   // Primary contact

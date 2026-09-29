@@ -45,7 +45,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
       where: { id: params.id },
       include: {
         versions: { where: { id: versionId } },
-        partnerProject: { select: { id: true, projectCode: true, projectBudget: true, brokerProfile: { select: { userId: true } } } }
+        partnerProject: { select: { id: true, projectCode: true, projectBudget: true, finalProjectValue: true, brokerProfile: { select: { userId: true } } } }
       },
     });
     if (!contract || contract.versions.length === 0) throw new ApiError(404, "Contract or version not found.");
@@ -60,9 +60,9 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
         throw new ApiError(400, "Contract version must be in UNDER_REVIEW or SIGNED status to verify.");
       }
 
-      // Parse project budget for payment calculation
-      const budgetStr = contract.partnerProject.projectBudget.replace(/[^0-9.]/g, "");
-      const projectPrice = parseFloat(budgetStr) || 0;
+      // Resolve project price from finalProjectValue (established in Phase 6)
+      const projectPrice = contract.partnerProject.finalProjectValue || parseFloat(contract.partnerProject.projectBudget.replace(/[^0-9.]/g, "")) || 0;
+      
       const advancePercentage = 40;
       const advanceAmount = Math.round((projectPrice * advancePercentage) / 100);
       const remainingAmount = projectPrice - advanceAmount;

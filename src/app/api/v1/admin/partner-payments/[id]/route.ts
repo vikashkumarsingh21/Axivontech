@@ -52,6 +52,14 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
         throw new ApiError(400, "Payment must be in SUBMITTED or UNDER_REVIEW status to verify.");
       }
 
+      // Contract gate: verify contract is VERIFIED before allowing payment verification
+      const contract = await db.partnerContract.findUnique({
+        where: { partnerProjectId: projectId },
+      });
+      if (!contract || contract.status !== "VERIFIED") {
+        throw new ApiError(400, "Project contract must be VERIFIED before payment can be verified.");
+      }
+
       // COMMISSION CALCULATION
       const activeRule = await db.commissionRule.findFirst({ where: { isActive: true } });
       let commAmount = 0;
@@ -144,7 +152,34 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
       return NextResponse.json({ success: true, message: "Payment rejected." });
     }
 
-    throw new ApiError(400, "Invalid action. Use 'verify' or 'reject'.");
+    if (action === "request_info") {
+      if (!rejectionReason) throw new ApiError(400, "Reason for requesting more information is required.");
+
+      await db.$transaction([
+        db.partnerPayment.update({
+          where: { id: params.id },
+          data: { 
+            status: "PENDING",
+            rejectionReason,
+            rejectedAt: null,
+          },
+        }),
+        db.auditLog.create({
+          data: { userId, action: "PAYMENT_MORE_INFO_REQUESTED", resource: "PartnerPayment", details: { paymentId: params.id, projectCode, reason: rejectionReason } },
+        }),
+        db.notification.create({
+          data: {
+            userId: brokerUserId, type: "SYSTEM", title: "Payment: More Information Required",
+            message: `More information is needed for your payment on project ${projectCode}. Please update and resubmit.`,
+            link: `/broker/projects/${projectId}`,
+          },
+        }),
+      ]);
+
+      return NextResponse.json({ success: true, message: "More information requested from partner." });
+    }
+
+    throw new ApiError(400, "Invalid action. Use 'verify', 'reject', or 'request_info'.");
   } catch (error) {
     return handleApiError(error);
   }
