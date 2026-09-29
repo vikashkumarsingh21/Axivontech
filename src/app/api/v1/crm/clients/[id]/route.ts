@@ -3,7 +3,8 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const { id } = await params;
     const userId = req.headers.get("x-user-id");
@@ -38,7 +39,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const { id } = await params;
     const userId = req.headers.get("x-user-id");

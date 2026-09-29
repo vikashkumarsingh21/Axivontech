@@ -67,7 +67,7 @@ const containerVariants: Variants = {
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" as any } },
 };
 
 /* ── Mobile accordion section ────────────────────────────────── */
@@ -254,7 +254,7 @@ export default function Footer() {
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          transition={{ duration: 0.4, ease: "easeOut" as any }}
           className="mt-8 sm:mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#262626] pt-6 sm:pt-8 text-center text-xs sm:text-sm text-[#52525b] lg:flex-row lg:text-left"
         >
           <p>© 2026 Axivon Technologies. All Rights Reserved.</p>

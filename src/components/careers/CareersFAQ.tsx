@@ -197,7 +197,7 @@ function AuroraBackground() {
           transition={
             reduceMotion
               ? undefined
-              : { duration: orb.duration, repeat: Infinity, ease: "easeInOut" }
+              : { duration: orb.duration, repeat: Infinity, ease: "easeInOut" as any }
           }
         />
       ))}
@@ -257,7 +257,7 @@ function FloatingParticles() {
             duration: p.duration,
             delay: p.delay,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: "easeInOut" as any,
           }}
         />
       ))}
@@ -406,7 +406,7 @@ function FaqAccordionItem({
               exit={{ height: 0, opacity: 0 }}
               transition={{
                 height: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-                opacity: { duration: 0.25, ease: "easeInOut" },
+                opacity: { duration: 0.25, ease: "easeInOut" as any },
               }}
               style={{ overflow: "hidden" }}
             >

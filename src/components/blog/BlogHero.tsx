@@ -169,7 +169,7 @@ function AuroraBackground() {
           transition={
             reduceMotion
               ? undefined
-              : { duration: orb.duration, repeat: Infinity, ease: "easeInOut" }
+              : { duration: orb.duration, repeat: Infinity, ease: "easeInOut" as any }
           }
         />
       ))}
@@ -263,7 +263,7 @@ function FloatingParticles({ count = 30 }: { count?: number }) {
             duration: p.duration,
             delay: p.delay,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: "easeInOut" as any,
           }}
         />
       ))}
@@ -418,7 +418,7 @@ function KnowledgeSphere() {
           background: `radial-gradient(circle, ${COLORS.purple}55, transparent 70%)`,
         }}
         animate={reduceMotion ? undefined : { opacity: [0.5, 0.9, 0.5], scale: [1, 1.08, 1] }}
-        transition={reduceMotion ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        transition={reduceMotion ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" as any }}
         aria-hidden={true}
       />
 
@@ -463,7 +463,7 @@ function HoloCard({
       <motion.div
         animate={reduceMotion ? undefined : { y: [0, -12, 0] }}
         transition={
-          reduceMotion ? undefined : { duration: 5 + delay, repeat: Infinity, ease: "easeInOut", delay }
+          reduceMotion ? undefined : { duration: 5 + delay, repeat: Infinity, ease: "easeInOut" as any, delay }
         }
         className="relative rounded-xl border border-white/10 bg-[#141414]/[0.04] p-3 backdrop-blur-xl"
         style={{ width, boxShadow: "0 18px 40px -16px rgba(0,0,0,0.6)" }}
@@ -543,7 +543,7 @@ function TopicPill({
       <motion.div
         animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
         transition={
-          reduceMotion ? undefined : { duration: 4.5 + delay, repeat: Infinity, ease: "easeInOut", delay }
+          reduceMotion ? undefined : { duration: 4.5 + delay, repeat: Infinity, ease: "easeInOut" as any, delay }
         }
         className="flex items-center gap-1.5 whitespace-nowrap rounded-full border bg-[#141414]/[0.04] px-3 py-1.5 backdrop-blur-xl"
         style={{ borderColor: `${topic.accent}55`, boxShadow: `0 0 20px -10px ${topic.accent}` }}
@@ -732,7 +732,7 @@ export default function BlogHero({
               className="h-1.5 w-1.5 rounded-full"
               style={{ backgroundColor: COLORS.cyan, boxShadow: `0 0 8px ${COLORS.cyan}` }}
               animate={reduceMotion ? undefined : { opacity: [0.4, 1, 0.4] }}
-              transition={reduceMotion ? undefined : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              transition={reduceMotion ? undefined : { duration: 2, repeat: Infinity, ease: "easeInOut" as any }}
               aria-hidden={true}
             />
             Axivon Insights

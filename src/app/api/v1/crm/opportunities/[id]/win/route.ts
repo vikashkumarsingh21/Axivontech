@@ -3,7 +3,8 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const { id } = await params;
     const userId = req.headers.get("x-user-id");

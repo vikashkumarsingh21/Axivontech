@@ -9,14 +9,14 @@ const VALID_ROLES = ["EMPLOYEE", "ADMIN", "CO_FOUNDER"] as const;
 
 const changeRoleSchema = z.object({
   roleName: z.enum(VALID_ROLES, {
-    errorMap: () => ({ message: "Invalid role. Allowed: EMPLOYEE, ADMIN, CO_FOUNDER" }),
+    message: "Invalid role. Allowed: EMPLOYEE, ADMIN, CO_FOUNDER"
   }),
 });
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const actorId = req.headers.get("x-user-id");
     await requirePermission(actorId, "people.view");

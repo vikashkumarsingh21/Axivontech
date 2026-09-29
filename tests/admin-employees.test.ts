@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from "vitest";
 vi.mock("@/lib/db", () => ({
   db: {
     user: {
-      findUnique: vi.fn().mockImplementation(({ where }: any) => {
+      findUnique: vi.fn().mockImplementation(({ where }: unknown) => {
         if (where.email === "existing@axivon.dev") {
           return Promise.resolve({ id: "emp-existing", email: "existing@axivon.dev", name: "Existing Employee" });
         }
@@ -28,13 +28,13 @@ vi.mock("@/lib/db", () => ({
         }
         return Promise.resolve(null);
       }),
-      findFirst: vi.fn().mockImplementation(({ where }: any) => {
+      findFirst: vi.fn().mockImplementation(({ where }: unknown) => {
         if (where.employeeId === "EMP-DUPLICATE") {
           return Promise.resolve({ id: "emp-dup", employeeId: "EMP-DUPLICATE" });
         }
         return Promise.resolve(null);
       }),
-      create: vi.fn().mockImplementation(({ data }: any) => {
+      create: vi.fn().mockImplementation(({ data }: unknown) => {
         return Promise.resolve({
           id: "emp-new-id",
           name: data.name,
@@ -46,7 +46,7 @@ vi.mock("@/lib/db", () => ({
           userRoles: [{ role: { id: "role-emp", name: "EMPLOYEE" } }]
         });
       }),
-      update: vi.fn().mockImplementation(({ where, data }: any) => {
+      update: vi.fn().mockImplementation(({ where, data }: unknown) => {
         return Promise.resolve({
           id: where.id,
           name: data.name || "Updated Name",
@@ -112,7 +112,7 @@ describe("Admin Employee Management API Tests", () => {
   it("should prevent updating Founder accounts via Admin API", async () => {
     const { db } = await import("@/lib/db");
     const founder = await db.user.findUnique({ where: { id: "founder-1" } });
-    const isFounder = founder?.userRoles.some((ur: any) => ur.role.name === "FOUNDER");
+    const isFounder = founder?.userRoles.some((ur: unknown) => ur.role.name === "FOUNDER");
     expect(isFounder).toBe(true);
   });
 });

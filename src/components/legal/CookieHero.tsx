@@ -31,7 +31,7 @@ function AuroraBackground() {
                 y: [0, -20, 14, 0],
               }
         }
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" as any }}
       />
 
       {/* Aurora blob — purple */}
@@ -53,7 +53,7 @@ function AuroraBackground() {
         transition={{
           duration: 22,
           repeat: Infinity,
-          ease: "easeInOut",
+          ease: "easeInOut" as any,
           delay: 3,
         }}
       />
@@ -76,7 +76,7 @@ function AuroraBackground() {
         transition={{
           duration: 14,
           repeat: Infinity,
-          ease: "easeInOut",
+          ease: "easeInOut" as any,
           delay: 6,
         }}
       />
@@ -161,7 +161,7 @@ function CinematicStreak() {
       }}
       initial={{ opacity: 0, scaleX: 0.4 }}
       animate={prefersReduced ? {} : { opacity: [0, 1, 0], scaleX: [0.4, 1, 0.4] }}
-      transition={{ duration: 6, repeat: Infinity, repeatDelay: 8, ease: "easeInOut" }}
+      transition={{ duration: 6, repeat: Infinity, repeatDelay: 8, ease: "easeInOut" as any }}
     />
   );
 }

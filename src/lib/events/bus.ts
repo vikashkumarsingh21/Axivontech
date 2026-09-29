@@ -155,7 +155,7 @@ export class EventBus {
         priority: eventType === "SECURITY_EVENT" ? "URGENT" : "NORMAL",
         dedupKey,
       }).catch((err) => {
-        console.error("[EventBus] Notification creation failed:", err?.message);
+        console.error("[EventBus] Notification creation failed:", (err as Error)?.message);
       });
     }
 
@@ -167,9 +167,9 @@ export class EventBus {
         entityType: entityType || "SYSTEM",
         entityId,
         summary: message || title,
-        metadata: metadata ? { ...metadata, correlationId } : { correlationId },
+        metadata: metadata ? { ...(metadata as object), correlationId } : { correlationId },
       }).catch((err) => {
-        console.error("[EventBus] Activity log failed:", err?.message);
+        console.error("[EventBus] Activity log failed:", (err as Error)?.message);
       });
     }
 
@@ -185,8 +185,8 @@ export class EventBus {
         message,
         correlationId,
       });
-    } catch (err: any) {
-      console.error("[EventBus] Automation trigger failed:", err?.message);
+    } catch (err: unknown) {
+      console.error("[EventBus] Automation trigger failed:", (err as Error)?.message);
     }
   }
 }

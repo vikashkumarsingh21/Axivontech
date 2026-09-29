@@ -55,7 +55,7 @@ const FAQ_ITEMS: FAQItem[] = [
 
 const headerVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as any } },
 };
 
 const listVariants: Variants = {
@@ -65,7 +65,7 @@ const listVariants: Variants = {
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as any } },
 };
 
 function FAQRow({
@@ -131,7 +131,7 @@ function FAQRow({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: "easeInOut" }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: "easeInOut" as any }}
               className="overflow-hidden"
             >
               <p className="px-6 pb-6 text-base leading-relaxed text-[#a1a1aa] sm:px-7 sm:pb-7">

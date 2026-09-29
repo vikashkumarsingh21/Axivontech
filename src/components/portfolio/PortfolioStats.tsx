@@ -188,17 +188,17 @@ function AuroraBackground({ reduceMotion }: { reduceMotion: boolean }) {
       <motion.div
         className="absolute -left-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-[#e8a064]/30 blur-[120px]"
         animate={reduceMotion ? undefined : { x: [0, 60, -20, 0], y: [0, 40, -30, 0] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute -right-32 top-1/3 h-[30rem] w-[30rem] rounded-full bg-purple-600/25 blur-[120px]"
         animate={reduceMotion ? undefined : { x: [0, -50, 30, 0], y: [0, -30, 40, 0] }}
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute bottom-0 left-1/3 h-[26rem] w-[26rem] rounded-full bg-cyan-400/20 blur-[110px]"
         animate={reduceMotion ? undefined : { x: [0, 40, -40, 0], y: [0, -20, 20, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" as any }}
       />
     </div>
   );
@@ -259,7 +259,7 @@ function FloatingParticles({ reduceMotion }: { reduceMotion: boolean }) {
             duration: particle.duration,
             delay: particle.delay,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: "easeInOut" as any,
           }}
         />
       ))}
@@ -410,7 +410,7 @@ function StatCard({ stat, index, isSectionInView, reduceMotion }: StatCardProps)
             className="absolute inset-0 -z-10 rounded-2xl blur-md"
             style={{ background: stat.accent[1] }}
             animate={reduceMotion ? undefined : { opacity: [0.2, 0.45, 0.2] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" as any }}
           />
           <Icon className="h-7 w-7" style={{ color: stat.accent[1] }} strokeWidth={1.75} aria-hidden={true} />
         </div>

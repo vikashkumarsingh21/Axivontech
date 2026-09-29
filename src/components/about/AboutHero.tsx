@@ -87,13 +87,13 @@ export default function AboutHero() {
         aria-hidden={true}
         className="pointer-events-none absolute -left-44 top-10 h-[460px] w-[460px] rounded-full bg-[radial-gradient(circle,_rgba(232,160,100,0.05),_transparent_70%)] blur-[120px]"
         animate={{ x: [0, 40, 0], y: [0, 35, 0] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         aria-hidden={true}
         className="pointer-events-none absolute -right-44 top-1/3 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,_rgba(232,160,100,0.04),_transparent_70%)] blur-[120px]"
         animate={{ x: [0, -35, 0], y: [0, 45, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" as any }}
       />
 
       <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-16 lg:grid-cols-2 lg:gap-12">
@@ -261,7 +261,7 @@ export default function AboutHero() {
           <motion.span
             className="h-1.5 w-1.5 rounded-full bg-[#e8a064]"
             animate={{ y: [0, 12, 0], opacity: [1, 0.3, 1] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" as any }}
           />
         </div>
         <ChevronDown className="h-3 w-3 text-[#52525b]" strokeWidth={2} />

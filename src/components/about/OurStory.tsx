@@ -169,12 +169,12 @@ function BackgroundLayer() {
       <motion.div
         className="absolute -left-24 -top-32 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,_rgba(232,160,100,0.04),_transparent_70%)] blur-[120px]"
         animate={shouldReduceMotion ? undefined : { x: [0, 30, 0], y: [0, 20, 0] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute -bottom-40 -right-24 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,_rgba(232,160,100,0.03),_transparent_70%)] blur-[130px]"
         animate={shouldReduceMotion ? undefined : { x: [0, -25, 0], y: [0, -25, 0] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" as any, delay: 1 }}
       />
 
       {/* fade into next section */}
@@ -225,7 +225,7 @@ function TimelineNode({
         <motion.span
           className="absolute inset-0 rounded-full bg-[#e8a064]/30"
           animate={{ scale: [1, 1.6], opacity: [0.6, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeOut" as any }}
         />
       )}
       <div

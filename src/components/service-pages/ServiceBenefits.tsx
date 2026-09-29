@@ -172,7 +172,7 @@ function BackgroundParticles({ prefersReducedMotion }: { prefersReducedMotion: b
             duration: p.duration,
             delay: p.delay,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: "easeInOut" as any,
           }}
         />
       ))}
@@ -197,7 +197,7 @@ function AuroraBackground({ prefersReducedMotion }: { prefersReducedMotion: bool
             ? {}
             : { x: [0, 60, -30, 0], y: [0, 50, -20, 0], scale: [1, 1.1, 0.95, 1] }
         }
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute top-1/2 -right-40 w-[550px] h-[550px] rounded-full"
@@ -211,7 +211,7 @@ function AuroraBackground({ prefersReducedMotion }: { prefersReducedMotion: bool
             ? {}
             : { x: [0, -50, 30, 0], y: [0, -60, 40, 0], scale: [1, 0.9, 1.1, 1] }
         }
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" as any, delay: 4 }}
       />
       <motion.div
         className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[500px] h-[400px] rounded-full"
@@ -225,7 +225,7 @@ function AuroraBackground({ prefersReducedMotion }: { prefersReducedMotion: bool
             ? {}
             : { scaleX: [1, 1.2, 0.9, 1], scaleY: [1, 0.8, 1.1, 1] }
         }
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 8 }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" as any, delay: 8 }}
       />
     </div>
   );
@@ -246,7 +246,7 @@ function GridOverlay() {
           backgroundSize: "72px 72px",
         }}
         animate={{ opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" as any }}
       />
     </div>
   );
@@ -273,7 +273,7 @@ function BorderBeam({ active }: { active: boolean }) {
               initial={{ x: "-100%" }}
               animate={{ x: "100%" }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1.4, ease: "easeInOut" }}
+              transition={{ duration: 1.4, ease: "easeInOut" as any }}
             />
             <motion.div
               key="right"
@@ -285,7 +285,7 @@ function BorderBeam({ active }: { active: boolean }) {
               initial={{ y: "-100%" }}
               animate={{ y: "100%" }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1.4, ease: "easeInOut", delay: 0.2 }}
+              transition={{ duration: 1.4, ease: "easeInOut" as any, delay: 0.2 }}
             />
           </>
         )}
@@ -319,7 +319,7 @@ function SignalLine({ inView, hovered }: { inView: boolean; hovered: boolean }) 
               "linear-gradient(90deg, transparent 0%, rgba(212,145,92,0.8) 50%, transparent 100%)",
           }}
           animate={{ x: ["-100%", "200%"] }}
-          transition={{ duration: 1.2, ease: "easeInOut" }}
+          transition={{ duration: 1.2, ease: "easeInOut" as any }}
         />
       )}
     </div>
@@ -481,7 +481,7 @@ function BenefitCard({
             }}
             initial={{ x: "-100%" }}
             animate={{ x: "160%" }}
-            transition={{ duration: 0.9, ease: "easeOut" }}
+            transition={{ duration: 0.9, ease: "easeOut" as any }}
             aria-hidden
           />
         )}
@@ -501,7 +501,7 @@ function BenefitCard({
                 ? {}
                 : { y: [0, -3, 0], rotate: [0, 1, -1, 0] }
             }
-            transition={{ duration: 4 + index * 0.5, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 4 + index * 0.5, repeat: Infinity, ease: "easeInOut" as any }}
           >
             {/* Icon inner glow */}
             <div
@@ -659,7 +659,7 @@ function StatsPanel({ prefersReducedMotion }: { prefersReducedMotion: boolean })
               "linear-gradient(90deg, transparent 0%, rgba(232,160,100,0.7) 25%, rgba(212,145,92,0.9) 50%, rgba(201,146,42,0.7) 75%, transparent 100%)",
           }}
           animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as any }}
           aria-hidden
         />
       )}

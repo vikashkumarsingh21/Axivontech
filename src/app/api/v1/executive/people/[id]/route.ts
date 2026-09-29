@@ -7,8 +7,8 @@ import { handleApiError, ApiError } from "@/lib/api-error";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const actorId = req.headers.get("x-user-id");
     await requirePermission(actorId, "people.view");
@@ -80,8 +80,8 @@ const updateUserSchema = z.object({
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const actorId = req.headers.get("x-user-id");
     await requirePermission(actorId, "people.view");

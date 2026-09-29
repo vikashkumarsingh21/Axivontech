@@ -107,19 +107,19 @@ function AuroraLayer({ reduceMotion }: { reduceMotion: boolean }) {
         className="absolute -top-48 -left-40 h-[40rem] w-[40rem] rounded-full blur-[130px]"
         style={{ background: "radial-gradient(circle, rgba(232,160,100,0.4), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, 70, 0], y: [0, 50, 0] }}
-        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute top-1/4 -right-40 h-[36rem] w-[36rem] rounded-full blur-[130px]"
         style={{ background: "radial-gradient(circle, rgba(201,146,42,0.38), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, -60, 0], y: [0, -40, 0] }}
-        transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute bottom-[-10rem] left-1/3 h-[34rem] w-[34rem] rounded-full blur-[130px]"
         style={{ background: "radial-gradient(circle, rgba(212,145,92,0.28), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, 50, 0], y: [0, -30, 0] }}
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" as any }}
       />
     </div>
   );
@@ -183,7 +183,7 @@ function FloatingParticles({ reduceMotion }: { reduceMotion: boolean }) {
             boxShadow: `0 0 10px 2px ${p.hue}`,
           }}
           animate={reduceMotion ? undefined : { y: [0, -30, 0], opacity: [0.2, 0.9, 0.2] }}
-          transition={{ duration: p.dur, repeat: Infinity, ease: "easeInOut", delay: i * 0.4 }}
+          transition={{ duration: p.dur, repeat: Infinity, ease: "easeInOut" as any, delay: i * 0.4 }}
         />
       ))}
     </div>
@@ -321,7 +321,7 @@ function JobCard({ position, className, floatDelay }: { position: OpenPosition; 
     <motion.div
       className={["relative w-[208px] flex-none rounded-xl", className].filter(Boolean).join(" ")}
       animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
-      transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: floatDelay }}
+      transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" as any, delay: floatDelay }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       whileHover={{ scale: 1.04 }}
@@ -419,7 +419,7 @@ function RecruitmentDashboard() {
         onMouseLeave={handleLeave}
         style={{ rotateX: srx, rotateY: sry, transformStyle: "preserve-3d" }}
         animate={reduceMotion ? undefined : { y: [0, -12, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" as any }}
         className="relative"
       >
         <BorderBeam active speed={6} />

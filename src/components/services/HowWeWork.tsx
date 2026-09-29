@@ -44,7 +44,7 @@ export default function HowWeWork() {
 
   const fadeUp = {
     hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as any } },
   };
 
   return (

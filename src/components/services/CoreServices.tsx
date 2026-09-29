@@ -40,7 +40,7 @@ export default function CoreServices() {
                 key={service.slug}
                 initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" }}
+                transition={{ duration: 0.6, delay: index * 0.15, ease: "easeOut" as any }}
                 className="group flex flex-col md:flex-row gap-6 md:gap-12 lg:gap-24 border-t border-[#1e1e1e] pt-12"
               >
                 {/* Number & Title */}

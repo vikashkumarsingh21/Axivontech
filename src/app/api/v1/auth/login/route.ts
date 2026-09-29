@@ -35,8 +35,16 @@ export async function POST(req: NextRequest) {
       throw new ApiError(401, "Invalid email or password");
     }
 
+    if (user.status !== "ACTIVE") {
+      throw new ApiError(403, `Account is ${user.status}. Please check your email or contact support.`);
+    }
+
+    if (user.mustChangePassword) {
+      throw new ApiError(403, "Please complete your account activation and password setup using the link sent to your email.");
+    }
+
     // Identify primary role for session based on role hierarchy
-    const roleHierarchy = ["FOUNDER", "CO_FOUNDER", "ADMIN", "EMPLOYEE"];
+    const roleHierarchy = ["FOUNDER", "CO_FOUNDER", "ADMIN", "EMPLOYEE", "BROKER"];
     const userRoleNames = user.userRoles.map((ur) => ur.role.name);
     const role = roleHierarchy.find((r) => userRoleNames.includes(r)) || userRoleNames[0] || "EMPLOYEE";
 

@@ -3,7 +3,8 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     await requirePermission(userId, "crm.lead.view");
@@ -21,7 +22,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     await requirePermission(userId, "crm.lead.create");
@@ -55,7 +57,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     await requirePermission(userId, "crm.lead.create");

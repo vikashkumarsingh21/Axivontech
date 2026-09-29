@@ -198,7 +198,7 @@ function BentoCard({ category, index }: { category: CategoryEntry; index: number
       initial={reduceMotion ? false : { opacity: 0, y: 36 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, delay: index * 0.12, ease: "easeOut" }}
+      transition={{ duration: 0.6, delay: index * 0.12, ease: "easeOut" as any }}
       whileHover={reduceMotion ? undefined : { y: -6 }}
       style={{
         rotateX: reduceMotion ? 0 : springRotateX,

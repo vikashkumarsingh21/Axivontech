@@ -78,7 +78,7 @@ export default function ServicesFAQ() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      transition={{ duration: 0.3, ease: "easeInOut" as any }}
                     >
                       <div className="px-6 pb-6 text-sm text-[#a1a1aa] leading-relaxed border-t border-[#2a2a2a] pt-4">
                         {faq.answer}

@@ -5,7 +5,7 @@ import { hasPermission, requirePermission } from "../src/lib/auth/permissions";
 vi.mock("@/lib/db", () => ({
   db: {
     user: {
-      findUnique: vi.fn().mockImplementation(({ where }: any) => {
+      findUnique: vi.fn().mockImplementation(({ where }: unknown) => {
         if (where.id === "admin-user") {
           return Promise.resolve({
             id: "admin-user",

@@ -31,7 +31,7 @@ export default function PortfolioHero() {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.21, 0.47, 0.32, 0.98],
+        ease: [0.21, 0.47, 0.32, 0.98] as any,
       }
     },
   };
@@ -111,7 +111,7 @@ export default function PortfolioHero() {
           transition={
             shouldReduceMotion
               ? {}
-              : { repeat: Infinity, duration: 2, ease: "easeInOut" }
+              : { repeat: Infinity, duration: 2, ease: "easeInOut" as any }
           }
         >
           <ArrowDown className="h-5 w-5 opacity-50" />

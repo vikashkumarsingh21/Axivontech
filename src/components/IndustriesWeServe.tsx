@@ -44,7 +44,7 @@ const INDUSTRIES: Industry[] = [
 
 const headerVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as any } },
 };
 
 const gridVariants: Variants = {
@@ -57,13 +57,13 @@ const cardVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" },
+    transition: { duration: 0.4, ease: "easeOut" as any },
   },
 };
 
 const imageVariants: Variants = {
   hidden: { opacity: 0, x: 24 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" as any } },
 };
 
 export default function IndustriesWeServe() {

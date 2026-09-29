@@ -5,8 +5,8 @@ import { handleApiError, ApiError } from "@/lib/api-error";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     const user = await validateActiveUser(userId);

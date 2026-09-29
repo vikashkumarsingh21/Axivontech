@@ -176,7 +176,7 @@ function TestimonialCard({ entry, index }: { entry: TestimonialEntry; index: num
           <motion.div
             aria-hidden={true}
             animate={reduceMotion ? undefined : { y: [0, -5, 0] }}
-            transition={{ duration: 4 + index * 0.3, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 4 + index * 0.3, repeat: Infinity, ease: "easeInOut" as any }}
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#e8a064] via-[#c9922a] to-[#d4915c] p-[2px]"
           >
             <div className="flex h-full w-full items-center justify-center rounded-full bg-[#0a1024] text-sm font-semibold text-white">

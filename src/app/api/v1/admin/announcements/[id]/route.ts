@@ -17,8 +17,8 @@ const UpdateAnnouncementSchema = z.object({
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     if (!userId) throw new ApiError(401, "Unauthorized");
@@ -42,8 +42,8 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     if (!userId) throw new ApiError(401, "Unauthorized");
@@ -106,8 +106,8 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     if (!userId) throw new ApiError(401, "Unauthorized");

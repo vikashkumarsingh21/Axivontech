@@ -32,7 +32,7 @@ export default function CTA() {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
+          transition={{ duration: 0.55, ease: "easeOut" as any }}
           className="relative overflow-hidden rounded-[2rem] border border-[#262626] shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
         >
           {/* Background image */}

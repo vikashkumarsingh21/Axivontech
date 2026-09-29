@@ -17,7 +17,7 @@ export default function RelatedWork() {
 
   const fadeUp = {
     hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as any } },
   };
 
   return (
@@ -80,7 +80,7 @@ export default function RelatedWork() {
                     </Link>
                   </h3>
                   <p className="text-sm text-[#a1a1aa] line-clamp-2 leading-relaxed">
-                    {project.description}
+                    {project.seoDescription}
                   </p>
                 </div>
               </motion.div>

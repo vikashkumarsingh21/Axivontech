@@ -28,8 +28,10 @@ export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModal
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 50);
     } else {
-      setQuery("");
-      setResults([]);
+      setTimeout(() => {
+        setQuery("");
+        setResults([]);
+      }, 0);
     }
   }, [isOpen]);
 
@@ -51,13 +53,12 @@ export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModal
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    if (!query || query.trim().length < 2) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
-
     const timer = setTimeout(async () => {
+      if (!query || query.trim().length < 2) {
+        setResults([]);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
         const res = await fetch(`/api/v1/search?q=${encodeURIComponent(query.trim())}`);

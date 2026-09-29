@@ -76,8 +76,8 @@ export class JobRunner {
                   entityId: reminder.id,
                   dedupKey: `REMINDER::${reminder.id}::${now.toISOString().slice(0, 13)}`,
                 });
-              } catch (e: any) {
-                console.error(`[JobRunner] REMINDER_CHECK failed for ${reminder.id}:`, e.message);
+              } catch (e: unknown) {
+                console.error(`[JobRunner] REMINDER_CHECK failed for ${reminder.id}:`, (e as Error).message);
               }
             }
             break;
@@ -138,8 +138,8 @@ export class JobRunner {
                   priority: "HIGH",
                   dedupKey: `FOLLOWUP::${fu.id}::${now.toISOString().slice(0, 10)}`,
                 });
-              } catch (e: any) {
-                console.error(`[JobRunner] FOLLOWUP_REMINDER failed for ${fu.id}:`, e.message);
+              } catch (e: unknown) {
+                console.error(`[JobRunner] FOLLOWUP_REMINDER failed for ${fu.id}:`, (e as Error).message);
               }
             }
             break;
@@ -165,7 +165,7 @@ export class JobRunner {
         results.push({ id: job.id, status: "COMPLETED", jobType: job.jobType });
       } catch (err: unknown) {
         const isFailed = job.attempts + 1 >= job.maxAttempts;
-        const msg = err instanceof Error ? err.message : String(err);
+        const msg = err instanceof Error ? (err as Error).message : String(err);
         await db.backgroundJob.update({
           where: { id: job.id },
           data: {

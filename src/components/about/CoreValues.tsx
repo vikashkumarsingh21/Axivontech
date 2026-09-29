@@ -143,19 +143,19 @@ function AuroraBackground() {
             "linear-gradient(90deg, transparent, #c47a3a, #e8a064, #f0b07a, transparent)",
         }}
         animate={shouldReduceMotion ? undefined : { x: ["-4%", "4%", "-4%"] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" as any }}
       />
 
       {/* floating gradient orbs */}
       <motion.div
         className="absolute -left-24 top-16 h-[24rem] w-[24rem] rounded-full bg-[#e8a064]/5 blur-[120px]"
         animate={shouldReduceMotion ? undefined : { x: [0, 25, 0], y: [0, 15, 0] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute -right-20 bottom-0 h-[26rem] w-[26rem] rounded-full bg-[#c47a3a]/4 blur-[130px]"
         animate={shouldReduceMotion ? undefined : { x: [0, -20, 0], y: [0, -20, 0] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" as any, delay: 1 }}
       />
 
       {/* fade into surrounding sections */}
@@ -184,7 +184,7 @@ function CardIcon({
           className="absolute inset-0 rounded-2xl"
           style={{ background: gradient }}
           animate={{ scale: [1, 1.35, 1], opacity: [0.5, 0, 0.5] }}
-          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" as any }}
         />
       )}
       <motion.div

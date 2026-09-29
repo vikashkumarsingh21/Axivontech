@@ -137,7 +137,7 @@ function ArticleCard({ article, index }: { article: ArticleSlot; index: number }
                 y: {
                   duration: 7 + (index % 4) * 0.6,
                   repeat: Infinity,
-                  ease: "easeInOut",
+                  ease: "easeInOut" as any,
                   delay: index * 0.35,
                 },
               }

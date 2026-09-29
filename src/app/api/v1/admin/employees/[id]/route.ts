@@ -24,8 +24,8 @@ const updateEmployeeSchema = z.object({
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const adminId = req.headers.get("x-user-id");
     await requirePermission(adminId, "users:read");
@@ -75,8 +75,8 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const adminId = req.headers.get("x-user-id");
     await requirePermission(adminId, "users:write");
@@ -202,8 +202,8 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const adminId = req.headers.get("x-user-id");
     await requirePermission(adminId, "users:delete");

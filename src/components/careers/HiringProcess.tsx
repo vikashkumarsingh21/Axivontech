@@ -125,19 +125,19 @@ function AuroraLayer({ reduceMotion }: { reduceMotion: boolean }) {
         className="absolute -top-44 -right-36 h-[38rem] w-[38rem] rounded-full blur-[130px]"
         style={{ background: "radial-gradient(circle, rgba(201,146,42,0.34), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, -55, 0], y: [0, 40, 0] }}
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute top-1/3 -left-40 h-[34rem] w-[34rem] rounded-full blur-[130px]"
         style={{ background: "radial-gradient(circle, rgba(232,160,100,0.34), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, 50, 0], y: [0, -35, 0] }}
-        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute bottom-[-12rem] right-1/3 h-[32rem] w-[32rem] rounded-full blur-[130px]"
         style={{ background: "radial-gradient(circle, rgba(212,145,92,0.24), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, -40, 0], y: [0, 25, 0] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" as any }}
       />
     </div>
   );
@@ -198,7 +198,7 @@ function FloatingParticles({ reduceMotion }: { reduceMotion: boolean }) {
             boxShadow: `0 0 10px 2px ${p.hue}`,
           }}
           animate={reduceMotion ? undefined : { y: [0, -28, 0], opacity: [0.2, 0.9, 0.2] }}
-          transition={{ duration: p.dur, repeat: Infinity, ease: "easeInOut", delay: i * 0.45 }}
+          transition={{ duration: p.dur, repeat: Infinity, ease: "easeInOut" as any, delay: i * 0.45 }}
         />
       ))}
     </div>
@@ -367,7 +367,7 @@ function TimelineMarker({ step, index }: { step: ProcessStep; index: number }) {
     <div className="relative flex flex-none flex-col items-center">
       <motion.div
         animate={reduceMotion ? undefined : { y: [0, -6, 0] }}
-        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: index * 0.25 }}
+        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" as any, delay: index * 0.25 }}
         className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-white/15 bg-[#0a0f24] backdrop-blur-xl"
         style={{ boxShadow: `0 0 0 1px ${step.accent}33, 0 0 28px ${step.accent}55` }}
       >
@@ -376,7 +376,7 @@ function TimelineMarker({ step, index }: { step: ProcessStep; index: number }) {
           className="absolute inset-0 rounded-full"
           style={{ boxShadow: `0 0 0 1px ${step.accent}55` }}
           animate={reduceMotion ? undefined : { opacity: [0.4, 0.9, 0.4], scale: [1, 1.12, 1] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" as any, delay: index * 0.2 }}
         />
         <Icon className="h-5 w-5" style={{ color: step.accent }} aria-hidden />
       </motion.div>

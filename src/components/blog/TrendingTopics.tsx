@@ -177,7 +177,7 @@ function TopicCard({ topic, index }: { topic: TrendingTopic; index: number }) {
                 y: {
                   duration: 7.5 + (index % 4) * 0.5,
                   repeat: Infinity,
-                  ease: "easeInOut",
+                  ease: "easeInOut" as any,
                   delay: index * 0.3,
                 },
               }

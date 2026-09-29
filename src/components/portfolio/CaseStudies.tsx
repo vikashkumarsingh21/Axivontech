@@ -160,7 +160,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
           filter: "blur(50px)",
         }}
         animate={reduced ? {} : { x: [0, 70, -35, 0], y: [0, 55, -25, 0], scale: [1, 1.12, 0.93, 1] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute top-1/3 -right-44 w-[560px] h-[560px] rounded-full"
@@ -169,7 +169,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
           filter: "blur(50px)",
         }}
         animate={reduced ? {} : { x: [0, -55, 35, 0], y: [0, -65, 40, 0], scale: [1, 0.9, 1.1, 1] }}
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" as any, delay: 4 }}
       />
       <motion.div
         className="absolute -bottom-28 left-1/3 w-[480px] h-[380px] rounded-full"
@@ -178,7 +178,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
           filter: "blur(60px)",
         }}
         animate={reduced ? {} : { scaleX: [1, 1.15, 0.92, 1], scaleY: [1, 0.85, 1.08, 1] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 8 }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" as any, delay: 8 }}
       />
     </div>
   );
@@ -199,7 +199,7 @@ function PerspectiveGrid() {
           WebkitMaskImage: "radial-gradient(ellipse 75% 60% at 50% 20%, black 25%, transparent 75%)",
         }}
         animate={{ opacity: [0.4, 0.85, 0.4] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" as any }}
       />
     </div>
   );
@@ -253,7 +253,7 @@ function BackgroundParticles({ reduced }: { reduced: boolean }) {
             background: `radial-gradient(circle, rgba(212,145,92,${p.opacity}) 0%, rgba(201,146,42,${p.opacity * 0.5}) 100%)`,
           }}
           animate={{ y: [0, -100, 0], x: [0, p.drift, 0], opacity: [0, p.opacity, 0] }}
-          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" as any }}
         />
       ))}
     </div>
@@ -313,7 +313,7 @@ function ConnectorDot({ color, reduced, inView }: { color: string; reduced: bool
           className="absolute w-12 h-12 rounded-full"
           style={{ border: `1px solid ${color}`, opacity: 0 }}
           animate={{ scale: [1, 1.9], opacity: [0.6, 0] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeOut" }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: "easeOut" as any }}
           aria-hidden
         />
       )}
@@ -325,7 +325,7 @@ function ConnectorDot({ color, reduced, inView }: { color: string; reduced: bool
           className="w-3.5 h-3.5 rounded-full"
           style={{ background: color, boxShadow: `0 0 10px ${color}` }}
           animate={reduced ? {} : { scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" as any }}
         />
       </div>
     </div>
@@ -358,7 +358,7 @@ function ResultChip({
     const controls = animate(0, result.value, {
       duration: 1.4,
       delay: 0.3 + index * 0.12,
-      ease: "easeOut",
+      ease: "easeOut" as any,
       onUpdate: (latest) => setDisplayValue(Math.round(latest)),
     });
     return () => controls.stop();
@@ -368,7 +368,7 @@ function ResultChip({
     <motion.div
       initial={{ opacity: 0, y: 14, scale: 0.94 }}
       animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{ duration: 0.5, delay: 0.2 + index * 0.1, ease: "easeOut" }}
+      transition={{ duration: 0.5, delay: 0.2 + index * 0.1, ease: "easeOut" as any }}
       className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl"
       style={{
         background: "rgba(255,255,255,0.035)",
@@ -434,7 +434,7 @@ function TransformationArc({
       <motion.div
         initial={{ opacity: 0, x: -16 }}
         animate={isInView ? { opacity: 1, x: 0 } : {}}
-        transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+        transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" as any }}
         className="rounded-xl p-4"
         style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
       >
@@ -460,7 +460,7 @@ function TransformationArc({
       <motion.div
         initial={{ opacity: 0, scale: 0.6 }}
         animate={isInView ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" }}
+        transition={{ duration: 0.4, delay: 0.35, ease: "easeOut" as any }}
         className="flex justify-center -my-1"
         aria-hidden
       >
@@ -473,7 +473,7 @@ function TransformationArc({
         >
           <motion.div
             animate={reduced ? {} : { y: [0, 2, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" as any }}
           >
             <ArrowDown size={14} style={{ color: accentPrimary }} />
           </motion.div>
@@ -484,7 +484,7 @@ function TransformationArc({
       <motion.div
         initial={{ opacity: 0, x: 16 }}
         animate={isInView ? { opacity: 1, x: 0 } : {}}
-        transition={{ duration: 0.6, delay: 0.45, ease: "easeOut" }}
+        transition={{ duration: 0.6, delay: 0.45, ease: "easeOut" as any }}
         className="rounded-xl p-4"
         style={{
           background: `linear-gradient(135deg, ${accentPrimary}10 0%, ${accentSecondary}08 100%)`,
@@ -559,7 +559,7 @@ function CaseStudyCard({
       ref={cardRef}
       initial={{ opacity: 0, x: reduced ? 0 : slideDir * 56, y: 24, filter: "blur(12px)" }}
       animate={isInView ? { opacity: 1, x: 0, y: 0, filter: "blur(0px)" } : {}}
-      transition={{ duration: 0.8, ease: "easeOut" }}
+      transition={{ duration: 0.8, ease: "easeOut" as any }}
       style={reduced ? {} : { rotateX, rotateY, transformStyle: "preserve-3d", perspective: 1200 }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
@@ -631,7 +631,7 @@ function CaseStudyCard({
                   border: `1px solid ${study.accentPrimary}38`,
                 }}
                 animate={reduced ? {} : { y: [0, -3, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as any }}
               >
                 <div
                   className="absolute inset-0 rounded-xl"

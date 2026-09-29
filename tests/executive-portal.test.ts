@@ -5,7 +5,7 @@ import { getExecutiveScope, isDepartmentAllowed } from "../src/lib/auth/executiv
 vi.mock("@/lib/db", () => ({
   db: {
     user: {
-      findUnique: vi.fn().mockImplementation(({ where }: any) => {
+      findUnique: vi.fn().mockImplementation(({ where }: unknown) => {
         if (where.id === "founder-user") {
           return Promise.resolve({
             id: "founder-user",

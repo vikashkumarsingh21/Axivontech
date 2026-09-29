@@ -3,7 +3,8 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const { id } = await params;
     const userId = req.headers.get("x-user-id");
@@ -39,7 +40,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const { id } = await params;
     const userId = req.headers.get("x-user-id");
@@ -49,9 +51,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (!lead) throw new ApiError(404, "Lead not found");
 
     const body = await req.json();
-    const { name, email, phone, companyName, website, serviceInterest, message, status } = body;
+    const { name, email, phone, companyName, website, serviceInterest, message, status, nextFollowUpAt } = body;
 
     const oldStatus = lead.status;
+    
+    // Status transition validation
+    if (status && status !== oldStatus) {
+      if (oldStatus === "CONVERTED") {
+        throw new ApiError(400, "Cannot change status of a converted lead.");
+      }
+      
+      const validStatuses = ["NEW", "CONTACTED", "MEETING", "QUALIFIED", "NOT_QUALIFIED", "CONVERTED", "LOST", "NURTURE"];
+      if (!validStatuses.includes(status)) {
+        throw new ApiError(400, `Invalid status: ${status}`);
+      }
+      
+      // Converted status must go through the dedicated /convert endpoint
+      if (status === "CONVERTED") {
+         throw new ApiError(400, "Use the /convert endpoint to convert a lead.");
+      }
+    }
 
     const updatedLead = await db.lead.update({
       where: { id },
@@ -64,6 +83,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ...(serviceInterest !== undefined && { serviceInterest }),
         ...(message !== undefined && { message }),
         ...(status && { status }),
+        ...(nextFollowUpAt !== undefined && { nextFollowUpAt: nextFollowUpAt ? new Date(nextFollowUpAt) : null }),
+        ...(status && status !== oldStatus && status !== "NEW" ? { lastContactAt: new Date() } : {}),
       },
       include: {
         owner: { select: { id: true, name: true, email: true } },

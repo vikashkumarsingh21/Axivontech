@@ -25,7 +25,12 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json().catch(() => ({}));
-    const { name, email, phone, companyName, website, serviceInterest, message, source, campaign } = body;
+    const { 
+      name, email, phone, whatsapp, designation, 
+      companyName, industry, city, state, country, companySize, website, 
+      serviceInterest, message, budget, timeline, contactMethod, notes,
+      source, campaign, referralCode 
+    } = body;
 
     // Server-side validation
     if (!name || typeof name !== "string" || name.trim().length === 0) {
@@ -40,6 +45,19 @@ export async function POST(req: NextRequest) {
 
     const normalizedEmail = email.trim().toLowerCase();
     const cleanPhone = phone ? String(phone).trim() : null;
+
+    // Process Referral Code
+    let ownerId: string | null = null;
+    if (referralCode && typeof referralCode === "string" && referralCode.trim() !== "") {
+      const brokerProfile = await db.brokerProfile.findUnique({
+        where: { referralCode: referralCode.trim() },
+        select: { userId: true },
+      });
+      if (!brokerProfile) {
+        throw new ApiError(400, "Invalid referral code. Please check the link and try again.");
+      }
+      ownerId = brokerProfile.userId;
+    }
 
     // Check Duplicate Leads (past 30 days email or phone match)
     const thirtyDaysAgo = new Date();
@@ -56,9 +74,17 @@ export async function POST(req: NextRequest) {
     });
 
     const isDuplicate = !!existingLead;
-    const duplicateReason = isDuplicate
-      ? `Possible duplicate of lead ${existingLead.leadCode} (created ${existingLead.createdAt.toISOString().split("T")[0]})`
-      : null;
+    let finalOwnerId = ownerId;
+    let duplicateReason = null;
+
+    if (isDuplicate) {
+      if (existingLead.ownerId && ownerId && existingLead.ownerId !== ownerId) {
+        duplicateReason = `Possible duplicate of lead ${existingLead.leadCode}. Submitted by broker ${ownerId} but reassigned to original owner ${existingLead.ownerId}.`;
+        finalOwnerId = existingLead.ownerId; // Preserve original attribution
+      } else {
+        duplicateReason = `Possible duplicate of lead ${existingLead.leadCode} (created ${existingLead.createdAt.toISOString().split("T")[0]})`;
+      }
+    }
 
     // Generate unique Lead Code
     const todayStr = new Date().toISOString().replace(/-/g, "").slice(0, 8);
@@ -69,7 +95,19 @@ export async function POST(req: NextRequest) {
 
     // Valid lead sources
     const validSources = ["WEBSITE_CONTACT", "CONSULTATION", "REFERRAL", "SOCIAL_MEDIA", "CAMPAIGN", "MANUAL", "PARTNER", "OTHER"];
-    const leadSource = validSources.includes(source) ? source : "WEBSITE_CONTACT";
+    let leadSource = validSources.includes(source) ? source : "WEBSITE_CONTACT";
+    if (ownerId) {
+      leadSource = "PARTNER"; // Force source to partner if coming through broker
+    }
+
+    // Handle budget logic for the Float field (if passed as string)
+    let parsedBudget: number | null = null;
+    if (budget && typeof budget === "string") {
+      const bStr = budget.replace(/[^0-9]/g, "");
+      if (bStr) parsedBudget = parseInt(bStr, 10);
+    } else if (typeof budget === "number") {
+      parsedBudget = budget;
+    }
 
     // Create Lead + LeadActivity in transaction
     const [lead] = await db.$transaction([
@@ -79,16 +117,27 @@ export async function POST(req: NextRequest) {
           name: name.trim(),
           email: normalizedEmail,
           phone: cleanPhone,
+          whatsapp: whatsapp ? String(whatsapp).trim() : null,
+          designation: designation ? String(designation).trim() : null,
           companyName: companyName ? String(companyName).trim() : null,
+          industry: industry ? String(industry).trim() : null,
+          city: city ? String(city).trim() : null,
+          state: state ? String(state).trim() : null,
+          country: country ? String(country).trim() : null,
+          companySize: companySize ? String(companySize).trim() : null,
           website: website ? String(website).trim() : null,
           serviceInterest: serviceInterest ? String(serviceInterest).trim() : null,
           message: message ? String(message).trim() : null,
+          budget: parsedBudget,
+          timeline: timeline ? String(timeline).trim() : null,
+          qualificationNotes: notes ? String(notes).trim() : null,
           source: leadSource,
           campaign: campaign ? String(campaign).trim() : null,
           status: "NEW",
           qualificationStatus: "UNQUALIFIED",
           isDuplicate,
           duplicateReason,
+          ownerId: finalOwnerId,
         },
       }),
     ]);

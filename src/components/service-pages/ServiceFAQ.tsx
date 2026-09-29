@@ -116,7 +116,7 @@ function FloatingParticles() {
             duration: p.duration,
             delay: p.delay,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: "easeInOut" as any,
           }}
         />
       ))}
@@ -138,7 +138,7 @@ function AuroraBackground() {
             "radial-gradient(circle, rgba(232,160,100,0.35), transparent 70%)",
         }}
         animate={{ x: [0, 60, 0], y: [0, 40, 0] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute top-1/3 -right-32 h-[30rem] w-[30rem] rounded-full blur-[120px]"
@@ -147,7 +147,7 @@ function AuroraBackground() {
             "radial-gradient(circle, rgba(201,146,42,0.32), transparent 70%)",
         }}
         animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute bottom-0 left-1/3 h-[28rem] w-[28rem] rounded-full blur-[120px]"
@@ -156,7 +156,7 @@ function AuroraBackground() {
             "radial-gradient(circle, rgba(212,145,92,0.22), transparent 70%)",
         }}
         animate={{ x: [0, 40, 0], y: [0, -20, 0] }}
-        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" as any }}
       />
       {/* subtle grid */}
       <div
@@ -373,7 +373,7 @@ function CTAStrip({
         className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
         style={{ background: "rgba(212,145,92,0.25)" }}
         animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.9, 1.05, 0.9] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" as any }}
       />
 
       <div className="relative">

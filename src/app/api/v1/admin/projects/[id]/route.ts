@@ -4,8 +4,8 @@ import { validateActiveUser } from "@/lib/auth/permissions";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     const admin = await validateActiveUser(userId);
@@ -47,8 +47,8 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     const admin = await validateActiveUser(userId);

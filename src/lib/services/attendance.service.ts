@@ -409,8 +409,8 @@ export class AttendanceService {
             }
 
             alertsSent++;
-          } catch (err: any) {
-            console.error(`[AttendanceService] Failed sending incomplete hours alert to ${emp.email}:`, err.message);
+          } catch (err: unknown) {
+            console.error(`[AttendanceService] Failed sending incomplete hours alert to ${emp.email}:`, (err as Error).message);
           }
         }
       }

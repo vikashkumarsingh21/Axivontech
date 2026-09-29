@@ -246,7 +246,7 @@ function LeaderCard({ leader, index }: { leader: (typeof LEADERSHIP_TEAM)[0]; in
           />
           <motion.div
             animate={reduceMotion ? undefined : { scale: hovered ? [1, 1.05, 1] : 1 }}
-            transition={{ duration: 1.6, repeat: hovered && !reduceMotion ? Infinity : 0, ease: "easeInOut" }}
+            transition={{ duration: 1.6, repeat: hovered && !reduceMotion ? Infinity : 0, ease: "easeInOut" as any }}
             className={`relative flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br ${leader.gradient} p-[3px] sm:h-32 sm:w-32`}
           >
             <div className="relative h-full w-full overflow-hidden rounded-full bg-[#141414]">
@@ -262,7 +262,7 @@ function LeaderCard({ leader, index }: { leader: (typeof LEADERSHIP_TEAM)[0]; in
 
           <motion.div
             animate={reduceMotion ? undefined : { y: [0, -4, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" as any }}
             className="absolute -bottom-1 -right-1 flex items-center gap-1 rounded-full border border-[#262626] bg-[#1c1c1e] px-2 py-0.5 shadow-md"
           >
             <BadgeCheck className="h-3.5 w-3.5 text-[#e8a064]" strokeWidth={2} aria-hidden={true} />

@@ -21,8 +21,8 @@ const resetPasswordSchema = z
 
 export async function POST(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const actorId = req.headers.get("x-user-id");
     await requirePermission(actorId, "people.view");

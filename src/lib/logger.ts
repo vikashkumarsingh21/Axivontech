@@ -8,7 +8,7 @@ export interface LogPayload {
   route?: string;
   userId?: string;
   durationMs?: number;
-  error?: any;
+  error?: unknown;
   metadata?: Record<string, any>;
 }
 
@@ -24,7 +24,7 @@ const SENSITIVE_KEYS = new Set([
   "creditCard",
 ]);
 
-function sanitize(obj: any): any {
+function sanitize(obj: unknown): unknown {
   if (obj === null || obj === undefined) return obj;
   if (typeof obj !== "object") return obj;
 

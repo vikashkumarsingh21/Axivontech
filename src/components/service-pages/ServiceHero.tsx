@@ -13,7 +13,7 @@ export default function ServiceHero({ service }: { service: ServiceData }) {
 
   const fadeUp = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as any } },
   };
 
   const staggerContainer = {

@@ -15,8 +15,8 @@ const CreateVersionSchema = z.object({
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     const user = await validateActiveUser(userId);
@@ -47,8 +47,8 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     const user = await validateActiveUser(userId);

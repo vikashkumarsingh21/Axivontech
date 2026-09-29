@@ -178,7 +178,7 @@ function CookieTypeCard({ icon, title, description, tag }: CookieTypeCardProps) 
   return (
     <motion.div
       whileHover={{ y: -2, scale: 1.012 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
+      transition={{ duration: 0.2, ease: "easeOut" as any }}
       className="group relative flex flex-col gap-3 rounded-xl p-4"
       style={{
         background: "rgba(255,255,255,0.03)",
@@ -649,7 +649,7 @@ function AmbientBackground() {
           filter: "blur(80px)",
         }}
         animate={prefersReduced ? {} : { x: [0, 20, 0], y: [0, -16, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" as any }}
       />
       {/* Soft aurora — bottom-right */}
       <motion.div
@@ -659,7 +659,7 @@ function AmbientBackground() {
           filter: "blur(72px)",
         }}
         animate={prefersReduced ? {} : { x: [0, -16, 0], y: [0, 14, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" as any, delay: 4 }}
       />
       {/* Grid */}
       <div className="absolute inset-0 opacity-[0.022]">

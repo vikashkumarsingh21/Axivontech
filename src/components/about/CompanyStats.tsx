@@ -238,7 +238,7 @@ function FloatingParticles({ reduced }: { reduced: boolean }) {
             duration: p.duration,
             delay: p.delay,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: "easeInOut" as any,
           }}
         />
       ))}

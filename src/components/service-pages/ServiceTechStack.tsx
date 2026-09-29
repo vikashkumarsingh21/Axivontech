@@ -225,7 +225,7 @@ function BackgroundParticles({ reduced }: { reduced: boolean }) {
             background: `radial-gradient(circle, rgba(232,160,100,${p.opacity}) 0%, rgba(201,146,42,${p.opacity * 0.5}) 100%)`,
           }}
           animate={{ y: [0, -90, 0], x: [0, p.drift, 0], opacity: [0, p.opacity, 0] }}
-          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" as any }}
         />
       ))}
     </div>
@@ -255,7 +255,7 @@ function AuroraOrbs({ reduced }: { reduced: boolean }) {
             filter: "blur(52px)",
           }}
           animate={reduced ? {} : { x: [0, 40, -25, 0], y: [0, -35, 28, 0], scale: [1, 1.08, 0.94, 1] }}
-          transition={{ duration: orb.dur, delay: orb.delay, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: orb.dur, delay: orb.delay, repeat: Infinity, ease: "easeInOut" as any }}
         />
       ))}
     </div>
@@ -277,7 +277,7 @@ function GridOverlay() {
           backgroundSize: "72px 72px",
         }}
         animate={{ opacity: [0.4, 0.85, 0.4] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" as any }}
       />
     </div>
   );
@@ -385,7 +385,7 @@ function CentralOrb({ service }: { service: ServiceData }) {
           boxShadow: "0 0 40px rgba(232,160,100,0.2), inset 0 1px 0 rgba(255,255,255,0.07)",
         }}
         animate={{ scale: [1, 1.04, 1] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as any }}
       >
         {/* Glow ring */}
         <motion.div
@@ -579,7 +579,7 @@ function TechCard({ tech, index, reduced }: { tech: TechItem; index: number; red
               initial={{ x: "-100%" }}
               animate={{ x: "160%" }}
               exit={{}}
-              transition={{ duration: 0.85, ease: "easeOut" }}
+              transition={{ duration: 0.85, ease: "easeOut" as any }}
               aria-hidden
             />
           )}
@@ -612,7 +612,7 @@ function TechCard({ tech, index, reduced }: { tech: TechItem; index: number; red
                 border: `1px solid ${tech.accent.primary}32`,
               }}
               animate={reduced ? {} : { y: [0, -3, 0] }}
-              transition={{ duration: 3.5 + (index % 4) * 0.5, repeat: Infinity, ease: "easeInOut" }}
+              transition={{ duration: 3.5 + (index % 4) * 0.5, repeat: Infinity, ease: "easeInOut" as any }}
             >
               <div
                 className="absolute inset-0 rounded-xl"

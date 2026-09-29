@@ -220,7 +220,7 @@ function AuroraBackground() {
               : {
                   duration: orb.duration,
                   repeat: Infinity,
-                  ease: "easeInOut",
+                  ease: "easeInOut" as any,
                 }
           }
         />
@@ -309,7 +309,7 @@ function FloatingParticles() {
             duration: p.duration,
             delay: p.delay,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: "easeInOut" as any,
           }}
         />
       ))}

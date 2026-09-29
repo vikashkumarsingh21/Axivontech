@@ -141,19 +141,19 @@ function AuroraLayer({ reduceMotion }: { reduceMotion: boolean }) {
         className="absolute -top-44 -right-36 h-[38rem] w-[38rem] rounded-full blur-[130px]"
         style={{ background: "radial-gradient(circle, rgba(201,146,42,0.36), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, -60, 0], y: [0, 40, 0] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute top-1/3 -left-40 h-[34rem] w-[34rem] rounded-full blur-[130px]"
         style={{ background: "radial-gradient(circle, rgba(232,160,100,0.36), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, 55, 0], y: [0, -35, 0] }}
-        transition={{ duration: 27, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 27, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute bottom-[-12rem] right-1/3 h-[32rem] w-[32rem] rounded-full blur-[130px]"
         style={{ background: "radial-gradient(circle, rgba(212,145,92,0.26), transparent 70%)" }}
         animate={reduceMotion ? undefined : { x: [0, -45, 0], y: [0, 25, 0] }}
-        transition={{ duration: 23, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 23, repeat: Infinity, ease: "easeInOut" as any }}
       />
     </div>
   );
@@ -214,7 +214,7 @@ function FloatingParticles({ reduceMotion }: { reduceMotion: boolean }) {
             boxShadow: `0 0 10px 2px ${p.hue}`,
           }}
           animate={reduceMotion ? undefined : { y: [0, -28, 0], opacity: [0.2, 0.9, 0.2] }}
-          transition={{ duration: p.dur, repeat: Infinity, ease: "easeInOut", delay: i * 0.45 }}
+          transition={{ duration: p.dur, repeat: Infinity, ease: "easeInOut" as any, delay: i * 0.45 }}
         />
       ))}
     </div>
@@ -240,7 +240,7 @@ function HolographicCircle({
       className={`pointer-events-none absolute rounded-full border ${className}`}
       style={{ width: size, height: size, borderColor: `${hue}33` }}
       animate={reduceMotion ? undefined : { y: [0, -18, 0], rotate: [0, 8, 0], opacity: [0.25, 0.55, 0.25] }}
-      transition={{ duration, repeat: Infinity, ease: "easeInOut" }}
+      transition={{ duration, repeat: Infinity, ease: "easeInOut" as any }}
     />
   );
 }

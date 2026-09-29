@@ -61,7 +61,7 @@ const fadeUpVariants: Variants = {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.7, ease: "easeOut" },
+    transition: { duration: 0.7, ease: "easeOut" as any },
   },
 };
 
@@ -72,7 +72,7 @@ const cardReveal: Variants = {
     y: 0,
     scale: 1,
     filter: "blur(0px)",
-    transition: { duration: 0.7, delay: i * 0.1, ease: "easeOut" },
+    transition: { duration: 0.7, delay: i * 0.1, ease: "easeOut" as any },
   }),
 };
 
@@ -88,7 +88,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
           filter: "blur(50px)",
         }}
         animate={reduced ? {} : { x: [0, 70, -35, 0], y: [0, 55, -25, 0], scale: [1, 1.12, 0.93, 1] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" as any }}
       />
       <motion.div
         className="absolute top-1/3 -right-44 w-[560px] h-[560px] rounded-full"
@@ -97,7 +97,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
           filter: "blur(50px)",
         }}
         animate={reduced ? {} : { x: [0, -55, 35, 0], y: [0, -65, 40, 0], scale: [1, 0.9, 1.1, 1] }}
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" as any, delay: 4 }}
       />
       <motion.div
         className="absolute -bottom-28 left-1/3 w-[480px] h-[380px] rounded-full"
@@ -106,7 +106,7 @@ function AuroraBackground({ reduced }: { reduced: boolean }) {
           filter: "blur(60px)",
         }}
         animate={reduced ? {} : { scaleX: [1, 1.15, 0.92, 1], scaleY: [1, 0.85, 1.08, 1] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 8 }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" as any, delay: 8 }}
       />
     </div>
   );
@@ -127,7 +127,7 @@ function PerspectiveGrid() {
           WebkitMaskImage: "radial-gradient(ellipse 75% 60% at 50% 20%, black 25%, transparent 75%)",
         }}
         animate={{ opacity: [0.4, 0.85, 0.4] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" as any }}
       />
     </div>
   );
@@ -181,7 +181,7 @@ function BackgroundParticles({ reduced }: { reduced: boolean }) {
             background: `radial-gradient(circle, rgba(212,145,92,${p.opacity}) 0%, rgba(201,146,42,${p.opacity * 0.5}) 100%)`,
           }}
           animate={{ y: [0, -100, 0], x: [0, p.drift, 0], opacity: [0, p.opacity, 0] }}
-          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" as any }}
         />
       ))}
     </div>
@@ -220,7 +220,7 @@ function ProjectVisual({
                 strokeLinecap="round"
                 opacity="0.5"
                 animate={reduced ? {} : { pathLength: [0.3, 1, 0.3], opacity: [0.25, 0.6, 0.25] }}
-                transition={{ duration: 4 + i * 0.3, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
+                transition={{ duration: 4 + i * 0.3, repeat: Infinity, ease: "easeInOut" as any, delay: i * 0.2 }}
               />
             ))}
             {Array.from({ length: 6 }).map((_, i) => (
@@ -250,7 +250,7 @@ function ProjectVisual({
                 fill="none"
                 opacity="0.5"
                 animate={reduced ? {} : { r: [10, 55], opacity: [0.55, 0] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "easeOut", delay: i * 1.15 }}
+                transition={{ duration: 3.5, repeat: Infinity, ease: "easeOut" as any, delay: i * 1.15 }}
               />
             ))}
             <motion.circle
@@ -359,7 +359,7 @@ function ProjectVisual({
               strokeLinejoin="round"
               opacity="0.7"
               animate={reduced ? {} : { pathLength: [0, 1], opacity: [0, 0.8, 0.7] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" as any }}
             />
             <motion.circle
               cx="100" cy="60" r="3"
@@ -379,7 +379,7 @@ function ProjectVisual({
       <motion.div
         className="w-full h-full"
         animate={hovered && !reduced ? { scale: 1.06 } : { scale: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        transition={{ duration: 0.5, ease: "easeOut" as any }}
       >
         {renderMotif()}
       </motion.div>
@@ -394,7 +394,7 @@ function TechChip({ name, index, isInView }: { name: string; index: number; isIn
     <motion.span
       initial={{ opacity: 0, y: 6, scale: 0.92 }}
       animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{ duration: 0.4, delay: 0.3 + index * 0.06, ease: "easeOut" }}
+      transition={{ duration: 0.4, delay: 0.3 + index * 0.06, ease: "easeOut" as any }}
       whileHover={{ scale: 1.06, y: -1 }}
       className="text-[11px] font-medium px-2.5 py-1 rounded-md"
       style={{
@@ -511,7 +511,7 @@ function ProjectCard({ project, index, reduced }: { project: PortfolioProject; i
               initial={{ x: "-100%" }}
               animate={{ x: "160%" }}
               exit={{}}
-              transition={{ duration: 0.95, ease: "easeOut" }}
+              transition={{ duration: 0.95, ease: "easeOut" as any }}
               aria-hidden
             />
           )}
@@ -596,7 +596,7 @@ function ProjectCard({ project, index, reduced }: { project: PortfolioProject; i
               backdropFilter: "blur(10px)",
             }}
             animate={reduced ? {} : { y: [0, -3, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as any, delay: index * 0.3 }}
           >
             <Icon size={16} style={{ color: project.accentPrimary }} strokeWidth={2} aria-hidden />
           </motion.div>

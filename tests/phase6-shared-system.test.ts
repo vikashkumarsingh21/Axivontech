@@ -6,7 +6,7 @@ import { JobRunner } from "../src/lib/jobs/runner";
 vi.mock("@/lib/db", () => ({
   db: {
     communicationTemplate: {
-      findFirst: vi.fn().mockImplementation(({ where }: any) => {
+      findFirst: vi.fn().mockImplementation(({ where }: unknown) => {
         if (where.key === "WELCOME_EMAIL") {
           return Promise.resolve({
             key: "WELCOME_EMAIL",
@@ -19,7 +19,7 @@ vi.mock("@/lib/db", () => ({
       }),
     },
     emailTemplate: {
-      findUnique: vi.fn().mockImplementation(({ where }: any) => {
+      findUnique: vi.fn().mockImplementation(({ where }: unknown) => {
         if (where.key === "WELCOME_EMAIL") {
           return Promise.resolve({
             key: "WELCOME_EMAIL",
@@ -32,14 +32,14 @@ vi.mock("@/lib/db", () => ({
       }),
     },
     emailLog: {
-      create: vi.fn().mockImplementation(({ data }: any) => Promise.resolve({ id: "log-1", ...data })),
+      create: vi.fn().mockImplementation(({ data }: unknown) => Promise.resolve({ id: "log-1", ...data })),
     },
     notification: {
       findMany: vi.fn().mockResolvedValue([]),
       count: vi.fn().mockResolvedValue(0),
     },
     backgroundJob: {
-      create: vi.fn().mockImplementation(({ data }: any) => Promise.resolve({ id: "job-1", ...data })),
+      create: vi.fn().mockImplementation(({ data }: unknown) => Promise.resolve({ id: "job-1", ...data })),
       findMany: vi.fn().mockResolvedValue([]),
       update: vi.fn().mockResolvedValue({}),
     },
@@ -48,11 +48,11 @@ vi.mock("@/lib/db", () => ({
     },
     automationExecution: {
       findFirst: vi.fn().mockResolvedValue(null),
-      create: vi.fn().mockImplementation(({ data }: any) => Promise.resolve({ id: "exec-1", ...data })),
+      create: vi.fn().mockImplementation(({ data }: unknown) => Promise.resolve({ id: "exec-1", ...data })),
     },
     userPreference: {
       findUnique: vi.fn().mockResolvedValue(null),
-      create: vi.fn().mockImplementation(({ data }: any) => Promise.resolve({ id: "pref-1", ...data })),
+      create: vi.fn().mockImplementation(({ data }: unknown) => Promise.resolve({ id: "pref-1", ...data })),
     },
   },
 }));

@@ -18,6 +18,11 @@ export function AdminSidebar() {
     
     // CRM Section
     { name: "CRM Dashboard", href: "/admin/crm/dashboard", icon: Activity, isCrm: true },
+    { name: "Brokers", href: "/admin/crm/brokers", icon: Users, isCrm: true },
+    { name: "Partner Leads", href: "/admin/crm/general-leads", icon: Users, isCrm: true },
+    { name: "Partner Projects", href: "/admin/crm/partner-projects", icon: Briefcase, isCrm: true },
+    { name: "Partner Documents", href: "/admin/crm/documents", icon: FolderOpen, isCrm: true },
+    { name: "Partner Payments", href: "/admin/crm/payments", icon: DollarSign, isCrm: true },
     { name: "Lead Inbox", href: "/admin/crm/leads", icon: Users, isCrm: true },
     { name: "Sales Pipeline", href: "/admin/crm/pipeline", icon: TrendingUp, isCrm: true },
     { name: "CRM Follow-ups", href: "/admin/crm/follow-ups", icon: Clock, isCrm: true },
@@ -36,6 +41,7 @@ export function AdminSidebar() {
     { name: "Documents", href: "/admin/documents", icon: FolderOpen },
     { name: "Activity Logs", href: "/admin/activity", icon: Activity },
     { name: "Settings", href: "/admin/settings", icon: Settings },
+    { name: "Payment Settings", href: "/admin/settings/payment", icon: DollarSign },
   ];
 
   return (
@@ -65,7 +71,7 @@ export function AdminSidebar() {
           const isActive = pathname === item.href || (item.href !== "/admin/dashboard" && pathname?.startsWith(item.href));
 
           // Divider before HR & Operations section
-          const isFirstHr = index === 7;
+          const isFirstHr = index === 12;
 
           return (
             <div key={item.name}>

@@ -21,11 +21,15 @@ export async function middleware(req: NextRequest) {
   const isExecutiveRoute = pathname.startsWith("/executive");
   const isExecutiveApiRoute = pathname.startsWith("/api/v1/executive");
 
-  if (isEmployeeRoute || isEmployeeApiRoute || isAdminRoute || isAdminApiRoute || isExecutiveRoute || isExecutiveApiRoute) {
+  // Protect /broker routes
+  const isBrokerRoute = pathname.startsWith("/broker");
+  const isBrokerApiRoute = pathname.startsWith("/api/v1/broker");
+
+  if (isEmployeeRoute || isEmployeeApiRoute || isAdminRoute || isAdminApiRoute || isExecutiveRoute || isExecutiveApiRoute || isBrokerRoute || isBrokerApiRoute) {
     const sessionCookie = req.cookies.get("axivon_session")?.value;
 
     if (!sessionCookie) {
-      if (isEmployeeApiRoute || isAdminApiRoute || isExecutiveApiRoute) {
+      if (isEmployeeApiRoute || isAdminApiRoute || isExecutiveApiRoute || isBrokerApiRoute) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
       return NextResponse.redirect(new URL("/login", req.url));
@@ -44,11 +48,25 @@ export async function middleware(req: NextRequest) {
         if (isAdminApiRoute) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
-        return NextResponse.redirect(new URL("/employee/dashboard", req.url));
+        return NextResponse.redirect(role === "BROKER" ? new URL("/broker/dashboard", req.url) : new URL("/employee/dashboard", req.url));
       }
 
       if ((isExecutiveRoute || isExecutiveApiRoute) && role !== "FOUNDER" && role !== "CO_FOUNDER") {
         if (isExecutiveApiRoute) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+        return NextResponse.redirect(role === "BROKER" ? new URL("/broker/dashboard", req.url) : new URL("/employee/dashboard", req.url));
+      }
+
+      if ((isEmployeeRoute || isEmployeeApiRoute) && role === "BROKER") {
+        if (isEmployeeApiRoute) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+        return NextResponse.redirect(new URL("/broker/dashboard", req.url));
+      }
+
+      if ((isBrokerRoute || isBrokerApiRoute) && role !== "BROKER" && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
+        if (isBrokerApiRoute) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
         return NextResponse.redirect(new URL("/employee/dashboard", req.url));
@@ -86,5 +104,7 @@ export const config = {
     "/api/v1/admin/:path*",
     "/executive/:path*",
     "/api/v1/executive/:path*",
+    "/broker/:path*",
+    "/api/v1/broker/:path*",
   ],
 };

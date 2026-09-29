@@ -5,8 +5,8 @@ import { validateActiveUser } from "@/lib/auth/permissions";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ entityType: string; entityId: string }> }
-) {
+  props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     if (!userId) throw new ApiError(401, "Unauthorized");

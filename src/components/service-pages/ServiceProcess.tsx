@@ -146,7 +146,7 @@ function BackgroundParticles({ reduced }: { reduced: boolean }) {
             background: `radial-gradient(circle, rgba(232,160,100,${p.opacity}) 0%, rgba(201,146,42,${p.opacity * 0.5}) 100%)`,
           }}
           animate={{ y: [0, -100, 0], x: [0, p.xDrift, 0], opacity: [0, p.opacity, 0] }}
-          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" as any }}
         />
       ))}
     </div>
@@ -177,7 +177,7 @@ function AuroraOrbs({ reduced }: { reduced: boolean }) {
           animate={reduced ? {} : {
             x: [0, 50, -30, 0], y: [0, -40, 30, 0], scale: [1, 1.1, 0.93, 1],
           }}
-          transition={{ duration: orb.dur, delay: orb.delay, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: orb.dur, delay: orb.delay, repeat: Infinity, ease: "easeInOut" as any }}
         />
       ))}
     </div>
@@ -199,7 +199,7 @@ function GridOverlay() {
           backgroundSize: "72px 72px",
         }}
         animate={{ opacity: [0.4, 0.9, 0.4] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" as any }}
       />
     </div>
   );
@@ -301,7 +301,7 @@ function ConnectorDot({
           className="absolute w-10 h-10 rounded-full"
           style={{ border: `1px solid ${color}`, opacity: 0 }}
           animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeOut" as any }}
           aria-hidden
         />
       )}
@@ -318,7 +318,7 @@ function ConnectorDot({
           className="w-3 h-3 rounded-full"
           style={{ background: color, boxShadow: `0 0 8px ${color}` }}
           animate={reduced ? {} : { scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" as any }}
         />
       </div>
     </div>
@@ -429,7 +429,7 @@ function StepCard({
             }}
             initial={{ x: "-100%" }}
             animate={{ x: "160%" }}
-            transition={{ duration: 0.9, ease: "easeOut" }}
+            transition={{ duration: 0.9, ease: "easeOut" as any }}
             aria-hidden
           />
         )}
@@ -485,7 +485,7 @@ function StepCard({
               border: `1px solid ${accent.primary}30`,
             }}
             animate={reduced ? {} : { y: [0, -3, 0] }}
-            transition={{ duration: 3.5 + index * 0.4, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 3.5 + index * 0.4, repeat: Infinity, ease: "easeInOut" as any }}
           >
             <div
               className="absolute inset-0 rounded-xl"

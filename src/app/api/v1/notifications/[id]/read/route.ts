@@ -18,7 +18,8 @@ async function markNotificationRead(userId: string, id: string) {
   return updated;
 }
 
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     if (!userId) throw new ApiError(401, "Unauthorized");
@@ -31,7 +32,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
     if (!userId) throw new ApiError(401, "Unauthorized");

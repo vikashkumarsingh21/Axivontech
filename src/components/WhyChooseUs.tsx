@@ -74,7 +74,7 @@ const STATS: Stat[] = [
 
 const headerVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as any } },
 };
 
 const gridVariants: Variants = {
@@ -84,7 +84,7 @@ const gridVariants: Variants = {
 
 const cardVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" as any } },
 };
 
 // ── Count-up ──────────────────────────────────────────────────────
@@ -181,7 +181,7 @@ export default function WhyChooseUs() {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+              transition={{ duration: 0.5, ease: "easeOut" as any, delay: 0.2 }}
               className="mt-12 w-full overflow-hidden rounded-2xl border border-[#262626] bg-[#141414]"
             >
               <div className="grid grid-cols-2 divide-x divide-y divide-[#262626]">
@@ -196,7 +196,7 @@ export default function WhyChooseUs() {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 }}
+              transition={{ duration: 0.5, ease: "easeOut" as any, delay: 0.3 }}
               className="relative mt-6 aspect-[16/10] w-full overflow-hidden rounded-2xl border border-[#262626] bg-[#141414]"
             >
               <Image

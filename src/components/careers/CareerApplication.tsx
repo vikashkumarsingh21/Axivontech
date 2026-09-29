@@ -59,7 +59,7 @@ function Particle({ x, y, size, delay, duration }: { x: number; y: number; size:
       className="absolute rounded-full pointer-events-none"
       style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, background: "rgba(232,160,100,0.4)" }}
       animate={{ y: [-20, 20, -20], opacity: [0.2, 0.8, 0.2], scale: [1, 1.3, 1] }}
-      transition={{ duration, delay, repeat: Infinity, ease: "easeInOut" }}
+      transition={{ duration, delay, repeat: Infinity, ease: "easeInOut" as any }}
     />
   );
 }
@@ -112,7 +112,7 @@ function FloatingInput({ label, name, type = "text", icon, value, onChange, requ
               fontSize: active ? "10px" : "13px",
               color: active ? (focused ? "#e8a064" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
             }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: "easeOut" as any }}
           >
             {label}{required && " *"}
           </motion.label>
@@ -183,7 +183,7 @@ function FloatingSelect({ value, onChange }: { value: string; onChange: (name: k
               fontSize: active ? "10px" : "13px",
               color: active ? (focused ? "#e8a064" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
             }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: "easeOut" as any }}
           >
             Position Applying For *
           </motion.span>
@@ -264,7 +264,7 @@ function FloatingTextarea({ value, onChange }: { value: string; onChange: (name:
               color: active ? (focused ? "#e8a064" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
               marginBottom: active ? "4px" : "0px",
             }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: "easeOut" as any }}
           >
             Cover Letter / Message
           </motion.label>
@@ -529,19 +529,19 @@ if (!emailRegex.test(form.email)) {
           className="absolute w-[600px] h-[600px] rounded-full"
           style={{ left: "-10%", top: "-10%", background: "radial-gradient(circle, rgba(232,160,100,0.12) 0%, transparent 70%)" }}
           animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" as any }}
         />
         <motion.div
           className="absolute w-[500px] h-[500px] rounded-full"
           style={{ right: "-5%", bottom: "10%", background: "radial-gradient(circle, rgba(201,146,42,0.1) 0%, transparent 70%)" }}
           animate={{ scale: [1.2, 1, 1.2], opacity: [0.6, 0.3, 0.6] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" as any }}
         />
         <motion.div
           className="absolute w-[300px] h-[300px] rounded-full"
           style={{ left: "40%", top: "30%", background: "radial-gradient(circle, rgba(212,145,92,0.06) 0%, transparent 70%)" }}
           animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" as any }}
         />
         {particles.map((p, i) => <Particle key={i} {...p} />)}
       </div>
@@ -634,7 +634,7 @@ if (!emailRegex.test(form.email)) {
                 className="absolute inset-0 rounded-3xl pointer-events-none"
                 style={{ padding: 1 }}
                 animate={{ opacity: [0.3, 0.7, 0.3] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as any }}
               >
                 <div
                   className="w-full h-full rounded-3xl"

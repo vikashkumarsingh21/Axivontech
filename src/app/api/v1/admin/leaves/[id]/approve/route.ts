@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
   try {
     const { id } = await params;
     const adminId = req.headers.get("x-user-id");

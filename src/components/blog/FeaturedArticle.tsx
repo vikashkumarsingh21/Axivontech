@@ -169,7 +169,7 @@ function AuroraBackground() {
           transition={
             reduceMotion
               ? undefined
-              : { duration: orb.duration, repeat: Infinity, ease: "easeInOut" }
+              : { duration: orb.duration, repeat: Infinity, ease: "easeInOut" as any }
           }
         />
       ))}
@@ -257,7 +257,7 @@ function FloatingParticles({ count = 26 }: { count?: number }) {
             duration: p.duration,
             delay: p.delay,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: "easeInOut" as any,
           }}
         />
       ))}
@@ -363,7 +363,7 @@ function KnowledgeSphere() {
           background: `radial-gradient(circle, ${COLORS.purple}55, transparent 70%)`,
         }}
         animate={reduceMotion ? undefined : { opacity: [0.5, 0.9, 0.5], scale: [1, 1.08, 1] }}
-        transition={reduceMotion ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        transition={reduceMotion ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" as any }}
         aria-hidden={true}
       />
 
@@ -436,7 +436,7 @@ function FloatingContentPanel({
     >
       <motion.div
         animate={reduceMotion ? undefined : { y: [0, -12, 0] }}
-        transition={reduceMotion ? undefined : { duration: 5 + delay, repeat: Infinity, ease: "easeInOut", delay }}
+        transition={reduceMotion ? undefined : { duration: 5 + delay, repeat: Infinity, ease: "easeInOut" as any, delay }}
         className="relative rounded-xl border border-white/10 bg-[#141414]/[0.04] p-3 backdrop-blur-xl"
         style={{ width, boxShadow: "0 18px 40px -16px rgba(0,0,0,0.6)" }}
       >
@@ -637,7 +637,7 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
                 className="absolute inset-y-0 w-1/3 opacity-40"
                 style={{ background: `linear-gradient(90deg, transparent, ${COLORS.cyan}33, transparent)` }}
                 animate={reduceMotion ? undefined : { x: ["-120%", "220%"] }}
-                transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                transition={reduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" as any }}
                 aria-hidden={true}
               />
               <div className="relative flex flex-col items-center gap-2 text-white/40">
@@ -658,7 +658,7 @@ function MainFeaturedCard({ article }: { article?: FeaturedArticleData }) {
                 className="h-1.5 w-1.5 rounded-full"
                 style={{ backgroundColor: COLORS.cyan, boxShadow: `0 0 8px ${COLORS.cyan}` }}
                 animate={reduceMotion ? undefined : { opacity: [0.4, 1, 0.4] }}
-                transition={reduceMotion ? undefined : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                transition={reduceMotion ? undefined : { duration: 2, repeat: Infinity, ease: "easeInOut" as any }}
                 aria-hidden={true}
               />
             )}

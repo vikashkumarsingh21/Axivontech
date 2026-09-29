@@ -81,27 +81,27 @@ const STEPS: Step[] = [
 
 const headerVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as any } },
 };
 
 const lineVariants: Variants = {
   hidden: { scaleY: 0 },
-  visible: { scaleY: 1, transition: { duration: 1, ease: "easeInOut" } },
+  visible: { scaleY: 1, transition: { duration: 1, ease: "easeInOut" as any } },
 };
 
 const mobileRowVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as any } },
 };
 
 const leftRowVariants: Variants = {
   hidden: { opacity: 0, x: -24 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.45, ease: "easeOut" } },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.45, ease: "easeOut" as any } },
 };
 
 const rightRowVariants: Variants = {
   hidden: { opacity: 0, x: 24 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.45, ease: "easeOut" } },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.45, ease: "easeOut" as any } },
 };
 
 function StepCard({ step }: { step: Step }) {

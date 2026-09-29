@@ -4,7 +4,7 @@ export interface SendEmailOptions {
   to: string;
   templateKey: string;
   variables?: Record<string, any>;
-  metadata?: any;
+  metadata?: unknown;
 }
 
 // -----------------------------------------------------------------------
@@ -104,10 +104,10 @@ export class EmailService {
 
     try {
       await deliverEmail(to, subject, body);
-    } catch (err: any) {
-      console.error("[EmailService] Delivery failed:", err.message);
+    } catch (err: unknown) {
+      console.error("[EmailService] Delivery failed:", (err as Error).message);
       status = "FAILED";
-      errorMsg = err.message;
+      errorMsg = (err as Error).message;
     }
 
     const log = await db.emailLog.create({
@@ -116,7 +116,7 @@ export class EmailService {
         templateKey,
         subject,
         status,
-        metadata: errorMsg ? { ...metadata, error: errorMsg } : metadata || variables,
+        metadata: errorMsg ? { ...(metadata as object), error: errorMsg } : metadata || variables,
       },
     });
 

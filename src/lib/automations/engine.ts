@@ -150,14 +150,14 @@ export class AutomationEngine {
           },
         });
         executions.push(exec);
-      } catch (err: any) {
+      } catch (err: unknown) {
         await db.automationExecution.create({
           data: {
             automationId: wf.id,
             triggerEvent,
             status: "FAILED",
             dedupKey,
-            result: { error: err.message },
+            result: { error: (err as Error).message },
           },
         });
       }
