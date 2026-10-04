@@ -10,7 +10,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
     await requirePermission(userId, "users:write");
 
     const body = await req.json();
-    const { action, notes } = body;
+    const { action, notes, payoutReference } = body;
 
     const commission = await db.commission.findUnique({
       where: { id: params.id },
@@ -19,7 +19,17 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
     
     if (!commission) throw new ApiError(404, "Commission not found.");
 
+    // BP-1204: History Immutability - Once PAID, it cannot be modified arbitrarily
+    if (commission.status === "PAID" && action !== "adjust") {
+       throw new ApiError(400, "Paid commissions cannot be modified.");
+    }
+
     if (action === "approve") {
+      // Transition rule: PENDING/ELIGIBLE -> APPROVED
+      if (commission.status !== "PENDING" && commission.status !== "ELIGIBLE") {
+        throw new ApiError(400, "Only PENDING or ELIGIBLE commissions can be approved.");
+      }
+      
       await db.$transaction([
         db.commission.update({
           where: { id: params.id },
@@ -36,16 +46,27 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
     }
 
     if (action === "pay") {
+      // Transition rule: APPROVED -> PAID
+      if (commission.status !== "APPROVED") {
+        throw new ApiError(400, "Commission must be APPROVED before payout.");
+      }
+
       await db.$transaction([
         db.commission.update({
           where: { id: params.id },
-          data: { status: "PAID", paidAt: new Date(), paidById: userId, notes: notes || commission.notes },
+          data: { 
+            status: "PAID", 
+            paidAt: new Date(), 
+            paidById: userId, 
+            notes: notes || commission.notes,
+            payoutReference: payoutReference || null
+          },
         }),
         db.auditLog.create({
-          data: { userId, action: "COMMISSION_PAID", resource: "Commission", details: { commissionId: params.id } }
+          data: { userId, action: "COMMISSION_PAID", resource: "Commission", details: { commissionId: params.id, payoutReference } }
         }),
         db.notification.create({
-          data: { userId: commission.brokerProfile.userId, type: "SYSTEM", title: "Commission Paid", message: `Your commission of ₹${commission.commissionAmount} has been paid.`, link: "/broker/commissions" }
+          data: { userId: commission.brokerProfile.userId, type: "SYSTEM", title: "Commission Paid", message: `Your commission of ₹${commission.commissionAmount} has been paid. Ref: ${payoutReference || 'N/A'}`, link: "/broker/commissions" }
         })
       ]);
       return NextResponse.json({ success: true, message: "Commission marked as paid." });

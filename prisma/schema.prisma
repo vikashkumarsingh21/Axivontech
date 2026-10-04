@@ -58,6 +58,9 @@ model User {
   notifications           Notification[]
   uploadedDocs            Document[]              @relation("DocumentUploader")
   projectMembers          ProjectMember[]
+  partnerProjectMembers   PartnerProjectMember[]
+  qaIssuesReported        QaIssue[]               @relation("QaIssueReporter")
+  qaIssuesAssigned        QaIssue[]               @relation("QaIssueAssignee")
 
   // Phase 4: Executive Relations
   executiveProfile   ExecutiveProfile?
@@ -176,16 +179,51 @@ model PartnerProject {
   status String @default("PROJECT_REQUESTED")
   // PROJECT_REQUESTED, REVIEWING, DISCUSSION, PROPOSAL_SENT, NEGOTIATION,
   // CONTRACT_SENT, CONTRACT_SIGNED, PAYMENT_PENDING, PAYMENT_SUBMITTED,
-  // PAYMENT_VERIFICATION, PROJECT_CONFIRMED, IN_PROGRESS, COMPLETED,
+  // PAYMENT_VERIFICATION, PROJECT_CONFIRMED, 
+  // TECHNICAL_REVIEW, TECHNICAL_APPROVED, APPROVED, IN_PROGRESS, COMPLETED,
   // CANCELLED, REJECTED
 
   // Internal notes (admin only — never sent to broker)
   adminNotes String?
 
+  // Phase 9: Technical Review
+  technicalReviewStatus String?   // PENDING, IN_REVIEW, CLARIFICATION_REQUIRED, APPROVED
+  technicalReviewedById  String?
+  technicalReviewedAt    DateTime?
+  technicalNotes         String?  @db.Text
+
+  // Phase 9: Project Approval
+  approvedById String?
+  approvedAt   DateTime?
+
+  // Phase 9: Project Start
+  startedAt   DateTime?
+  startedById String?
+
+  // Phase 9: Project Owner
+  projectOwnerId String?
+
+  // Phase 9: Client Account Link
+  clientUserId String? @unique
+
+  // Phase 10: Client Portal fields
+  expectedDeliveryDate DateTime?
+  progressPercentage   Int     @default(0)
+
+  // Phase 11: Execution & Completion fields
+  qaStatus        String?   // INTERNAL_QA, UAT_READY, UAT_IN_PROGRESS, UAT_APPROVED, UAT_REJECTED
+  deliveredAt     DateTime?
+  completedAt     DateTime?
+  completedById   String?
+
   // Relations
-  contract  PartnerContract?
-  payment   PartnerPayment?
-  documents PartnerDocument[]
+  contract   PartnerContract?
+  payment    PartnerPayment?
+  documents  PartnerDocument[]
+  milestones PartnerProjectMilestone[]
+  tasks      Task[]           @relation("PartnerProjectTasks")
+  qaIssues   QaIssue[]        @relation("PartnerProjectQaIssues")
+  team       PartnerProjectMember[]
 
   // Linked to existing CRM Lead/Opportunity if converted
   leadId        String? @unique
@@ -200,6 +238,66 @@ model PartnerProject {
   @@index([projectCode])
 }
 
+model PartnerProjectMilestone {
+  id               String   @id @default(cuid())
+  partnerProjectId String
+  partnerProject   PartnerProject @relation(fields: [partnerProjectId], references: [id], onDelete: Cascade)
+  
+  title            String
+  description      String?
+  status           String   @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETED, ON_HOLD
+  
+  startDate        DateTime?
+  targetDate       DateTime?
+  completionDate   DateTime?
+  
+  order            Int      @default(0)
+  
+  isClientVisible  Boolean  @default(true) // BP-1005 rule: explicit visibility
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([partnerProjectId])
+}
+
+model PartnerProjectMember {
+  partnerProjectId String
+  userId           String
+  role             String @default("MEMBER") // LEAD, DEVELOPER, DESIGNER, QA
+
+  partnerProject   PartnerProject @relation(fields: [partnerProjectId], references: [id], onDelete: Cascade)
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([partnerProjectId, userId])
+}
+
+model QaIssue {
+  id               String   @id @default(cuid())
+  partnerProjectId String
+  partnerProject   PartnerProject @relation("PartnerProjectQaIssues", fields: [partnerProjectId], references: [id], onDelete: Cascade)
+
+  title            String
+  description      String   @db.Text
+  status           String   @default("OPEN") // OPEN, IN_PROGRESS, FIXED, RETEST, PASSED, FAILED, CLOSED
+  severity         String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+
+  reporterId       String
+  reporter         User     @relation("QaIssueReporter", fields: [reporterId], references: [id], onDelete: Restrict)
+
+  assignedToId     String?
+  assignedTo       User?    @relation("QaIssueAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  resolvedAt       DateTime?
+  resolutionNotes  String?  @db.Text
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([partnerProjectId])
+  @@index([status])
+}
+
 // Documents shared by Admin/Founder to Brokers
 model PartnerDocument {
   id          String    @id @default(cuid())
@@ -210,8 +308,9 @@ model PartnerDocument {
   mimeType    String?
   sizeBytes   Int?
   category    String    @default("GENERAL")
-  // GENERAL, COMPANY_INFO, PARTNER_GUIDELINES, MARKETING, PRICING, SERVICE_INFO, CONTRACT, PROJECT_DOCS, IMPORTANT_NOTICE
+  // GENERAL, COMPANY_INFO, PARTNER_GUIDELINES, MARKETING, PRICING, SERVICE_INFO, CONTRACT, PROJECT_DOCS, IMPORTANT_NOTICE, CLIENT_DELIVERABLE, CLIENT_REPORT
   isImportant Boolean   @default(false)
+  isClientVisible Boolean @default(false) // Phase 10: controls Client Portal visibility
   expiresAt   DateTime?
 
   // Who uploaded
@@ -533,6 +632,9 @@ model Task {
   description  String?
   projectId    String?
   project      Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  partnerProjectId String?
+  partnerProject   PartnerProject? @relation("PartnerProjectTasks", fields: [partnerProjectId], references: [id], onDelete: SetNull)
   priority     String    @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
   status       String    @default("TODO") // TODO, IN_PROGRESS, BLOCKED, COMPLETED
   dueDate      DateTime?

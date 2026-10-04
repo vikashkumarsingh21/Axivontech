@@ -25,11 +25,28 @@ export async function middleware(req: NextRequest) {
   const isBrokerRoute = pathname.startsWith("/broker");
   const isBrokerApiRoute = pathname.startsWith("/api/v1/broker");
 
-  if (isEmployeeRoute || isEmployeeApiRoute || isAdminRoute || isAdminApiRoute || isExecutiveRoute || isExecutiveApiRoute || isBrokerRoute || isBrokerApiRoute) {
+  // Protect /client routes
+  const isClientRoute = pathname.startsWith("/client");
+  const isClientApiRoute = pathname.startsWith("/api/v1/client");
+
+  // Protect /crm routes
+  const isCrmRoute = pathname.startsWith("/crm");
+  const isCrmApiRoute = pathname.startsWith("/api/v1/crm");
+
+  const isProtectedApiRoute = isEmployeeApiRoute || isAdminApiRoute || isExecutiveApiRoute || isBrokerApiRoute || isClientApiRoute || isCrmApiRoute;
+  const isProtectedRoute = isEmployeeRoute || isAdminRoute || isExecutiveRoute || isBrokerRoute || isClientRoute || isCrmRoute;
+
+  // IMPORTANT: Prevent header spoofing on public routes
+  // Next.js passes client headers through. We must strictly control x-user-id.
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.delete("x-user-id");
+  requestHeaders.delete("x-user-role");
+
+  if (isProtectedRoute || isProtectedApiRoute) {
     const sessionCookie = req.cookies.get("axivon_session")?.value;
 
     if (!sessionCookie) {
-      if (isEmployeeApiRoute || isAdminApiRoute || isExecutiveApiRoute || isBrokerApiRoute) {
+      if (isProtectedApiRoute) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
       return NextResponse.redirect(new URL("/login", req.url));
@@ -72,8 +89,14 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/employee/dashboard", req.url));
       }
 
-      // Add user info to headers for downstream consumption
-      const requestHeaders = new Headers(req.headers);
+      if ((isClientRoute || isClientApiRoute) && role !== "CLIENT") {
+        if (isClientApiRoute) {
+           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+        return NextResponse.redirect(new URL("/login", req.url));
+      }
+
+      // Add user info to headers for downstream consumption securely
       requestHeaders.set("x-user-id", payload.userId as string);
       requestHeaders.set("x-user-role", payload.role as string);
 
@@ -84,7 +107,7 @@ export async function middleware(req: NextRequest) {
       });
     } catch (error) {
       // Invalid token
-      const response = (isEmployeeApiRoute || isAdminApiRoute || isExecutiveApiRoute)
+      const response = isProtectedApiRoute
         ? NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         : NextResponse.redirect(new URL("/login", req.url));
       
@@ -93,7 +116,12 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  // Allow public routes, but with the spoofed headers stripped
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 }
 
 export const config = {
@@ -106,5 +134,9 @@ export const config = {
     "/api/v1/executive/:path*",
     "/broker/:path*",
     "/api/v1/broker/:path*",
+    "/client/:path*",
+    "/api/v1/client/:path*",
+    "/crm/:path*",
+    "/api/v1/crm/:path*",
   ],
 };

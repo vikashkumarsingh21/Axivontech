@@ -13,7 +13,21 @@ export async function GET(req: Request) {
 
     const commissions = await db.commission.findMany({
       where: { brokerProfileId: brokerProfile.id },
-      include: {
+      select: {
+        id: true,
+        partnerProjectId: true,
+        projectValue: true,
+        commissionType: true,
+        commissionRate: true,
+        commissionAmount: true,
+        currency: true,
+        status: true,
+        eligibleAt: true,
+        approvedAt: true,
+        paidAt: true,
+        payoutReference: true,
+        createdAt: true,
+        updatedAt: true,
         partnerProject: { select: { projectCode: true, projectName: true } },
         commissionRule: { select: { name: true, type: true, value: true } },
       },
