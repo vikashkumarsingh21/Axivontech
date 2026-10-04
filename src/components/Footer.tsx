@@ -25,6 +25,7 @@ const COMPANY_LINKS: FooterLink[] = [
   { label: "Blog", href: "/blog" },
   { label: "Careers", href: "/careers" },
   { label: "Contact", href: "/contact" },
+  { label: "Business Partner", href: "/business-partner" },
   { label: "Team Login", href: "/login" },
 ];
 
