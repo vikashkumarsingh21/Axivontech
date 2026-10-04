@@ -10,6 +10,7 @@ import LocalBusinessSchema from "@/components/seo/LocalBusinessSchema";
 import WebSiteSchema from "@/components/seo/WebSiteSchema";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import dynamic from 'next/dynamic';
+import NextTopLoader from 'nextjs-toploader';
 
 const ChatWidget = dynamic(() => import('@/components/chatbot/ChatWidget'));
 
@@ -97,11 +98,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen flex flex-col bg-[#0f0f0f] text-[#f4f4f5]">
-
-  <OrganizationSchema />
-  <LocalBusinessSchema />
-  <WebSiteSchema />
-  <Navbar />
+        <NextTopLoader color="#e8a064" showSpinner={false} />
+        <OrganizationSchema />
+        <LocalBusinessSchema />
+        <WebSiteSchema />
+        <Navbar />
 
   <main className="flex-1">
     {children}

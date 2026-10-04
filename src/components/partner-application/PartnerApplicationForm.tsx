@@ -127,7 +127,21 @@ export default function PartnerApplicationForm() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.message || "Failed to submit application");
+        let errorMessage = data.message || data.error || "Failed to submit application";
+        
+        // If there are specific validation details from Zod, append the first one
+        if (data.details) {
+          const detailKeys = Object.keys(data.details).filter(k => k !== "_errors");
+          if (detailKeys.length > 0) {
+            const firstKey = detailKeys[0];
+            const fieldError = data.details[firstKey]?._errors?.[0];
+            if (fieldError) {
+              errorMessage = `${errorMessage}: ${firstKey} - ${fieldError}`;
+            }
+          }
+        }
+        
+        throw new Error(errorMessage);
       }
 
       setIsSubmitted(true);

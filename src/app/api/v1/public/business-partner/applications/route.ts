@@ -19,14 +19,14 @@ const EducationOptionalSchema = z.object({
   board: z.string().optional(),
   passingYear: z.string().optional(),
   percentage: z.string().optional(),
-}).optional();
+}).optional().nullable();
 
 const EducationUGSchema = z.object({
   degree: z.string().optional(),
   college: z.string().optional(),
   passingYear: z.string().optional(),
   branch: z.string().optional(),
-}).optional();
+}).optional().nullable();
 
 const applicationSchema = z.object({
   fullName: z

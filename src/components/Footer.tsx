@@ -116,52 +116,13 @@ export default function Footer() {
           viewport={{ once: true, amount: 0.15 }}
           variants={containerVariants}
         >
-          {/* ── Brand section (always visible) ───────────────── */}
-          <motion.div variants={itemVariants} className="mb-8 md:mb-0">
-            <Link href="/" className="inline-block">
-              <Image
-                src="/assets/logo/logo-full.png"
-                alt="Axivon Technologies Logo"
-                width={220}
-                height={60}
-                className="h-10 sm:h-12 w-auto object-contain brightness-0 invert"
-              />
-            </Link>
-
-            <p className="mt-4 max-w-sm text-sm leading-6 text-[#71717a]">
-              We craft digital products that help modern businesses look credible, operate efficiently, and grow with confidence.
-            </p>
-
-            <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e8a064]">
-              Future-ready technology for modern businesses
-            </p>
-
-            <div className="mt-5 flex items-center gap-3">
-              {SOCIAL_LINKS.map((social) => {
-                const Icon = social.icon;
-                return (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    className="flex h-10 w-10 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-[#262626] bg-[#141414] text-[#a1a1aa] transition-colors hover:border-[#e8a064] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
-                  >
-                    <Icon className="h-4 w-4" />
-                  </a>
-                );
-              })}
-            </div>
-          </motion.div>
-
           {/* ── Link columns ─────────────────────────────────── */}
           <motion.div
             variants={itemVariants}
             className="mt-8 grid grid-cols-1 md:grid-cols-[1.6fr_1fr_1fr_1.2fr] md:gap-10"
           >
-            {/* Brand column (desktop only — already shown above on mobile) */}
-            <div className="hidden md:block">
+            {/* Brand column */}
+            <div className="mb-8 md:mb-0">
               <Link href="/" className="inline-block">
                 <Image
                   src="/assets/logo/logo-full.png"
