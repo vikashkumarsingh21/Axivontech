@@ -1,0 +1,518 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/@prisma/client/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("CLIENT_DATABASE_URL")
+}
+
+model PartnerProject {
+//   commission      Commission?
+  id              String        @id @default(cuid())
+  projectCode     String        @unique
+  brokerProfileId String
+//   brokerProfile   BrokerProfile @relation(fields: [brokerProfileId], references: [id], onDelete: Cascade)
+
+  // Client details (collected from public form — never trust from browser)
+  clientName        String
+  clientEmail       String
+  clientPhone       String
+  clientWhatsapp    String?
+  clientDesignation String?
+
+  // Company details
+  companyName     String
+  industry        String
+  businessAddress String?
+  city            String
+  state           String
+  country         String
+  website         String?
+  companySize     String?
+  gstNumber       String?
+  regNumber       String?
+
+  // Project details
+  projectName            String
+  requiredService        String
+//   detailedRequirement    String  @db.Text
+  expectedTimeline       String
+  projectBudget          String
+  finalProjectValue      Float?
+  additionalRequirements String?
+
+  // Primary contact
+  contactPerson String?
+  contactEmail  String?
+  contactPhone  String?
+
+  // Status
+  status String @default("PROJECT_REQUESTED")
+  // PROJECT_REQUESTED, REVIEWING, DISCUSSION, PROPOSAL_SENT, NEGOTIATION,
+  // CONTRACT_SENT, CONTRACT_SIGNED, PAYMENT_PENDING, PAYMENT_SUBMITTED,
+  // PAYMENT_VERIFICATION, PROJECT_CONFIRMED, 
+  // TECHNICAL_REVIEW, TECHNICAL_APPROVED, APPROVED, IN_PROGRESS, COMPLETED,
+  // CANCELLED, REJECTED
+
+  // Internal notes (admin only — never sent to broker)
+  adminNotes String?
+
+  // Phase 9: Technical Review
+  technicalReviewStatus String?   // PENDING, IN_REVIEW, CLARIFICATION_REQUIRED, APPROVED
+  technicalReviewedById  String?
+  technicalReviewedAt    DateTime?
+//   technicalNotes         String?  @db.Text
+
+  // Phase 9: Project Approval
+  approvedById String?
+  approvedAt   DateTime?
+
+  // Phase 9: Project Start
+  startedAt   DateTime?
+  startedById String?
+
+  // Phase 9: Project Owner
+  projectOwnerId String?
+
+  // Phase 9: Client Account Link
+  clientUserId String? @unique
+
+  // Phase 10: Client Portal fields
+  expectedDeliveryDate DateTime?
+  progressPercentage   Int     @default(0)
+
+  // Phase 11: Execution & Completion fields
+  qaStatus        String?   // INTERNAL_QA, UAT_READY, UAT_IN_PROGRESS, UAT_APPROVED, UAT_REJECTED
+  deliveredAt     DateTime?
+  completedAt     DateTime?
+  completedById   String?
+
+  // Relations
+  contract   PartnerContract?
+  payment    PartnerPayment?
+//   documents  PartnerDocument[]
+  milestones PartnerProjectMilestone[]
+//   tasks      Task[]           @relation("PartnerProjectTasks")
+//   qaIssues   QaIssue[]        @relation("PartnerProjectQaIssues")
+  team       PartnerProjectMember[]
+
+  // Linked to existing CRM Lead/Opportunity if converted
+  leadId        String? @unique
+  convertedFromLead Lead? @relation("LeadToProject", fields: [leadId], references: [id], onDelete: SetNull)
+  opportunityId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([brokerProfileId])
+  @@index([status])
+  @@index([projectCode])
+}
+
+model PartnerProjectMilestone {
+  id               String   @id @default(cuid())
+  partnerProjectId String
+  partnerProject   PartnerProject @relation(fields: [partnerProjectId], references: [id], onDelete: Cascade)
+  
+  title            String
+  description      String?
+  status           String   @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETED, ON_HOLD
+  
+  startDate        DateTime?
+  targetDate       DateTime?
+  completionDate   DateTime?
+  
+  order            Int      @default(0)
+  
+  isClientVisible  Boolean  @default(true) // BP-1005 rule: explicit visibility
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([partnerProjectId])
+}
+
+model PartnerProjectMember {
+  partnerProjectId String
+  userId           String
+  role             String @default("MEMBER") // LEAD, DEVELOPER, DESIGNER, QA
+
+  partnerProject   PartnerProject @relation(fields: [partnerProjectId], references: [id], onDelete: Cascade)
+//   user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([partnerProjectId, userId])
+}
+
+model PartnerContract {
+  id               String         @id @default(cuid())
+  partnerProjectId String         @unique
+  partnerProject   PartnerProject @relation(fields: [partnerProjectId], references: [id], onDelete: Cascade)
+  
+  status           String         @default("SENT") // LATEST status: NOT_SENT, SENT, DOWNLOADED, SIGNED, UNDER_REVIEW, VERIFIED, REJECTED, REUPLOAD_REQUIRED
+  
+  versions         PartnerContractVersion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PartnerContractVersion {
+  id                String          @id @default(cuid())
+  partnerContractId String
+  partnerContract   PartnerContract @relation(fields: [partnerContractId], references: [id], onDelete: Cascade)
+  
+  versionNumber     Int
+
+  // Sent contract (by Admin/Founder)
+  contractName        String
+  contractDescription String?
+  contractFileUrl     String
+  contractStorageKey  String?
+  sentAt              DateTime @default(now())
+  sentById            String
+
+  // Signed contract (uploaded by Broker/client)
+  signedFileUrl    String?
+  signedStorageKey String?
+  stampFileUrl     String?
+  stampStorageKey  String?
+  signedAt         DateTime?
+  signingConfirmed Boolean   @default(false)
+
+  // Admin verification for this specific version
+  status          String    @default("SENT")
+  // SENT, DOWNLOADED, SIGNED, UNDER_REVIEW, VERIFIED, REJECTED, REUPLOAD_REQUIRED, SUPERSEDED
+  verifiedAt      DateTime?
+  verifiedById    String?
+  rejectionReason String?
+  rejectedAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([partnerContractId])
+  @@index([status])
+}
+
+model PartnerPayment {
+  id               String         @id @default(cuid())
+  partnerProjectId String         @unique
+  partnerProject   PartnerProject @relation(fields: [partnerProjectId], references: [id], onDelete: Cascade)
+
+  // Calculated amounts
+  projectPrice      Float
+  advancePercentage Int    @default(40)
+  advanceAmount     Float
+  remainingAmount   Float
+  currency          String @default("INR")
+
+  // Payment settings snapshot at time of payment request (versioning)
+  paymentSettingsSnapshot Json?
+
+  // Proof submitted by Broker/client
+  paymentMethod   String? // BANK | UPI
+  amountPaid      Float?
+  transactionId   String?
+  paymentDate     DateTime?
+  proofFileUrl    String?
+  proofStorageKey String?
+  additionalNotes String?
+
+  // Status
+  status String @default("PENDING")
+  // PENDING, SUBMITTED, UNDER_REVIEW, VERIFIED, REJECTED
+
+  verifiedAt      DateTime?
+  verifiedById    String?
+  rejectionReason String?
+  rejectedAt      DateTime?
+
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Lead {
+  id                  String  @id @default(cuid())
+  leadCode            String  @unique
+  name                String
+  email               String
+  phone               String?
+  whatsapp            String?
+  designation         String?
+  companyName         String?
+  industry            String?
+  city                String?
+  state               String?
+  country             String?
+  companySize         String?
+  website             String?
+  serviceInterest     String?
+  message             String?
+  source              String  @default("WEBSITE_CONTACT") // WEBSITE_CONTACT, CONSULTATION, REFERRAL, SOCIAL_MEDIA, CAMPAIGN, MANUAL, PARTNER, OTHER
+  campaign            String?
+  status              String  @default("NEW") // NEW, CONTACTED, MEETING, QUALIFIED, NOT_QUALIFIED, CONVERTED, LOST, NURTURE
+  qualificationStatus String  @default("UNQUALIFIED") // QUALIFIED, UNQUALIFIED, IN_PROGRESS
+
+  // Qualification Details
+  budget             Float?
+  timeline           String?
+  businessNeed       String?
+  decisionMakerKnown Boolean @default(false)
+  qualificationNotes String?
+
+  // Duplicate Tracking
+  isDuplicate     Boolean @default(false)
+  duplicateReason String?
+
+  // Follow-up Tracking
+  nextFollowUpAt DateTime?
+  lastContactAt  DateTime?
+
+  // Qualification Tracking
+  qualifiedAt       DateTime?
+  qualifiedByUserId String?
+//   qualifiedByUser   User?    @relation("LeadQualifier", fields: [qualifiedByUserId], references: [id], onDelete: SetNull)
+
+  // Conversion Tracking
+  convertedAt       DateTime?
+  convertedByUserId String?
+//   convertedByUser   User?    @relation("LeadConverter", fields: [convertedByUserId], references: [id], onDelete: SetNull)
+
+  ownerId String?
+//   owner   User?   @relation("LeadOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  convertedClientId String?
+  convertedClient   CrmClient? @relation(fields: [convertedClientId], references: [id], onDelete: SetNull)
+
+  // Relations
+  activities       LeadActivity[]
+  followUps        FollowUp[]
+  opportunities    Opportunity[]
+  notes            LeadNote[]
+  meetings         LeadMeeting[]
+  convertedProject PartnerProject? @relation("LeadToProject")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([email])
+  @@index([leadCode])
+  @@index([qualifiedByUserId])
+  @@index([convertedByUserId])
+}
+
+model LeadActivity {
+  id            String       @id @default(cuid())
+  leadId        String?
+  lead          Lead?        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  clientId      String?
+  client        CrmClient?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  actorId String?
+//   actor   User?   @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  type     String // LEAD_CREATED, LEAD_ASSIGNED, STATUS_CHANGED, NOTE_ADDED, CALL_RECORDED, MEETING_RECORDED, FOLLOWUP_CREATED, FOLLOWUP_COMPLETED, OPPORTUNITY_CREATED, PROPOSAL_SENT, DEAL_WON, DEAL_LOST, CLIENT_CONVERTED
+  title    String
+  notes    String?
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+  @@index([opportunityId])
+  @@index([clientId])
+  @@index([actorId])
+}
+
+model FollowUp {
+  id            String       @id @default(cuid())
+  leadId        String?
+  lead          Lead?        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  clientId      String?
+  client        CrmClient?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  assignedToId String
+//   assignedTo   User   @relation("FollowUpAssignee", fields: [assignedToId], references: [id], onDelete: Cascade)
+
+  dueAt       DateTime
+  type        String    @default("CALL") // CALL, EMAIL, MEETING, WHATSAPP, DEMO, PROPOSAL_FOLLOWUP, GENERAL
+  notes       String?
+  status      String    @default("UPCOMING") // UPCOMING, DUE, OVERDUE, COMPLETED
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([assignedToId])
+  @@index([leadId])
+  @@index([opportunityId])
+  @@index([status])
+  @@index([dueAt])
+}
+
+model LeadNote {
+  id         String @id @default(cuid())
+  leadId     String
+  lead       Lead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  authorId   String
+//   author     User   @relation("LeadNoteAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+//   content    String @db.Text
+  visibility String @default("INTERNAL") // INTERNAL, PARTNER_VISIBLE
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([leadId])
+  @@index([authorId])
+}
+
+model LeadMeeting {
+  id           String    @id @default(cuid())
+  leadId       String
+  lead         Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  scheduledAt  DateTime
+  type         String    @default("VIRTUAL") // VIRTUAL, IN_PERSON, PHONE
+  participants String?
+  outcome      String?
+  nextAction   String?
+  followUpDate DateTime?
+//   notes        String?   @db.Text
+  createdById  String
+//   createdBy    User      @relation("LeadMeetingCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([leadId])
+  @@index([createdById])
+}
+
+model PipelineStage {
+  id          String  @id @default(cuid())
+  name        String
+  key         String  @unique // QUALIFIED, DISCOVERY, PROPOSAL, NEGOTIATION, WON, LOST
+  order       Int     @default(0)
+  probability Int     @default(50)
+  description String?
+
+  opportunities Opportunity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Opportunity {
+  id              String     @id @default(cuid())
+  opportunityCode String     @unique
+  leadId          String?
+  lead            Lead?      @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  clientId        String?
+  client          CrmClient? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  name              String
+  description       String?
+  value             Float     @default(0)
+  currency          String    @default("INR")
+  probability       Int       @default(50)
+  expectedCloseDate DateTime?
+  stage             String    @default("QUALIFIED") // QUALIFIED, DISCOVERY, PROPOSAL, NEGOTIATION, WON, LOST
+
+  stageId       String?
+  pipelineStage PipelineStage? @relation(fields: [stageId], references: [id], onDelete: SetNull)
+
+  ownerId String?
+//   owner   User?   @relation("OpportunityOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  lossReason String?
+
+  proposals  Proposal[]
+  activities LeadActivity[]
+  followUps  FollowUp[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([leadId])
+  @@index([clientId])
+  @@index([stage])
+}
+
+model Proposal {
+  id             String      @id @default(cuid())
+  proposalNumber String      @unique
+  opportunityId  String
+  opportunity    Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  title             String
+  amount            Float
+  currency          String    @default("INR")
+  status            String    @default("DRAFT") // DRAFT, READY, SENT, ACCEPTED, REJECTED, EXPIRED
+  sentAt            DateTime?
+  validUntil        DateTime?
+  documentReference String?
+
+  createdById String?
+//   createdBy   User?   @relation("ProposalCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([opportunityId])
+  @@index([status])
+}
+
+model CrmClient {
+  id          String  @id @default(cuid())
+  clientCode  String  @unique
+  companyName String
+  contactName String
+  email       String
+  phone       String?
+  website     String?
+  industry    String?
+  status      String  @default("ACTIVE") // ACTIVE, INACTIVE, ONBOARDING
+
+  ownerId String?
+//   owner   User?   @relation("ClientOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  leads         Lead[]
+  opportunities Opportunity[]
+  activities    LeadActivity[]
+  followUps     FollowUp[]
+  contacts      ClientContact[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([email])
+  @@index([clientCode])
+}
+
+model ClientContact {
+  id       String    @id @default(cuid())
+  clientId String
+  client   CrmClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  name      String
+  email     String?
+  phone     String?
+  role      String?
+  isPrimary Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId])
+}
+

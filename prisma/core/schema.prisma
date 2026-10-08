@@ -1,0 +1,538 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/@prisma/client/core"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("CORE_DATABASE_URL")
+}
+
+model Organization {
+  id                String             @id @default(cuid())
+  name              String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  users             User[]
+  portfolioProjects PortfolioProject[]
+}
+
+model User {
+//   createdCommissionRules CommissionRule[] @relation("CommissionRuleCreator")
+//   approvedCommissions    Commission[]     @relation("CommissionApprover")
+//   paidCommissions        Commission[]     @relation("CommissionPayer")
+  id                     String           @id @default(cuid())
+  email                  String           @unique
+  name                   String
+  passwordHash           String
+  phone                  String?
+  avatarUrl              String?
+  employeeId             String?          @unique
+  department             String?
+  designation            String?
+  address                String?
+  emergencyContact       String?
+  status                 String           @default("ACTIVE")
+  inactiveAt             DateTime?
+  requiredDailyMinutes   Int              @default(480)
+  joiningDate            DateTime         @default(now())
+
+  mustChangePassword     Boolean          @default(false)
+  activationToken        String?
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  sessions       Session[]
+  auditLogs      AuditLog[]
+
+  // Roles and Permissions
+  userRoles UserRole[]
+
+  // Phase 2: Employee Portal Relations
+//   attendances             Attendance[]
+//   tasks                   Task[]
+//   taskComments            TaskComment[]
+//   workReports             WorkReport[]
+//   leaveRequests           LeaveRequest[]
+//   regularizations         RegularizationRequest[]
+//   reviewedRegularizations RegularizationRequest[] @relation("RegularizationReviewer")
+  notifications           Notification[]
+  uploadedDocs            Document[]              @relation("DocumentUploader")
+//   projectMembers          ProjectMember[]
+//   partnerProjectMembers   PartnerProjectMember[]
+//   qaIssuesReported        QaIssue[]               @relation("QaIssueReporter")
+//   qaIssuesAssigned        QaIssue[]               @relation("QaIssueAssignee")
+
+  // Phase 4: Executive Relations
+//   executiveProfile   ExecutiveProfile?
+//   requestedApprovals ApprovalRequest[] @relation("ApprovalRequester")
+//   decidedApprovals   ApprovalRequest[] @relation("ApprovalDecider")
+  securityEvents     SecurityEvent[]
+
+  // Phase 6: Shared System Relations
+//   reminders            Reminder[]
+//   createdAutomations   AutomationWorkflow[]
+  userPreference       UserPreference?
+  activities           Activity[]           @relation("ActivityActor")
+//   createdAnnouncements Announcement[]       @relation("AnnouncementCreator")
+  uploadedDocVersions  DocumentVersion[]    @relation("VersionUploader")
+  documentPermissions  DocumentPermission[] @relation("UserDocumentPermissions")
+
+  // Phase 5: CRM Relations
+//   ownedLeads               Lead[]              @relation("LeadOwner")
+//   qualifiedLeads           Lead[]              @relation("LeadQualifier")
+//   convertedLeads           Lead[]              @relation("LeadConverter")
+//   leadActivities           LeadActivity[]      @relation("ActivityActor")
+//   assignedFollowUps        FollowUp[]          @relation("FollowUpAssignee")
+//   ownedOpportunities       Opportunity[]       @relation("OpportunityOwner")
+//   createdProposals         Proposal[]          @relation("ProposalCreator")
+  knowledgeCreated         KnowledgeDocument[] @relation("KnowledgeCreator")
+  knowledgeUpdated         KnowledgeDocument[] @relation("KnowledgeUpdater")
+//   ownedClients             CrmClient[]         @relation("ClientOwner")
+  createdPortfolioProjects PortfolioProject[]  @relation("PortfolioCreator")
+//   leadNotes                LeadNote[]          @relation("LeadNoteAuthor")
+//   leadMeetings             LeadMeeting[]       @relation("LeadMeetingCreator")
+
+  // Broker Relations
+//   brokerProfile BrokerProfile?
+
+  // Partner System Relations
+  uploadedPartnerDocuments PartnerDocument[] @relation("PartnerDocumentUploader")
+  paymentSettingsUpdated   PaymentSettings[] @relation("PaymentSettingsUpdater")
+
+  // Business Partner Application Relations
+//   reviewedApplications       BusinessPartnerApplication[] @relation("ApplicationReviewer")
+//   createdApplicationMeetings ApplicationMeeting[]         @relation("ApplicationMeetingCreator")
+//   changedApplicationStatuses ApplicationStatusHistory[]     @relation("ApplicationStatusChanger")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PartnerDocument {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  fileUrl     String
+  storageKey  String?
+  mimeType    String?
+  sizeBytes   Int?
+  category    String    @default("GENERAL")
+  // GENERAL, COMPANY_INFO, PARTNER_GUIDELINES, MARKETING, PRICING, SERVICE_INFO, CONTRACT, PROJECT_DOCS, IMPORTANT_NOTICE, CLIENT_DELIVERABLE, CLIENT_REPORT
+  isImportant Boolean   @default(false)
+  isClientVisible Boolean @default(false) // Phase 10: controls Client Portal visibility
+  expiresAt   DateTime?
+
+  // Who uploaded
+  uploadedById String
+  uploadedBy   User   @relation("PartnerDocumentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  // Targeting: if brokerProfileId is null → shared with ALL brokers
+  brokerProfileId String?
+//   brokerProfile   BrokerProfile? @relation(fields: [brokerProfileId], references: [id], onDelete: Cascade)
+
+  // Optionally linked to a specific project
+  partnerProjectId String?
+//   partnerProject   PartnerProject? @relation(fields: [partnerProjectId], references: [id], onDelete: SetNull)
+
+  isRead Boolean   @default(false)
+  readAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([brokerProfileId])
+  @@index([partnerProjectId])
+  @@index([category])
+}
+
+model PaymentSettings {
+  id       String  @id @default(cuid())
+  type     String // BANK | UPI
+  isActive Boolean @default(true)
+
+  // Bank details
+  accountHolderName String?
+  bankName          String?
+  accountNumber     String?
+  ifscCode          String?
+  branch            String?
+  accountType       String? // SAVINGS | CURRENT
+
+  // UPI details
+  upiId     String?
+  upiName   String?
+  qrCodeUrl String?
+
+  updatedById String?
+  updatedBy   User?   @relation("PaymentSettingsUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type, isActive])
+}
+
+model Role {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Permission {
+  id          String  @id @default(cuid())
+  name        String  @unique // e.g., "users:read", "users:write"
+  description String?
+
+  rolePermissions RolePermission[]
+
+  createdAt DateTime @default(now())
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  resource  String
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type       String // TASK_ASSIGNED, TASK_UPDATED, LEAVE_UPDATED, WORK_REPORT_REVIEWED, NEW_LEAD, FOLLOW_UP_DUE, PROPOSAL_UPDATED, ANNOUNCEMENT, DOCUMENT_SHARED, SECURITY_EVENT, SYSTEM_EVENT
+  title      String
+  message    String
+  isRead     Boolean   @default(false)
+  readAt     DateTime?
+  link       String? // Optional URL to redirect to
+  entityType String?
+  entityId   String?
+  priority   String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  dedupKey   String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([dedupKey])
+}
+
+model Document {
+  id              String  @id @default(cuid())
+  title           String
+  description     String?
+  category        String // COMPANY_POLICY, GUIDELINE, FORM, HR_DOCUMENT, PROJECT_DOCUMENT, CLIENT_DOCUMENT, TEMPLATE, INTERNAL_RESOURCE
+  fileUrl         String
+  storageKey      String?
+  mimeType        String?
+  size            Int?
+  visibility      String  @default("COMPANY") // COMPANY, DEPARTMENT, ROLE, PROJECT, PRIVATE, USERS
+  visibilityScope String?
+  currentVersion  Int     @default(1)
+  isArchived      Boolean @default(false)
+
+  uploadedById String
+  uploadedBy   User   @relation("DocumentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  versions    DocumentVersion[]
+  permissions DocumentPermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([visibility])
+  @@index([uploadedById])
+  @@index([isArchived])
+}
+
+model SecurityEvent {
+  id        String  @id @default(cuid())
+  userId    String?
+  user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventType String // LOGIN_SUCCESS, LOGIN_FAILED, ROLE_CHANGED, PERMISSION_CHANGED, SENSITIVE_EXPORT, SUSPICIOUS_ACCESS
+  ipAddress String?
+  userAgent String?
+  details   Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+model OrganizationSetting {
+  id          String  @id @default(cuid())
+  key         String  @unique
+  value       Json
+  updatedById String?
+
+  updatedAt DateTime @updatedAt
+}
+
+model EmailLog {
+  id          String  @id @default(cuid())
+  toEmail     String
+  templateKey String
+  subject     String
+  status      String  @default("SENT") // SENT, FAILED
+  error       String?
+  metadata    Json?
+
+  sentAt DateTime @default(now())
+
+  @@index([toEmail])
+  @@index([templateKey])
+}
+
+model EmailTemplate {
+  id        String  @id @default(cuid())
+  key       String  @unique
+  subject   String
+  htmlBody  String
+  textBody  String
+  variables Json? // Array of allowed variable names
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BackgroundJob {
+  id          String    @id @default(cuid())
+  jobType     String // NOTIFICATION_SEND, EMAIL_RETRY, REMINDER_DELIVERY, ANNOUNCEMENT_SCHEDULE, DOCUMENT_EXPIRY
+  status      String    @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  payload     Json?
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3)
+  scheduledAt DateTime  @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+  error       String?
+
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([jobType])
+}
+
+model UserPreference {
+  id                 String  @id @default(cuid())
+  userId             String  @unique
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailNotifications Boolean @default(true)
+  inAppNotifications Boolean @default(true)
+  timezone           String  @default("UTC")
+  theme              String  @default("dark")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DocumentVersion {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  versionNumber Int     @default(1)
+  fileUrl       String
+  storageKey    String?
+  size          Int?
+  mimeType      String?
+  changeNotes   String?
+
+  uploadedById String
+  uploadedBy   User   @relation("VersionUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([documentId, versionNumber])
+  @@index([documentId])
+  @@index([uploadedById])
+}
+
+model DocumentPermission {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  userId      String?
+  user        User?   @relation("UserDocumentPermissions", fields: [userId], references: [id], onDelete: Cascade)
+  role        String? // FOUNDER, CO_FOUNDER, ADMIN, EMPLOYEE
+  accessLevel String  @default("VIEW") // VIEW, EDIT, ADMIN
+
+  createdAt DateTime @default(now())
+
+  @@index([documentId])
+  @@index([userId])
+}
+
+model Activity {
+  id      String  @id @default(cuid())
+  actorId String?
+  actor   User?   @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  action     String // CREATED, UPDATED, DELETED, ASSIGNED, APPROVED, REJECTED, PUBLISHED, ARCHIVED, UPLOADED, EXPORTED, CONVERTED
+  entityType String // TASK, LEAVE, REPORT, PROJECT, ANNOUNCEMENT, DOCUMENT, LEAD, OPPORTUNITY, CLIENT, USER, SYSTEM
+  entityId   String?
+  summary    String
+  metadata   Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+model CommunicationTemplate {
+  id        String  @id @default(cuid())
+  key       String  @unique
+  category  String  @default("EMAIL") // EMAIL, NOTIFICATION, ANNOUNCEMENT, REPORT
+  name      String
+  subject   String?
+  content   String
+  variables Json? // Array of allowed variable names
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([key])
+}
+
+model KnowledgeDocument {
+  id              String   @id @default(cuid())
+  title           String
+  category        String   @default("COMPANY") // COMPANY, SERVICES, PROCESS, PRICING, FAQ, PORTFOLIO, TECHNOLOGY, CONTACT, INDUSTRIES
+  sourceType      String   @default("MANUAL") // MANUAL, WEBSITE_PAGE, DOCUMENT
+  sourceReference String?
+//   content         String   @db.Text
+  status          String   @default("DRAFT") // DRAFT, REVIEW, PUBLISHED, ARCHIVED
+  version         Int      @default(1)
+//   tags            String[]
+
+  createdById String?
+  createdBy   User?   @relation("KnowledgeCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedById String?
+  updatedBy   User?   @relation("KnowledgeUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([status])
+  @@index([createdById])
+}
+
+model ChatKnowledgeGap {
+  id         String    @id @default(cuid())
+  question   String
+  intent     String    @default("UNKNOWN")
+  frequency  Int       @default(1)
+  status     String    @default("OPEN") // OPEN, ADDRESSED, IGNORED
+  resolvedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([intent])
+}
+
+model ChatFeedback {
+  id             String  @id @default(cuid())
+  conversationId String
+  rating         String // HELPFUL, NOT_HELPFUL
+  comment        String?
+  messageContent String?
+
+  createdAt DateTime @default(now())
+
+  @@index([rating])
+  @@index([conversationId])
+}
+
+model PortfolioProject {
+  id               String        @id @default(cuid())
+  organizationId   String?
+  organization     Organization? @relation(fields: [organizationId], references: [id])
+  slug             String        @unique
+  title            String
+  category         String
+  industry         String
+  shortDescription String
+//   fullDescription  String        @db.Text
+//   problem          String        @db.Text
+//   solution         String        @db.Text
+//   features         String[]
+//   technologies     String[]
+  client           String?
+  liveUrl          String?
+  githubUrl        String?
+  thumbnail        String
+  heroImage        String
+//   gallery          String[]
+
+  status       String  @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  featured     Boolean @default(false)
+  displayOrder Int     @default(0)
+
+  seoTitle       String?
+  seoDescription String?
+
+  createdById String?
+  createdBy   User?   @relation("PortfolioCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+  archivedAt  DateTime?
+
+  @@index([status])
+  @@index([slug])
+  @@index([organizationId])
+  @@index([featured])
+}
+

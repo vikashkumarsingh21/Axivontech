@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/@prisma/client/broker"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("BROKER_DATABASE_URL")
+}
+
+model BrokerProfile {
+  commissions  Commission[]
+  id           String       @id @default(cuid())
+  userId       String       @unique
+//   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referralCode String?      @unique
+  partnerId    String?      @unique
+
+  companyName String?
+  designation String?
+  whatsapp    String?
+  city        String?
+  state       String?
+  country     String?
+  website     String?
+
+  // Relations
+//   partnerDocuments PartnerDocument[]
+//   partnerProjects  PartnerProject[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([referralCode])
+}
+
+model CommissionRule {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  type        String   @default("PERCENTAGE") // PERCENTAGE, FIXED
+  value       Float
+  isActive    Boolean  @default(true)
+  createdById String?
+//   createdBy   User?    @relation("CommissionRuleCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  commissions Commission[]
+}
+
+model Commission {
+  id               String         @id @default(cuid())
+  partnerProjectId String         @unique
+//   partnerProject   PartnerProject @relation(fields: [partnerProjectId], references: [id], onDelete: Cascade)
+  brokerProfileId  String
+  brokerProfile    BrokerProfile  @relation(fields: [brokerProfileId], references: [id], onDelete: Cascade)
+
+  commissionRuleId String?
+  commissionRule   CommissionRule? @relation(fields: [commissionRuleId], references: [id], onDelete: SetNull)
+
+  projectValue     Float
+  commissionType   String @default("PERCENTAGE")
+  commissionRate   Float?
+  commissionAmount Float
+  currency         String @default("INR")
+
+  status String @default("PENDING")
+  // PENDING, ELIGIBLE, APPROVED, PROCESSING, PAID, CANCELLED, REJECTED
+
+  eligibleAt   DateTime?
+  approvedAt   DateTime?
+  approvedById String?
+//   approvedBy   User?     @relation("CommissionApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+
+  paidAt   DateTime?
+  paidById String?
+//   paidBy   User?     @relation("CommissionPayer", fields: [paidById], references: [id], onDelete: SetNull)
+
+  notes           String?
+  payoutReference String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([brokerProfileId])
+  @@index([status])
+}
+
+model BusinessPartnerApplication {
+  id                 String   @id @default(cuid())
+  applicationId      String   @unique
+  
+  fullName           String
+  email              String   @unique
+  phone              String
+  country            String
+  state              String?
+  city               String
+
+  occupation         String
+  currentWork        String?
+  yearsOfExperience  Int?
+//   relevantExperience String?  @db.Text
+//   clientNetwork      String?  @db.Text
+
+  education10th      Json     
+  education12th      Json?    
+  educationUndergrad Json?  
+
+//   motivation         String?  @db.Text
+//   contribution       String?  @db.Text
+//   additionalInfo     String?  @db.Text
+
+  emailVerifiedAt    DateTime?
+  verificationToken  String?
+
+  status             String   @default("SUBMITTED") 
+//   decisionReason     String?  @db.Text
+
+  reviewedById       String?
+//   reviewedBy         User?    @relation("ApplicationReviewer", fields: [reviewedById], references: [id])
+  
+  reviewedAt         DateTime?
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  meetings           ApplicationMeeting[]
+  statusHistory      ApplicationStatusHistory[]
+
+  @@index([status])
+  @@index([email])
+}
+
+model ApplicationMeeting {
+  id               String                     @id @default(cuid())
+  applicationId    String
+  application      BusinessPartnerApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  
+  meetingDate      DateTime
+  durationMinutes  Int       @default(30)
+  meetingType      String    @default("ONLINE") 
+  locationOrLink   String?
+  status           String    @default("SCHEDULED") 
+//   notes            String?   @db.Text
+
+  createdById      String?
+//   createdBy        User?     @relation("ApplicationMeetingCreator", fields: [createdById], references: [id])
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([applicationId])
+  @@index([status])
+}
+
+model ApplicationStatusHistory {
+  id               String                     @id @default(cuid())
+  applicationId    String
+  application      BusinessPartnerApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  previousStatus   String?
+  newStatus        String
+//   reason           String?    @db.Text
+  
+  changedById      String?
+//   changedBy        User?      @relation("ApplicationStatusChanger", fields: [changedById], references: [id])
+
+  createdAt        DateTime   @default(now())
+
+  @@index([applicationId])
+}
+

@@ -1,0 +1,398 @@
+[
+  {
+    "model": "Organization",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "User",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "Role",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "Permission",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "UserRole",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "RolePermission",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "Session",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "AuditLog",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "SecurityEvent",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "OrganizationSetting",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "Notification",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "BackgroundJob",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "EmailLog",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "EmailTemplate",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "CommunicationTemplate",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "UserPreference",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "Activity",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "Document",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "DocumentVersion",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "DocumentPermission",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "PartnerDocument",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "PaymentSettings",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "KnowledgeDocument",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "ChatKnowledgeGap",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "ChatFeedback",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "PortfolioProject",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "Attendance",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "AttendanceBreak",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "AttendancePolicy",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "RegularizationRequest",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "Holiday",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "Task",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "TaskComment",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "WorkReport",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "LeaveRequest",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "Project",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "ProjectMember",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "ExecutiveProfile",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "ApprovalRequest",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "Reminder",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "Announcement",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "AutomationWorkflow",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "AutomationExecution",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "QaIssue",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "PartnerProject",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "PartnerProjectMilestone",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "PartnerProjectMember",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "PartnerContract",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "PartnerContractVersion",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "PartnerPayment",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "Lead",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "LeadActivity",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "FollowUp",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "LeadNote",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "LeadMeeting",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "PipelineStage",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "Opportunity",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "Proposal",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "CrmClient",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "ClientContact",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "BrokerProfile",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "CommissionRule",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "Commission",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "BusinessPartnerApplication",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  },
+  {
+    "model": "ApplicationMeeting",
+    "source": 0,
+    "target": 0,
+    "status": "PASS (Empty)"
+  },
+  {
+    "model": "ApplicationStatusHistory",
+    "source": -1,
+    "target": -1,
+    "status": "ERROR"
+  }
+]

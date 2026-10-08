@@ -10,6 +10,7 @@ const IndustriesWeServe = dynamic(() => import("@/components/IndustriesWeServe")
 const Portfolio = dynamic(() => import("@/components/Portfolio"));
 const Process = dynamic(() => import("@/components/Process"));
 const FAQ = dynamic(() => import("@/components/FAQ"));
+const ClientReviews = dynamic(() => import("@/components/ClientReviews"));
 const CTA = dynamic(() => import("@/components/CTA"));
 
 export const metadata: Metadata = createPageMetadata({
@@ -36,6 +37,7 @@ export default function Home() {
       <IndustriesWeServe />
       <Portfolio />
       <Process />
+      <ClientReviews />
       <FAQ />
       <CTA />
     </>
