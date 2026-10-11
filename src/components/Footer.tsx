@@ -11,6 +11,7 @@ import { motion, type Variants } from "framer-motion";
 import { Mail, Globe, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 interface FooterLink {
@@ -108,6 +109,13 @@ function FooterAccordion({
 }
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  // Do not render global Axivon footer on individual demo projects (which have their own dedicated footer)
+  if (pathname?.startsWith("/demo-projects/") && pathname !== "/demo-projects") {
+    return null;
+  }
+
   return (
     <footer className="border-t border-[#262626] bg-[#0c0c0d] py-10 sm:py-16 text-[#a1a1aa]">
       <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-10">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
+import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import ContactHero from "@/components/contact/ContactHero";
 import ContactOptions from "@/components/contact/ContactOptions";
@@ -42,7 +43,9 @@ export default function ContactPage() {
       <ContactOptions />
       
       {/* Sections 03 & 04 (Two-column layout) */}
-      <ContactForm />
+      <Suspense fallback={<div className="min-h-[400px] bg-[#0f0f0f]" />}>
+        <ContactForm />
+      </Suspense>
       
       {/* Section 05 */}
       <ContactTrust />

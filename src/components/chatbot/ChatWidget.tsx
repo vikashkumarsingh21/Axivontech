@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Sparkles, MessageSquare, ChevronDown } from "lucide-react";
 import { Message } from "./types";
@@ -11,6 +12,7 @@ import { TypingIndicator } from "./TypingIndicator";
 import { MessageInput } from "./MessageInput";
 
 export default function ChatWidget() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -109,6 +111,10 @@ export default function ChatWidget() {
       prev.map(m => m.isLeadCapture ? { ...m, isLeadCapture: false } : m)
     );
   };
+
+  if (pathname?.startsWith("/demo-projects/") && pathname !== "/demo-projects") {
+    return null;
+  }
 
   return (
     <aside className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col items-end">
