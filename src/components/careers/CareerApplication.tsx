@@ -335,7 +335,6 @@ function BenefitCard({ benefit, index }: { benefit: typeof BENEFITS[0]; index: n
       viewport={{ once: true }}
       whileHover={{ y: -6, scale: 1.05 }}
       animate={{ y: [0, -4, 0] }}
-      // @ts-ignore — framer-motion animate + whileHover both work
       style={{ animationDelay: `${index * 0.3}s` }}
       className="relative p-3 rounded-xl cursor-default group"
     >
@@ -509,12 +508,26 @@ if (!emailRegex.test(form.email)) {
 
 
 
-  const particles = Array.from({ length: 18 }, (_, i) => ({
-    x: Math.random() * 100, y: Math.random() * 100,
-    size: Math.random() * 3 + 1.5,
-    delay: Math.random() * 4,
-    duration: 4 + Math.random() * 4,
-  }));
+  const particles = [
+    { x: 12, y: 15, size: 2.4, delay: 0.5, duration: 5.2 },
+    { x: 28, y: 72, size: 3.1, delay: 1.2, duration: 6.8 },
+    { x: 45, y: 33, size: 1.8, delay: 2.1, duration: 4.5 },
+    { x: 67, y: 84, size: 2.6, delay: 0.8, duration: 7.1 },
+    { x: 82, y: 22, size: 3.5, delay: 1.7, duration: 5.9 },
+    { x: 91, y: 65, size: 2.0, delay: 3.0, duration: 6.2 },
+    { x: 15, y: 88, size: 2.8, delay: 2.4, duration: 5.5 },
+    { x: 38, y: 12, size: 3.2, delay: 0.2, duration: 7.4 },
+    { x: 55, y: 58, size: 1.9, delay: 1.9, duration: 4.8 },
+    { x: 74, y: 41, size: 2.5, delay: 3.3, duration: 6.0 },
+    { x: 88, y: 79, size: 3.0, delay: 0.9, duration: 5.7 },
+    { x: 22, y: 45, size: 2.2, delay: 2.7, duration: 6.5 },
+    { x: 61, y: 18, size: 3.4, delay: 1.4, duration: 7.0 },
+    { x: 33, y: 92, size: 2.1, delay: 0.6, duration: 5.1 },
+    { x: 79, y: 52, size: 2.7, delay: 2.0, duration: 6.4 },
+    { x: 5, y: 38, size: 3.3, delay: 3.1, duration: 5.8 },
+    { x: 95, y: 10, size: 1.7, delay: 1.1, duration: 4.6 },
+    { x: 48, y: 76, size: 2.9, delay: 2.5, duration: 6.9 },
+  ];
 
   return (
     <section

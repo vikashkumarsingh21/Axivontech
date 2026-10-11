@@ -8,6 +8,21 @@ export default function AdminDashboard() {
   const [activity, setActivity] = useState<any[]>([]);
   const [pendingLeaves, setPendingLeaves] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [greeting, setGreeting] = useState("Welcome");
+
+  const formatAction = (action: string) => action.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+
+  const calculateTimeAgo = (dateStr: string, referenceTime: number) => {
+    const time = new Date(dateStr).getTime();
+    if (isNaN(time)) return "";
+    const diff = Math.max(0, referenceTime - time);
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "Just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
+  };
 
   const load = async () => {
     setLoading(true);
@@ -20,7 +35,12 @@ export default function AdminDashboard() {
       if (summaryRes.ok) setData(await summaryRes.json());
       if (auditRes.ok) {
         const d = await auditRes.json();
-        setActivity(d.data || []);
+        const nowMs = Date.now();
+        const formattedActivity = (d.data || []).map((item: any) => ({
+          ...item,
+          timeAgoFormatted: calculateTimeAgo(item.createdAt, nowMs),
+        }));
+        setActivity(formattedActivity);
       }
       if (leavesRes.ok) {
         const d = await leavesRes.json();
@@ -30,22 +50,11 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
-
-  const now = new Date();
-  const hour = now.getHours();
-  const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
-
-  const formatAction = (action: string) => action.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-  const timeAgo = (dateStr: string) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return "Just now";
-    if (mins < 60) return `${mins}m ago`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${hrs}h ago`;
-    return `${Math.floor(hrs / 24)}d ago`;
-  };
+  useEffect(() => {
+    const hour = new Date().getHours();
+    setGreeting(hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening");
+    load();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -101,7 +110,7 @@ export default function AdminDashboard() {
                     <p className="text-sm text-white truncate">{formatAction(log.action)}</p>
                     <p className="text-xs text-gray-500">{log.resource} · {log.user?.name || "System"}</p>
                   </div>
-                  <span className="text-xs text-gray-600 whitespace-nowrap">{timeAgo(log.createdAt)}</span>
+                  <span className="text-xs text-gray-600 whitespace-nowrap">{log.timeAgoFormatted}</span>
                 </div>
               ))}
             </div>

@@ -11,10 +11,6 @@ export default function BrokerProjectsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  useEffect(() => {
-    fetchProjects();
-  }, [search, statusFilter]);
-
   const fetchProjects = async () => {
     setLoading(true);
     try {
@@ -32,6 +28,10 @@ export default function BrokerProjectsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchProjects();
+  }, [search, statusFilter]);
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">

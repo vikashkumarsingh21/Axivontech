@@ -38,13 +38,16 @@ interface EmployeeSidebarProps {
   onClose: () => void;
 }
 
-export function EmployeeSidebar({ isOpen, onClose }: EmployeeSidebarProps) {
-  const pathname = usePathname();
+interface SidebarInnerProps {
+  pathname: string;
+  onClose: () => void;
+}
 
+function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(href + "/");
 
-  const SidebarContent = () => (
+  return (
     <div className="flex flex-col h-full bg-[#0a0a0a] border-r border-white/5 w-64 pt-6">
       {/* Logo + Close Button (mobile) */}
       <div className="px-6 pb-6 border-b border-white/5 flex items-center justify-between">
@@ -110,12 +113,16 @@ export function EmployeeSidebar({ isOpen, onClose }: EmployeeSidebarProps) {
       </div>
     </div>
   );
+}
+
+export function EmployeeSidebar({ isOpen, onClose }: EmployeeSidebarProps) {
+  const pathname = usePathname();
 
   return (
     <>
       {/* Desktop: always visible static sidebar */}
       <div className="hidden lg:flex h-full shrink-0">
-        <SidebarContent />
+        <SidebarInner pathname={pathname} onClose={onClose} />
       </div>
 
       {/* Mobile/Tablet: slide-in drawer */}
@@ -124,7 +131,7 @@ export function EmployeeSidebar({ isOpen, onClose }: EmployeeSidebarProps) {
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <SidebarContent />
+        <SidebarInner pathname={pathname} onClose={onClose} />
       </div>
     </>
   );

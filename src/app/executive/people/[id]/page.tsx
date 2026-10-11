@@ -34,10 +34,6 @@ export default function UserDetailPage() {
   const [roleForm, setRoleForm] = useState("");
   const [passwordForm, setPasswordForm] = useState({ newPassword: "", confirmPassword: "" });
 
-  useEffect(() => {
-    fetchUser();
-  }, [id]);
-
   const fetchUser = async () => {
     try {
       const res = await fetch(`/api/v1/executive/people/${id}`);
@@ -52,6 +48,10 @@ export default function UserDetailPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUser();
+  }, [id]);
 
   const handleUpdate = async (type: "email" | "status" | "role" | "password") => {
     if (!confirm(`Are you sure you want to perform this sensitive action?`)) return;

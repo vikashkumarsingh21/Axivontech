@@ -56,10 +56,6 @@ export default function EmployeeProfilePage() {
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
   const fetchProfile = async () => {
     try {
       setLoading(true);
@@ -87,6 +83,10 @@ export default function EmployeeProfilePage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

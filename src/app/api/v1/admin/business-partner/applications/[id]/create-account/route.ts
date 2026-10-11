@@ -30,7 +30,7 @@ export async function POST(
     }
 
     // Check if the user already exists
-    let user = await db.user.findUnique({
+    const user = await db.user.findUnique({
       where: { email: application.email },
     });
 

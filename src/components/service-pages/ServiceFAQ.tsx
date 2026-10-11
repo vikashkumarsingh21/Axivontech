@@ -84,11 +84,11 @@ function FloatingParticles() {
     () =>
       Array.from({ length: 18 }, (_, i) => ({
         id: i,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        size: 1.5 + Math.random() * 2.5,
-        duration: 10 + Math.random() * 14,
-        delay: Math.random() * 6,
+        left: ((i * 41 + 17) % 94) + 3,
+        top: ((i * 53 + 23) % 94) + 3,
+        size: 1.5 + ((i * 5) % 3) * 0.8,
+        duration: 10 + ((i * 7) % 14),
+        delay: (i * 2) % 6,
         hue: i % 3 === 0 ? "#d4915c" : i % 3 === 1 ? "#e8a064" : "#c9922a",
       })),
     []

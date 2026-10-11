@@ -53,7 +53,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
       
       // BP-0904: Client Account Creation
       // Only create if there's no clientUserId linked and no existing user with that email
-      let clientUserId = project.clientUserId;
+      const clientUserId = project.clientUserId;
       let isNewClient = false;
       
       if (!clientUserId) {

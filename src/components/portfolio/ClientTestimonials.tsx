@@ -265,11 +265,11 @@ function ParticlesField() {
     () =>
       Array.from({ length: 20 }, (_, i) => ({
         id: i,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        size: Math.random() * 2 + 1,
-        duration: Math.random() * 10 + 10,
-        delay: Math.random() * 6,
+        left: ((i * 37 + 13) % 95) + 2.5,
+        top: ((i * 47 + 29) % 95) + 2.5,
+        size: 1 + ((i * 7) % 3) * 0.7,
+        duration: 10 + ((i * 11) % 10),
+        delay: (i * 3) % 7,
       })),
     []
   );

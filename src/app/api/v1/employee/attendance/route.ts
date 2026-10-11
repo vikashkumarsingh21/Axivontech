@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
 
     const isWeeklyOff = policy.weeklyOffDays.includes(today.getDay());
 
-    let calc = AttendanceService.calculateDay({
+    const calc = AttendanceService.calculateDay({
       checkInAt: todayRecord?.checkInAt || null,
       checkOutAt: todayRecord?.checkOutAt || null,
       breaks: todayRecord?.breaks || [],
