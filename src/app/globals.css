@@ -167,6 +167,59 @@ img {
   background-clip: text;
 }
 
+/* ── Demo project light-theme isolation ──────────────────────── */
+/* Applied to the wrapper div of light-themed demo project pages.
+   Overrides the global dark color-scheme so native form controls,
+   scrollbars, autofill backgrounds, and other browser-chrome render
+   correctly in light mode without affecting the main Axivon site. */
+.demo-light-theme {
+  color-scheme: light;
+}
+.demo-light-theme ::placeholder {
+  color: rgba(39, 35, 42, 0.4);
+}
+.demo-light-theme ::-webkit-scrollbar-track {
+  background: #f0ebe3;
+}
+.demo-light-theme ::-webkit-scrollbar-thumb {
+  background: #c8c0b8;
+}
+.demo-light-theme ::-webkit-scrollbar-thumb:hover {
+  background: #a8a098;
+}
+
+/* ── NovaCart E-Commerce Demo Theme Isolation ────────────────── */
+.novacart-theme {
+  --novacart-background: #F7F7F2;
+  --novacart-text: #1C1D1A;
+  --novacart-accent: #D8F16A;
+  --novacart-accent-hover: #c9e355;
+  --novacart-surface: #FFFFFF;
+  --novacart-secondary: #E8EBE3;
+  --novacart-muted: #696D66;
+  --novacart-border: #DCDDD5;
+  color-scheme: light;
+  background-color: var(--novacart-background);
+  color: var(--novacart-text);
+}
+.novacart-theme ::selection {
+  background: #D8F16A;
+  color: #1C1D1A;
+}
+.novacart-theme ::placeholder {
+  color: #696D66;
+}
+.novacart-theme ::-webkit-scrollbar-track {
+  background: #F7F7F2;
+}
+.novacart-theme ::-webkit-scrollbar-thumb {
+  background: #DCDDD5;
+  border-radius: 9999px;
+}
+.novacart-theme ::-webkit-scrollbar-thumb:hover {
+  background: #696D66;
+}
+
 /* ── Reduced motion ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   html {

@@ -47,7 +47,7 @@ export const metadata = {
 
 export default function MediCarePage() {
   return (
-    <div className="min-h-screen bg-white text-[#263746]">
+    <div className="demo-light-theme min-h-screen bg-white text-[#263746]">
       {/* Axivon Demo Showcase Strip */}
       <MediCareDemoStrip />
 

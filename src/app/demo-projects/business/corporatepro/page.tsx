@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 
 export default function CorporateProPage() {
   return (
-    <div className="min-h-screen bg-[#F7F5EF] text-[#252925] font-sans antialiased selection:bg-[#29483B]/20 selection:text-[#252925]">
+    <div className="demo-light-theme min-h-screen bg-[#F7F5EF] text-[#252925] font-sans antialiased selection:bg-[#29483B]/20 selection:text-[#252925]">
       {/* 1. Axivon Demo Portfolio Context Strip */}
       <CorporateProDemoStrip />
 

@@ -123,4 +123,80 @@ This document records the provenance, licensing, and usage details for all visua
   - `public/images/demo-projects/medicare/dept-neurology.jpg`: `https://images.unsplash.com/photo-1559757175-5700dde675bc` (Unsplash License, Neurology brain telemetry review)
   - `public/images/demo-projects/medicare/dept-general.jpg`: `https://images.unsplash.com/photo-1505751172876-fa1923c5c528` (Unsplash License, General Medicine clinical consultation)
 
+---
+
+## 6. Demo Projects — FoodieHub (Saffron & Stone)
+
+- **Asset**: `public/images/demo-projects/foodiehub/hero-dish.jpg`
+  - **Source Platform**: Unsplash (`unsplash.com`)
+  - **Direct URL**: `https://images.unsplash.com/photo-1585937421612-70a008356fbe`
+  - **License**: Unsplash License (Free for commercial and personal use, no attribution required).
+  - **Role**: Hero section visual showing contemporary plated Indian culinary artistry with aromatic spices.
+
+- **Asset**: `public/images/demo-projects/foodiehub/story-kitchen.jpg`
+  - **Source Platform**: Unsplash (`unsplash.com`)
+  - **Direct URL**: `https://images.unsplash.com/photo-1556910103-1c02745aae4d`
+  - **License**: Unsplash License.
+  - **Role**: Our Story culinary craftsmanship visual showing mindful kitchen preparation and fresh ingredients.
+
+- **Signature Dishes (Demonstrations)**:
+  - `public/images/demo-projects/foodiehub/sig-paneer-tikka.jpg`: `https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8` (Unsplash License, Smoked Paneer Tikka with mint emulsification)
+  - `public/images/demo-projects/foodiehub/sig-dal-makhani.jpg`: `https://images.unsplash.com/photo-1546833999-b9f581a1996d` (Unsplash License, Slow-simmered rich dal with whole spices)
+  - `public/images/demo-projects/foodiehub/sig-kulfi-dessert.jpg`: `https://images.unsplash.com/photo-1551024709-8f23befc6f87` (Unsplash License, Artisan saffron cardamom dessert)
+
+- **Dining Ambience & Experience**:
+  - `public/images/demo-projects/foodiehub/ambience-interior.jpg`: `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4` (Unsplash License, Warm contemporary dining room with atmospheric lighting)
+  - `public/images/demo-projects/foodiehub/ambience-table.jpg`: `https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c` (Unsplash License, Intimate dining table setting with ceramic tableware)
+  - `public/images/demo-projects/foodiehub/private-dining.jpg`: `https://images.unsplash.com/photo-1544025162-d76694265947` (Unsplash License, Private gathering banquet setup)
+
+- **Curated Gallery & Details**:
+  - `public/images/demo-projects/foodiehub/gallery-ingredients.jpg`: `https://images.unsplash.com/photo-1596040033229-a9821ebd058d` (Unsplash License, Handpicked spices, saffron, and botanicals)
+  - `public/images/demo-projects/foodiehub/gallery-drink.jpg`: `https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd` (Unsplash License, Artisan botanical spritz / cooler)
+  - `public/images/demo-projects/foodiehub/gallery-tandoor.jpg`: `https://images.unsplash.com/photo-1601050690597-df0568f70950` (Unsplash License, Tandoori clay oven culinary technique)
+
+---
+
+## 7. Demo Projects — EduSmart (Aurevia Academy)
+
+- **Asset**: `public/images/demo-projects/edusmart/hero-campus.jpg`
+  - **Source Platform**: Unsplash (`unsplash.com`)
+  - **Direct URL**: `https://images.unsplash.com/photo-1541339907198-e08756dedf3f`
+  - **License**: Unsplash License (Free for commercial and personal use, no attribution required).
+  - **Role**: Hero section visual showing contemporary academic university architecture and open campus grounds.
+
+- **Asset**: `public/images/demo-projects/edusmart/about-learning.jpg`
+  - **Source Platform**: Unsplash (`unsplash.com`)
+  - **Direct URL**: `https://images.unsplash.com/photo-1523240795612-9a054b0db644`
+  - **License**: Unsplash License.
+  - **Role**: Introductory section visual showing students collaborating in an inspiring modern library study space.
+
+- **Campus Life & Facilities (Demonstrations)**:
+  - `public/images/demo-projects/edusmart/campus-library.jpg`: `https://images.unsplash.com/photo-1521587760476-6c12a4b040da` (Unsplash License, Modern library and research study space)
+  - `public/images/demo-projects/edusmart/campus-creative-lab.jpg`: `https://images.unsplash.com/photo-1581092918056-0c4c3acd3789` (Unsplash License, Design thinking and creative technology studio)
+  - `public/images/demo-projects/edusmart/campus-quad.jpg`: `https://images.unsplash.com/photo-1562774053-701939374585` (Unsplash License, Historic and contemporary academic courtyard quad)
+  - `public/images/demo-projects/edusmart/academic-seminar.jpg`: `https://images.unsplash.com/photo-1524178232363-1fb2b075b655` (Unsplash License, Collaborative academic seminar discussion)
+
+- **Faculty Portraits (Sample Demonstrations)**:
+  - `public/images/demo-projects/edusmart/faculty-mira.jpg`: `https://images.unsplash.com/photo-1573496359142-b8d87734a5a2` (Unsplash License, Dr. Mira Kapoor — Business Studies)
+  - `public/images/demo-projects/edusmart/faculty-arjun.jpg`: `https://images.unsplash.com/photo-1534528741775-53994a69daeb` (Unsplash License, Arjun Mehta — Computer Science)
+  - `public/images/demo-projects/edusmart/faculty-nisha.jpg`: `https://images.unsplash.com/photo-1580894732444-8ecded7900cd` (Unsplash License, Nisha Rao — Design & Creative Studies)
+  - `public/images/demo-projects/edusmart/faculty-rohan.jpg`: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d` (Unsplash License, Rohan Malhotra — Communication Studies)
+
+---
+
+## 8. Demo Projects — NovaCart (Lifestyle E-Commerce)
+
+- **Hero & Categories**:
+  - `public/images/demo-projects/novacart/hero-lifestyle.jpg`: `https://images.unsplash.com/photo-1441986300917-64674bd600d8` (Unsplash License, Minimalist curated lifestyle flatlay)
+  - `public/images/demo-projects/novacart/cat-fashion.jpg`: `https://images.unsplash.com/photo-1511556532299-8f662fc26c06` (Unsplash License, Eyewear & personal styling accents)
+  - `public/images/demo-projects/novacart/cat-bags.jpg`: `https://images.unsplash.com/photo-1553062407-98eeb64c6a62` (Unsplash License, Ergonomic carry & travel essentials)
+  - `public/images/demo-projects/novacart/cat-home.jpg`: `https://images.unsplash.com/photo-1513519245088-0e12902e5a38` (Unsplash License, Tactile ceramics & mindful living objects)
+  - `public/images/demo-projects/novacart/cat-tech.jpg`: `https://images.unsplash.com/photo-1505740420928-5e560c06d30e` (Unsplash License, Modern workspace audio & desk accessories)
+
+- **24 Sample Product Assets**:
+  - High-resolution, royalty-free photography downloaded to `public/images/demo-projects/novacart/` covering watches, sunglasses, belts, scarves, bags, ceramics, ambient lighting, and desk hardware under the Unsplash free commercial license.
+
+
+
+
 
