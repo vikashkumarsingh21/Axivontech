@@ -1,60 +1,109 @@
 "use client";
 
 import React from "react";
-import { HeartPulse, CalendarCheck, Layers, HelpCircle } from "lucide-react";
+import { 
+  HeartPulse, 
+  Award, 
+  Clock, 
+  Users, 
+  ShieldCheck, 
+  Building2, 
+  Stethoscope,
+  Sparkles
+} from "lucide-react";
+import { motion } from "framer-motion";
 
-const TRUST_PILLARS = [
+const STATS = [
+  {
+    icon: Award,
+    stat: "25+",
+    label: "Years of Care",
+    description: "Dedicated to clinical excellence & continuous patient wellness",
+  },
   {
     icon: HeartPulse,
-    title: "Patient-Centred Approach",
-    description: "Care pathways formulated around your individual wellness needs, medical context, and comfort.",
+    stat: "99.2%",
+    label: "Patient Satisfaction",
+    description: "Evaluated through third-party clinical experience audits",
   },
   {
-    icon: CalendarCheck,
-    title: "Clear Appointment Process",
-    description: "Streamlined consultation guidance designed to reduce unnecessary clinic wait times and uncertainty.",
+    icon: Users,
+    stat: "45+",
+    label: "Board Specialists",
+    description: "Multidisciplinary consultants across 6 integrated wings",
   },
   {
-    icon: Layers,
-    title: "Dedicated Departments",
-    description: "Multispeciality departments operating in tandem to provide holistic diagnostic and clinical care.",
+    icon: Clock,
+    stat: "< 15 min",
+    label: "Average Wait Time",
+    description: "Protected consultation windows respecting patient time",
   },
-  {
-    icon: HelpCircle,
-    title: "Accessible Patient Support",
-    description: "Compassionate clinical staff ready to answer preparatory questions and assist your hospital visit.",
-  },
+];
+
+const CERTIFICATIONS = [
+  { label: "NABH Accredited Hospital" },
+  { label: "JCI International Quality Standards" },
+  { label: "ISO 9001:2015 Clinical Safety" },
+  { label: "24/7 Emergency & Acute Trauma Care" },
 ];
 
 export default function MediCareTrustStrip() {
   return (
     <section
-      aria-label="Core Patient Values"
-      className="border-y border-[#C9DED6] bg-[#EAF6F2]/60 py-10"
+      aria-label="Clinical Metrics and Trust Indicators"
+      className="border-y border-[#D4E8E0] bg-[#F0F7F4] py-12"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {TRUST_PILLARS.map((pillar) => {
-            const Icon = pillar.icon;
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-[#D4E8E0]">
+          {STATS.map((item, index) => {
+            const Icon = item.icon;
             return (
-              <div
-                key={pillar.title}
-                className="flex items-start gap-3.5 transition-transform duration-200 hover:-translate-y-0.5"
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                className={`flex flex-col ${index > 0 ? "lg:pl-8" : ""}`}
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#147D78] shadow-sm border border-[#C9DED6]">
-                  <Icon className="h-5 w-5" />
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-[#147D78] shadow-xs border border-[#D4E8E0]">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <span className="font-mono text-3xl font-extrabold tracking-tight text-[#147D78]">
+                    {item.stat}
+                  </span>
                 </div>
-                <div>
-                  <h3 className="text-base font-bold text-[#263746]">
-                    {pillar.title}
-                  </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-[#263746]/75">
-                    {pillar.description}
-                  </p>
-                </div>
-              </div>
+                <h3 className="mt-2.5 text-sm font-bold text-[#263746]">
+                  {item.label}
+                </h3>
+                <p className="mt-1 text-xs leading-relaxed text-[#4A6577]">
+                  {item.description}
+                </p>
+              </motion.div>
             );
           })}
+        </div>
+
+        {/* Accreditations Row */}
+        <div className="mt-10 pt-8 border-t border-[#D4E8E0]/70 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#147D78]">
+            <ShieldCheck className="h-4 w-4" />
+            <span>Clinical Trust Benchmarks</span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-4">
+            {CERTIFICATIONS.map((cert) => (
+              <span
+                key={cert.label}
+                className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-[#263746] shadow-xs border border-[#D4E8E0]"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-[#147D78]" />
+                {cert.label}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </section>

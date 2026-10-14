@@ -336,7 +336,7 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
                 Need Help Planning Your Software, AI, or Hardware Architecture?
               </h4>
               <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                Whether you need a custom web application, an enterprise AI integration, or technical guidance for embedded robotics development in Rajkot, Ahmedabad, or anywhere in Gujarat, our senior engineering team is ready to assist.
+                Whether you need a custom web application, an enterprise AI integration, or technical guidance for embedded robotics development across India or globally, our remote engineering team is ready to assist.
               </p>
               <div className="pt-2 flex flex-wrap gap-3">
                 <Link

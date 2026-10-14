@@ -66,7 +66,7 @@ export const servicesData: ServiceData[] = [
     shortDescription:
       "High-performance websites and web applications engineered for scale, speed, and conversions.",
     heroDescription:
-      "Axivon Technologies provides professional Website Development Services for startups, enterprises and growing businesses. We build SEO-friendly, high-performance websites........",
+      "Axivon Technologies provides professional Website Development Services for startups, enterprises, and growing businesses. We build SEO-friendly, high-performance websites and custom web applications.",
     badge: "Full-Stack Excellence",
     icon: "Globe",
     metaTitle: "Website Development Company | Custom Web Development Services | Axivon Technologies",

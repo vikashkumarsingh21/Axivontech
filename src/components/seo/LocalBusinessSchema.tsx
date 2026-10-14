@@ -1,89 +1,18 @@
+/**
+ * LocalBusinessSchema — INTENTIONALLY REMOVED
+ *
+ * Axivon Technologies operates as a remote-first company without a verified
+ * public business address. Using ProfessionalService or LocalBusiness schema
+ * requires a physical location where customers can visit. Since the business
+ * does not have an appropriate public address, this schema type is not
+ * applicable and has been removed to avoid misleading structured data.
+ *
+ * The Organization schema in OrganizationSchema.tsx covers the company's
+ * structured data needs accurately.
+ *
+ * If the company acquires a verified business location in the future,
+ * this component can be restored with accurate address information.
+ */
 export default function LocalBusinessSchema() {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-
-    name: "Axivon Technologies",
-
-    url: "https://axivontech.in",
-
-    logo: "https://axivontech.in/assets/logo/logo-full.png",
-
-    image: "https://axivontech.in/assets/logo/logo-full.png",
-
-    telephone: "+91-9473263768",
-
-    email: "contact@axivontech.in",
-
-    description:
-      "Axivon Technologies is a Website Development, Mobile App Development, AI Solutions, SEO, UI/UX Design and Software Development Company based in Rajkot, Gujarat.",
-
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Rajkot",
-      addressRegion: "Gujarat",
-      addressCountry: "IN",
-    },
-
-    areaServed: ["Rajkot", "Ahmedabad", "Gujarat", "India"],
-
-    priceRange: "$$",
-
-    sameAs: [
-      "https://www.linkedin.com/company/axivon-technologies",
-      "https://www.instagram.com/axivontechnology/",
-      "https://www.facebook.com/profile.php?id=100088604305929"
-    ],
-
-    hasOfferCatalog: {
-      "@type": "OfferCatalog",
-      name: "Technology Services",
-      itemListElement: [
-        {
-          "@type": "Offer",
-          itemOffered: {
-            "@type": "Service",
-            name: "Website Development",
-          },
-        },
-        {
-          "@type": "Offer",
-          itemOffered: {
-            "@type": "Service",
-            name: "Mobile App Development",
-          },
-        },
-        {
-          "@type": "Offer",
-          itemOffered: {
-            "@type": "Service",
-            name: "Custom Software Development",
-          },
-        },
-        {
-          "@type": "Offer",
-          itemOffered: {
-            "@type": "Service",
-            name: "AI Solutions",
-          },
-        },
-        {
-          "@type": "Offer",
-          itemOffered: {
-            "@type": "Service",
-            name: "SEO Services",
-          },
-        },
-      ],
-    },
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(schema),
-      }}
-    />
-  );
+  return null;
 }

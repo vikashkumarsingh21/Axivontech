@@ -2,13 +2,15 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, AlertCircle, Sparkles, RefreshCw, Send, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertCircle, Sparkles, RefreshCw, Send, ShieldCheck, Clock, Users } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface FormData {
   fullName: string;
   email: string;
   company: string;
   service: string;
+  timeframe: string;
   message: string;
 }
 
@@ -24,6 +26,7 @@ export default function NorthlineContact() {
     email: "",
     company: "",
     service: "Strategy & Growth",
+    timeframe: "Next 30–60 Days",
     message: "",
   });
 
@@ -35,19 +38,19 @@ export default function NorthlineContact() {
     const errs: FormErrors = {};
 
     if (!formData.fullName.trim()) {
-      errs.fullName = "Please provide your full name.";
+      errs.fullName = "Please provide your full executive name.";
     }
 
     if (!formData.email.trim()) {
-      errs.email = "Please provide your work email address.";
+      errs.email = "Please provide your corporate email address.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-      errs.email = "Please enter a valid email address.";
+      errs.email = "Please enter a valid corporate email format.";
     }
 
     if (!formData.message.trim()) {
-      errs.message = "Please describe your business inquiry.";
-    } else if (formData.message.trim().length < 10) {
-      errs.message = "Please provide at least 10 characters describing your inquiry.";
+      errs.message = "Please describe the business challenges or mandate context.";
+    } else if (formData.message.trim().length < 15) {
+      errs.message = "Please provide at least 15 characters describing your strategic inquiry.";
     }
 
     setErrors(errs);
@@ -65,7 +68,7 @@ export default function NorthlineContact() {
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
-    }, 700);
+    }, 600);
   };
 
   const handleReset = () => {
@@ -74,6 +77,7 @@ export default function NorthlineContact() {
       email: "",
       company: "",
       service: "Strategy & Growth",
+      timeframe: "Next 30–60 Days",
       message: "",
     });
     setErrors({});
@@ -84,126 +88,174 @@ export default function NorthlineContact() {
     <section
       id="contact"
       aria-label="Contact & Inquiries"
-      className="relative bg-[#F7F5EF] py-20 sm:py-28 border-b border-[#29483B]/10"
+      className="relative bg-[#F7F5EF] py-20 sm:py-28 border-b border-[#29483B]/10 overflow-hidden"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+      {/* Background Architectural Grid Lines */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.025]"
+        style={{
+          backgroundImage:
+            "linear-gradient(#29483B 1px, transparent 1px), linear-gradient(90deg, #29483B 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+        }}
+      />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-          {/* Left Column: Context & Axivon CTA */}
+          {/* Left Column: Context, Protocols & Axivon CTA */}
           <div className="lg:col-span-5 flex flex-col justify-between">
             <div>
               <div className="inline-flex items-center gap-2 mb-4">
-                <span className="h-px w-6 bg-[#B87352]" />
-                <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#B87352]">
+                <span className="h-px w-7 bg-[#B87352]" />
+                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.24em] text-[#B87352]">
                   START A CONVERSATION
                 </span>
               </div>
 
-              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-[#252925] leading-tight mb-6">
-                Let&apos;s talk about what&apos;s next.
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#252925] leading-tight mb-6">
+                Let&apos;s evaluate what&apos;s next for your enterprise.
               </h2>
 
-              <p className="text-base text-[#252925]/80 leading-relaxed mb-8">
-                Share a little about your business and the challenge you&apos;re looking to solve. We review every prospective advisory mandate with rigorous confidentiality.
+              <p className="text-base text-[#252925]/80 leading-relaxed mb-8 font-normal">
+                Share a concise overview of your operational transition or strategic questions. We review prospective client engagements with rigorous confidentiality and objectivity.
               </p>
 
-              {/* Advisory Details */}
+              {/* Advisory Discretion Protocol */}
               <div className="space-y-4 pt-6 border-t border-[#29483B]/10 text-xs sm:text-sm text-[#252925]/80">
-                <div className="flex items-start gap-3">
-                  <ShieldCheck className="h-5 w-5 text-[#29483B] shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xs bg-[#E2E9E0] text-[#29483B] shrink-0">
+                    <ShieldCheck className="h-4 w-4" />
+                  </div>
                   <div>
-                    <strong className="block text-[#252925] font-semibold">Strict Confidentiality</strong>
-                    <span>All introductory discussions are protected by reciprocal mutual discretion.</span>
+                    <strong className="block text-[#252925] font-semibold text-xs uppercase tracking-wider mb-0.5">
+                      Mutual Discretion
+                    </strong>
+                    <span className="text-xs text-[#252925]/75">
+                      All introductory consultations are strictly confidential and governed by non-disclosure standards.
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-[#29483B] shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xs bg-[#E2E9E0] text-[#29483B] shrink-0">
+                    <Clock className="h-4 w-4" />
+                  </div>
                   <div>
-                    <strong className="block text-[#252925] font-semibold">Prompt Partner Review</strong>
-                    <span>An experienced partner responds within one business day with objective feedback.</span>
+                    <strong className="block text-[#252925] font-semibold text-xs uppercase tracking-wider mb-0.5">
+                      Direct Partner Review
+                    </strong>
+                    <span className="text-xs text-[#252925]/75">
+                      A senior advisory partner reviews your inquiry and provides candid feedback within one business day.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xs bg-[#E2E9E0] text-[#29483B] shrink-0">
+                    <Users className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <strong className="block text-[#252925] font-semibold text-xs uppercase tracking-wider mb-0.5">
+                      Direct Partner Discovery
+                    </strong>
+                    <span className="text-xs text-[#252925]/75">
+                      Your introductory diagnostic is conducted directly with partners, not business development surrogates.
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Contextual Axivon Banner */}
-            <div className="mt-12 rounded-sm border border-[#29483B]/20 bg-white p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-2 text-[#e8a064]">
+            <div className="mt-12 rounded-xs border border-[#29483B]/18 bg-white p-6 shadow-xs">
+              <div className="flex items-center gap-2 mb-2 text-[#B87352]">
                 <Sparkles className="h-4 w-4 text-[#B87352]" />
-                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#B87352]">
-                  Axivon Technologies Portfolio Demo
+                <span className="text-[10px] font-bold uppercase tracking-[0.18em]">
+                  Axivon Demo Showcase
                 </span>
               </div>
-              <p className="text-xs text-[#252925]/80 leading-relaxed mb-4">
-                Looking to build a sophisticated corporate website like <span className="font-semibold text-[#29483B]">CorporatePro</span> for your own consulting or enterprise firm?
+              <p className="text-xs text-[#252925]/80 leading-relaxed mb-4 font-normal">
+                Looking to commission a bespoke corporate web platform like <strong className="font-semibold text-[#29483B]">CorporatePro</strong> for your consulting firm or enterprise?
               </p>
               <Link
                 href="/contact?project=CorporatePro#contact-form"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#29483B] hover:text-[#1f372d] uppercase tracking-wider"
+                className="group inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[#29483B] hover:text-[#1e352b]"
               >
-                <span>Request this website blueprint with Axivon</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                <span>Commission this build with Axivon</span>
+                <ArrowRight className="h-3.5 w-3.5 text-[#B87352] transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
           </div>
 
-          {/* Right Column: Interactive Form & Demo Validation */}
+          {/* Right Column: Premium Form Styling with Warm Copper Accents */}
           <div className="lg:col-span-7">
-            <div className="rounded-sm border border-[#29483B]/15 bg-white p-8 sm:p-10 shadow-sm relative">
+            <div className="rounded-xs border border-[#29483B]/18 bg-white p-8 sm:p-10 shadow-lg relative">
               {/* Frontend Demo Banner */}
-              <div className="mb-6 rounded-sm bg-[#E2E9E0]/50 p-3.5 border border-[#29483B]/10 flex items-center gap-2.5 text-xs text-[#29483B]">
+              <div className="mb-6 rounded-xs bg-[#E2E9E0]/60 p-3.5 border border-[#29483B]/10 flex items-center gap-2.5 text-xs text-[#29483B]">
                 <AlertCircle className="h-4 w-4 shrink-0 text-[#B87352]" />
-                <p className="leading-tight">
-                  <span className="font-semibold">Interactive Frontend Demonstration:</span> Form submission operates purely client-side. No private data is transmitted.
+                <p className="leading-tight font-normal">
+                  <span className="font-semibold">Interactive Showcase:</span> Validation executes client-side for demonstration purposes. No private communications are dispatched.
                 </p>
               </div>
 
               {isSubmitted ? (
                 /* Honest Success State */
-                <div className="py-8 text-center animate-in fade-in duration-300">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#E2E9E0] text-[#29483B] mb-5">
-                    <CheckCircle2 className="h-8 w-8 text-[#29483B]" />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="py-10 text-center"
+                >
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xs bg-[#29483B] text-[#F7F5EF] mb-5 shadow-xs">
+                    <CheckCircle2 className="h-7 w-7 text-[#B87352]" />
                   </div>
 
-                  <h3 className="font-serif text-2xl font-medium text-[#252925] mb-3">
-                    Demo Interaction Completed
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#B87352] block mb-2">
+                    DEMO VALIDATION COMPLETE
+                  </span>
+
+                  <h3 className="font-serif text-2xl sm:text-3xl font-normal text-[#252925] mb-3">
+                    Inquiry Verified Successfully
                   </h3>
 
-                  <p className="text-sm text-[#252925]/80 max-w-md mx-auto leading-relaxed mb-4">
-                    Thank you, <strong className="text-[#252925]">{formData.fullName}</strong>. Your test inquiry for <strong className="text-[#29483B]">{formData.service}</strong> was validated successfully.
+                  <p className="text-sm text-[#252925]/80 max-w-md mx-auto leading-relaxed mb-3 font-normal">
+                    Thank you, <strong className="text-[#252925]">{formData.fullName}</strong>. Your test inquiry for <strong className="text-[#29483B]">{formData.service}</strong> has been structured and validated against corporate requirements.
                   </p>
 
-                  <p className="text-xs text-[#77796F] max-w-sm mx-auto mb-8 leading-relaxed">
-                    As this is a fictional corporate website demonstration, no actual email has been dispatched or stored.
+                  <p className="text-xs text-[#77796F] max-w-sm mx-auto mb-8 leading-relaxed font-normal">
+                    This is a fictional advisory firm demonstration designed by Axivon Technologies.
                   </p>
 
                   <div className="flex flex-wrap items-center justify-center gap-4">
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="inline-flex items-center gap-2 rounded-sm border border-[#29483B]/20 bg-transparent px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-[#252925] hover:bg-[#F7F5EF] transition-colors"
+                      className="inline-flex items-center gap-2 rounded-xs border border-[#29483B]/25 bg-transparent px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#252925] hover:bg-[#F7F5EF] transition-colors"
                     >
-                      <RefreshCw className="h-3.5 w-3.5" />
+                      <RefreshCw className="h-3.5 w-3.5 text-[#B87352]" />
                       <span>Reset Form</span>
                     </button>
 
                     <Link
                       href="/contact?project=CorporatePro#contact-form"
-                      className="inline-flex items-center gap-2 rounded-sm bg-[#29483B] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-[#F7F5EF] hover:bg-[#1f372d] transition-colors shadow-sm"
+                      className="inline-flex items-center gap-2 rounded-xs bg-[#29483B] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#F7F5EF] hover:bg-[#1e352b] transition-colors shadow-xs"
                     >
-                      <span>Inquire with Axivon Team</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
+                      <span>Engage Axivon Team</span>
+                      <ArrowRight className="h-3.5 w-3.5 text-[#B87352]" />
                     </Link>
                   </div>
-                </div>
+                </motion.div>
               ) : (
                 /* Form Fields */
                 <form onSubmit={handleSubmit} noValidate className="space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {/* Full Name */}
                     <div>
-                      <label htmlFor="fullName" className="block text-xs font-semibold uppercase tracking-[0.1em] text-[#252925] mb-2">
-                        Full Name <span className="text-[#B87352]">*</span>
+                      <label
+                        htmlFor="fullName"
+                        className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#252925] mb-2"
+                      >
+                        Executive Name <span className="text-[#B87352]">*</span>
                       </label>
                       <input
                         type="text"
@@ -214,19 +266,22 @@ export default function NorthlineContact() {
                           if (errors.fullName) setErrors({ ...errors, fullName: undefined });
                         }}
                         placeholder="e.g. Eleanor Vance"
-                        className={`w-full rounded-sm border px-3.5 py-2.5 text-sm text-[#252925] bg-[#F7F5EF]/30 placeholder-[#77796F]/60 transition-colors focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#29483B] ${
-                          errors.fullName ? "border-[#B87352]" : "border-[#29483B]/20"
+                        className={`w-full rounded-xs border px-4 py-3 text-sm text-[#252925] bg-[#F7F5EF]/40 placeholder-[#77796F]/60 transition-all focus:bg-white focus:outline-none focus:border-[#B87352] focus:ring-1 focus:ring-[#B87352] ${
+                          errors.fullName ? "border-[#B87352] bg-red-50/20" : "border-[#29483B]/20"
                         }`}
                       />
                       {errors.fullName && (
-                        <p className="mt-1 text-xs text-[#B87352]">{errors.fullName}</p>
+                        <p className="mt-1.5 text-xs text-[#B87352] font-medium">{errors.fullName}</p>
                       )}
                     </div>
 
                     {/* Email */}
                     <div>
-                      <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-[0.1em] text-[#252925] mb-2">
-                        Work Email <span className="text-[#B87352]">*</span>
+                      <label
+                        htmlFor="email"
+                        className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#252925] mb-2"
+                      >
+                        Corporate Email <span className="text-[#B87352]">*</span>
                       </label>
                       <input
                         type="email"
@@ -237,12 +292,12 @@ export default function NorthlineContact() {
                           if (errors.email) setErrors({ ...errors, email: undefined });
                         }}
                         placeholder="e.g. eleanor@company.com"
-                        className={`w-full rounded-sm border px-3.5 py-2.5 text-sm text-[#252925] bg-[#F7F5EF]/30 placeholder-[#77796F]/60 transition-colors focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#29483B] ${
-                          errors.email ? "border-[#B87352]" : "border-[#29483B]/20"
+                        className={`w-full rounded-xs border px-4 py-3 text-sm text-[#252925] bg-[#F7F5EF]/40 placeholder-[#77796F]/60 transition-all focus:bg-white focus:outline-none focus:border-[#B87352] focus:ring-1 focus:ring-[#B87352] ${
+                          errors.email ? "border-[#B87352] bg-red-50/20" : "border-[#29483B]/20"
                         }`}
                       />
                       {errors.email && (
-                        <p className="mt-1 text-xs text-[#B87352]">{errors.email}</p>
+                        <p className="mt-1.5 text-xs text-[#B87352] font-medium">{errors.email}</p>
                       )}
                     </div>
                   </div>
@@ -250,8 +305,11 @@ export default function NorthlineContact() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {/* Company */}
                     <div>
-                      <label htmlFor="company" className="block text-xs font-semibold uppercase tracking-[0.1em] text-[#252925] mb-2">
-                        Company Name <span className="text-xs text-[#77796F] lowercase font-normal">(optional)</span>
+                      <label
+                        htmlFor="company"
+                        className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#252925] mb-2"
+                      >
+                        Enterprise / Organization <span className="text-[10px] text-[#77796F] lowercase font-normal">(optional)</span>
                       </label>
                       <input
                         type="text"
@@ -259,34 +317,63 @@ export default function NorthlineContact() {
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                         placeholder="e.g. Apex Industrial Group"
-                        className="w-full rounded-sm border border-[#29483B]/20 px-3.5 py-2.5 text-sm text-[#252925] bg-[#F7F5EF]/30 placeholder-[#77796F]/60 transition-colors focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#29483B]"
+                        className="w-full rounded-xs border border-[#29483B]/20 px-4 py-3 text-sm text-[#252925] bg-[#F7F5EF]/40 placeholder-[#77796F]/60 transition-all focus:bg-white focus:outline-none focus:border-[#B87352] focus:ring-1 focus:ring-[#B87352]"
                       />
                     </div>
 
                     {/* Service Selection */}
                     <div>
-                      <label htmlFor="service" className="block text-xs font-semibold uppercase tracking-[0.1em] text-[#252925] mb-2">
-                        Area of Interest
+                      <label
+                        htmlFor="service"
+                        className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#252925] mb-2"
+                      >
+                        Primary Advisory Vector
                       </label>
                       <select
                         id="service"
                         value={formData.service}
                         onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                        className="w-full rounded-sm border border-[#29483B]/20 px-3.5 py-2.5 text-sm text-[#252925] bg-[#F7F5EF]/30 transition-colors focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#29483B]"
+                        className="w-full rounded-xs border border-[#29483B]/20 px-4 py-3 text-sm text-[#252925] bg-[#F7F5EF]/40 transition-all focus:bg-white focus:outline-none focus:border-[#B87352] focus:ring-1 focus:ring-[#B87352]"
                       >
-                        <option value="Strategy & Growth">Strategy & Growth</option>
-                        <option value="Operational Excellence">Operational Excellence</option>
-                        <option value="Digital Transformation">Digital Transformation</option>
-                        <option value="Diagnostic Assessment">Focused Diagnostic Assessment</option>
-                        <option value="General Advisory Inquiry">General Advisory Inquiry</option>
+                        <option value="Strategy & Growth">Strategy & Growth Architecture</option>
+                        <option value="Operational Excellence">Operational Excellence & RACI</option>
+                        <option value="Digital Transformation">Digital Transformation Governance</option>
+                        <option value="Diagnostic Assessment">Focused 4-Week Diagnostic Assessment</option>
+                        <option value="General Corporate Advisory">General Corporate Advisory Inquiry</option>
                       </select>
                     </div>
                   </div>
 
-                  {/* Message */}
+                  {/* Mandate Horizon / Urgency Selector */}
                   <div>
-                    <label htmlFor="message" className="block text-xs font-semibold uppercase tracking-[0.1em] text-[#252925] mb-2">
-                      Inquiry & Context <span className="text-[#B87352]">*</span>
+                    <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#252925] mb-2">
+                      Anticipated Mandate Horizon
+                    </label>
+                    <div className="grid grid-cols-3 gap-2.5">
+                      {["Immediate (Next 30 Days)", "Next 30–60 Days", "Exploratory / H2"].map((time) => (
+                        <button
+                          key={time}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, timeframe: time })}
+                          className={`rounded-xs px-3 py-2 text-xs font-medium text-center transition-all ${
+                            formData.timeframe === time
+                              ? "bg-[#29483B] text-[#F7F5EF] shadow-xs"
+                              : "bg-[#F7F5EF]/50 text-[#252925]/80 border border-[#29483B]/15 hover:bg-[#E2E9E0]"
+                          }`}
+                        >
+                          {time}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Message Context */}
+                  <div>
+                    <label
+                      htmlFor="message"
+                      className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#252925] mb-2"
+                    >
+                      Mandate Overview & Operational Context <span className="text-[#B87352]">*</span>
                     </label>
                     <textarea
                       id="message"
@@ -296,13 +383,13 @@ export default function NorthlineContact() {
                         setFormData({ ...formData, message: e.target.value });
                         if (errors.message) setErrors({ ...errors, message: undefined });
                       }}
-                      placeholder="Briefly describe the business challenges, transitions, or strategic questions you would like to explore..."
-                      className={`w-full rounded-sm border px-3.5 py-2.5 text-sm text-[#252925] bg-[#F7F5EF]/30 placeholder-[#77796F]/60 transition-colors focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#29483B] ${
-                        errors.message ? "border-[#B87352]" : "border-[#29483B]/20"
+                      placeholder="Briefly describe the business challenges, transitions, or operational bottlenecks you are looking to address..."
+                      className={`w-full rounded-xs border px-4 py-3 text-sm text-[#252925] bg-[#F7F5EF]/40 placeholder-[#77796F]/60 transition-all focus:bg-white focus:outline-none focus:border-[#B87352] focus:ring-1 focus:ring-[#B87352] ${
+                        errors.message ? "border-[#B87352] bg-red-50/20" : "border-[#29483B]/20"
                       }`}
                     />
                     {errors.message && (
-                      <p className="mt-1 text-xs text-[#B87352]">{errors.message}</p>
+                      <p className="mt-1.5 text-xs text-[#B87352] font-medium">{errors.message}</p>
                     )}
                   </div>
 
@@ -311,17 +398,17 @@ export default function NorthlineContact() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-[#29483B] px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#F7F5EF] shadow-sm transition-all hover:bg-[#1f372d] hover:shadow-md disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#29483B]"
+                      className="group inline-flex w-full items-center justify-center gap-2 rounded-xs bg-[#29483B] px-6 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#F7F5EF] shadow-sm transition-all hover:bg-[#1e352b] hover:shadow-md disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#29483B]"
                     >
                       {isSubmitting ? (
                         <>
-                          <RefreshCw className="h-4 w-4 animate-spin" />
-                          <span>Processing Inquiry...</span>
+                          <RefreshCw className="h-4 w-4 animate-spin text-[#B87352]" />
+                          <span>Validating Client Mandate...</span>
                         </>
                       ) : (
                         <>
                           <span>Submit Advisory Inquiry</span>
-                          <Send className="h-3.5 w-3.5" />
+                          <Send className="h-3.5 w-3.5 text-[#B87352] transition-transform group-hover:translate-x-0.5" />
                         </>
                       )}
                     </button>

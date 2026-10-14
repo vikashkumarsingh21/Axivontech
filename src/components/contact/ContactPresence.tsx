@@ -57,9 +57,9 @@ export default function ContactPresence() {
                   <MapPin className="h-5 w-5 text-[#e8a064]" aria-hidden />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-[#f4f4f5]">India Operations</h3>
+                  <h3 className="text-lg font-semibold text-[#f4f4f5]">Pan-India Delivery</h3>
                   <p className="mt-1 text-sm text-[#a1a1aa] leading-relaxed">
-                    Headquartered in Muzaffarpur, Bihar. We support businesses and startups across the country with dedicated engineering teams.
+                    Operating remotely across India. We partner with fast-growing startups, enterprises, and institutions nationwide with dedicated engineering talent.
                   </p>
                 </div>
               </div>

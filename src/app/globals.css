@@ -174,6 +174,7 @@ img {
    correctly in light mode without affecting the main Axivon site. */
 .demo-light-theme {
   color-scheme: light;
+  background-image: none;
 }
 .demo-light-theme ::placeholder {
   color: rgba(39, 35, 42, 0.4);
@@ -186,6 +187,41 @@ img {
 }
 .demo-light-theme ::-webkit-scrollbar-thumb:hover {
   background: #a8a098;
+}
+
+/* ── EduSmart (Aurevia Academy) Demo Theme Isolation ─────────── */
+.edusmart-theme {
+  --edusmart-background: #F7F3EB;
+  --edusmart-text: #27232A;
+  --edusmart-text-secondary: #5A5260;
+  --edusmart-text-muted: #8E8694;
+  --edusmart-primary: #3B2A43;
+  --edusmart-accent: #C4964C;
+  --edusmart-surface: #EDE8E0;
+  --edusmart-surface-soft: #F5F0E8;
+  --edusmart-border: #D6CDBF;
+  --edusmart-highlight: #E8DDD0;
+  color-scheme: light;
+  background-color: #F7F3EB;
+  color: #27232A;
+  background-image: none;
+}
+.edusmart-theme ::selection {
+  background: #3B2A43;
+  color: #F7F3EB;
+}
+.edusmart-theme ::placeholder {
+  color: #8E8694;
+}
+.edusmart-theme ::-webkit-scrollbar-track {
+  background: #EDE8E0;
+}
+.edusmart-theme ::-webkit-scrollbar-thumb {
+  background: #D6CDBF;
+  border-radius: 9999px;
+}
+.edusmart-theme ::-webkit-scrollbar-thumb:hover {
+  background: #C4964C;
 }
 
 /* ── NovaCart E-Commerce Demo Theme Isolation ────────────────── */
@@ -218,6 +254,39 @@ img {
 }
 .novacart-theme ::-webkit-scrollbar-thumb:hover {
   background: #696D66;
+}
+
+/* ── LeadPilot CRM & SaaS Demo Theme Isolation ──────────────── */
+.leadpilot-theme {
+  --leadpilot-graphite: #252925;
+  --leadpilot-porcelain: #F6F7F4;
+  --leadpilot-white: #FFFFFF;
+  --leadpilot-jade: #2F806A;
+  --leadpilot-jade-hover: #266b58;
+  --leadpilot-sage: #E5F0EB;
+  --leadpilot-amber: #DDA34B;
+  --leadpilot-muted: #747A75;
+  --leadpilot-border: #E3E6E1;
+  color-scheme: light;
+  background-color: var(--leadpilot-porcelain);
+  color: var(--leadpilot-graphite);
+}
+.leadpilot-theme ::selection {
+  background: #E5F0EB;
+  color: #2F806A;
+}
+.leadpilot-theme ::placeholder {
+  color: #747A75;
+}
+.leadpilot-theme ::-webkit-scrollbar-track {
+  background: #F6F7F4;
+}
+.leadpilot-theme ::-webkit-scrollbar-thumb {
+  background: #E3E6E1;
+  border-radius: 9999px;
+}
+.leadpilot-theme ::-webkit-scrollbar-thumb:hover {
+  background: #747A75;
 }
 
 /* ── Reduced motion ──────────────────────────────────────────── */

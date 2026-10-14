@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, CheckCircle2, AlertCircle, Mail, MessageCircle, MapPin } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, Mail, MessageCircle, Globe2 } from "lucide-react";
 
 interface FormData {
   service: string;
@@ -144,11 +144,11 @@ export default function ContactForm() {
 
                 <div className="flex items-start gap-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
-                    <MapPin className="h-4 w-4 text-[#e8a064]" />
+                    <Globe2 className="h-4 w-4 text-[#e8a064]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-[#f4f4f5]">Location</h3>
-                    <p className="mt-1 text-sm text-[#a1a1aa]">Muzaffarpur, Bihar, India</p>
+                    <h3 className="text-sm font-medium text-[#f4f4f5]">Working Model</h3>
+                    <p className="mt-1 text-sm text-[#a1a1aa]">Remote-first — collaborating with clients across India</p>
                   </div>
                 </div>
               </div>

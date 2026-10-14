@@ -8,7 +8,7 @@ export default function OrganizationSchema() {
     url: SITE_URL,
     logo: DEFAULT_OG_IMAGE,
     description:
-      "Axivon Technologies provides Web Development, Mobile App Development, AI Solutions, Cloud Solutions, SEO Services, Digital Marketing, UI/UX Design, and Custom Software Development.",
+      "Axivon Technologies is a remote-first technology company providing Web Development, Mobile App Development, AI Solutions, Cloud Solutions, SEO Services, Digital Marketing, UI/UX Design, and Custom Software Development for businesses across India.",
     founder: {
       "@type": "Person",
       name: "Vikash Kumar",
@@ -20,13 +20,7 @@ export default function OrganizationSchema() {
       contactType: "customer support",
       email: "contact@axivontech.in",
       areaServed: "IN",
-      availableLanguage: ["English", "Hindi", "Gujarati"],
-    },
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Rajkot",
-      addressRegion: "Gujarat",
-      addressCountry: "IN",
+      availableLanguage: ["English", "Hindi"],
     },
     sameAs: [
       SOCIAL_PROFILES.linkedin,

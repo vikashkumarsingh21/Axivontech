@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 
 export default function EduSmartPage() {
   return (
-    <div className="demo-light-theme min-h-screen bg-[#F7F3EB] text-[#27232A] selection:bg-[#33243B] selection:text-white">
+    <div className="demo-light-theme edusmart-theme min-h-screen bg-[#F7F3EB] text-[#27232A] selection:bg-[#3B2A43] selection:text-[#F7F3EB]">
       {/* 1. Axivon Demo Preview Banner */}
       <EduSmartDemoStrip />
 
