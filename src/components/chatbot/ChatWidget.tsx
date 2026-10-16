@@ -10,6 +10,7 @@ import { ChatWelcome } from "./ChatWelcome";
 import { ChatMessage } from "./ChatMessage";
 import { TypingIndicator } from "./TypingIndicator";
 import { MessageInput } from "./MessageInput";
+import { isPortalOrStandaloneRoute } from "@/lib/utils";
 
 export default function ChatWidget() {
   const pathname = usePathname();
@@ -112,7 +113,8 @@ export default function ChatWidget() {
     );
   };
 
-  if (pathname?.startsWith("/demo-projects/") && pathname !== "/demo-projects") {
+  // Do not render floating public chatbot on portals, auth screens, or demo projects
+  if (isPortalOrStandaloneRoute(pathname)) {
     return null;
   }
 

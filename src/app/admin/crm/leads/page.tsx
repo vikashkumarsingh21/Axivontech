@@ -215,7 +215,7 @@ export default function LeadsPage() {
             />
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <select
               value={statusFilter}
               onChange={(e) => {
@@ -359,8 +359,8 @@ export default function LeadsPage() {
       {/* Add Lead Modal */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#141414] border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+          <div className="bg-[#141414] border border-white/10 rounded-2xl w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 sticky top-0 bg-[#141414] z-10">
               <h2 className="text-lg font-bold text-white">Create New Lead</h2>
               <button onClick={() => setIsAddOpen(false)} className="text-gray-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -375,7 +375,7 @@ export default function LeadsPage() {
             )}
 
             <form onSubmit={handleAddSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-300 mb-1">
                     Contact Name <span className="text-red-500">*</span>
@@ -404,7 +404,7 @@ export default function LeadsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-300 mb-1">Phone Number</label>
                   <input
@@ -427,7 +427,7 @@ export default function LeadsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-300 mb-1">Service Interest</label>
                   <input

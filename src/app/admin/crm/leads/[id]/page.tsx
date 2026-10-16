@@ -205,7 +205,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || "Conversion failed");
       setIsConvertOpen(false);
-      setFeedback({ type: "success", message: `🎉 Lead converted to Client ${d.data.client.clientCode}!` });
+      setFeedback({ type: "success", message: `Lead converted to Client ${d.data.client.clientCode} successfully.` });
       loadLead();
     } catch (err: any) {
       setFeedback({ type: "error", message: err.message });

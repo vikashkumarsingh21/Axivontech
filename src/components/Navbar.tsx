@@ -11,6 +11,7 @@ import {
   type Variants,
 } from "framer-motion";
 import { ChevronDown, Briefcase, Sparkles, ArrowRight } from "lucide-react";
+import { isPortalOrStandaloneRoute } from "@/lib/utils";
 
 const EASE_NAV = [0.22, 1, 0.36, 1] as const;
 
@@ -159,8 +160,8 @@ export default function Navbar() {
     return pathname.startsWith(href);
   };
 
-  // Do not render global Axivon navbar on individual demo projects (which have their own dedicated preview strip and navigation)
-  if (pathname?.startsWith("/demo-projects/") && pathname !== "/demo-projects") {
+  // Do not render global marketing navbar on portals, auth screens, or demo projects
+  if (isPortalOrStandaloneRoute(pathname)) {
     return null;
   }
 

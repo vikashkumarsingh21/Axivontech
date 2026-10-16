@@ -1,24 +1,26 @@
 @import "tailwindcss";
 
 /* ============================================================
-   AXIVON TECHNOLOGIES — PREMIUM DARK EDITORIAL DESIGN SYSTEM
-   Direction B: Dark base · Warm amber accent · Editorial type
+   AXIVON TECHNOLOGIES — PREMIUM DARK DESIGN SYSTEM
+   Blue-tinted dark base · Emerald accent · Champagne gold
    ============================================================ */
 
 :root {
-  /* ── Backgrounds ─────────────────────────────────────────── */
-  --bg-base:        #0f0f0f;   /* Page base */
-  --bg-surface:     #141414;   /* Subtle alt section */
-  --bg-panel:       #1c1c1e;   /* Card / panel surface */
-  --bg-panel-2:     #242424;   /* Elevated panel */
-  --bg-panel-hover: #2a2a2a;   /* Panel hover state */
+  /* ── Backgrounds — Premium blue-tinted dark ───────────────── */
+  --bg-base:        #0B0D10;   /* Page base */
+  --bg-surface:     #101318;   /* Secondary / alt section */
+  --bg-panel:       #151A21;   /* Card / panel surface */
+  --bg-panel-2:     #1B222B;   /* Elevated panel / popover */
+  --bg-panel-hover: #202833;   /* Panel hover state */
+  --bg-sidebar:     #0E1116;   /* Sidebar surface */
+  --bg-input:       #10151B;   /* Input field background */
 
-  /* Light contrast sections */
+  /* Light contrast sections (public website only) */
   --bg-light:       #ffffff;
   --bg-light-alt:   #f9f9f8;
   --bg-light-soft:  #f3f3f1;
 
-  /* ── Brand Accent — Warm Amber ───────────────────────────── */
+  /* ── Brand Accent — Warm Amber (public website) ──────────── */
   --accent:         #e8a064;
   --accent-hover:   #f0b07a;
   --accent-dark:    #c47a3a;
@@ -27,11 +29,23 @@
   --accent-border:  rgba(232, 160, 100, 0.25);
   --accent-bg:      #2a1f14;   /* Very dark amber bg for badges */
 
+  /* ── Portal Accent — Emerald ─────────────────────────────── */
+  --portal-accent:       #10B981;
+  --portal-accent-hover: #059669;
+  --portal-accent-fg:    #04130E;
+  --portal-accent-soft:  rgba(16, 185, 129, 0.10);
+  --portal-accent-border:rgba(16, 185, 129, 0.25);
+
+  /* ── Secondary — Champagne Gold ──────────────────────────── */
+  --gold:           #D6B779;
+  --gold-soft:      rgba(214, 183, 121, 0.10);
+  --gold-border:    rgba(214, 183, 121, 0.25);
+
   /* ── Text ────────────────────────────────────────────────── */
-  --text-1:   #f4f4f5;    /* Primary — on dark bg */
-  --text-2:   #a1a1aa;    /* Secondary */
-  --text-3:   #71717a;    /* Muted */
-  --text-4:   #52525b;    /* Disabled / placeholder */
+  --text-1:   #F3F5F7;    /* Primary — on dark bg */
+  --text-2:   #A7B0BC;    /* Secondary */
+  --text-3:   #7E8997;    /* Muted */
+  --text-4:   #566171;    /* Disabled / placeholder */
 
   /* Text on light sections */
   --text-dark-1:  #111111;
@@ -39,38 +53,48 @@
   --text-dark-3:  #737373;
 
   /* ── Borders ─────────────────────────────────────────────── */
-  --border-1:  #262626;
-  --border-2:  #303030;
-  --border-3:  #3f3f46;
+  --border-1:  #1E2530;
+  --border-2:  #29313B;
+  --border-3:  #364152;
 
   /* Light section borders */
   --border-light-1: #e5e5e3;
   --border-light-2: #d4d4d2;
 
   /* ── Shadows ─────────────────────────────────────────────── */
-  --shadow-sm:  0 2px 8px rgba(0,0,0,0.35);
-  --shadow-md:  0 8px 24px rgba(0,0,0,0.40);
-  --shadow-lg:  0 20px 48px rgba(0,0,0,0.50);
-  --shadow-accent: 0 8px 24px rgba(232,160,100,0.15);
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.40);
+  --shadow-md:  0 8px 24px rgba(0,0,0,0.45);
+  --shadow-lg:  0 20px 48px rgba(0,0,0,0.55);
+  --shadow-accent: 0 8px 24px rgba(16,185,129,0.12);
 
   /* ── Status ──────────────────────────────────────────────── */
-  --success: #4ade80;
-  --error:   #f87171;
-  --warning: #fbbf24;
-  --info:    #60a5fa;
+  --success: #34D399;
+  --error:   #F87171;
+  --warning: #FBBF24;
+  --info:    #67C5D8;
 
   /* ── Spacing scale ───────────────────────────────────────── */
-  --section-y:     6rem;    /* py-24 */
-  --section-y-lg:  7rem;    /* py-28 */
-  --section-y-xl:  8rem;    /* py-32 */
+  --section-y:     6rem;
+  --section-y-lg:  7rem;
+  --section-y-xl:  8rem;
   --container-px:  1.5rem;
-  --container-max: 80rem;   /* max-w-7xl */
+  --container-max: 80rem;
 }
 
-/* ── Tailwind theme bridge ───────────────────────────────────── */
+/* ── Tailwind v4 theme bridge — generates bg-*, text-*, border-* utilities ── */
 @theme inline {
-  --color-background: var(--bg-base);
-  --color-foreground: var(--text-1);
+  --color-background: #0B0D10;
+  --color-foreground: #F3F5F7;
+  --color-surface: #101318;
+  --color-card: #151A21;
+  --color-elevated: #1B222B;
+  --color-inset: #10151B;
+  --color-dim: #202833;
+  --color-edge: #29313B;
+  --color-subtle: #1E2530;
+  --color-secondary: #A7B0BC;
+  --color-muted: #7E8997;
+  --color-gold: #D6B779;
   --font-sans: var(--font-geist-sans);
 }
 
@@ -86,10 +110,10 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Subtle hero ambient glow — single, restrained */
+  /* Subtle ambient glow — restrained emerald tint */
   background-image: radial-gradient(
     ellipse 80% 40% at 15% 0%,
-    rgba(232, 160, 100, 0.07),
+    rgba(16, 185, 129, 0.04),
     transparent 70%
   );
   background-attachment: fixed;

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, ChevronLeft, ChevronRight, AlertCircle, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, ChevronLeft, ChevronRight, AlertCircle, Lock, Mail, CheckCircle2, X } from "lucide-react";
 
 // Types
 interface Poster {
@@ -26,6 +26,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loggedOutNotice, setLoggedOutNotice] = useState(false);
   const router = useRouter();
 
   // Poster carousel state
@@ -34,6 +35,16 @@ export default function LoginPage() {
   const [isHovered, setIsHovered] = useState(false);
   const [progress, setProgress] = useState(0);
   const [prefersReduced, setPrefersReduced] = useState(false);
+
+  // Check URL parameters for logout notice safely
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("logged_out") === "1" || params.get("logout") === "true") {
+        setLoggedOutNotice(true);
+      }
+    }
+  }, []);
 
   // Check prefers-reduced-motion safely
   useEffect(() => {
@@ -189,9 +200,9 @@ export default function LoginPage() {
   const currentPoster = posters[currentIndex] || posters[0];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col lg:flex-row relative overflow-hidden">
+    <div className="min-h-dvh bg-[#0B0D10] flex flex-col lg:flex-row relative overflow-x-hidden">
       {/* Left panel (40% desktop, full width mobile): Login form */}
-      <div className="w-full lg:w-[40%] flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 min-h-screen bg-[#0a0a0a] z-10 border-r border-white/[0.04]">
+      <div className="w-full lg:w-[40%] flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 min-h-dvh bg-[#0B0D10] z-10 border-r border-[#1E2530] overflow-y-auto">
         {/* Top: Logo & AXIVON ONE Badge */}
         <div>
           <Link href="/" className="inline-block">
@@ -205,7 +216,7 @@ export default function LoginPage() {
             />
           </Link>
           <div className="mt-2.5">
-            <span className="inline-flex items-center text-[10px] font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="inline-flex items-center text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
               AXIVON ONE
             </span>
           </div>
@@ -225,13 +236,35 @@ export default function LoginPage() {
             transition={{ duration: prefersReduced ? 0 : 0.4, delay: prefersReduced ? 0 : 0.1 }}
             className="mb-8"
           >
-            <h1 className="text-3xl font-bold text-white tracking-tight">
+            <h1 className="text-3xl font-bold text-[#F3F5F7] tracking-tight">
               Welcome back.
             </h1>
-            <p className="text-sm text-gray-400 mt-2">
+            <p className="text-sm text-[#A7B0BC] mt-2">
               Sign in to your secure workspace.
             </p>
           </motion.div>
+
+          {/* Logged Out Success Notice */}
+          {loggedOutNotice && !error && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-5 flex items-center justify-between gap-2.5 p-3.5 rounded-lg bg-emerald-500/[0.08] border border-emerald-500/20 text-[13px] text-emerald-400"
+            >
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                <span>You have been safely signed out.</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLoggedOutNotice(false)}
+                className="text-emerald-400/70 hover:text-emerald-300 p-0.5"
+                aria-label="Dismiss notice"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </motion.div>
+          )}
 
           {/* Error Message Box */}
           {error && (
@@ -255,12 +288,12 @@ export default function LoginPage() {
             >
               <label
                 htmlFor="email"
-                className="block text-[13px] font-medium text-gray-300 mb-2"
+                className="block text-[13px] font-medium text-[#A7B0BC] mb-2"
               >
                 Work Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7E8997] pointer-events-none" />
                 <input
                   id="email"
                   type="email"
@@ -269,7 +302,7 @@ export default function LoginPage() {
                   placeholder="you@axivontech.in"
                   autoComplete="email"
                   required
-                  className="w-full h-11 pl-10 pr-3.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[14px] text-white placeholder:text-gray-600 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/30 transition-colors duration-150"
+                  className="w-full h-11 pl-10 pr-3.5 rounded-lg bg-[#10151B] border border-[#29313B] text-[16px] sm:text-[14px] text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-colors duration-150"
                 />
               </div>
             </motion.div>
@@ -282,12 +315,12 @@ export default function LoginPage() {
             >
               <label
                 htmlFor="password"
-                className="block text-[13px] font-medium text-gray-300 mb-2"
+                className="block text-[13px] font-medium text-[#A7B0BC] mb-2"
               >
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7E8997] pointer-events-none" />
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -296,12 +329,12 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   autoComplete="current-password"
                   required
-                  className="w-full h-11 pl-10 pr-11 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[14px] text-white placeholder:text-gray-600 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/30 transition-colors duration-150"
+                  className="w-full h-11 pl-10 pr-11 rounded-lg bg-[#10151B] border border-[#29313B] text-[16px] sm:text-[14px] text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-colors duration-150"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#7E8997] hover:text-[#A7B0BC] transition-colors"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   tabIndex={-1}
                 >
@@ -325,7 +358,7 @@ export default function LoginPage() {
                 disabled={loading}
                 whileHover={prefersReduced ? undefined : { scale: 1.01 }}
                 whileTap={prefersReduced ? undefined : { scale: 0.99 }}
-                className="w-full h-11 mt-1 bg-red-600 text-white font-semibold text-[14px] rounded-lg hover:bg-red-500 active:bg-red-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-[#0a0a0a] shadow-lg shadow-red-600/20"
+                className="w-full h-11 mt-1 bg-emerald-500 text-[#04130E] font-semibold text-[14px] rounded-lg hover:bg-emerald-600 active:bg-emerald-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:ring-offset-2 focus:ring-offset-[#0B0D10] shadow-lg shadow-emerald-500/20"
               >
                 {loading ? (
                   <span className="inline-flex items-center gap-2">
@@ -344,14 +377,14 @@ export default function LoginPage() {
         </motion.div>
 
         {/* Footer */}
-        <div className="pt-6 border-t border-white/[0.05] flex items-center justify-between text-xs text-gray-500">
+        <div className="pt-6 border-t border-[#1E2530] flex items-center justify-between text-xs text-[#7E8997]">
           <Link
             href="/"
-            className="hover:text-gray-300 transition-colors"
+            className="text-emerald-400 hover:text-emerald-300 transition-colors"
           >
             ← Back to website
           </Link>
-          <span className="text-gray-600">
+          <span className="text-[#566171]">
             © {new Date().getFullYear()} Axivon Technologies
           </span>
         </div>
@@ -363,7 +396,7 @@ export default function LoginPage() {
         aria-label="Featured Announcements"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="hidden lg:flex lg:w-[60%] relative flex-col justify-between overflow-hidden bg-[#0a0a0a]"
+        className="hidden lg:flex lg:w-[60%] relative flex-col justify-between overflow-hidden bg-[#0B0D10]"
       >
         {posters.length > 0 && currentPoster ? (
           <div className="relative w-full h-full flex flex-col justify-end overflow-hidden">
@@ -385,9 +418,9 @@ export default function LoginPage() {
                     aria-label={currentPoster.altText || currentPoster.title}
                   />
                 ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#1c0808] via-[#120505] to-[#0a0a0a]">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#061811] via-[#0b1f17] to-[#0B0D10]">
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-                    <div className="absolute top-1/3 left-1/3 w-96 h-96 rounded-full bg-red-600/10 blur-[100px] pointer-events-none" />
+                    <div className="absolute top-1/3 left-1/3 w-96 h-96 rounded-full bg-emerald-500/10 blur-[100px] pointer-events-none" />
                   </div>
                 )}
 
@@ -396,11 +429,11 @@ export default function LoginPage() {
 
                 {/* Bottom text */}
                 <div className="relative z-10 p-10 xl:p-16 max-w-2xl mb-8">
-                  <h3 className="text-3xl font-bold text-white tracking-tight leading-tight">
+                  <h3 className="text-3xl font-bold text-[#F3F5F7] tracking-tight leading-tight">
                     {currentPoster.title}
                   </h3>
                   {currentPoster.subtitle && (
-                    <p className="text-base text-gray-300 mt-3 leading-relaxed">
+                    <p className="text-base text-[#A7B0BC] mt-3 leading-relaxed">
                       {currentPoster.subtitle}
                     </p>
                   )}
@@ -408,7 +441,7 @@ export default function LoginPage() {
                     <div className="mt-5">
                       <Link
                         href={currentPoster.ctaUrl}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold tracking-wide transition-colors shadow-lg shadow-red-600/20"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-[#04130E] text-xs font-semibold tracking-wide transition-colors shadow-lg shadow-emerald-500/20"
                       >
                         <span>{currentPoster.ctaLabel}</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -426,7 +459,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={goToPrev}
                   aria-label="Previous slide"
-                  className="absolute left-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 hover:bg-black/70 border border-white/10 text-white backdrop-blur-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="absolute left-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-[#101318]/60 hover:bg-[#1B222B] border border-[#29313B] text-[#F3F5F7] backdrop-blur-md transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
@@ -434,7 +467,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={goToNext}
                   aria-label="Next slide"
-                  className="absolute right-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 hover:bg-black/70 border border-white/10 text-white backdrop-blur-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="absolute right-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-[#101318]/60 hover:bg-[#1B222B] border border-[#29313B] text-[#F3F5F7] backdrop-blur-md transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
@@ -452,7 +485,7 @@ export default function LoginPage() {
                     aria-label={`Go to slide ${index + 1}`}
                     className={`h-1.5 rounded-full transition-all duration-300 focus:outline-none ${
                       index === currentIndex
-                        ? "w-8 bg-red-500"
+                        ? "w-8 bg-emerald-500"
                         : "w-2 bg-white/30 hover:bg-white/60"
                     }`}
                   />
@@ -460,18 +493,18 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Progress bar: thin red line at bottom */}
+            {/* Progress bar: thin emerald line at bottom */}
             {posters.length > 1 && (
               <motion.div
-                className="absolute bottom-0 left-0 h-0.5 bg-red-500 z-30"
+                className="absolute bottom-0 left-0 h-0.5 bg-emerald-500 z-30"
                 style={{ width: `${progress}%` }}
               />
             )}
           </div>
         ) : (
           /* Fallback when no posters (empty array or fetch error) */
-          <div className="relative flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-[#0f0f0f] via-[#1a0a0a] to-[#0a0a0a] overflow-hidden">
-            {/* Red animated orb/glow effect in background */}
+          <div className="relative flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-[#0B0D10] via-[#071a12] to-[#0B0D10] overflow-hidden">
+            {/* Emerald animated orb/glow effect in background */}
             <motion.div
               animate={
                 prefersReduced
@@ -486,7 +519,7 @@ export default function LoginPage() {
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
-              className="absolute w-[500px] h-[500px] rounded-full bg-red-600/15 blur-[120px] pointer-events-none"
+              className="absolute w-[500px] h-[500px] rounded-full bg-emerald-500/15 blur-[120px] pointer-events-none"
             />
 
             {/* Subtle animated background grid */}
@@ -516,10 +549,10 @@ export default function LoginPage() {
                 className="h-12 w-auto brightness-0 invert opacity-95 mb-6"
                 priority
               />
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-snug mb-3">
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#F3F5F7] tracking-tight leading-snug mb-3">
                 Engineering Tomorrow&apos;s Infrastructure
               </h2>
-              <p className="text-sm text-gray-400 max-w-sm leading-relaxed">
+              <p className="text-sm text-[#A7B0BC] max-w-sm leading-relaxed">
                 Unified enterprise workspace, mission-critical operations, and intelligent systems.
               </p>
             </div>

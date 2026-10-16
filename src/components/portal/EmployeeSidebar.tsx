@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -17,6 +18,7 @@ import {
   Briefcase,
   X,
   User,
+  Shield,
 } from "lucide-react";
 
 const navItems = [
@@ -48,27 +50,36 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
     pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0a] border-r border-white/5 w-64 pt-6">
-      {/* Logo + Close Button (mobile) */}
-      <div className="px-6 pb-6 border-b border-white/5 flex items-center justify-between">
-        <Image
-          src="/assets/logo/logo-full.png"
-          alt="Axivon Technologies"
-          width={160}
-          height={40}
-          className="h-8 w-auto brightness-0 invert"
-        />
+    <div className="flex flex-col h-full bg-[#0E1116] border-r border-[#1E2530] w-64 pt-5 select-none shadow-xs">
+      {/* Brand Header */}
+      <div className="px-5 pb-5 border-b border-[#1E2530] flex items-center justify-between">
+        <div>
+          <Link href="/employee/dashboard" className="block transition-opacity hover:opacity-90">
+            <Image
+              src="/assets/logo/logo-full.png"
+              alt="Axivon Technologies"
+              width={140}
+              height={36}
+              className="h-7 w-auto brightness-0 invert opacity-90"
+              priority
+            />
+          </Link>
+          <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <Shield className="w-3 h-3 text-emerald-500" />
+            <span>Employee Portal</span>
+          </div>
+        </div>
         <button
           onClick={onClose}
-          className="lg:hidden p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
-          aria-label="Close sidebar"
+          className="lg:hidden p-1.5 rounded-lg text-[#566171] hover:text-[#F3F5F7] hover:bg-[#202833] transition-colors"
+          aria-label="Close navigation sidebar"
         >
-          <X className="w-4 h-4" />
+          <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Nav Items */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
+      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
@@ -77,37 +88,40 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
               key={item.name}
               href={item.href}
               onClick={onClose}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group ${
+              className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
                 active
-                  ? "bg-blue-500/15 text-blue-400 border border-blue-500/20"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25"
+                  : "text-[#A7B0BC] hover:text-[#F3F5F7] hover:bg-[#202833] border border-transparent"
               }`}
             >
-              <Icon
-                className={`w-5 h-5 shrink-0 transition-colors ${
-                  active
-                    ? "text-blue-400"
-                    : "text-gray-500 group-hover:text-blue-400"
-                }`}
-              />
-              <span>{item.name}</span>
+              <div className="flex items-center gap-3">
+                <Icon
+                  className={`w-4 h-4 shrink-0 transition-colors ${
+                    active
+                      ? "text-emerald-500"
+                      : "text-[#566171] group-hover:text-[#A7B0BC]"
+                  }`}
+                  strokeWidth={active ? 2.2 : 1.8}
+                />
+                <span>{item.name}</span>
+              </div>
               {active && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-400" />
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               )}
             </Link>
           );
         })}
       </nav>
 
-      {/* Logout */}
-      <div className="p-4 border-t border-white/5">
+      {/* Logout Footer */}
+      <div className="p-3.5 border-t border-[#1E2530] bg-[#0B0D10]/50">
         <form action="/api/v1/auth/logout" method="POST">
           <button
             type="submit"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400/80 hover:text-red-400 hover:bg-red-500/10 transition-colors text-sm font-medium"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-[#7E8997] hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 border border-transparent transition-all text-xs font-semibold"
           >
-            <LogOut className="w-5 h-5" />
-            <span>Logout</span>
+            <LogOut className="w-4 h-4 text-[#566171] group-hover:text-red-400" />
+            <span>Sign Out</span>
           </button>
         </form>
       </div>
@@ -117,6 +131,16 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
 
 export function EmployeeSidebar({ isOpen, onClose }: EmployeeSidebarProps) {
   const pathname = usePathname();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   return (
     <>

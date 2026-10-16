@@ -354,8 +354,9 @@ export default function AdminDashboard() {
                         {lead.leadCode}
                       </Link>
                       {lead.isDuplicate && (
-                        <span className="block text-[10px] text-amber-400 font-sans font-medium">
-                          ⚠️ Duplicate
+                        <span className="inline-flex items-center gap-1 text-[10px] text-amber-400 font-sans font-medium">
+                          <AlertCircle className="w-3 h-3 text-amber-400" />
+                          <span>Duplicate</span>
                         </span>
                       )}
                     </td>

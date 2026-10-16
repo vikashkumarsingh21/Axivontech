@@ -13,6 +13,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { isPortalOrStandaloneRoute } from "@/lib/utils";
 
 interface FooterLink {
   label: string;
@@ -111,8 +112,8 @@ function FooterAccordion({
 export default function Footer() {
   const pathname = usePathname();
 
-  // Do not render global Axivon footer on individual demo projects (which have their own dedicated footer)
-  if (pathname?.startsWith("/demo-projects/") && pathname !== "/demo-projects") {
+  // Do not render global marketing footer on portals, auth screens, or demo projects
+  if (isPortalOrStandaloneRoute(pathname)) {
     return null;
   }
 

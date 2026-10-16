@@ -178,7 +178,7 @@ export default function ApplicationDetailPage() {
             <button 
               onClick={handleCreateAccount} 
               disabled={creatingAccount}
-              className="bg-[#e8a064] text-black font-semibold px-4 py-2 rounded-sm text-sm hover:bg-white transition-colors"
+              className="bg-[#e8a064] text-black font-semibold px-4 py-2 rounded-sm text-sm hover:bg-[#f0c090] transition-colors"
             >
               {creatingAccount ? "Creating Account..." : "Create Partner Account"}
             </button>
@@ -384,7 +384,7 @@ export default function ApplicationDetailPage() {
                   actionModal === "APPROVE" ? "bg-green-600 hover:bg-green-500 text-white" :
                   actionModal === "REJECT" ? "bg-red-600 hover:bg-red-500 text-white" :
                   actionModal === "ON_HOLD" ? "bg-yellow-600 hover:bg-yellow-500 text-white" :
-                  "bg-[#e8a064] hover:bg-white text-black"
+                  "bg-[#e8a064] hover:bg-[#f0c090] text-black"
                 }`}
               >
                 {submittingAction ? "Processing..." : "Confirm Action"}
@@ -454,7 +454,7 @@ export default function ApplicationDetailPage() {
               <button 
                 onClick={handleScheduleMeeting}
                 disabled={submittingMeeting}
-                className="px-4 py-2 text-sm font-semibold bg-[#e8a064] hover:bg-white text-black transition-colors rounded-sm"
+                className="px-4 py-2 text-sm font-semibold bg-[#e8a064] hover:bg-[#f0c090] text-black transition-colors rounded-sm"
               >
                 {submittingMeeting ? "Scheduling..." : "Schedule Meeting"}
               </button>

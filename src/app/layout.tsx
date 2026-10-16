@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
@@ -14,7 +14,6 @@ import NextTopLoader from 'nextjs-toploader';
 
 const ChatWidget = dynamic(() => import('@/components/chatbot/ChatWidget'));
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -26,6 +25,13 @@ const geistMono = Geist_Mono({
 });
 
 import { SITE_URL, SITE_NAME, DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE } from "@/lib/seo/config";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#0B0D10",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -97,8 +103,8 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-screen flex flex-col bg-[#0f0f0f] text-[#f4f4f5]">
-        <NextTopLoader color="#e8a064" showSpinner={false} />
+      <body className="min-h-screen flex flex-col bg-[#0B0D10] text-[#F3F5F7]">
+        <NextTopLoader color="#10B981" showSpinner={false} />
         <OrganizationSchema />
         <LocalBusinessSchema />
         <WebSiteSchema />

@@ -263,7 +263,7 @@ export default function EmployeesPage() {
                 : "bg-[#111111] border-white/10 text-gray-400 hover:text-white hover:border-white/20"
             }`}
           >
-            {dept === "All" ? "🏢 All Departments & Roles" : `⚡ ${dept}`}
+            {dept === "All" ? "All Departments & Roles" : dept}
           </button>
         ))}
       </div>

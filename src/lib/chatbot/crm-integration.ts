@@ -93,7 +93,7 @@ export async function createChatbotLead(
         data: recipientIds.map((userId) => ({
           userId,
           type: "SYSTEM",
-          title: `🤖 New Chatbot Lead: ${lead.name}`,
+          title: `New Chatbot Lead: ${lead.name}`,
           message: `Score: ${leadScore} | ${leadData.projectType || "General Inquiry"} | ${
             leadData.industry ? `Industry: ${leadData.industry}` : ""
           } | ${leadData.budget ? `Budget: ${leadData.budget}` : ""} (${lead.leadCode})`,

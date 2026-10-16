@@ -25,7 +25,7 @@ export default function ComingSoon({ title }: ComingSoonProps) {
 
           <div className="mt-8">
             <h2 className="text-3xl font-semibold bg-gradient-to-r from-[#e8a064] via-[#c9922a] to-[#d4915c] bg-clip-text text-transparent">
-              🚀 Coming Soon
+              Coming Soon
             </h2>
 
             <p className="mt-6 text-lg text-slate-400">

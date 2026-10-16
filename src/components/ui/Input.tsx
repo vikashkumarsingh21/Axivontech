@@ -1,21 +1,48 @@
 import * as React from "react";
-import { cn } from "./Button"; // Reusing the cn utility
+import { cn } from "./Button";
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  error?: string;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+}
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, error, leftIcon, rightIcon, ...props }, ref) => {
     return (
-      <input
-        type={type}
-        className={cn(
-          "flex h-9 w-full rounded-md border border-white/10 bg-black/50 px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 text-white",
-          className
+      <div className="relative w-full">
+        {leftIcon && (
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#566171] pointer-events-none">
+            {leftIcon}
+          </div>
         )}
-        ref={ref}
-        {...props}
-      />
+        <input
+          type={type}
+          className={cn(
+            "flex h-10 sm:h-9 w-full rounded-lg border border-[#29313B] bg-[#10151B] px-3 py-1.5 text-base sm:text-sm text-[#F3F5F7] shadow-xs transition-colors",
+            "placeholder:text-[#566171]",
+            "focus-visible:outline-none focus-visible:border-emerald-500 focus-visible:ring-2 focus-visible:ring-emerald-500/20",
+            "disabled:cursor-not-allowed disabled:bg-[#0B0D10] disabled:text-[#566171] disabled:border-[#1E2530]",
+            {
+              "pl-9": !!leftIcon,
+              "pr-9": !!rightIcon,
+              "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/20": !!error,
+            },
+            className
+          )}
+          ref={ref}
+          {...props}
+        />
+        {rightIcon && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[#566171]">
+            {rightIcon}
+          </div>
+        )}
+        {error && (
+          <p className="mt-1 text-xs text-red-400 font-medium">{error}</p>
+        )}
+      </div>
     );
   }
 );

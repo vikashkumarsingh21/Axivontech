@@ -58,7 +58,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
         clientId: client?.id,
         actorId: actor.id,
         type: "DEAL_WON",
-        title: `🎉 Deal Won: ${opp.name} (₹${opp.value})`,
+        title: `Deal Won: ${opp.name} (₹${opp.value})`,
         notes: `Marked as Won by ${actor.name}`,
       },
     });

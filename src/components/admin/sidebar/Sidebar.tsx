@@ -149,16 +149,18 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
             </Link>
           </li>
           <li>
-            <button
-              type="button"
-              className="group flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-[#B7BDC7] transition-colors duration-200 hover:bg-[#1B212A] hover:text-white"
-            >
-              <LogOut
-                size={18}
-                className="shrink-0 text-[#B7BDC7] transition-colors duration-200 group-hover:text-white"
-              />
-              {!isCollapsed && <span className="truncate">Logout</span>}
-            </button>
+            <form action="/api/v1/auth/logout" method="POST" className="w-full">
+              <button
+                type="submit"
+                className="group flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-[#B7BDC7] transition-colors duration-200 hover:bg-[#1B212A] hover:text-white"
+              >
+                <LogOut
+                  size={18}
+                  className="shrink-0 text-[#B7BDC7] transition-colors duration-200 group-hover:text-white"
+                />
+                {!isCollapsed && <span className="truncate">Logout</span>}
+              </button>
+            </form>
           </li>
         </ul>
       </div>

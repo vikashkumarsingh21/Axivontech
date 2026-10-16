@@ -60,7 +60,7 @@ export default function PipelinePage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to mark as Won.");
-      setFeedback({ type: "success", message: "🎉 Deal Marked as Closed Won!" });
+      setFeedback({ type: "success", message: "Deal marked as Closed Won successfully." });
       loadPipeline();
     } catch (err: any) {
       setFeedback({ type: "error", message: err.message });
