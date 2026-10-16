@@ -104,6 +104,8 @@ model User {
   createdApplicationMeetings ApplicationMeeting[]         @relation("ApplicationMeetingCreator")
   changedApplicationStatuses ApplicationStatusHistory[]     @relation("ApplicationStatusChanger")
 
+  loginPagePosters LoginPagePoster[] @relation("PosterCreator")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -1630,4 +1632,26 @@ model ClientReview {
   @@index([status])
   @@index([isFeatured])
   @@index([createdAt])
+}
+
+model LoginPagePoster {
+  id            String    @id @default(cuid())
+  title         String
+  subtitle      String?
+  imageUrl      String    @db.Text
+  altText       String?
+  ctaLabel      String?
+  ctaUrl        String?
+  displayOrder  Int       @default(0)
+  status        String    @default("DRAFT")
+  startsAt      DateTime?
+  endsAt        DateTime?
+  internalNotes String?   @db.Text
+  createdById   String?
+  createdBy     User?     @relation("PosterCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status])
+  @@index([displayOrder])
 }

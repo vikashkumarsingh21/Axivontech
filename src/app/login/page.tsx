@@ -1,18 +1,145 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { Eye, EyeOff, ChevronLeft, ChevronRight, AlertCircle, Lock, Mail } from "lucide-react";
+
+// Types
+interface Poster {
+  id: string;
+  title: string;
+  subtitle?: string;
+  imageUrl: string;
+  altText?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
+  displayOrder: number;
+}
 
 export default function LoginPage() {
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
+  // Poster carousel state
+  const [posters, setPosters] = useState<Poster[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [prefersReduced, setPrefersReduced] = useState(false);
+
+  // Check prefers-reduced-motion safely
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      setPrefersReduced(mediaQuery.matches);
+      const listener = (event: MediaQueryListEvent) => {
+        setPrefersReduced(event.matches);
+      };
+      mediaQuery.addEventListener?.("change", listener);
+      return () => mediaQuery.removeEventListener?.("change", listener);
+    }
+  }, []);
+
+  // Fetch posters on mount to avoid hydration mismatch
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchPosters() {
+      try {
+        const res = await fetch("/api/v1/public/login-posters");
+        if (!res.ok) throw new Error("Failed to fetch posters");
+        const data = await res.json();
+        const list: Poster[] = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.posters)
+          ? data.posters
+          : [];
+        if (isMounted) {
+          list.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+          setPosters(list);
+        }
+      } catch {
+        if (isMounted) {
+          setPosters([]);
+        }
+      }
+    }
+    fetchPosters();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Slide navigation callbacks
+  const goToNext = useCallback(() => {
+    if (posters.length <= 1) return;
+    setCurrentIndex((prev) => (prev + 1) % posters.length);
+    setProgress(0);
+  }, [posters.length]);
+
+  const goToPrev = useCallback(() => {
+    if (posters.length <= 1) return;
+    setCurrentIndex((prev) => (prev - 1 + posters.length) % posters.length);
+    setProgress(0);
+  }, [posters.length]);
+
+  const goToSlide = useCallback((index: number) => {
+    setCurrentIndex(index);
+    setProgress(0);
+  }, []);
+
+  // Advance slide when progress completes
+  useEffect(() => {
+    if (posters.length <= 1) return;
+
+    if (progress >= 100) {
+      setCurrentIndex((prev) => (prev + 1) % posters.length);
+      setProgress(0);
+    }
+  }, [progress, posters.length]);
+
+  // Progress bar timer: 50ms tick, 0 -> 100 over 6000ms
+  useEffect(() => {
+    if (posters.length <= 1 || isHovered) return;
+
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        const next = prev + (50 / 6000) * 100;
+        return next >= 100 ? 100 : next;
+      });
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [posters.length, isHovered]);
+
+  // Keyboard navigation support: Left / Right arrow keys
+  useEffect(() => {
+    if (posters.length <= 1) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeTag = document.activeElement?.tagName?.toLowerCase();
+      if (activeTag === "input" || activeTag === "textarea") {
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        goToPrev();
+      } else if (e.key === "ArrowRight") {
+        goToNext();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [posters.length, goToPrev, goToNext]);
+
+  // Auth form submit
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -41,125 +168,126 @@ export default function LoginPage() {
         router.push("/employee/dashboard");
       }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Helper to determine if imageUrl is a valid URL or path
+  const hasValidImage = (url?: string) => {
+    if (!url) return false;
+    const trimmed = url.trim();
+    return (
+      trimmed.startsWith("http://") ||
+      trimmed.startsWith("https://") ||
+      trimmed.startsWith("data:") ||
+      trimmed.startsWith("/")
+    );
+  };
+
+  const currentPoster = posters[currentIndex] || posters[0];
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex">
-      {/* Left Brand Panel — hidden on mobile */}
-      <div className="hidden lg:flex lg:w-[45%] xl:w-[48%] relative flex-col justify-between p-12 xl:p-16 bg-[#0e0e0e] border-r border-white/[0.04]">
-        {/* Top: Logo */}
+    <div className="min-h-screen bg-[#0a0a0a] flex flex-col lg:flex-row relative overflow-hidden">
+      {/* Left panel (40% desktop, full width mobile): Login form */}
+      <div className="w-full lg:w-[40%] flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 min-h-screen bg-[#0a0a0a] z-10 border-r border-white/[0.04]">
+        {/* Top: Logo & AXIVON ONE Badge */}
         <div>
           <Link href="/" className="inline-block">
             <Image
               src="/assets/logo/logo-full.png"
               alt="Axivon Technologies"
-              width={180}
-              height={48}
-              className="h-9 w-auto brightness-0 invert opacity-90"
-              priority
-            />
-          </Link>
-        </div>
-
-        {/* Center: Welcome messaging */}
-        <div className="max-w-md">
-          <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[#e8a064]/70 mb-5">
-            Employee Portal
-          </p>
-          <h1 className="text-[2.75rem] xl:text-5xl font-bold text-white leading-[1.1] tracking-tight mb-5">
-            Welcome<br />back.
-          </h1>
-          <p className="text-[15px] text-gray-400 leading-relaxed max-w-sm">
-            Access your Axivon employee workspace — attendance, tasks, reports, and team collaboration.
-          </p>
-        </div>
-
-        {/* Bottom: Security note */}
-        <div className="flex items-center gap-3 text-xs text-gray-500">
-          <svg className="w-4 h-4 text-gray-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-          </svg>
-          <span>Secured connection · Session managed by Axivon Technologies</span>
-        </div>
-      </div>
-
-      {/* Right Login Form Panel */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10">
-        {/* Mobile Logo — visible only on small screens */}
-        <div className="lg:hidden mb-10 text-center">
-          <Link href="/">
-            <Image
-              src="/assets/logo/logo-full.png"
-              alt="Axivon Technologies"
               width={160}
               height={44}
-              className="h-8 w-auto brightness-0 invert opacity-90 mx-auto"
+              className="h-8 sm:h-9 w-auto brightness-0 invert opacity-90"
               priority
             />
           </Link>
-          <p className="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#e8a064]/60 mt-4">
-            Employee Portal
-          </p>
+          <div className="mt-2.5">
+            <span className="inline-flex items-center text-[10px] font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              AXIVON ONE
+            </span>
+          </div>
         </div>
 
-        <div className="w-full max-w-[400px]">
-          {/* Form Header */}
-          <div className="mb-8">
-            <h2 className="text-[22px] font-semibold text-white tracking-tight">
-              Sign in to your account
-            </h2>
-            <p className="text-sm text-gray-500 mt-1.5">
-              Enter your credentials to continue.
+        {/* Center: Animated Login Form */}
+        <motion.div
+          initial={prefersReduced ? false : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: prefersReduced ? 0 : 0.5 }}
+          className="w-full max-w-[390px] mx-auto my-auto py-10"
+        >
+          {/* Welcome heading & subtext */}
+          <motion.div
+            initial={prefersReduced ? false : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: prefersReduced ? 0 : 0.4, delay: prefersReduced ? 0 : 0.1 }}
+            className="mb-8"
+          >
+            <h1 className="text-3xl font-bold text-white tracking-tight">
+              Welcome back.
+            </h1>
+            <p className="text-sm text-gray-400 mt-2">
+              Sign in to your secure workspace.
             </p>
-          </div>
+          </motion.div>
 
-          {/* Error Message */}
+          {/* Error Message Box */}
           {error && (
-            <div className="mb-5 flex items-start gap-2.5 p-3.5 rounded-lg bg-red-500/[0.07] border border-red-500/15 text-[13px] text-red-400/90">
-              <svg className="w-4 h-4 mt-0.5 shrink-0 text-red-400/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-              </svg>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-5 flex items-start gap-2.5 p-3.5 rounded-lg bg-red-500/[0.08] border border-red-500/20 text-[13px] text-red-400"
+            >
+              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-400" />
               <span>{error}</span>
-            </div>
+            </motion.div>
           )}
 
-          {/* Login Form */}
+          {/* Form */}
           <form onSubmit={handleLogin} className="space-y-5">
-            {/* Email Field */}
-            <div>
+            {/* Work Email Field */}
+            <motion.div
+              initial={prefersReduced ? false : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: prefersReduced ? 0 : 0.4, delay: prefersReduced ? 0 : 0.2 }}
+            >
               <label
-                className="block text-[13px] font-medium text-gray-300 mb-2"
                 htmlFor="email"
+                className="block text-[13px] font-medium text-gray-300 mb-2"
               >
                 Work Email
               </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                autoComplete="email"
-                className="w-full h-11 px-3.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[14px] text-white placeholder:text-gray-600 focus:outline-none focus:border-[#e8a064]/40 focus:ring-1 focus:ring-[#e8a064]/30 transition-colors duration-150"
-                required
-              />
-            </div>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@axivontech.in"
+                  autoComplete="email"
+                  required
+                  className="w-full h-11 pl-10 pr-3.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[14px] text-white placeholder:text-gray-600 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/30 transition-colors duration-150"
+                />
+              </div>
+            </motion.div>
 
             {/* Password Field */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label
-                  className="block text-[13px] font-medium text-gray-300"
-                  htmlFor="password"
-                >
-                  Password
-                </label>
-              </div>
+            <motion.div
+              initial={prefersReduced ? false : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: prefersReduced ? 0 : 0.4, delay: prefersReduced ? 0 : 0.3 }}
+            >
+              <label
+                htmlFor="password"
+                className="block text-[13px] font-medium text-gray-300 mb-2"
+              >
+                Password
+              </label>
               <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -167,63 +295,236 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   autoComplete="current-password"
-                  className="w-full h-11 px-3.5 pr-11 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[14px] text-white placeholder:text-gray-600 focus:outline-none focus:border-[#e8a064]/40 focus:ring-1 focus:ring-[#e8a064]/30 transition-colors duration-150"
                   required
+                  className="w-full h-11 pl-10 pr-11 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[14px] text-white placeholder:text-gray-600 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/30 transition-colors duration-150"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-gray-500 hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-300 transition-colors"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   tabIndex={-1}
                 >
                   {showPassword ? (
-                    <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-                    </svg>
+                    <EyeOff className="w-4 h-4" />
                   ) : (
-                    <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+                    <Eye className="w-4 h-4" />
                   )}
                 </button>
               </div>
-            </div>
+            </motion.div>
 
             {/* Sign In Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full h-11 mt-2 bg-[#e8a064] text-[#1a1a1a] font-semibold text-[14px] rounded-lg hover:bg-[#f0b07a] active:bg-[#c47a3a] transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#e8a064]/50 focus:ring-offset-2 focus:ring-offset-[#0a0a0a]"
+            <motion.div
+              initial={prefersReduced ? false : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: prefersReduced ? 0 : 0.4, delay: prefersReduced ? 0 : 0.4 }}
             >
-              {loading ? (
-                <span className="inline-flex items-center gap-2">
-                  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Signing in…
-                </span>
-              ) : (
-                "Sign In"
-              )}
-            </button>
+              <motion.button
+                type="submit"
+                disabled={loading}
+                whileHover={prefersReduced ? undefined : { scale: 1.01 }}
+                whileTap={prefersReduced ? undefined : { scale: 0.99 }}
+                className="w-full h-11 mt-1 bg-red-600 text-white font-semibold text-[14px] rounded-lg hover:bg-red-500 active:bg-red-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-[#0a0a0a] shadow-lg shadow-red-600/20"
+              >
+                {loading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Signing in…
+                  </span>
+                ) : (
+                  "Sign In"
+                )}
+              </motion.button>
+            </motion.div>
           </form>
+        </motion.div>
 
-          {/* Footer */}
-          <div className="mt-8 pt-6 border-t border-white/[0.05] flex items-center justify-between text-xs text-gray-600">
-            <Link
-              href="/"
-              className="hover:text-gray-400 transition-colors"
-            >
-              ← Back to website
-            </Link>
-            <span className="text-gray-700">
-              © {new Date().getFullYear()} Axivon Technologies
-            </span>
-          </div>
+        {/* Footer */}
+        <div className="pt-6 border-t border-white/[0.05] flex items-center justify-between text-xs text-gray-500">
+          <Link
+            href="/"
+            className="hover:text-gray-300 transition-colors"
+          >
+            ← Back to website
+          </Link>
+          <span className="text-gray-600">
+            © {new Date().getFullYear()} Axivon Technologies
+          </span>
         </div>
+      </div>
+
+      {/* Right panel (60% desktop, hidden mobile): Animated poster carousel */}
+      <div
+        role="region"
+        aria-label="Featured Announcements"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="hidden lg:flex lg:w-[60%] relative flex-col justify-between overflow-hidden bg-[#0a0a0a]"
+      >
+        {posters.length > 0 && currentPoster ? (
+          <div className="relative w-full h-full flex flex-col justify-end overflow-hidden">
+            {/* Slide animation container */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentPoster.id || currentIndex}
+                initial={prefersReduced ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={prefersReduced ? undefined : { opacity: 0 }}
+                transition={{ duration: prefersReduced ? 0 : 0.6, ease: "easeInOut" }}
+                className="absolute inset-0 flex flex-col justify-end"
+              >
+                {/* Full-panel background */}
+                {hasValidImage(currentPoster.imageUrl) ? (
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-out"
+                    style={{ backgroundImage: `url("${currentPoster.imageUrl}")` }}
+                    aria-label={currentPoster.altText || currentPoster.title}
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#1c0808] via-[#120505] to-[#0a0a0a]">
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+                    <div className="absolute top-1/3 left-1/3 w-96 h-96 rounded-full bg-red-600/10 blur-[100px] pointer-events-none" />
+                  </div>
+                )}
+
+                {/* Dark overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent pointer-events-none" />
+
+                {/* Bottom text */}
+                <div className="relative z-10 p-10 xl:p-16 max-w-2xl mb-8">
+                  <h3 className="text-3xl font-bold text-white tracking-tight leading-tight">
+                    {currentPoster.title}
+                  </h3>
+                  {currentPoster.subtitle && (
+                    <p className="text-base text-gray-300 mt-3 leading-relaxed">
+                      {currentPoster.subtitle}
+                    </p>
+                  )}
+                  {currentPoster.ctaLabel && currentPoster.ctaUrl && (
+                    <div className="mt-5">
+                      <Link
+                        href={currentPoster.ctaUrl}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold tracking-wide transition-colors shadow-lg shadow-red-600/20"
+                      >
+                        <span>{currentPoster.ctaLabel}</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Prev/Next arrow buttons */}
+            {posters.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={goToPrev}
+                  aria-label="Previous slide"
+                  className="absolute left-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 hover:bg-black/70 border border-white/10 text-white backdrop-blur-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={goToNext}
+                  aria-label="Next slide"
+                  className="absolute right-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/40 hover:bg-black/70 border border-white/10 text-white backdrop-blur-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+
+            {/* Dot pagination at bottom */}
+            {posters.length > 1 && (
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+                {posters.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => goToSlide(index)}
+                    aria-label={`Go to slide ${index + 1}`}
+                    className={`h-1.5 rounded-full transition-all duration-300 focus:outline-none ${
+                      index === currentIndex
+                        ? "w-8 bg-red-500"
+                        : "w-2 bg-white/30 hover:bg-white/60"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Progress bar: thin red line at bottom */}
+            {posters.length > 1 && (
+              <motion.div
+                className="absolute bottom-0 left-0 h-0.5 bg-red-500 z-30"
+                style={{ width: `${progress}%` }}
+              />
+            )}
+          </div>
+        ) : (
+          /* Fallback when no posters (empty array or fetch error) */
+          <div className="relative flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-[#0f0f0f] via-[#1a0a0a] to-[#0a0a0a] overflow-hidden">
+            {/* Red animated orb/glow effect in background */}
+            <motion.div
+              animate={
+                prefersReduced
+                  ? undefined
+                  : {
+                      scale: [1, 1.2, 1],
+                      opacity: [0.3, 0.5, 0.3],
+                    }
+              }
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="absolute w-[500px] h-[500px] rounded-full bg-red-600/15 blur-[120px] pointer-events-none"
+            />
+
+            {/* Subtle animated background grid */}
+            <motion.div
+              animate={
+                prefersReduced
+                  ? undefined
+                  : {
+                      backgroundPosition: ["0px 0px", "32px 32px"],
+                    }
+              }
+              transition={{
+                duration: 25,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] pointer-events-none"
+            />
+
+            {/* Center-aligned branded content */}
+            <div className="relative z-10 flex flex-col items-center text-center max-w-md px-6">
+              <Image
+                src="/assets/logo/logo-full.png"
+                alt="Axivon Technologies"
+                width={240}
+                height={64}
+                className="h-12 w-auto brightness-0 invert opacity-95 mb-6"
+                priority
+              />
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-snug mb-3">
+                Engineering Tomorrow&apos;s Infrastructure
+              </h2>
+              <p className="text-sm text-gray-400 max-w-sm leading-relaxed">
+                Unified enterprise workspace, mission-critical operations, and intelligent systems.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

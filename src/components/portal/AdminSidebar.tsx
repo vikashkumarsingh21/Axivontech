@@ -11,7 +11,7 @@ import {
   FolderOpen, Activity, Settings, LogOut, DollarSign,
   TrendingUp, Award, Clock, MessageSquare, ChevronDown, 
   ChevronRight, Building, UserCheck, ShieldCheck,
-  CreditCard, UserPlus, Layers, Sparkles
+  CreditCard, UserPlus, Layers, Sparkles, Image as ImageIcon, LayoutTemplate
 } from "lucide-react";
 
 type NavItem = {
@@ -37,6 +37,7 @@ export function AdminSidebar() {
     "Sales CRM & Leads": true,
     "Business Partner Network": true,
     "Workforce & Operations": false,
+    "Content Management": false,
     "Platform & Governance": false,
   });
 
@@ -86,6 +87,13 @@ export function AdminSidebar() {
         { name: "Work Reports", href: "/admin/work-reports", icon: FileText },
         { name: "Projects", href: "/admin/projects", icon: Briefcase },
         { name: "Tasks", href: "/admin/tasks", icon: CheckSquare },
+      ]
+    },
+    {
+      title: "Content Management",
+      icon: LayoutTemplate,
+      items: [
+        { name: "Login Page Posters", href: "/admin/content/login-posters", icon: ImageIcon },
       ]
     },
     {
