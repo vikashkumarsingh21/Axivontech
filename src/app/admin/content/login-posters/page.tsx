@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, Search, Filter, Edit, Trash2, Eye, EyeOff,
   Image as ImageIcon, Calendar, Clock, CheckCircle,
   XCircle, AlertCircle, ArrowUp, ArrowDown, RefreshCw,
-  X, Save, Loader2, LayoutTemplate, ExternalLink
+  X, Save, Loader2, LayoutTemplate, ExternalLink, Upload
 } from "lucide-react";
 
 type PosterStatus = "DRAFT" | "ACTIVE" | "SCHEDULED" | "INACTIVE";
@@ -73,18 +73,76 @@ export default function LoginPostersPage() {
   const [deleting, setDeleting] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      setSaveError("File is too large. Maximum allowed size is 10MB.");
+      return;
+    }
+
+    setUploading(true);
+    setSaveError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/v1/admin/login-posters/upload", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (res.ok && data?.url) {
+        handleFormChange("imageUrl", data.url);
+        setPreviewUrl(data.url);
+      } else {
+        // Fallback to Data URL if upload endpoint failed
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result as string;
+          handleFormChange("imageUrl", base64);
+          setPreviewUrl(base64);
+        };
+        reader.readAsDataURL(file);
+      }
+    } catch {
+      // Local FileReader fallback
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        handleFormChange("imageUrl", base64);
+        setPreviewUrl(base64);
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const fetchPosters = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/v1/admin/login-posters");
-      if (!res.ok) throw new Error("Failed to load posters");
-      const data = await res.json();
-      setPosters(data.posters || []);
-      setStats(data.stats || { total: 0, active: 0, draft: 0, scheduled: 0, inactive: 0 });
+      const res = await fetch("/api/v1/admin/login-posters", {
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error(data?.error || data?.message || `Failed to load posters (${res.status})`);
+      }
+      setPosters(data?.posters || []);
+      setStats(data?.stats || { total: 0, active: 0, draft: 0, scheduled: 0, inactive: 0 });
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message || "An unexpected error occurred while loading posters.");
     } finally {
       setLoading(false);
     }
@@ -158,25 +216,27 @@ export default function LoginPostersPage() {
         res = await fetch(`/api/v1/admin/login-posters/${editingPoster.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(body),
         });
       } else {
         res = await fetch("/api/v1/admin/login-posters", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(body),
         });
       }
 
+      const d = await res.json().catch(() => null);
       if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.error || "Save failed");
+        throw new Error(d?.error || d?.message || `Save failed (${res.status})`);
       }
 
       closeModal();
       fetchPosters();
     } catch (e: any) {
-      setSaveError(e.message);
+      setSaveError(e.message || "Failed to save poster.");
     } finally {
       setSaving(false);
     }
@@ -185,12 +245,16 @@ export default function LoginPostersPage() {
   const handleDelete = async (id: string) => {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/v1/admin/login-posters/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Delete failed");
+      const res = await fetch(`/api/v1/admin/login-posters/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const d = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(d?.error || d?.message || "Delete failed");
       setDeleteConfirm(null);
       fetchPosters();
     } catch (e: any) {
-      alert(e.message);
+      alert(e.message || "Failed to delete poster.");
     } finally {
       setDeleting(false);
     }
@@ -201,6 +265,7 @@ export default function LoginPostersPage() {
     await fetch(`/api/v1/admin/login-posters/${poster.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ displayOrder: newOrder }),
     });
     fetchPosters();
@@ -211,6 +276,7 @@ export default function LoginPostersPage() {
     await fetch(`/api/v1/admin/login-posters/${poster.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ status: newStatus }),
     });
     fetchPosters();
@@ -277,11 +343,11 @@ export default function LoginPostersPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="h-9 px-3 bg-white/[0.03] border border-white/[0.08] rounded-lg text-sm text-gray-300 focus:outline-none focus:border-red-500/30 cursor-pointer"
             >
-              <option value="ALL">All Statuses</option>
-              <option value="ACTIVE">Active</option>
-              <option value="DRAFT">Draft</option>
-              <option value="SCHEDULED">Scheduled</option>
-              <option value="INACTIVE">Inactive</option>
+              <option value="ALL" className="bg-[#181818] text-white">All Statuses</option>
+              <option value="ACTIVE" className="bg-[#181818] text-white">Active</option>
+              <option value="DRAFT" className="bg-[#181818] text-white">Draft</option>
+              <option value="SCHEDULED" className="bg-[#181818] text-white">Scheduled</option>
+              <option value="INACTIVE" className="bg-[#181818] text-white">Inactive</option>
             </select>
             {/* Refresh */}
             <button
@@ -531,15 +597,43 @@ export default function LoginPostersPage() {
                   />
                 </div>
 
-                {/* Image URL */}
+                {/* Image URL, File Upload & Quick Presets */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1.5">Image URL <span className="text-red-400">*</span></label>
+                  <div className="flex items-center justify-between mb-1.5 flex-wrap gap-2">
+                    <label className="block text-xs font-medium text-gray-400">
+                      Poster Image <span className="text-red-400">*</span>
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        disabled={uploading}
+                        onClick={() => fileInputRef.current?.click()}
+                        className="flex items-center gap-1.5 px-2.5 py-1 bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-medium transition-colors cursor-pointer"
+                      >
+                        {uploading ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Upload className="w-3.5 h-3.5" />
+                        )}
+                        {uploading ? "Uploading Image…" : "Upload from PC"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* URL Input */}
                   <div className="relative">
                     <input
-                      type="url"
+                      type="text"
                       value={form.imageUrl}
                       onChange={(e) => handleFormChange("imageUrl", e.target.value)}
-                      placeholder="https://... or data:image/..."
+                      placeholder="https://... or click 'Upload from PC'"
                       className="w-full h-10 px-3 pr-10 bg-white/[0.03] border border-white/[0.08] rounded-lg text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-red-500/30 focus:ring-1 focus:ring-red-500/20"
                     />
                     {form.imageUrl && (
@@ -548,12 +642,65 @@ export default function LoginPostersPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                        title="Open image in new tab"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     )}
                   </div>
-                  <p className="text-[11px] text-gray-600 mt-1">Paste a direct image URL (JPEG, PNG, WebP) or a hosted image link.</p>
+
+                  {/* Presets and Guidance */}
+                  <div className="flex items-center justify-between mt-2 flex-wrap gap-2 text-[11px] text-gray-500">
+                    <span>Direct URL, relative path, or uploaded image file.</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-gray-600">Sample Presets:</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleFormChange("title", "Engineering Tomorrow's Infrastructure");
+                          handleFormChange("subtitle", "Autonomous AI Agents, Next-Gen Cloud, & Enterprise Security");
+                          handleFormChange("imageUrl", "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1600&q=80");
+                          handleFormChange("altText", "Global digital infrastructure network");
+                          handleFormChange("ctaLabel", "Explore Solutions");
+                          handleFormChange("ctaUrl", "/services");
+                          handleFormChange("status", "ACTIVE");
+                        }}
+                        className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+                      >
+                        Global Tech
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleFormChange("title", "Applied Artificial Intelligence");
+                          handleFormChange("subtitle", "Transforming Enterprise Operations with Autonomous Intelligence");
+                          handleFormChange("imageUrl", "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1600&q=80");
+                          handleFormChange("altText", "Neural network AI visualization");
+                          handleFormChange("ctaLabel", "Discover AI");
+                          handleFormChange("ctaUrl", "/services/ai-solutions");
+                          handleFormChange("status", "ACTIVE");
+                        }}
+                        className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+                      >
+                        AI Neural
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleFormChange("title", "Mission-Critical Software Engineering");
+                          handleFormChange("subtitle", "Scalable, resilient architectures engineered for modern business");
+                          handleFormChange("imageUrl", "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80");
+                          handleFormChange("altText", "Cybersecurity and enterprise systems visualization");
+                          handleFormChange("ctaLabel", "View Portfolio");
+                          handleFormChange("ctaUrl", "/portfolio");
+                          handleFormChange("status", "ACTIVE");
+                        }}
+                        className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+                      >
+                        Cybersecurity
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Alt Text */}
@@ -601,10 +748,10 @@ export default function LoginPostersPage() {
                       onChange={(e) => handleFormChange("status", e.target.value)}
                       className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-lg text-sm text-gray-300 focus:outline-none focus:border-red-500/30 cursor-pointer"
                     >
-                      <option value="DRAFT">Draft</option>
-                      <option value="ACTIVE">Active</option>
-                      <option value="SCHEDULED">Scheduled</option>
-                      <option value="INACTIVE">Inactive</option>
+                      <option value="DRAFT" className="bg-[#181818] text-white">Draft</option>
+                      <option value="ACTIVE" className="bg-[#181818] text-white">Active</option>
+                      <option value="SCHEDULED" className="bg-[#181818] text-white">Scheduled</option>
+                      <option value="INACTIVE" className="bg-[#181818] text-white">Inactive</option>
                     </select>
                   </div>
                   <div>

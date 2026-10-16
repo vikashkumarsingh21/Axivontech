@@ -33,8 +33,33 @@ export async function middleware(req: NextRequest) {
   const isCrmRoute = pathname.startsWith("/crm");
   const isCrmApiRoute = pathname.startsWith("/api/v1/crm");
 
-  const isProtectedApiRoute = isEmployeeApiRoute || isAdminApiRoute || isExecutiveApiRoute || isBrokerApiRoute || isClientApiRoute || isCrmApiRoute;
-  const isProtectedRoute = isEmployeeRoute || isAdminRoute || isExecutiveRoute || isBrokerRoute || isClientRoute || isCrmRoute;
+  // General authenticated APIs (applicable to all authenticated roles)
+  const isGeneralAuthApiRoute =
+    pathname.startsWith("/api/v1/me") ||
+    pathname.startsWith("/api/v1/notifications") ||
+    pathname.startsWith("/api/v1/reminders") ||
+    pathname.startsWith("/api/v1/documents") ||
+    pathname.startsWith("/api/v1/activity") ||
+    pathname.startsWith("/api/v1/preferences") ||
+    pathname.startsWith("/api/v1/automations") ||
+    pathname.startsWith("/api/v1/announcements") ||
+    pathname.startsWith("/api/v1/search");
+
+  const isProtectedApiRoute =
+    isEmployeeApiRoute ||
+    isAdminApiRoute ||
+    isExecutiveApiRoute ||
+    isBrokerApiRoute ||
+    isClientApiRoute ||
+    isCrmApiRoute ||
+    isGeneralAuthApiRoute;
+  const isProtectedRoute =
+    isEmployeeRoute ||
+    isAdminRoute ||
+    isExecutiveRoute ||
+    isBrokerRoute ||
+    isClientRoute ||
+    isCrmRoute;
 
   // IMPORTANT: Prevent header spoofing on public routes
   // Next.js passes client headers through. We must strictly control x-user-id.
@@ -138,5 +163,14 @@ export const config = {
     "/api/v1/client/:path*",
     "/crm/:path*",
     "/api/v1/crm/:path*",
+    "/api/v1/me/:path*",
+    "/api/v1/notifications/:path*",
+    "/api/v1/reminders/:path*",
+    "/api/v1/documents/:path*",
+    "/api/v1/activity/:path*",
+    "/api/v1/preferences/:path*",
+    "/api/v1/automations/:path*",
+    "/api/v1/announcements/:path*",
+    "/api/v1/search/:path*",
   ],
 };

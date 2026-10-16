@@ -31,14 +31,26 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json({ message: "Logged out successfully" });
 
-    // Clear the cookie
-    response.cookies.delete("axivon_session");
+    // Clear the cookie explicitly across all browser contexts
+    response.cookies.set({
+      name: "axivon_session",
+      value: "",
+      path: "/",
+      maxAge: 0,
+      expires: new Date(0),
+    });
 
     return response;
   } catch (error) {
     // Even if something fails, ensure the cookie is cleared
     const response = NextResponse.json({ message: "Logged out" });
-    response.cookies.delete("axivon_session");
+    response.cookies.set({
+      name: "axivon_session",
+      value: "",
+      path: "/",
+      maxAge: 0,
+      expires: new Date(0),
+    });
     return response;
   }
 }

@@ -9,13 +9,13 @@ import {
   CreditCard,
   Truck,
   ArrowRight,
-  Info,
-  CheckCircle2,
   AlertCircle,
   ShoppingBag,
+  Info,
 } from "lucide-react";
 import { useNovaCart } from "@/context/NovaCartContext";
 import { formatPrice } from "@/data/novacart-data";
+import { getStoredDemoOrders, saveStoredDemoOrders, DemoOrder } from "@/data/novacart-store-data";
 
 export default function NovaCartCheckoutPage() {
   const router = useRouter();
@@ -86,9 +86,49 @@ export default function NovaCartCheckoutPage() {
 
     setIsSubmitting(true);
 
-    // Save transient summary for confirmation screen in sessionStorage only
+    const orderId = `AXV-ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+    const nowIso = new Date().toISOString();
+
+    const newOrder: DemoOrder = {
+      id: orderId,
+      createdAt: nowIso,
+      customerName: formData.fullName,
+      customerEmail: formData.email,
+      customerPhone: formData.phone,
+      shippingAddress: {
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        postalCode: formData.postalCode,
+      },
+      items: cart.map((i) => ({
+        productId: i.product.id,
+        productName: i.product.name,
+        quantity: i.quantity,
+        price: i.product.price,
+        image: i.product.images[0] || "",
+        variant: i.selectedColor || i.selectedSize || undefined,
+      })),
+      subtotal,
+      shipping: deliveryFee,
+      discount,
+      total: finalOrderTotal,
+      status: "PROCESSING",
+      paymentMethod: formData.paymentMethod.toUpperCase(),
+      paymentStatus: "PAID",
+    };
+
+    try {
+      const existingOrders = getStoredDemoOrders();
+      saveStoredDemoOrders([newOrder, ...existingOrders]);
+    } catch {
+      // Ignore localStorage issues
+    }
+
+    // Save transient summary for confirmation screen in sessionStorage
     try {
       const summaryPayload = {
+        orderId,
         fullName: formData.fullName,
         email: formData.email,
         itemCount: cart.reduce((a, b) => a + b.quantity, 0),

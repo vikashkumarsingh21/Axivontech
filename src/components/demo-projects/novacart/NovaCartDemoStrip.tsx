@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, Sparkles, ExternalLink } from "lucide-react";
+import { ArrowLeft, Sparkles, ExternalLink, LayoutDashboard, Download } from "lucide-react";
 
 export default function NovaCartDemoStrip() {
   return (
@@ -17,29 +17,47 @@ export default function NovaCartDemoStrip() {
           className="group inline-flex items-center gap-1.5 font-medium text-[#1C1D1A] transition-colors hover:text-[#696D66] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1C1D1A]"
         >
           <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-x-1" />
-          <span className="tracking-tight">Back to All Demo Projects</span>
+          <span className="tracking-tight">Back to All Demos</span>
         </Link>
 
         {/* Center: Showcase identifier */}
-        <div className="hidden items-center gap-2 font-mono text-[11px] font-semibold tracking-wider uppercase md:flex">
+        <div className="hidden items-center gap-3 font-mono text-[11px] font-semibold tracking-wider uppercase lg:flex">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#1C1D1A] opacity-40" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#1C1D1A]" />
           </span>
           <span className="text-[#1C1D1A]/80">
-            SPECIMEN 05 <span className="text-[#696D66]">/</span> NOVACART E-COMMERCE
+            SPECIMEN 05 <span className="text-[#696D66]">/</span> AXIVON COMMERCE
           </span>
         </div>
 
-        {/* Right: Lead CTA */}
-        <div className="flex items-center gap-2.5">
+        {/* Right: Quick Actions */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <Link
+            href="/demo-projects/ecommerce/novacart/admin"
+            className="group inline-flex items-center gap-1.5 rounded-full border border-[#DCDDD5] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1C1D1A] shadow-xs transition-all hover:bg-[#F7F7F2]"
+            title="Open isolated demo store administration dashboard"
+          >
+            <LayoutDashboard className="h-3 w-3 text-[#1C1D1A]" />
+            <span className="hidden sm:inline">Demo Admin</span>
+          </Link>
+
+          <Link
+            href="/application-demos/ecommerce"
+            className="group inline-flex items-center gap-1.5 rounded-full border border-[#DCDDD5] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1C1D1A] shadow-xs transition-all hover:bg-[#F7F7F2]"
+            title="Download complete standalone E-commerce application package"
+          >
+            <Download className="h-3 w-3 text-[#1C1D1A]" />
+            <span className="hidden sm:inline">Download Package</span>
+          </Link>
+
           <Link
             href="/contact?project=NovaCart#contact-form"
-            className="group inline-flex items-center gap-1.5 rounded-full bg-[#1C1D1A] px-3 py-1 text-[11px] font-semibold text-white shadow-xs transition-all duration-200 hover:bg-[#343630] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1C1D1A] focus-visible:ring-offset-1"
+            className="group inline-flex items-center gap-1.5 rounded-full bg-[#1C1D1A] px-3 py-1 text-[11px] font-semibold text-white shadow-xs transition-all duration-200 hover:bg-[#343630] hover:shadow-sm"
           >
-            <Sparkles className="h-3 w-3 text-[#D8F16A] transition-transform duration-200 group-hover:rotate-12" />
-            <span>Build a Store Like This</span>
-            <ExternalLink className="h-3 w-3 opacity-60 transition-opacity duration-200 group-hover:opacity-100" />
+            <Sparkles className="h-3 w-3 text-[#D8F16A]" />
+            <span>Consult Axivon</span>
+            <ExternalLink className="h-3 w-3 opacity-60" />
           </Link>
         </div>
       </div>

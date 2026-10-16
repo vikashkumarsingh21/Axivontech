@@ -41,6 +41,7 @@ export default function NovaCartHeader() {
   const navLinks = [
     { label: "Shop All", href: "/demo-projects/ecommerce/novacart/shop" },
     { label: "New Arrivals", href: "/demo-projects/ecommerce/novacart/shop?filter=new" },
+    { label: "Store Admin", href: "/demo-projects/ecommerce/novacart/admin" },
   ];
 
   return (

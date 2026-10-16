@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth/password";
 import { signSession } from "@/lib/auth/session";
 import { handleApiError, ApiError } from "@/lib/api-error";
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -12,6 +13,21 @@ const loginSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown-ip";
+    const rateLimitKey = `auth_login:${ip}`;
+    const rateCheck = isRateLimited(rateLimitKey, RATE_LIMIT_PRESETS.AUTH_LOGIN);
+    if (rateCheck.limited) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please try again later." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": Math.ceil(rateCheck.resetMs / 1000).toString(),
+          },
+        }
+      );
+    }
+
     const body = await req.json();
     const { email, password } = loginSchema.parse(body);
 

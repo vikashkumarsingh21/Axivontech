@@ -16,29 +16,16 @@ import {
 } from "lucide-react";
 import { useNovaCart } from "@/context/NovaCartContext";
 import { formatPrice } from "@/data/novacart-data";
+import { getStoredDemoOrders, DemoOrder } from "@/data/novacart-store-data";
 
 export default function NovaCartAccountPage() {
   const { wishlist, totalCartQuantity } = useNovaCart();
   const [activeTab, setActiveTab] = useState<"orders" | "profile" | "addresses">("orders");
+  const [orders, setOrders] = useState<DemoOrder[]>([]);
 
-  const sampleDemoOrders = [
-    {
-      id: "DEMO-ORD-8942",
-      date: "04 October 2026",
-      items: "Minimalist Matte Chrono Watch (Slate Black)",
-      total: 4499,
-      status: "Delivered (Sample)",
-      isComplete: true,
-    },
-    {
-      id: "DEMO-ORD-7619",
-      date: "18 September 2026",
-      items: "Aeroflex Commuter Backpack 22L (Matte Black)",
-      total: 5999,
-      status: "Delivered (Sample)",
-      isComplete: true,
-    },
-  ];
+  React.useEffect(() => {
+    setOrders(getStoredDemoOrders());
+  }, []);
 
   return (
     <div className="py-8 sm:py-12">
@@ -174,34 +161,56 @@ export default function NovaCartAccountPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {sampleDemoOrders.map((ord) => (
-                    <div
-                      key={ord.id}
-                      className="rounded-xl border border-[#DCDDD5] bg-white p-5 shadow-xs"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#DCDDD5] pb-3 text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-[#1C1D1A]">{ord.id}</span>
-                          <span className="text-[#696D66]">· {ord.date}</span>
-                        </div>
-                        <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                          <span>{ord.status}</span>
-                        </span>
-                      </div>
-
-                      <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div>
-                          <p className="text-sm font-semibold text-[#1C1D1A]">{ord.items}</p>
-                          <p className="text-xs text-[#696D66]">Courier: Delhivery Express Air</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-bold text-[#1C1D1A]">{formatPrice(ord.total)}</p>
-                          <span className="text-[11px] text-[#696D66]">Paid (Demonstration)</span>
-                        </div>
-                      </div>
+                  {orders.length === 0 ? (
+                    <div className="rounded-xl border border-[#DCDDD5] bg-white p-8 text-center text-xs text-[#696D66]">
+                      No demonstration orders placed yet. Add products to your bag and complete checkout to see them here!
                     </div>
-                  ))}
+                  ) : (
+                    orders.map((ord) => (
+                      <div
+                        key={ord.id}
+                        className="rounded-xl border border-[#DCDDD5] bg-white p-5 shadow-xs"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#DCDDD5] pb-3 text-xs">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-[#1C1D1A]">{ord.id}</span>
+                            <span className="text-[#696D66]">
+                              · {new Date(ord.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                            </span>
+                          </div>
+                          <span
+                            className={`inline-flex items-center gap-1 font-semibold ${
+                              ord.status === "DELIVERED"
+                                ? "text-emerald-700"
+                                : ord.status === "SHIPPED"
+                                ? "text-blue-700"
+                                : ord.status === "CANCELLED"
+                                ? "text-red-700"
+                                : "text-amber-700"
+                            }`}
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            <span>{ord.status}</span>
+                          </span>
+                        </div>
+
+                        <div className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div>
+                            <p className="text-sm font-semibold text-[#1C1D1A]">
+                              {ord.items.map((it) => `${it.productName}${it.variant ? ` (${it.variant})` : ""} × ${it.quantity}`).join(", ")}
+                            </p>
+                            <p className="text-xs text-[#696D66]">
+                              Courier: Delhivery Express Air · {ord.shippingAddress.city}, {ord.shippingAddress.state}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-[#1C1D1A]">{formatPrice(ord.total)}</p>
+                            <span className="text-[11px] text-[#696D66]">{ord.paymentMethod} (Demonstration)</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             )}

@@ -7,6 +7,14 @@ interface Params {
   params: Promise<{ id: string }>;
 }
 
+function parseDateOrNull(val: unknown): Date | null {
+  if (!val || typeof val !== "string") return null;
+  const trimmed = val.trim();
+  if (!trimmed) return null;
+  const parsed = new Date(trimmed);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
 export async function GET(req: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
@@ -38,7 +46,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     const userId = req.headers.get("x-user-id");
     await requirePermission(userId, "admin:access");
 
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const {
       title,
       subtitle,
@@ -61,6 +69,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "Poster not found" }, { status: 404 });
     }
 
+    const validStatuses = ["DRAFT", "ACTIVE", "SCHEDULED", "INACTIVE"];
+
     const updated = await db.loginPagePoster.update({
       where: { id },
       data: {
@@ -70,15 +80,22 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         ...(altText !== undefined && { altText: altText?.trim() || null }),
         ...(ctaLabel !== undefined && { ctaLabel: ctaLabel?.trim() || null }),
         ...(ctaUrl !== undefined && { ctaUrl: ctaUrl?.trim() || null }),
-        ...(displayOrder !== undefined && { displayOrder }),
-        ...(status !== undefined && { status }),
-        ...(startsAt !== undefined && { startsAt: startsAt ? new Date(startsAt) : null }),
-        ...(endsAt !== undefined && { endsAt: endsAt ? new Date(endsAt) : null }),
+        ...(displayOrder !== undefined && {
+          displayOrder:
+            typeof displayOrder === "number"
+              ? displayOrder
+              : parseInt(String(displayOrder), 10) || 0,
+        }),
+        ...(status !== undefined && {
+          status: validStatuses.includes(status) ? status : existing.status,
+        }),
+        ...(startsAt !== undefined && { startsAt: parseDateOrNull(startsAt) }),
+        ...(endsAt !== undefined && { endsAt: parseDateOrNull(endsAt) }),
         ...(internalNotes !== undefined && { internalNotes: internalNotes?.trim() || null }),
       },
     });
 
-    return NextResponse.json({ poster: updated });
+    return NextResponse.json({ success: true, poster: updated });
   } catch (error) {
     return handleApiError(error);
   }

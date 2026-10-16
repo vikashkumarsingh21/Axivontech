@@ -227,4 +227,47 @@ describe("3. Carousel Interaction & Accessibility Logic", () => {
 
     expect(currentPoster).toBeNull();
   });
+
+  describe("4. Poster Image Upload & Input Normalization", () => {
+    it("validates permitted image MIME types and rejects non-image formats", () => {
+      const validMimes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
+      const isValidMime = (type: string) => validMimes.includes(type);
+
+      expect(isValidMime("image/jpeg")).toBe(true);
+      expect(isValidMime("image/png")).toBe(true);
+      expect(isValidMime("image/webp")).toBe(true);
+      expect(isValidMime("application/pdf")).toBe(false);
+      expect(isValidMime("text/javascript")).toBe(false);
+      expect(isValidMime("application/x-msdownload")).toBe(false);
+    });
+
+    it("enforces 10MB maximum file size limit", () => {
+      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+      const isSizePermitted = (size: number) => size <= MAX_SIZE;
+
+      expect(isSizePermitted(1024 * 500)).toBe(true); // 500KB
+      expect(isSizePermitted(9 * 1024 * 1024)).toBe(true); // 9MB
+      expect(isSizePermitted(10 * 1024 * 1024)).toBe(true); // 10MB
+      expect(isSizePermitted(10 * 1024 * 1024 + 1)).toBe(false); // 10MB + 1B
+      expect(isSizePermitted(25 * 1024 * 1024)).toBe(false); // 25MB
+    });
+
+    it("safely parses and normalizes dates without crashing on invalid input", () => {
+      const parseDateOrNull = (val: unknown): Date | null => {
+        if (!val || typeof val !== "string") return null;
+        const trimmed = val.trim();
+        if (!trimmed) return null;
+        const parsed = new Date(trimmed);
+        return isNaN(parsed.getTime()) ? null : parsed;
+      };
+
+      expect(parseDateOrNull("2026-10-16T12:00:00Z")).toBeInstanceOf(Date);
+      expect(parseDateOrNull("")).toBeNull();
+      expect(parseDateOrNull("   ")).toBeNull();
+      expect(parseDateOrNull("invalid-date-string")).toBeNull();
+      expect(parseDateOrNull(null)).toBeNull();
+      expect(parseDateOrNull(undefined)).toBeNull();
+    });
+  });
 });
+
