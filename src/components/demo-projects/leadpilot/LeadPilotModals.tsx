@@ -58,7 +58,7 @@ export default function LeadPilotModals({ type, onClose }: ModalProps) {
     estimatedValue: 45000,
     stage: "Discovery" as DealStage,
     probability: 30,
-    expectedCloseDate: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
+    expectedCloseDate: "",
     assignedOwner: TEAM_MEMBERS[0],
     notes: "",
   });
@@ -69,7 +69,7 @@ export default function LeadPilotModals({ type, onClose }: ModalProps) {
     description: "",
     relatedLeadId: leads[0]?.id || "",
     relatedLeadName: leads[0]?.fullName || "",
-    dueDate: new Date(Date.now() + 3 * 86400000).toISOString().split("T")[0],
+    dueDate: "",
     priority: "High" as TaskPriority,
     status: "To Do" as const,
     assignedOwner: TEAM_MEMBERS[0],

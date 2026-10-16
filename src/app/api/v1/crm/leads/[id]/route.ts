@@ -27,6 +27,10 @@ export async function GET(req: NextRequest, props: { params: Promise<{ [key: str
           include: { pipelineStage: true },
           orderBy: { createdAt: "desc" },
         },
+        notes: {
+          include: { author: { select: { id: true, name: true, email: true } } },
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
 

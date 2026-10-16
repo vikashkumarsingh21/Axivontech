@@ -14,7 +14,7 @@ export default function ApplicationDetailPage() {
   const [error, setError] = useState("");
   
   const [actionReason, setActionReason] = useState("");
-  const [actionModal, setActionModal] = useState<"APPROVE" | "REJECT" | "ON_HOLD" | "MORE_INFO" | null>(null);
+  const [actionModal, setActionModal] = useState<"APPROVE" | "REJECT" | "ON_HOLD" | "MORE_INFO" | "UNDER_REVIEW" | null>(null);
   const [submittingAction, setSubmittingAction] = useState(false);
 
   const [meetingModal, setMeetingModal] = useState(false);
@@ -54,6 +54,7 @@ export default function ApplicationDetailPage() {
       if (actionModal === "REJECT") status = "REJECTED";
       if (actionModal === "ON_HOLD") status = "ON_HOLD";
       if (actionModal === "MORE_INFO") status = "MORE_INFO_REQUESTED";
+      if (actionModal === "UNDER_REVIEW") status = "UNDER_REVIEW";
 
       const res = await fetch(`/api/v1/admin/business-partner/applications/${params.id}`, {
         method: "PUT",
@@ -150,26 +151,60 @@ export default function ApplicationDetailPage() {
           <p className="text-gray-400 text-sm">Status: <strong className="text-white">{app.status.replace(/_/g, " ")}</strong></p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {app.status !== "APPROVED" && app.status !== "REJECTED" && (
             <>
+              {app.status === "SUBMITTED" && (
+                <button
+                  onClick={() => setActionModal("UNDER_REVIEW")}
+                  className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-4 py-2 rounded-sm text-sm hover:bg-blue-500/20"
+                >
+                  Start Review
+                </button>
+              )}
+              <button
+                onClick={() => setMeetingModal(true)}
+                className="bg-purple-500/10 border border-purple-500/30 text-purple-400 px-4 py-2 rounded-sm text-sm hover:bg-purple-500/20"
+              >
+                Schedule Meeting
+              </button>
               <button onClick={() => setActionModal("MORE_INFO")} className="bg-[#111] border border-white/10 text-white px-4 py-2 rounded-sm text-sm hover:bg-white/5">Request Info</button>
               <button onClick={() => setActionModal("ON_HOLD")} className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 px-4 py-2 rounded-sm text-sm hover:bg-yellow-500/20">Hold</button>
               <button onClick={() => setActionModal("REJECT")} className="bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-2 rounded-sm text-sm hover:bg-red-500/20">Reject</button>
               <button onClick={() => setActionModal("APPROVE")} className="bg-green-500/10 border border-green-500/30 text-green-500 px-4 py-2 rounded-sm text-sm hover:bg-green-500/20">Approve</button>
             </>
           )}
-          {app.status === "APPROVED" && (
+          {app.status === "APPROVED" && !app.linkedBroker && (
             <button 
               onClick={handleCreateAccount} 
               disabled={creatingAccount}
-              className="bg-[#e8a064] text-black font-medium px-4 py-2 rounded-sm text-sm hover:bg-white transition-colors"
+              className="bg-[#e8a064] text-black font-semibold px-4 py-2 rounded-sm text-sm hover:bg-white transition-colors"
             >
               {creatingAccount ? "Creating Account..." : "Create Partner Account"}
             </button>
           )}
         </div>
       </div>
+
+      {app.linkedBroker && (
+        <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="w-5 h-5 flex-shrink-0 text-green-400" />
+            <div>
+              <p className="font-semibold text-sm text-white">Active Partner Account</p>
+              <p className="text-xs text-green-300/80">
+                Partner ID: <strong className="font-mono text-white">{app.linkedBroker.partnerId}</strong> | Referral Code: <strong className="font-mono text-white">{app.linkedBroker.referralCode}</strong>
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/admin/crm/brokers"
+            className="px-3.5 py-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-xs font-semibold text-white transition-colors text-center"
+          >
+            View in Broker Directory →
+          </Link>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Details */}
@@ -303,6 +338,7 @@ export default function ApplicationDetailPage() {
           <div className="bg-[#111] border border-white/10 p-6 rounded-sm max-w-md w-full">
             <h3 className="text-xl font-semibold text-white mb-2">
               {actionModal === "APPROVE" && "Approve Application"}
+              {actionModal === "UNDER_REVIEW" && "Mark Application Under Review"}
               {actionModal === "REJECT" && "Reject Application"}
               {actionModal === "ON_HOLD" && "Put Application on Hold"}
               {actionModal === "MORE_INFO" && "Request More Information"}
@@ -310,7 +346,11 @@ export default function ApplicationDetailPage() {
             
             {actionModal === "APPROVE" ? (
               <p className="text-gray-400 text-sm mb-6">
-                Are you sure you want to approve this Business Partner Application? This will mark the application as ready for Phase 3 (Partner Account Creation).
+                Are you sure you want to approve this Business Partner Application? This will mark the application as ready for Partner Account Creation.
+              </p>
+            ) : actionModal === "UNDER_REVIEW" ? (
+              <p className="text-gray-400 text-sm mb-6">
+                Change status to Under Review? This signals that internal vetting is actively in progress.
               </p>
             ) : (
               <div className="mb-6">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Search, Plus, X, RefreshCw, AlertCircle, CheckCircle2, UserPlus, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Plus, X, RefreshCw, AlertCircle, CheckCircle2, UserPlus, Filter, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import Link from "next/link";
 
 interface Lead {
@@ -107,6 +107,15 @@ export default function LeadsPage() {
     }
   };
 
+  const handleExportCsv = () => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (statusFilter) params.set("status", statusFilter);
+    if (sourceFilter) params.set("source", sourceFilter);
+    params.set("export", "csv");
+    window.location.href = `/api/v1/crm/leads?${params.toString()}`;
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -120,9 +129,18 @@ export default function LeadsPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => fetchLeads()}
+            title="Refresh Leads"
             className="p-2.5 rounded-xl border border-white/10 bg-[#1a1a1a] text-gray-400 hover:text-white transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
+          <button
+            onClick={handleExportCsv}
+            title="Export to CSV"
+            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-white/10 bg-[#1a1a1a] hover:bg-white/5 text-gray-300 hover:text-white text-sm font-medium transition-colors"
+          >
+            <Download className="w-4 h-4 text-gray-400" />
+            <span className="hidden sm:inline">Export CSV</span>
           </button>
           <button
             onClick={() => {
@@ -135,6 +153,34 @@ export default function LeadsPage() {
             <Plus className="w-4 h-4" /> Add Lead
           </button>
         </div>
+      </div>
+
+      {/* Quick Status Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+        {[
+          { key: "", label: "All Leads" },
+          { key: "NEW", label: "New" },
+          { key: "CONTACTED", label: "Contacted" },
+          { key: "QUALIFIED", label: "Qualified" },
+          { key: "CONVERTED", label: "Converted" },
+          { key: "NURTURE", label: "Nurture" },
+          { key: "UNQUALIFIED", label: "Unqualified" },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => {
+              setStatusFilter(tab.key);
+              setPage(1);
+            }}
+            className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors border ${
+              statusFilter === tab.key
+                ? "bg-red-600 border-red-600 text-white shadow-md shadow-red-600/20"
+                : "bg-[#111111] border-white/10 text-gray-400 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Feedback Banner */}

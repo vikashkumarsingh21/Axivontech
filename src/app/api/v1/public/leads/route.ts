@@ -25,26 +25,34 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json().catch(() => ({}));
+    const rawName = body.name || body.fullName || body.contactName;
+    const rawEmail = body.email;
+    const rawPhone = body.phone || body.mobile;
+    const rawCompany = body.companyName || body.company;
+    const rawService = body.serviceInterest || body.service || body.subject;
     const { 
-      name, email, phone, whatsapp, designation, 
-      companyName, industry, city, state, country, companySize, website, 
-      serviceInterest, message, budget, timeline, contactMethod, notes,
+      whatsapp, designation, 
+      industry, city, state, country, companySize, website, 
+      message, budget, timeline, contactMethod, notes,
       source, campaign, referralCode 
     } = body;
 
     // Server-side validation
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
+    if (!rawName || typeof rawName !== "string" || rawName.trim().length === 0) {
       throw new ApiError(400, "Name is required.");
     }
-    if (!email || typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (!rawEmail || typeof rawEmail !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail.trim())) {
       throw new ApiError(400, "A valid email address is required.");
     }
-    if (name.length > 150) throw new ApiError(400, "Name exceeds maximum length of 150 characters.");
-    if (email.length > 150) throw new ApiError(400, "Email exceeds maximum length of 150 characters.");
-    if (message && message.length > 2000) throw new ApiError(400, "Message exceeds maximum length of 2000 characters.");
+    if (rawName.length > 150) throw new ApiError(400, "Name exceeds maximum length of 150 characters.");
+    if (rawEmail.length > 150) throw new ApiError(400, "Email exceeds maximum length of 150 characters.");
+    if (message && message.length > 3000) throw new ApiError(400, "Message exceeds maximum length of 3000 characters.");
 
-    const normalizedEmail = email.trim().toLowerCase();
-    const cleanPhone = phone ? String(phone).trim() : null;
+    const normalizedName = rawName.trim();
+    const normalizedEmail = rawEmail.trim().toLowerCase();
+    const cleanPhone = rawPhone ? String(rawPhone).trim() : null;
+    const cleanCompany = rawCompany && typeof rawCompany === "string" ? rawCompany.trim() : null;
+    const cleanService = rawService && typeof rawService === "string" ? rawService.trim() : null;
 
     // Process Referral Code
     let ownerId: string | null = null;
@@ -94,7 +102,7 @@ export async function POST(req: NextRequest) {
     const leadCode = `LD-${todayStr}-${String(countToday + 1).padStart(4, "0")}`;
 
     // Valid lead sources
-    const validSources = ["WEBSITE_CONTACT", "CONSULTATION", "REFERRAL", "SOCIAL_MEDIA", "CAMPAIGN", "MANUAL", "PARTNER", "OTHER"];
+    const validSources = ["WEBSITE_CONTACT", "CONSULTATION", "WEBSITE_CHATBOT", "REFERRAL", "SOCIAL_MEDIA", "CAMPAIGN", "MANUAL", "PARTNER", "OTHER"];
     let leadSource = validSources.includes(source) ? source : "WEBSITE_CONTACT";
     if (ownerId) {
       leadSource = "PARTNER"; // Force source to partner if coming through broker
@@ -114,19 +122,19 @@ export async function POST(req: NextRequest) {
       db.lead.create({
         data: {
           leadCode,
-          name: name.trim(),
+          name: normalizedName,
           email: normalizedEmail,
           phone: cleanPhone,
           whatsapp: whatsapp ? String(whatsapp).trim() : null,
           designation: designation ? String(designation).trim() : null,
-          companyName: companyName ? String(companyName).trim() : null,
+          companyName: cleanCompany,
           industry: industry ? String(industry).trim() : null,
           city: city ? String(city).trim() : null,
           state: state ? String(state).trim() : null,
           country: country ? String(country).trim() : null,
           companySize: companySize ? String(companySize).trim() : null,
           website: website ? String(website).trim() : null,
-          serviceInterest: serviceInterest ? String(serviceInterest).trim() : null,
+          serviceInterest: cleanService,
           message: message ? String(message).trim() : null,
           budget: parsedBudget,
           timeline: timeline ? String(timeline).trim() : null,
@@ -152,6 +160,38 @@ export async function POST(req: NextRequest) {
         metadata: { ip, source: leadSource, isDuplicate },
       },
     });
+
+    // Synchronize to Google Sheets / Excel external integration (resilient: failure does not block lead creation)
+    const googleSheetWebhook = process.env.GOOGLE_SHEETS_LEAD_WEBHOOK_URL || "https://script.google.com/macros/s/AKfycbwXF63WF4xQAMDJbv2yLiJSXamBxC47Ndu3M921vKteL3WsHYPnaEih-otyWSf6Xdg6/exec";
+    if (googleSheetWebhook) {
+      fetch(googleSheetWebhook, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: lead.name,
+          email: lead.email,
+          phone: lead.phone || "",
+          company: lead.companyName || "",
+          service: lead.serviceInterest || "",
+          subject: lead.serviceInterest || "Website Contact",
+          message: lead.message || "",
+          source: lead.source,
+          leadCode: lead.leadCode,
+          createdAt: lead.createdAt.toISOString(),
+        }),
+      }).catch(async (syncErr) => {
+        console.error("[Google Sheet Sync Error]", syncErr);
+        await db.leadActivity.create({
+          data: {
+            leadId: lead.id,
+            type: "INTEGRATION_ERROR",
+            title: "Spreadsheet Sync Failed",
+            notes: "Failed to dispatch lead row to external Google Sheet.",
+            metadata: { error: String(syncErr) },
+          },
+        }).catch(() => {});
+      });
+    }
 
     // Notify Admins & Founders
     const adminRoles = await db.userRole.findMany({

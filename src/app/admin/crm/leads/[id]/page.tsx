@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from "react";
 import { 
   Building2, Mail, Phone, Globe, Calendar, UserCheck, CheckCircle2, 
-  Clock, Plus, ArrowLeft, RefreshCw, AlertCircle, Award, UserPlus, FileText, Send 
+  Clock, Plus, ArrowLeft, RefreshCw, AlertCircle, Award, UserPlus, FileText, Send, MessageSquare 
 } from "lucide-react";
 import Link from "next/link";
 
@@ -14,6 +14,11 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Status and Notes state
+  const [noteContent, setNoteContent] = useState("");
+  const [noteVisibility, setNoteVisibility] = useState("INTERNAL");
+  const [submittingNote, setSubmittingNote] = useState(false);
 
   // Qualification form state
   const [qualForm, setQualForm] = useState({
@@ -89,6 +94,60 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || "Assignment failed");
       setFeedback({ type: "success", message: "Lead assigned successfully." });
+      loadLead();
+    } catch (err: any) {
+      setFeedback({ type: "error", message: err.message });
+    }
+  };
+
+  const handleStatusChange = async (newStatus: string) => {
+    try {
+      const res = await fetch(`/api/v1/crm/leads/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || "Failed to update lead status");
+      setFeedback({ type: "success", message: `Lead status updated to ${newStatus}` });
+      loadLead();
+    } catch (err: any) {
+      setFeedback({ type: "error", message: err.message });
+    }
+  };
+
+  const handleCreateNote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!noteContent.trim()) return;
+    setSubmittingNote(true);
+    try {
+      const res = await fetch(`/api/v1/crm/leads/${id}/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: noteContent, visibility: noteVisibility }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || "Failed to add note");
+      setNoteContent("");
+      setFeedback({ type: "success", message: "Internal note added successfully." });
+      loadLead();
+    } catch (err: any) {
+      setFeedback({ type: "error", message: err.message });
+    } finally {
+      setSubmittingNote(false);
+    }
+  };
+
+  const handleCompleteFollowUp = async (followUpId: string) => {
+    try {
+      const res = await fetch(`/api/v1/crm/follow-ups/${followUpId}/complete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completionNotes: "Completed from lead details view" }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || "Failed to complete follow-up");
+      setFeedback({ type: "success", message: "Follow-up marked as completed." });
       loadLead();
     } catch (err: any) {
       setFeedback({ type: "error", message: err.message });
@@ -220,21 +279,44 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
             <p className="text-sm text-gray-400 mt-1">{lead.companyName || "Independent Lead"}</p>
           </div>
 
-          {/* Owner Assignment Dropdown */}
-          <div className="bg-[#18181b] border border-white/10 rounded-xl p-3 min-w-[220px]">
-            <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">
-              Assigned Lead Owner
-            </label>
-            <select
-              value={lead.ownerId || ""}
-              onChange={(e) => handleAssign(e.target.value)}
-              className="w-full bg-[#111111] border border-white/10 text-white text-xs rounded-lg px-2.5 py-1.5 focus:outline-none"
-            >
-              <option value="">Unassigned</option>
-              {employees.filter(e => e.status === "ACTIVE").map(e => (
-                <option key={e.id} value={e.id}>{e.name} ({e.department || "No dept"})</option>
-              ))}
-            </select>
+          {/* Status & Owner Assignment Dropdowns */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="bg-[#18181b] border border-white/10 rounded-xl p-3 min-w-[170px]">
+              <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">
+                Lead Status
+              </label>
+              <select
+                value={lead.status}
+                disabled={lead.status === "CONVERTED"}
+                onChange={(e) => handleStatusChange(e.target.value)}
+                className="w-full bg-[#111111] border border-white/10 text-white text-xs rounded-lg px-2.5 py-1.5 focus:outline-none"
+              >
+                <option value="NEW">NEW</option>
+                <option value="CONTACTED">CONTACTED</option>
+                <option value="MEETING">MEETING</option>
+                <option value="QUALIFIED">QUALIFIED</option>
+                <option value="NOT_QUALIFIED">NOT QUALIFIED</option>
+                <option value="LOST">LOST</option>
+                <option value="NURTURE">NURTURE</option>
+                {lead.status === "CONVERTED" && <option value="CONVERTED">CONVERTED</option>}
+              </select>
+            </div>
+
+            <div className="bg-[#18181b] border border-white/10 rounded-xl p-3 min-w-[200px]">
+              <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">
+                Assigned Lead Owner
+              </label>
+              <select
+                value={lead.ownerId || ""}
+                onChange={(e) => handleAssign(e.target.value)}
+                className="w-full bg-[#111111] border border-white/10 text-white text-xs rounded-lg px-2.5 py-1.5 focus:outline-none"
+              >
+                <option value="">Unassigned</option>
+                {employees.filter(e => e.status === "ACTIVE").map(e => (
+                  <option key={e.id} value={e.id}>{e.name} ({e.department || "No dept"})</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -246,10 +328,24 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
             </a>
           </div>
           <div>
-            <span className="text-gray-500 block mb-1">Phone</span>
-            <span className="text-white flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-gray-400" /> {lead.phone || "—"}
-            </span>
+            <span className="text-gray-500 block mb-1">Phone & Chat</span>
+            {lead.phone ? (
+              <div className="flex items-center gap-2">
+                <a href={`tel:${lead.phone}`} className="text-white hover:underline flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-gray-400" /> {lead.phone}
+                </a>
+                <a
+                  href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-1.5 py-0.5 rounded text-[10px] bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20"
+                >
+                  WhatsApp
+                </a>
+              </div>
+            ) : (
+              <span className="text-gray-500">—</span>
+            )}
           </div>
           <div>
             <span className="text-gray-500 block mb-1">Source</span>
@@ -260,6 +356,13 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
             <span className="text-white">{lead.serviceInterest || "General Inquiry"}</span>
           </div>
         </div>
+
+        {lead.message && (
+          <div className="mt-4 p-3.5 rounded-xl bg-[#18181b] border border-white/5 text-xs">
+            <span className="text-gray-400 font-semibold block mb-1">Inquiry / Message:</span>
+            <p className="text-gray-200 leading-relaxed whitespace-pre-wrap">{lead.message}</p>
+          </div>
+        )}
       </div>
 
       {/* Main Grid: Qualification Form + Timeline */}
@@ -363,6 +466,14 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                     </div>
                     <p className="text-gray-400 mt-1">{new Date(f.dueAt).toLocaleString("en-IN")}</p>
                     {f.notes && <p className="text-gray-500 mt-1 italic">{f.notes}</p>}
+                    {f.status !== "COMPLETED" && (
+                      <button
+                        onClick={() => handleCompleteFollowUp(f.id)}
+                        className="mt-2 inline-flex items-center gap-1 text-[11px] text-green-400 hover:text-green-300 font-medium"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Mark Completed
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -392,6 +503,59 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               </div>
             </div>
           )}
+
+          {/* Internal Notes Section */}
+          <div className="bg-[#111111] border border-white/10 rounded-2xl p-5 space-y-4">
+            <h2 className="text-base font-semibold text-white flex items-center gap-2">
+              <FileText className="w-4 h-4 text-red-500" /> Internal Notes & Collaboration
+            </h2>
+
+            <form onSubmit={handleCreateNote} className="space-y-3">
+              <textarea
+                value={noteContent}
+                onChange={(e) => setNoteContent(e.target.value)}
+                placeholder="Log internal discussions, lead background, call outcomes..."
+                rows={3}
+                className="w-full bg-[#1e1e1e] border border-white/10 text-white text-xs rounded-xl p-3 focus:outline-none focus:border-red-500/50 resize-none"
+              />
+              <div className="flex items-center justify-between">
+                <select
+                  value={noteVisibility}
+                  onChange={(e) => setNoteVisibility(e.target.value)}
+                  className="bg-[#1e1e1e] border border-white/10 text-gray-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none"
+                >
+                  <option value="INTERNAL">Internal Only (Staff)</option>
+                  <option value="PARTNER_VISIBLE">Partner Visible</option>
+                </select>
+                <button
+                  type="submit"
+                  disabled={submittingNote || !noteContent.trim()}
+                  className="px-4 py-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white text-xs font-semibold rounded-lg transition-all shadow-md shadow-red-600/20"
+                >
+                  {submittingNote ? "Saving..." : "Add Note"}
+                </button>
+              </div>
+            </form>
+
+            <div className="space-y-2.5 mt-3 pt-3 border-t border-white/5">
+              {!lead.notes || lead.notes.length === 0 ? (
+                <p className="text-xs text-gray-500 text-center py-2">No internal notes logged yet.</p>
+              ) : (
+                lead.notes.map((n: any) => (
+                  <div key={n.id} className="p-3 bg-[#18181b] border border-white/5 rounded-xl text-xs space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-white">{n.author?.name || "Staff"}</span>
+                      <span className="text-[10px] text-gray-500">{new Date(n.createdAt).toLocaleString("en-IN")}</span>
+                    </div>
+                    <p className="text-gray-300 whitespace-pre-wrap">{n.content}</p>
+                    <span className="inline-block text-[9px] uppercase tracking-wider text-gray-500 bg-white/5 px-1.5 py-0.5 rounded">
+                      {n.visibility}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
 
           {/* Activity Timeline */}
           <div className="bg-[#111111] border border-white/10 rounded-2xl p-6">

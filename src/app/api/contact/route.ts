@@ -59,6 +59,25 @@ export async function POST(req: Request) {
           notes: `Subject/Interest: ${subject || service || "General Contact"}`,
         },
       });
+
+      // Notify Admins & Founders so it immediately surfaces
+      const adminRoles = await db.userRole.findMany({
+        where: { role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] } } },
+        select: { userId: true },
+      });
+      const recipientIds = Array.from(new Set(adminRoles.map((ur) => ur.userId)));
+
+      if (recipientIds.length > 0) {
+        await db.notification.createMany({
+          data: recipientIds.map((userId) => ({
+            userId,
+            type: "SYSTEM",
+            title: `New Lead: ${lead.name}`,
+            message: `${lead.companyName ? `${lead.companyName} — ` : ""}${lead.serviceInterest || "General Inquiry"} (${lead.leadCode})`,
+            link: `/admin/crm/leads/${lead.id}`,
+          })),
+        }).catch(() => {});
+      }
     }
 
     return NextResponse.json({

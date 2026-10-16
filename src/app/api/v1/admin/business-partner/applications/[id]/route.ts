@@ -7,11 +7,11 @@ import { JobRunner } from "@/lib/jobs/runner";
 
 // Valid status transitions
 const VALID_TRANSITIONS: Record<string, string[]> = {
-  SUBMITTED: ["UNDER_REVIEW"],
+  SUBMITTED: ["UNDER_REVIEW", "MEETING_SCHEDULED", "MORE_INFO_REQUESTED", "ON_HOLD", "APPROVED", "REJECTED"],
   UNDER_REVIEW: ["MEETING_SCHEDULED", "MORE_INFO_REQUESTED", "ON_HOLD", "APPROVED", "REJECTED"],
   MEETING_SCHEDULED: ["UNDER_REVIEW", "APPROVED", "REJECTED", "ON_HOLD"],
-  MORE_INFO_REQUESTED: ["UNDER_REVIEW"],
-  ON_HOLD: ["UNDER_REVIEW", "REJECTED"],
+  MORE_INFO_REQUESTED: ["UNDER_REVIEW", "APPROVED", "REJECTED"],
+  ON_HOLD: ["UNDER_REVIEW", "APPROVED", "REJECTED"],
   // Terminal states — no further transitions
   APPROVED: [],
   REJECTED: [],
@@ -66,7 +66,23 @@ export async function GET(
       throw new ApiError(404, "Application not found");
     }
 
-    return NextResponse.json(application, { status: 200 });
+    // Check if a broker/partner profile already exists for this applicant's email
+    const linkedBroker = await db.brokerProfile.findFirst({
+      where: {
+        user: {
+          email: { equals: application.email, mode: "insensitive" },
+        },
+      },
+      select: {
+        id: true,
+        partnerId: true,
+        referralCode: true,
+        companyName: true,
+        createdAt: true,
+      },
+    });
+
+    return NextResponse.json({ ...application, linkedBroker }, { status: 200 });
   } catch (err) {
     return handleApiError(err);
   }

@@ -63,6 +63,19 @@ export async function hasPermission(userId: string, requiredPermission: string):
     return false;
   }
 
+  // Superuser and administrative role authorization bypass
+  for (const ur of user.userRoles) {
+    const roleName = ur.role.name;
+    if (roleName === "FOUNDER" || roleName === "CO_FOUNDER") {
+      return true;
+    }
+    if (roleName === "ADMIN") {
+      // Admins have full access across administrative, workforce, and CRM operations
+      return true;
+    }
+  }
+
+  // Check granular role permissions
   for (const ur of user.userRoles) {
     for (const rp of ur.role.rolePermissions) {
       if (rp.permission.name === requiredPermission) {

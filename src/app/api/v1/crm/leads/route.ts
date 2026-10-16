@@ -14,8 +14,11 @@ export async function GET(req: NextRequest) {
     const qualification = searchParams.get("qualification") || "";
     const ownerId = searchParams.get("ownerId") || "";
     const source = searchParams.get("source") || "";
+    const from = searchParams.get("from") || "";
+    const to = searchParams.get("to") || "";
+    const isExport = searchParams.get("export") === "csv";
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "10")));
+    const limit = isExport ? 5000 : Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "10")));
     const skip = (page - 1) * limit;
 
     const where: any = {};
@@ -34,6 +37,64 @@ export async function GET(req: NextRequest) {
     if (qualification) where.qualificationStatus = qualification;
     if (ownerId) where.ownerId = ownerId;
     if (source) where.source = source;
+
+    if (from || to) {
+      where.createdAt = {};
+      if (from) where.createdAt.gte = new Date(from);
+      if (to) {
+        const toDate = new Date(to);
+        toDate.setHours(23, 59, 59, 999);
+        where.createdAt.lte = toDate;
+      }
+    }
+
+    if (isExport) {
+      const allLeads = await db.lead.findMany({
+        where,
+        include: {
+          owner: { select: { id: true, name: true, email: true } },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 5000,
+      });
+
+      const header = [
+        "Lead Code",
+        "Name",
+        "Email",
+        "Phone",
+        "Company",
+        "Service Interest",
+        "Source",
+        "Status",
+        "Qualification",
+        "Owner",
+        "Created At",
+      ];
+
+      const csvRows = allLeads.map((l) => [
+        `"${l.leadCode}"`,
+        `"${(l.name || "").replace(/"/g, '""')}"`,
+        `"${(l.email || "").replace(/"/g, '""')}"`,
+        `"${(l.phone || "").replace(/"/g, '""')}"`,
+        `"${(l.companyName || "").replace(/"/g, '""')}"`,
+        `"${(l.serviceInterest || "").replace(/"/g, '""')}"`,
+        `"${l.source}"`,
+        `"${l.status}"`,
+        `"${l.qualificationStatus}"`,
+        `"${(l.owner?.name || "Unassigned").replace(/"/g, '""')}"`,
+        `"${new Date(l.createdAt).toISOString()}"`,
+      ]);
+
+      const csvString = [header.join(","), ...csvRows.map((r) => r.join(","))].join("\r\n");
+
+      return new NextResponse(csvString, {
+        headers: {
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": `attachment; filename="axivon-leads-${new Date().toISOString().slice(0, 10)}.csv"`,
+        },
+      });
+    }
 
     const [leads, total] = await Promise.all([
       db.lead.findMany({

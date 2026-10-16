@@ -92,10 +92,17 @@ export default function ContactForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.fullName,
+          fullName: formData.fullName,
           email: formData.email,
           phone: formData.phone,
           company: formData.company,
-          message: `Project: ${formData.service}\nTimeline: ${formData.timeline || "Not specified"}\nBudget: ${formData.budget || "Not specified"}\nDetails: ${formData.message}`,
+          companyName: formData.company,
+          service: formData.service,
+          serviceInterest: formData.service,
+          budget: formData.budget,
+          timeline: formData.timeline,
+          source: "WEBSITE_CONTACT",
+          message: formData.message,
         }),
       });
 
