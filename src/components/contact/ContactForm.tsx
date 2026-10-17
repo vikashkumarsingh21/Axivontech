@@ -121,10 +121,10 @@ export default function ContactForm() {
           {/* Left Column: Contextual Info */}
           <div className="lg:col-span-5 flex flex-col justify-between">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-[#f4f4f5] mb-6">
+              <h2 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-[#F3F5F7] mb-6 text-balance">
                 Tell us what you're building.
               </h2>
-              <p className="text-[#a1a1aa] text-lg leading-relaxed max-w-md">
+              <p className="text-[#A7B0BC] text-base sm:text-lg leading-relaxed max-w-md font-light text-pretty">
                 Whether you have a clear technical specification or just a rough idea, we're here to help you navigate the technology landscape and build a solution that fits.
               </p>
               
@@ -134,8 +134,8 @@ export default function ContactForm() {
                     <Mail className="h-4 w-4 text-[#e8a064]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-[#f4f4f5]">Email Us</h3>
-                    <a href="mailto:info@axivontech.in" className="mt-1 text-sm text-[#a1a1aa] hover:text-[#e8a064] transition-colors">info@axivontech.in</a>
+                    <h3 className="font-heading text-sm font-semibold text-[#F3F5F7]">Email Us</h3>
+                    <a href="mailto:info@axivontech.in" className="mt-1 text-sm text-[#A7B0BC] hover:text-[#e8a064] transition-colors">info@axivontech.in</a>
                   </div>
                 </div>
 
@@ -144,8 +144,8 @@ export default function ContactForm() {
                     <MessageCircle className="h-4 w-4 text-[#e8a064]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-[#f4f4f5]">WhatsApp</h3>
-                    <a href="https://wa.me/919473263768" target="_blank" rel="noopener noreferrer" className="mt-1 text-sm text-[#a1a1aa] hover:text-[#e8a064] transition-colors">+91 94732 63768</a>
+                    <h3 className="font-heading text-sm font-semibold text-[#F3F5F7]">WhatsApp</h3>
+                    <a href="https://wa.me/919473263768" target="_blank" rel="noopener noreferrer" className="mt-1 text-sm text-[#A7B0BC] hover:text-[#e8a064] transition-colors">+91 94732 63768</a>
                   </div>
                 </div>
 
@@ -154,8 +154,8 @@ export default function ContactForm() {
                     <Globe2 className="h-4 w-4 text-[#e8a064]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-[#f4f4f5]">Working Model</h3>
-                    <p className="mt-1 text-sm text-[#a1a1aa]">Remote-first — collaborating with clients across India</p>
+                    <h3 className="font-heading text-sm font-semibold text-[#F3F5F7]">Working Model</h3>
+                    <p className="mt-1 text-sm text-[#A7B0BC]">Remote-first — collaborating with clients across India</p>
                   </div>
                 </div>
               </div>
@@ -174,8 +174,8 @@ export default function ContactForm() {
                     className="flex flex-col items-center justify-center text-center py-16"
                   >
                     <CheckCircle2 className="h-16 w-16 text-[#e8a064] mb-6" />
-                    <h3 className="text-2xl font-bold text-[#f4f4f5] mb-3">Inquiry Received</h3>
-                    <p className="text-[#a1a1aa] max-w-md mx-auto mb-8 leading-relaxed">
+                    <h3 className="font-heading text-2xl font-bold text-[#F3F5F7] mb-3">Inquiry Received</h3>
+                    <p className="text-[#A7B0BC] max-w-md mx-auto mb-8 leading-relaxed font-light">
                       Thank you for reaching out. Our engineering team will review your requirements and reply within 24 hours to schedule a deep dive.
                     </p>
                     <button
@@ -183,7 +183,7 @@ export default function ContactForm() {
                         setFormData(INITIAL_FORM_DATA);
                         setStatus("idle");
                       }}
-                      className="text-sm font-medium text-[#e8a064] hover:text-[#f0b07a] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] rounded-sm"
+                      className="text-sm font-semibold text-[#e8a064] hover:text-[#f0b07a] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] rounded-sm"
                     >
                       Start another request
                     </button>
@@ -200,22 +200,22 @@ export default function ContactForm() {
                   >
                     {/* 1. Personal Details */}
                     <div>
-                      <h3 className="text-sm font-semibold uppercase tracking-widest text-[#e8a064] mb-6">Personal Details</h3>
+                      <h3 className="font-heading text-xs font-semibold uppercase tracking-[0.16em] text-[#e8a064] mb-6">Personal Details</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div className="sm:col-span-2">
-                          <label htmlFor="fullName" className="block text-sm font-medium text-[#d4d4d4] mb-2">Full Name</label>
+                          <label htmlFor="fullName" className="block text-xs font-medium text-[#A7B0BC] mb-2">Full Name</label>
                           <input
                             id="fullName"
                             type="text"
                             name="fullName"
                             value={formData.fullName}
                             onChange={handleChange}
-                            className="w-full bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg p-3.5 text-[#f4f4f5] text-sm placeholder:text-[#555] focus:outline-none focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064] transition-colors"
+                            className="w-full bg-[#0f0f0f] border border-[#2a2a2a] rounded-xl p-3.5 text-[#F3F5F7] text-sm placeholder:text-[#566171] focus:outline-none focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064] transition-colors"
                             placeholder="John Doe"
                           />
                         </div>
                         <div>
-                          <label htmlFor="email" className="block text-sm font-medium text-[#d4d4d4] mb-2">Work Email</label>
+                          <label htmlFor="email" className="block text-xs font-medium text-[#A7B0BC] mb-2">Work Email</label>
                           <input
                             id="email"
                             type="email"

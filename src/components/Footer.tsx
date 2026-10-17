@@ -88,13 +88,13 @@ function FooterAccordion({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between py-4 text-base font-semibold text-[#f4f4f5] md:pointer-events-none md:cursor-default md:py-0 md:mb-4"
+        className="font-heading flex w-full items-center justify-between py-4 text-xs font-semibold uppercase tracking-[0.14em] text-[#F3F5F7] md:pointer-events-none md:cursor-default md:py-0 md:mb-4"
         aria-expanded={open}
       >
         <span>{title}</span>
         <ChevronDown
-          className={`h-4 w-4 text-[#71717a] transition-transform duration-200 md:hidden ${
-            open ? "rotate-180" : ""
+          className={`h-4 w-4 text-[#7E8997] transition-transform duration-200 md:hidden ${
+            open ? "rotate-180 text-[#e8a064]" : ""
           }`}
         />
       </button>
@@ -109,8 +109,12 @@ function FooterAccordion({
   );
 }
 
-export default function Footer() {
+export default function Footer({ careersEnabled = false }: { careersEnabled?: boolean } = {}) {
   const pathname = usePathname();
+
+  const companyLinks = COMPANY_LINKS.filter(
+    (link) => link.href !== "/careers" || careersEnabled
+  );
 
   // Do not render global marketing footer on portals, auth screens, or demo projects
   if (isPortalOrStandaloneRoute(pathname)) {
@@ -142,10 +146,10 @@ export default function Footer() {
                   className="h-12 w-auto object-contain brightness-0 invert"
                 />
               </Link>
-              <p className="mt-4 max-w-sm text-sm leading-6 text-[#71717a]">
+              <p className="mt-4 max-w-sm text-sm leading-relaxed text-[#A7B0BC] font-light text-pretty">
                 We craft digital products that help modern businesses look credible, operate efficiently, and grow with confidence.
               </p>
-              <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e8a064]">
+              <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e8a064]">
                 Future-ready technology for modern businesses
               </p>
               <div className="mt-6 flex items-center gap-3">
@@ -158,7 +162,7 @@ export default function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={social.label}
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-[#262626] bg-[#141414] text-[#a1a1aa] transition-colors hover:border-[#e8a064] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-[#262626] bg-[#141414] text-[#A7B0BC] transition-colors hover:border-[#e8a064] hover:text-[#F3F5F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
                     >
                       <Icon className="h-4 w-4" />
                     </a>
@@ -170,9 +174,9 @@ export default function Footer() {
             {/* Company — accordion on mobile */}
             <FooterAccordion title="Company">
               <ul className="flex flex-col gap-3 md:gap-2.5">
-                {COMPANY_LINKS.map((link) => (
+                {companyLinks.map((link) => (
                   <li key={link.label}>
-                    <Link href={link.href} className="block py-1 md:py-0 text-sm text-[#71717a] transition-colors hover:text-[#f4f4f5]">
+                    <Link href={link.href} className="block py-1 md:py-0 text-sm text-[#A7B0BC] transition-colors hover:text-[#F3F5F7]">
                       {link.label}
                     </Link>
                   </li>
@@ -185,7 +189,7 @@ export default function Footer() {
               <ul className="flex flex-col gap-3 md:gap-2.5">
                 {SERVICE_LINKS.map((link) => (
                   <li key={link.label}>
-                    <Link href={link.href} className="block py-1 md:py-0 text-sm text-[#71717a] transition-colors hover:text-[#f4f4f5]">
+                    <Link href={link.href} className="block py-1 md:py-0 text-sm text-[#A7B0BC] transition-colors hover:text-[#F3F5F7]">
                       {link.label}
                     </Link>
                   </li>
@@ -197,21 +201,21 @@ export default function Footer() {
             <FooterAccordion title="Contact">
               <ul className="flex flex-col gap-3 md:gap-2.5">
                 <li>
-                  <a href="mailto:info@axivontech.in" className="inline-flex items-center gap-2 py-1 md:py-0 text-sm text-[#71717a] transition-colors hover:text-[#f4f4f5]">
+                  <a href="mailto:info@axivontech.in" className="inline-flex items-center gap-2 py-1 md:py-0 text-sm text-[#A7B0BC] transition-colors hover:text-[#F3F5F7]">
                     <Mail className="h-4 w-4 shrink-0 text-[#e8a064]" />
                     info@axivontech.in
                   </a>
                 </li>
 
                 <li>
-                  <a href="https://wa.me/919473263768" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 py-1 md:py-0 text-sm text-[#71717a] transition-colors hover:text-[#f4f4f5]">
+                  <a href="https://wa.me/919473263768" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 py-1 md:py-0 text-sm text-[#A7B0BC] transition-colors hover:text-[#F3F5F7]">
                     <FaWhatsapp className="h-4 w-4 shrink-0 text-[#4ade80]" />
                     +91 9473263768
                   </a>
                 </li>
 
                 <li>
-                  <a href="https://axivontech.in" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 py-1 md:py-0 text-sm text-[#71717a] transition-colors hover:text-[#f4f4f5]">
+                  <a href="https://axivontech.in" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 py-1 md:py-0 text-sm text-[#A7B0BC] transition-colors hover:text-[#F3F5F7]">
                     <Globe className="h-4 w-4 shrink-0 text-[#e8a064]" />
                     axivontech.in
                   </a>
@@ -227,22 +231,22 @@ export default function Footer() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.4, ease: "easeOut" as any }}
-          className="mt-8 sm:mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#262626] pt-6 sm:pt-8 text-center text-xs sm:text-sm text-[#52525b] lg:flex-row lg:text-left"
+          className="mt-8 sm:mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#1E2530] pt-6 sm:pt-8 text-center text-xs sm:text-sm text-[#7E8997] lg:flex-row lg:text-left"
         >
           <p>© 2026 Axivon Technologies. All Rights Reserved.</p>
 
-          <nav aria-label="Legal" className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+          <nav aria-label="Legal" className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1">
             {LEGAL_LINKS.map((link, index) => (
-              <span key={link.label} className="flex items-center gap-x-2">
-                <Link href={link.href} className="text-xs sm:text-sm text-[#71717a] transition-colors hover:text-[#f4f4f5]">
+              <span key={link.label} className="flex items-center gap-x-2.5">
+                <Link href={link.href} className="text-xs sm:text-sm text-[#7E8997] transition-colors hover:text-[#F3F5F7]">
                   {link.label}
                 </Link>
-                {index < LEGAL_LINKS.length - 1 && <span className="text-[#303030]">•</span>}
+                {index < LEGAL_LINKS.length - 1 && <span className="text-[#364152]">•</span>}
               </span>
             ))}
           </nav>
 
-          <p className="hidden lg:block">Built with innovation, technology, and vision.</p>
+          <p className="hidden lg:block text-[#7E8997]">Built with innovation, technology, and vision.</p>
         </motion.div>
       </div>
     </footer>

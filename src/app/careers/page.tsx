@@ -1,90 +1,128 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
 import CareersHero from "@/components/careers/CareersHero";
+import WhyWorkWithUs from "@/components/careers/WhyWorkWithUs";
+import HiringProcess from "@/components/careers/HiringProcess";
+import CareersCTA from "@/components/careers/CareersCTA";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
+import { getPublishedJobs, getCareersPageSettings } from "@/lib/careers/careers-db";
 
-const CareerApplication = dynamic(() => import("@/components/careers/CareerApplication"));
-const WhyWorkWithUs = dynamic(() => import("@/components/careers/WhyWorkWithUs"));
-const OpenPositions = dynamic(() => import("@/components/careers/OpenPositions"));
-const HiringProcess = dynamic(() => import("@/components/careers/HiringProcess"));
-const EmployeeBenefits = dynamic(() => import("@/components/careers/EmployeeBenefits"));
+// Client interactive components
+const OpenPositions = dynamic(() => import("@/components/careers/OpenPositions"), {
+  loading: () => (
+    <div className="py-20 text-center text-[#7E8997] bg-[#0B0D10]">
+      <div className="w-8 h-8 rounded-full border-2 border-[#10B981] border-t-transparent animate-spin mx-auto mb-3" />
+      <p className="text-xs">Loading open positions...</p>
+    </div>
+  ),
+});
+
 const CareersFAQ = dynamic(() => import("@/components/careers/CareersFAQ"));
-// import CareersCTA from "@/components/CTA";
+const CareerApplication = dynamic(() => import("@/components/careers/CareerApplication"), {
+  loading: () => (
+    <div className="py-20 text-center text-[#7E8997] bg-[#0B0D10]">
+      <div className="w-8 h-8 rounded-full border-2 border-[#10B981] border-t-transparent animate-spin mx-auto mb-3" />
+      <p className="text-xs">Loading application form...</p>
+    </div>
+  ),
+});
 
-const CTA = dynamic(() => import("@/components/CTA"));
+export const revalidate = 0; // Immediate revalidation for administrator toggles
 
-export const metadata: Metadata = {
-  title: "Careers",
-  description:
-    "Join Axivon Technologies and build the future with a team of innovators, developers, AI engineers, designers, and technology experts. Explore exciting career opportunities and grow with us.",
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getCareersPageSettings();
 
-  keywords: [
-    "Axivon Careers",
-    "Technology Jobs",
-    "Software Developer Jobs",
-    "Frontend Developer",
-    "Backend Developer",
-    "AI Engineer",
-    "Machine Learning Engineer",
-    "UI UX Designer",
-    "Cloud Engineer",
-    "Technology Careers",
-    "Startup Jobs",
-    "Remote Jobs",
-    "IT Company Careers",
-    "Axivon Technologies",
-  ],
+  // If the administrator has turned the Careers page OFF, do not index or expose metadata
+  if (!settings.careersPageEnabled) {
+    return {
+      title: "Not Found | Axivon Technologies",
+      robots: { index: false, follow: false },
+    };
+  }
 
-  alternates: {
-    canonical: "https://axivontech.in/careers",
-  },
+  const title = settings.seoTitle || "Careers & Open Positions | Axivon Technologies";
+  const description =
+    settings.seoDescription ||
+    "Join Axivon Technologies. Explore engineering, AI, and design opportunities. 100% remote-first.";
 
-  openGraph: {
-    title: "Careers | Axivon Technologies",
-    description:
-      "Join Axivon Technologies and help build innovative digital products, AI solutions, cloud platforms, and next-generation technology experiences.",
-    url: "https://axivontech.in/careers",
-    siteName: "Axivon Technologies",
-    type: "website",
-  },
+  return {
+    title,
+    description,
+    keywords: [
+      "Axivon Careers",
+      "Technology Careers",
+      "Remote Engineering Jobs",
+      "Software Development Opportunities",
+      "Axivon Technologies",
+    ],
+    alternates: {
+      canonical: "https://axivontech.in/careers",
+    },
+    openGraph: {
+      title,
+      description,
+      url: "https://axivontech.in/careers",
+      siteName: "Axivon Technologies",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
-  twitter: {
-    card: "summary_large_image",
-    title: "Careers | Axivon Technologies",
-    description:
-      "Explore exciting opportunities and build the future with Axivon Technologies.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export default async function CareersPage() {
+  const settings = await getCareersPageSettings();
 
-export default function CareersPage() {
+  // SERVER-SIDE GUARD: If Careers page is disabled by Admin, trigger 404 immediately
+  if (!settings.careersPageEnabled) {
+    notFound();
+  }
+
+  const jobs = await getPublishedJobs();
+
   return (
-    <main className="overflow-hidden bg-[#0f0f0f]">
-      {/* Hero Section */}
-      <CareersHero />
+    <main className="min-h-screen bg-[#0B0D10] text-[#F3F5F7]">
+      <BreadcrumbSchema
+        items={[
+          {
+            name: "Home",
+            url: "https://axivontech.in",
+          },
+          {
+            name: "Careers",
+            url: "https://axivontech.in/careers",
+          },
+        ]}
+      />
 
-      {/* Why Work With Us */}
+      {/* 1. Careers Hero with Dynamic Content & Live Openings Count */}
+      <CareersHero settings={settings} openingsCount={jobs.length} />
+
+      {/* 2. Why Work With Axivon */}
       <WhyWorkWithUs />
 
-      {/* Open Positions */}
-      <OpenPositions />
+      {/* 3. Open Positions with Dynamic Jobs strictly from Database */}
+      <OpenPositions initialJobs={jobs} />
 
-      {/* Hiring Process */}
+      {/* 4. Transparent 4-Stage Hiring Process */}
       <HiringProcess />
 
-      {/* Employee Benefits */}
-      <EmployeeBenefits />
+      {/* 5. Frequently Asked Questions with Dynamic FAQs */}
+      <CareersFAQ faqs={Array.isArray(settings.faqs) ? (settings.faqs as any) : undefined} />
 
-      {/* FAQ */}
-      <CareersFAQ />
+      {/* 6. Career Application Submission Form connected to DB */}
+      <CareerApplication initialJobs={jobs} />
 
-      {/* Career Application Form */}
-      <CareerApplication />
-
-      {/* Global CTA */}
-      <CTA />
+      {/* 7. Speculative Application & Contact CTA */}
+      <CareersCTA settings={settings} />
     </main>
   );
 }

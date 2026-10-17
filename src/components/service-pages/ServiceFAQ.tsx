@@ -284,7 +284,7 @@ function FAQCard({ item, index, isOpen, onToggle }: FAQCardProps) {
             >
               {String(index + 1).padStart(2, "0")}
             </span>
-            <span className="text-[15px] font-medium leading-relaxed text-white/90 sm:text-base">
+            <span className="text-[15px] font-heading font-semibold leading-relaxed text-[#F3F5F7] sm:text-base tracking-tight">
               {item.question}
             </span>
           </span>
@@ -327,7 +327,7 @@ function FAQCard({ item, index, isOpen, onToggle }: FAQCardProps) {
                   transition={{ duration: 0.3, delay: 0.05 }}
                   className="h-px w-full bg-gradient-to-r from-white/15 via-white/5 to-transparent"
                 />
-                <p className="mt-4 text-sm leading-relaxed text-white/60 sm:text-[15px]">
+                <p className="mt-4 text-sm leading-relaxed text-[#A7B0BC] sm:text-[15px] text-pretty">
                   {item.answer}
                 </p>
               </div>
@@ -382,10 +382,10 @@ function CTAStrip({
           Let&apos;s talk
         </span>
 
-        <h3 className="mt-4 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+        <h3 className="mt-4 font-heading text-2xl font-bold tracking-tight text-[#F3F5F7] sm:text-3xl text-balance">
           Still Have Questions?
         </h3>
-        <p className="mt-2 text-sm text-white/60 sm:text-base">
+        <p className="mt-2 text-sm text-[#A7B0BC] sm:text-base text-pretty">
           Talk with our experts.
         </p>
 
@@ -476,7 +476,7 @@ export default function ServiceFAQ({ service }: ServiceFAQProps) {
             FAQ
           </span>
 
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-[2.75rem]">
+          <h2 className="mt-5 font-heading text-3xl font-extrabold tracking-tight text-[#F3F5F7] sm:text-4xl lg:text-[2.75rem] text-balance">
             Frequently Asked{" "}
             <span
               className="bg-clip-text text-transparent"
@@ -489,7 +489,7 @@ export default function ServiceFAQ({ service }: ServiceFAQProps) {
             </span>
           </h2>
 
-          <p className="mt-4 text-sm leading-relaxed text-white/55 sm:text-base">
+          <p className="mt-4 text-sm leading-relaxed text-[#A7B0BC] sm:text-base text-pretty">
             Everything you need to know about our {service.title} services.
           </p>
         </motion.div>

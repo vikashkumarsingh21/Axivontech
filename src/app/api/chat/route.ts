@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("[Chat API] Unhandled error:", error);
     return NextResponse.json(
-      { reply: "I'm having trouble responding right now. Please contact us at contact@axivontech.in or +91 94732 63768." },
+      { reply: "I'm having trouble responding right now. Please contact us at info@axivontech.in or +91 94732 63768." },
       { status: 500 }
     );
   }

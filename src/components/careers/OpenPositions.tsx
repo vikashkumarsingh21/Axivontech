@@ -1,634 +1,426 @@
 "use client";
 
-import { useRef, useCallback, type ReactNode, type MouseEvent as ReactMouseEvent } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-  useReducedMotion,
-} from "framer-motion";
-import {
-  Sparkles,
-  Code2,
-  ServerCog,
-  BrainCircuit,
-  PenTool,
-  Layers,
-  Laptop,
+  Search,
+  Briefcase,
+  MapPin,
   Clock,
   ArrowRight,
-  ArrowUpRight,
-  type LucideIcon,
+  X,
+  CheckCircle2,
+  Filter,
+  Eye,
+  Send,
+  Layers,
 } from "lucide-react";
+import Link from "next/link";
 
-/**
- * OpenPositions.tsx — Axivon Technologies
- * Next.js 15 / TypeScript / Tailwind CSS / Framer Motion / Lucide React
- *
- * A premium, hiring-platform-grade open roles section designed to sit
- * visually alongside CareersHero.tsx and WhyWorkWithUs.tsx.
- */
-
-/* -------------------------------------------------------------------------- */
-/*  Types                                                                     */
-/* -------------------------------------------------------------------------- */
-
-interface Position {
-  id: string;
-  title: string;
-  type: string;
-  workMode: string;
-  experience: string;
-  skills: string[];
-  icon: LucideIcon;
-  accent: string;
-  applyHref: string;
-  learnMoreHref: string;
+interface OpenPositionsProps {
+  initialJobs?: any[];
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Static data — confirmed roles only                                       */
-/* -------------------------------------------------------------------------- */
+export default function OpenPositions({ initialJobs }: OpenPositionsProps = {}) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [selectedDept, setSelectedDept] = useState<string>("All");
+  const [activeJobModal, setActiveJobModal] = useState<any | null>(null);
 
-const POSITIONS: Position[] = [
-  {
-    id: "frontend-intern",
-    title: "Frontend Developer Intern",
-    type: "Internship",
-    workMode: "Remote",
-    experience: "0–1 Years",
-    skills: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
-    icon: Code2,
-    accent: "#d4915c",
-    applyHref:
-  "mailto:info@axivontech.in?subject=Application%20for%20Frontend%20Developer%20Intern&body=Hello%20Axivon%20Technologies,%0A%0AI%20would%20like%20to%20apply%20for%20the%20Frontend%20Developer%20Intern%20position.%0A%0AName:%20%0APhone:%20%0ALinkedIn:%20%0AGitHub:%20%0APortfolio:%20%0A%0AThank%20You.",
-    learnMoreHref: "#position-frontend-developer-intern",
-  },
-  {
-    id: "backend-intern",
-    title: "Backend Developer Intern",
-    type: "Internship",
-    workMode: "Remote",
-    experience: "0–1 Years",
-    skills: ["Node.js", "Express.js", "PostgreSQL", "REST APIs"],
-    icon: ServerCog,
-    accent: "#e8a064",
-    applyHref:
-  "mailto:info@axivontech.in?subject=Application%20for%20Backend%20Developer%20Intern&body=Hello%20Axivon%20Technologies,%0A%0AI%20would%20like%20to%20apply%20for%20the%20Backend%20Developer%20Intern%20position.%0A%0AName:%20%0APhone:%20%0ALinkedIn:%20%0AGitHub:%20%0APortfolio:%20%0A%0AThank%20You.",
-    learnMoreHref: "#position-backend-developer-intern",
-  },
-  {
-    id: "aiml-intern",
-    title: "AI/ML Intern",
-    type: "Internship",
-    workMode: "Remote",
-    experience: "0–1 Years",
-    skills: ["Python", "Machine Learning", "TensorFlow", "Data Analysis"],
-    icon: BrainCircuit,
-    accent: "#c9922a",
-    applyHref:
-  "mailto:info@axivontech.in?subject=Application%20for%20AI/ML%20Intern&body=Hello%20Axivon%20Technologies,%0A%0AI%20would%20like%20to%20apply%20for%20the%20AI/ML%20Intern%20position.%0A%0AName:%20%0APhone:%20%0ALinkedIn:%20%0AGitHub:%20%0APortfolio:%20%0A%0AThank%20You.",
-    learnMoreHref: "#position-ai-ml-intern",
-  },
-  {
-    id: "uiux-intern",
-    title: "UI/UX Design Intern",
-    type: "Internship",
-    workMode: "Remote",
-    experience: "0–1 Years",
-    skills: ["Figma", "Wireframing", "Prototyping", "Design Systems"],
-    icon: PenTool,
-    accent: "#d4915c",
-    applyHref:
-  "mailto:info@axivontech.in?subject=Application%20for%20UI/UX%20Design%20Intern&body=Hello%20Axivon%20Technologies,%0A%0AI%20would%20like%20to%20apply%20for%20the%20UI/UX%20Design%20Intern%20position.%0A%0AName:%20%0APhone:%20%0ALinkedIn:%20%0AGitHub:%20%0APortfolio:%20%0A%0AThank%20You.",
-    learnMoreHref: "#position-ui-ux-design-intern",
-  },
-  {
-    id: "fullstack-intern",
-    title: "Full Stack Developer Intern",
-    type: "Internship",
-    workMode: "Remote",
-    experience: "0–1 Years",
-    skills: ["Next.js", "Node.js", "PostgreSQL", "TypeScript"],
-    icon: Layers,
-    accent: "#c9922a",
-    applyHref:
-  "mailto:info@axivontech.in?subject=Application%20for%20Full%20Stack%20Developer%20Intern&body=Hello%20Axivon%20Technologies,%0A%0AI%20would%20like%20to%20apply%20for%20the%20Full%20Stack%20Developer%20Intern%20position.%0A%0AName:%20%0APhone:%20%0ALinkedIn:%20%0AGitHub:%20%0APortfolio:%20%0A%0AThank%20You.",
-    learnMoreHref: "#position-full-stack-developer-intern",
-  },
-];
+  // Normalize jobs list strictly from authentic database records (no mock fallbacks)
+  const rawJobs = initialJobs || [];
+  const jobsList = useMemo(() => {
+    return rawJobs.map((j: any) => ({
+      id: j.id,
+      slug: j.slug,
+      title: j.title,
+      department: j.department,
+      type: j.type || j.employmentType || "Internship",
+      workMode: j.workMode || j.workArrangement || "Remote",
+      location: j.location || "Remote (India)",
+      experience: j.experience || j.experienceLevel || "0–1 Years",
+      shortDescription: j.shortDescription || j.summary || "",
+      roleOverview: j.roleOverview || j.description || j.summary || "",
+      responsibilities: j.responsibilities || [],
+      qualifications: j.qualifications || [],
+      skills: j.skills || [],
+      stipend: j.stipend,
+      deadline: j.deadline,
+      isFeatured: Boolean(j.isFeatured),
+    }));
+  }, [rawJobs]);
 
-/* -------------------------------------------------------------------------- */
-/*  Motion variants                                                          */
-/* -------------------------------------------------------------------------- */
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery.trim().toLowerCase());
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const sectionContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 26, filter: "blur(6px)" },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.7, ease: EASE },
-  },
-};
-
-const gridContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.12 } },
-};
-
-const cardReveal = {
-  hidden: { opacity: 0, y: 32, scale: 0.96, filter: "blur(8px)" },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    filter: "blur(0px)",
-    transition: { duration: 0.65, ease: EASE },
-  },
-};
-
-/* -------------------------------------------------------------------------- */
-/*  Decorative background layers                                             */
-/* -------------------------------------------------------------------------- */
-
-function AuroraLayer({ reduceMotion }: { reduceMotion: boolean }) {
-  return (
-    <div aria-hidden className="absolute inset-0 overflow-hidden">
-      <motion.div
-        className="absolute -top-44 -left-36 h-[38rem] w-[38rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(232,160,100,0.36), transparent 70%)" }}
-        animate={reduceMotion ? undefined : { x: [0, 60, 0], y: [0, 40, 0] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" as any }}
-      />
-      <motion.div
-        className="absolute top-1/3 -right-40 h-[34rem] w-[34rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(201,146,42,0.34), transparent 70%)" }}
-        animate={reduceMotion ? undefined : { x: [0, -55, 0], y: [0, -30, 0] }}
-        transition={{ duration: 27, repeat: Infinity, ease: "easeInOut" as any }}
-      />
-      <motion.div
-        className="absolute bottom-[-12rem] left-1/3 h-[32rem] w-[32rem] rounded-full blur-[130px]"
-        style={{ background: "radial-gradient(circle, rgba(212,145,92,0.26), transparent 70%)" }}
-        animate={reduceMotion ? undefined : { x: [0, 45, 0], y: [0, -25, 0] }}
-        transition={{ duration: 23, repeat: Infinity, ease: "easeInOut" as any }}
-      />
-    </div>
-  );
-}
-
-function PerspectiveGrid() {
-  return (
-    <div aria-hidden className="absolute inset-0 overflow-hidden" style={{ perspective: 900 }}>
-      <div
-        className="absolute inset-x-[-20%] top-[6%] h-[55%] opacity-[0.08]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)",
-          backgroundSize: "56px 56px",
-          transform: "rotateX(58deg)",
-          maskImage: "linear-gradient(to bottom, black, transparent 85%)",
-        }}
-      />
-    </div>
-  );
-}
-
-function NoiseTexture() {
-  return (
-    <svg aria-hidden className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.045] mix-blend-overlay">
-      <filter id="op-noise">
-        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" />
-      </filter>
-      <rect width="100%" height="100%" filter="url(#op-noise)" />
-    </svg>
-  );
-}
-
-function FloatingParticles({ reduceMotion }: { reduceMotion: boolean }) {
-  const particles = [
-    { left: 6, top: 16, size: 3, hue: "#d4915c", dur: 13 },
-    { left: 16, top: 66, size: 2, hue: "#e8a064", dur: 17 },
-    { left: 28, top: 38, size: 2.5, hue: "#c9922a", dur: 15 },
-    { left: 42, top: 82, size: 2, hue: "#d4915c", dur: 19 },
-    { left: 54, top: 12, size: 3, hue: "#e8a064", dur: 14 },
-    { left: 66, top: 56, size: 2, hue: "#c9922a", dur: 16 },
-    { left: 78, top: 24, size: 2.5, hue: "#d4915c", dur: 18 },
-    { left: 90, top: 64, size: 3, hue: "#e8a064", dur: 20 },
-  ];
-
-  return (
-    <div aria-hidden className="absolute inset-0 overflow-hidden">
-      {particles.map((p, i) => (
-        <motion.span
-          key={i}
-          className="absolute rounded-full"
-          style={{
-            left: `${p.left}%`,
-            top: `${p.top}%`,
-            width: p.size,
-            height: p.size,
-            background: p.hue,
-            boxShadow: `0 0 10px 2px ${p.hue}`,
-          }}
-          animate={reduceMotion ? undefined : { y: [0, -28, 0], opacity: [0.2, 0.9, 0.2] }}
-          transition={{ duration: p.dur, repeat: Infinity, ease: "easeInOut" as any, delay: i * 0.45 }}
-        />
-      ))}
-    </div>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Animated gradient heading phrase                                         */
-/* -------------------------------------------------------------------------- */
-
-function GradientPhrase({ children }: { children: ReactNode }) {
-  return (
-    <motion.span
-      className="relative inline-block bg-clip-text text-transparent"
-      style={{
-        backgroundImage: "linear-gradient(110deg, #d4915c, #e8a064 35%, #c9922a 65%, #d4915c)",
-        backgroundSize: "300% 100%",
-      }}
-      animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-    >
-      {children}
-    </motion.span>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Small badge chip                                                         */
-/* -------------------------------------------------------------------------- */
-
-function Badge({ icon: Icon, label, tone }: { icon?: LucideIcon; label: string; tone: "blue" | "purple" | "cyan" }) {
-  const toneMap: Record<typeof tone, string> = {
-    blue: "border-[#e8a064]/30 bg-[#e8a064]/10 text-[#7fa8ff]",
-    purple: "border-[#c9922a]/30 bg-[#c9922a]/10 text-[#c4a4ff]",
-    cyan: "border-[#d4915c]/30 bg-[#d4915c]/10 text-[#7fe9ff]",
-  };
-  return (
-    <span
-      className={[
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium",
-        toneMap[tone],
-      ].join(" ")}
-    >
-      {Icon && <Icon className="h-3 w-3" aria-hidden />}
-      {label}
-    </span>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Magnetic button (used for Apply Now)                                    */
-/* -------------------------------------------------------------------------- */
-
-function MagneticLink({
-  children,
-  href,
-  variant = "primary",
-  ariaLabel,
-  className,
-}: {
-  children: ReactNode;
-  href: string;
-  variant?: "primary" | "secondary";
-  ariaLabel: string;
-  className?: string;
-}) {
-  const ref = useRef<HTMLAnchorElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const sx = useSpring(x, { stiffness: 240, damping: 18, mass: 0.4 });
-  const sy = useSpring(y, { stiffness: 240, damping: 18, mass: 0.4 });
-
-  const handleMove = useCallback(
-    (e: ReactMouseEvent<HTMLAnchorElement>) => {
-      const rect = ref.current?.getBoundingClientRect();
-      if (!rect) return;
-      x.set((e.clientX - (rect.left + rect.width / 2)) * 0.2);
-      y.set((e.clientY - (rect.top + rect.height / 2)) * 0.3);
-    },
-    [x, y]
-  );
-
-  const handleLeave = useCallback(() => {
-    x.set(0);
-    y.set(0);
-  }, [x, y]);
-
-  const isPrimary = variant === "primary";
-
-  return (
-    <motion.a
-      ref={ref}
-      href={href}
-      aria-label={ariaLabel}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      style={{ x: sx, y: sy }}
-      whileTap={{ scale: 0.96 }}
-      className={[
-        "group relative inline-flex flex-1 items-center justify-center gap-1.5 overflow-hidden rounded-full px-4 py-2.5 text-[13px] font-semibold outline-none transition-shadow duration-300",
-        "focus-visible:ring-2 focus-visible:ring-[#d4915c]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]",
-        isPrimary
-          ? "text-white shadow-[0_8px_28px_-8px_rgba(232,160,100,0.65)] hover:shadow-[0_12px_38px_-8px_rgba(201,146,42,0.75)]"
-          : "border border-white/15 bg-[#141414]/[0.04] text-white/85 backdrop-blur-md hover:border-[#d4915c]/40 hover:bg-[#141414]/[0.08]",
-        className,
-      ].join(" ")}
-    >
-      {isPrimary && (
-        <span aria-hidden className="absolute inset-0 -z-10" style={{ background: "linear-gradient(135deg, #e8a064, #c9922a)" }} />
-      )}
-      {isPrimary && (
-        <span
-          aria-hidden
-          className="absolute inset-0 -z-10 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full"
-        />
-      )}
-      {children}
-    </motion.a>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Position card — 3D tilt + mouse spotlight + glow + glass + border beam  */
-/* -------------------------------------------------------------------------- */
-
-function PositionCard({ position }: { position: Position }) {
-  const Icon = position.icon;
-  const reduceMotion = useReducedMotion();
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const rx = useMotionValue(0);
-  const ry = useMotionValue(0);
-  const srx = useSpring(rx, { stiffness: 200, damping: 18 });
-  const sry = useSpring(ry, { stiffness: 200, damping: 18 });
-
-  const spotX = useMotionValue(50);
-  const spotY = useMotionValue(50);
-  const sSpotX = useSpring(spotX, { stiffness: 150, damping: 20 });
-  const sSpotY = useSpring(spotY, { stiffness: 150, damping: 20 });
-  const spotlightBg = useTransform(
-    [sSpotX, sSpotY],
-    ([x, y]: number[]) => `radial-gradient(280px circle at ${x}% ${y}%, ${position.accent}26, transparent 70%)`
-  );
-
-  const hover = useMotionValue(0);
-  const sHover = useSpring(hover, { stiffness: 220, damping: 22 });
-
-  const handleMove = useCallback(
-    (e: ReactMouseEvent<HTMLDivElement>) => {
-      const rect = cardRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      const relX = (e.clientX - rect.left) / rect.width;
-      const relY = (e.clientY - rect.top) / rect.height;
-      spotX.set(relX * 100);
-      spotY.set(relY * 100);
-      if (!reduceMotion) {
-        rx.set((relY - 0.5) * -8);
-        ry.set((relX - 0.5) * 10);
+  // Handle ESC key for modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && activeJobModal) {
+        setActiveJobModal(null);
       }
-    },
-    [reduceMotion, rx, ry, spotX, spotY]
-  );
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeJobModal]);
 
-  const handleEnter = useCallback(() => hover.set(1), [hover]);
-  const handleLeave = useCallback(() => {
-    hover.set(0);
-    rx.set(0);
-    ry.set(0);
-  }, [hover, rx, ry]);
+  const departments = useMemo(() => {
+    const depts = new Set<string>();
+    jobsList.forEach((j) => depts.add(j.department));
+    return ["All", ...Array.from(depts)];
+  }, [jobsList]);
+
+  const filteredJobs = useMemo(() => {
+    return jobsList.filter((job) => {
+      const matchesDept = selectedDept === "All" || job.department === selectedDept;
+      const matchesSearch =
+        !debouncedQuery ||
+        job.title.toLowerCase().includes(debouncedQuery) ||
+        job.department.toLowerCase().includes(debouncedQuery) ||
+        job.skills.some((s: string) => s.toLowerCase().includes(debouncedQuery)) ||
+        job.shortDescription.toLowerCase().includes(debouncedQuery);
+
+      return matchesDept && matchesSearch;
+    });
+  }, [jobsList, selectedDept, debouncedQuery]);
+
+  const handleApplyClick = (jobTitle: string) => {
+    setActiveJobModal(null);
+    // Find select element in application form and update value
+    const selectEl = document.getElementById("position-select") as HTMLSelectElement | null;
+    if (selectEl) {
+      selectEl.value = jobTitle;
+      selectEl.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    const formSection = document.getElementById("apply-form");
+    if (formSection) {
+      formSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const hasActiveFilters = searchQuery.length > 0 || selectedDept !== "All";
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setDebouncedQuery("");
+    setSelectedDept("All");
+  };
 
   return (
-    <motion.div variants={cardReveal} style={{ perspective: 1200 }} className="relative h-full">
-      <motion.div
-        ref={cardRef}
-        onMouseMove={handleMove}
-        onMouseEnter={handleEnter}
-        onMouseLeave={handleLeave}
-        style={{ rotateX: srx, rotateY: sry, transformStyle: "preserve-3d" }}
-        whileHover={{ scale: 1.02, y: -6 }}
-        transition={{ type: "spring", stiffness: 260, damping: 22 }}
-        className="group relative flex h-full flex-col rounded-2xl"
-      >
-        {/* animated border beam */}
-        <motion.span
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-2xl"
-          style={{
-            background: "conic-gradient(from 0deg, #d4915c, #e8a064, #c9922a, #d4915c)",
-            padding: 1.5,
-            WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-            WebkitMaskComposite: "xor",
-            maskComposite: "exclude",
-            opacity: sHover,
-            animation: "op-spin 3s linear infinite",
-          }}
-        />
-        <div className="absolute inset-0 rounded-2xl border border-white/10" />
+    <section id="open-positions" className="py-16 sm:py-24 bg-[#0B0D10] border-b border-[#1E2530]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="max-w-3xl mb-10 sm:mb-14">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#10B981]/10 text-[#10B981] text-xs font-semibold uppercase tracking-wider mb-3">
+            <Briefcase className="w-3.5 h-3.5" />
+            <span>Opportunities</span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl font-bold text-[#F3F5F7] tracking-tight mb-3">
+            Open Positions
+          </h2>
+          <p className="text-sm sm:text-base text-[#A7B0BC] leading-relaxed font-light">
+            Explore our current internship and early-career opportunities. We evaluate applicants on practical problem-solving ability, curiosity, and drive.
+          </p>
+        </div>
 
-        {/* glass body */}
-        <div
-          className={[
-            "relative flex h-full flex-col overflow-hidden rounded-2xl bg-[#141414]/[0.045] p-6 backdrop-blur-xl transition-shadow duration-300 sm:p-7",
-            "shadow-[0_10px_40px_-12px_rgba(0,0,0,0.45)] group-hover:shadow-[0_24px_70px_-18px_var(--axv-glow)]",
-          ].join(" ")}
-          style={{ ["--axv-glow" as string]: `${position.accent}66` }}
-        >
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-            style={{ background: spotlightBg }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{ backgroundImage: `linear-gradient(to right, transparent, ${position.accent}aa, transparent)` }}
-          />
-
-          {/* icon + title */}
-          <div className="relative z-10 flex items-start gap-4">
-            <span
-              className="flex h-12 w-12 flex-none items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
-              style={{ background: `${position.accent}1f`, color: position.accent }}
+        {rawJobs.length === 0 ? (
+          <div className="text-center py-16 px-6 sm:px-12 rounded-2xl bg-[#151A21] border border-[#29313B] max-w-2xl mx-auto my-6">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4">
+              <Briefcase className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-heading font-bold text-[#F3F5F7] mb-2">No Open Positions Currently Available</h3>
+            <p className="text-sm text-[#A7B0BC] leading-relaxed mb-6">
+              We are not actively recruiting for specific roles right now, but we are always eager to connect with driven software engineers, AI researchers, and designers. Feel free to submit a speculative profile below.
+            </p>
+            <a
+              href="#apply-form"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#04130E] font-heading font-semibold text-sm transition-colors"
             >
-              <Icon className="h-6 w-6" strokeWidth={1.8} aria-hidden />
-            </span>
-            <h3 className="mt-1 text-[17px] font-semibold leading-snug tracking-tight text-white">
-              {position.title}
-            </h3>
+              <span>Submit General Application</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
           </div>
+        ) : (
+          <>
+            {/* Search & Filter Toolbar */}
+            <div className="bg-[#151A21] border border-[#29313B] rounded-2xl p-4 sm:p-5 mb-8">
+              <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                {/* Search Input */}
+                <div className="relative flex-1">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#566171]" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search by title, skill, or keyword (e.g. Next.js, Python, Figma)..."
+                    aria-label="Search job positions"
+                    className="w-full h-11 pl-10 pr-9 bg-[#10151B] border border-[#29313B] rounded-xl text-sm text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981]/20 transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#7E8997] hover:text-[#F3F5F7]"
+                      aria-label="Clear search text"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
 
-          {/* badges */}
-          <div className="relative z-10 mt-4 flex flex-wrap gap-2">
-            <Badge label={position.type} tone="purple" />
-            <Badge icon={Laptop} label={position.workMode} tone="cyan" />
-            <Badge icon={Clock} label={position.experience} tone="blue" />
-          </div>
+                {/* Department Filter Pills */}
+                <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+                  {departments.map((dept) => {
+                    const isSelected = selectedDept === dept;
+                    return (
+                      <button
+                        key={dept}
+                        onClick={() => setSelectedDept(dept)}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-colors whitespace-nowrap ${
+                          isSelected
+                            ? "bg-[#10B981] text-[#04130E] font-semibold"
+                            : "bg-[#10151B] text-[#A7B0BC] hover:text-[#F3F5F7] border border-[#29313B] hover:bg-[#1B222B]"
+                        }`}
+                      >
+                        {dept === "All" ? "All Departments" : dept}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-          {/* skills chips */}
-          <ul className="relative z-10 mt-5 flex flex-wrap gap-2" aria-label={`Skills for ${position.title}`}>
-            {position.skills.map((skill) => (
-              <li
-                key={skill}
-                className="rounded-md border border-white/10 bg-[#141414]/[0.04] px-2.5 py-1 text-[11px] font-medium text-white/65"
+              {/* Filter Status Bar */}
+              <div className="flex items-center justify-between text-xs text-[#7E8997] mt-4 pt-3 border-t border-[#1E2530]">
+                <span>
+                  Showing <strong className="text-[#F3F5F7]">{filteredJobs.length}</strong> of {rawJobs.length} positions
+                </span>
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-[#10B981] hover:underline flex items-center gap-1 font-medium"
+                  >
+                    Reset filters
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Positions Grid or Empty Filter Result */}
+            {filteredJobs.length === 0 ? (
+              <div className="text-center py-16 px-4 rounded-2xl bg-[#151A21] border border-dashed border-[#29313B]">
+                <div className="w-12 h-12 rounded-xl bg-[#1B222B] text-[#7E8997] flex items-center justify-center mx-auto mb-3">
+                  <Search className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-[#F3F5F7] mb-1">No matching positions found</h3>
+                <p className="text-xs sm:text-sm text-[#7E8997] max-w-md mx-auto mb-5">
+                  We couldn&apos;t find any roles matching your current search criteria. Try clearing your filters or check back later.
+                </p>
+                <button
+                  onClick={clearFilters}
+                  className="px-4 py-2 rounded-lg bg-[#10B981] text-[#04130E] text-xs font-semibold hover:bg-[#059669] transition-colors"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredJobs.map((job) => (
+              <div
+                key={job.id}
+                className="rounded-2xl bg-[#151A21] border border-[#29313B] p-6 hover:border-[#10B981]/50 transition-all flex flex-col justify-between group"
               >
-                {skill}
-              </li>
+                <div>
+                  {/* Badges */}
+                  <div className="flex flex-wrap items-center gap-2 mb-3.5">
+                    <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20">
+                      {job.type}
+                    </span>
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#1B222B] text-[#A7B0BC] border border-[#29313B]">
+                      {job.workMode}
+                    </span>
+                    <span className="text-[11px] text-[#7E8997] ml-auto">
+                      {job.experience}
+                    </span>
+                  </div>
+
+                  {/* Title & Department */}
+                  <h3 className="text-lg font-bold text-[#F3F5F7] group-hover:text-[#10B981] transition-colors mb-1.5">
+                    {job.title}
+                  </h3>
+                  <div className="flex items-center gap-2 text-xs text-[#7E8997] mb-3">
+                    <Layers className="w-3.5 h-3.5 text-[#10B981]" />
+                    <span>{job.department}</span>
+                    <span>•</span>
+                    <MapPin className="w-3.5 h-3.5 text-[#7E8997]" />
+                    <span>{job.location}</span>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-xs sm:text-sm text-[#A7B0BC] leading-relaxed font-light mb-5 line-clamp-3">
+                    {job.shortDescription}
+                  </p>
+
+                  {/* Skills Pills */}
+                  <div className="flex flex-wrap gap-1.5 mb-6">
+                    {job.skills.slice(0, 4).map((skill: string) => (
+                      <span
+                        key={skill}
+                        className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#10151B] text-[#7E8997] border border-[#29313B]"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                    {job.skills.length > 4 && (
+                      <span className="text-[11px] text-[#7E8997] px-1 py-0.5">
+                        +{job.skills.length - 4}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Card Actions */}
+                <div className="pt-4 border-t border-[#1E2530] flex items-center justify-between gap-3">
+                  <button
+                    onClick={() => setActiveJobModal(job)}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-[#A7B0BC] hover:text-[#F3F5F7] transition-colors py-1.5 px-2 rounded-lg hover:bg-[#1B222B]"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>View Details</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleApplyClick(job.title)}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#04130E] bg-[#10B981] hover:bg-[#059669] transition-colors py-2 px-3.5 rounded-lg shadow-sm"
+                  >
+                    <span>Apply Now</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
+        )}
+          </>
+        )}
+      </div>
 
-          {/* spacer pushes actions to the bottom for equal-height cards */}
-          <div className="relative z-10 mt-auto" />
+      {/* Role Details Modal */}
+      {activeJobModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-job-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setActiveJobModal(null);
+          }}
+        >
+          <div className="bg-[#151A21] border border-[#29313B] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-[#1E2530] flex items-start justify-between gap-4 sticky top-0 bg-[#151A21] z-10">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20">
+                    {activeJobModal.type}
+                  </span>
+                  <span className="text-xs text-[#7E8997]">{activeJobModal.workMode}</span>
+                  <span className="text-xs text-[#7E8997]">• {activeJobModal.experience}</span>
+                </div>
+                <h3 id="modal-job-title" className="text-xl sm:text-2xl font-bold text-[#F3F5F7]">
+                  {activeJobModal.title}
+                </h3>
+                <p className="text-xs text-[#7E8997] mt-1">{activeJobModal.department} • {activeJobModal.location}</p>
+              </div>
+              <button
+                onClick={() => setActiveJobModal(null)}
+                className="p-1.5 rounded-lg text-[#7E8997] hover:text-[#F3F5F7] hover:bg-[#1B222B] transition-colors"
+                aria-label="Close dialog"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-          {/* actions */}
-          <div className="relative z-10 mt-6 flex items-center gap-3">
-            <MagneticLink
-              href={position.applyHref}
-              variant="primary"
-              ariaLabel={`Apply now for ${position.title}`}
-            >
-              Apply Now
-              <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden />
-            </MagneticLink>
-            <MagneticLink
-              href={position.learnMoreHref}
-              variant="secondary"
-              ariaLabel={`Learn more about ${position.title}`}
-            >
-              Learn More
-              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
-            </MagneticLink>
+            {/* Modal Content */}
+            <div className="p-6 space-y-6 text-sm text-[#A7B0BC]">
+              {/* Overview */}
+              <div>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-[#10B981] mb-2">Role Overview</h4>
+                <p className="leading-relaxed font-light">{activeJobModal.roleOverview}</p>
+              </div>
+
+              {/* Responsibilities */}
+              <div>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-[#10B981] mb-2.5">Key Responsibilities</h4>
+                <ul className="space-y-2">
+                  {activeJobModal.responsibilities.map((resp: string, i: number) => (
+                    <li key={i} className="flex items-start gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" />
+                      <span className="font-light">{resp}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Qualifications */}
+              <div>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-[#10B981] mb-2.5">Qualifications & Requirements</h4>
+                <ul className="space-y-2">
+                  {activeJobModal.qualifications.map((qual: string, i: number) => (
+                    <li key={i} className="flex items-start gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-[#D6B779] shrink-0 mt-0.5" />
+                      <span className="font-light">{qual}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Skills */}
+              <div>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-[#10B981] mb-2">Relevant Technologies & Skills</h4>
+                <div className="flex flex-wrap gap-2">
+                  {activeJobModal.skills.map((skill: string) => (
+                    <span
+                      key={skill}
+                      className="px-2.5 py-1 rounded bg-[#10151B] text-xs font-mono text-[#F3F5F7] border border-[#29313B]"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-5 border-t border-[#1E2530] flex items-center justify-end gap-3 sticky bottom-0 bg-[#151A21]">
+              <button
+                onClick={() => setActiveJobModal(null)}
+                className="px-4 py-2.5 rounded-xl text-xs font-medium text-[#A7B0BC] hover:text-[#F3F5F7] hover:bg-[#1B222B] transition-colors"
+              >
+                Close
+              </button>
+              {activeJobModal.slug && (
+                <Link
+                  href={`/careers/${activeJobModal.slug}`}
+                  className="px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#A7B0BC] hover:text-[#F3F5F7] hover:bg-[#1B222B] transition-colors flex items-center gap-1.5"
+                >
+                  <span>Full Role Page</span>
+                  <span className="text-[10px]">↗</span>
+                </Link>
+              )}
+              <button
+                onClick={() => handleApplyClick(activeJobModal.title)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10B981] hover:bg-[#059669] text-[#04130E] font-semibold text-xs transition-colors shadow-sm"
+              >
+                <span>Apply for this Role</span>
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Main component                                                           */
-/* -------------------------------------------------------------------------- */
-
-export default function OpenPositions() {
-  const reduceMotion = useReducedMotion();
-  const sectionRef = useRef<HTMLElement>(null);
-
-  const px = useMotionValue(0);
-  const py = useMotionValue(0);
-  const parallaxX = useSpring(px, { stiffness: 55, damping: 20 });
-  const parallaxY = useSpring(py, { stiffness: 55, damping: 20 });
-  const orbX = useTransform(parallaxX, (v) => v * 22);
-  const orbY = useTransform(parallaxY, (v) => v * 22);
-  const orbXInverse = useTransform(parallaxX, (v) => v * -16);
-  const orbYInverse = useTransform(parallaxY, (v) => v * -16);
-
-  const handleSectionMove = useCallback(
-    (e: ReactMouseEvent<HTMLElement>) => {
-      if (reduceMotion) return;
-      const rect = sectionRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      px.set((e.clientX - rect.left) / rect.width - 0.5);
-      py.set((e.clientY - rect.top) / rect.height - 0.5);
-    },
-    [reduceMotion, px, py]
-  );
-
-  return (
-    <section
-      ref={sectionRef}
-      onMouseMove={handleSectionMove}
-      aria-label="Open positions at Axivon Technologies"
-      className="relative isolate w-full overflow-hidden px-4 py-24 sm:px-6 sm:py-28 lg:px-10 lg:py-32 2xl:px-20"
-      style={{ background: "#0f0f0f" }}
-    >
-      <style>{`
-        @keyframes op-spin { to { transform: rotate(360deg); } }
-        @media (prefers-reduced-motion: reduce) {
-          .op-respect-motion * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
-        }
-      `}</style>
-
-      <AuroraLayer reduceMotion={!!reduceMotion} />
-      <PerspectiveGrid />
-      <FloatingParticles reduceMotion={!!reduceMotion} />
-      <NoiseTexture />
-
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute left-[8%] top-[14%] h-72 w-72 rounded-full blur-[100px] sm:h-96 sm:w-96"
-        style={{ background: "radial-gradient(circle, rgba(212,145,92,0.26), transparent 70%)", x: orbX, y: orbY }}
-      />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute bottom-[10%] right-[6%] h-80 w-80 rounded-full blur-[110px] sm:h-[26rem] sm:w-[26rem]"
-        style={{ background: "radial-gradient(circle, rgba(232,160,100,0.3), transparent 70%)", x: orbXInverse, y: orbYInverse }}
-      />
-
-      <div className="relative mx-auto max-w-[1400px] 2xl:max-w-[1600px]">
-        {/* Header */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.35 }}
-          variants={sectionContainer}
-          className="mx-auto max-w-2xl text-center"
-        >
-          <motion.span
-            variants={fadeUp}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#141414]/[0.05] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#d4915c] backdrop-blur-md"
-          >
-            <Sparkles className="h-3.5 w-3.5" aria-hidden />
-            Open Opportunities
-          </motion.span>
-
-          <motion.h2
-            variants={fadeUp}
-            className="mt-6 text-3xl font-bold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-[2.75rem]"
-          >
-            <GradientPhrase>Join Our Team</GradientPhrase>
-            <br />
-            And <GradientPhrase>Build The Future</GradientPhrase>
-          </motion.h2>
-
-          <motion.p variants={fadeUp} className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/60 sm:text-lg">
-            We are looking for passionate individuals who love technology,
-            innovation, problem-solving, and building meaningful digital
-            products. Become part of Axivon Technologies and help create the
-            next generation of software, AI solutions, and digital
-            experiences.
-          </motion.p>
-        </motion.div>
-
-        {/* Positions grid */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.12 }}
-          variants={gridContainer}
-          className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
-          role="list"
-          aria-label="Open internship positions"
-        >
-          {POSITIONS.map((position) => (
-            <div role="listitem" key={position.id}>
-              <PositionCard position={position} />
-            </div>
-          ))}
-        </motion.div>
-      </div>
+      )}
     </section>
   );
 }

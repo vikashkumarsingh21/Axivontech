@@ -1,843 +1,641 @@
 "use client";
-import type { ReactNode } from "react";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
 import {
-  User, Mail, Phone, MapPin, Link, GitBranch, Globe, FileText,
-  ChevronDown, Send, CheckCircle, Loader2, Briefcase, Sparkles,
-  Zap, Globe2, Trophy, ArrowUpRight
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Briefcase,
+  FileText,
+  Code2,
+  Link2,
+  Globe,
+  Send,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  Info,
+  Upload,
+  Check,
+  FileCheck
 } from "lucide-react";
-// ─── Types ────────────────────────────────────────────────────────────────────
 
-interface FormData {
+interface ApplicationFormData {
   fullName: string;
   email: string;
   phone: string;
   position: string;
+  jobId?: string;
   location: string;
+  experience: string;
   linkedin: string;
   github: string;
   portfolio: string;
   resumeUrl: string;
+  resumeFileName?: string;
   coverLetter: string;
 }
 
-type FormStatus = "idle" | "loading" | "success" | "error";
+interface CareerApplicationProps {
+  initialJobs?: { id: string; title: string; department?: string }[];
+  preselectedJobTitle?: string;
+  preselectedJobId?: string;
+}
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const POSITIONS = [
-  "Frontend Developer Intern",
-  "Backend Developer Intern",
-  "AI/ML Intern",
-  "UI/UX Design Intern",
-  "Full Stack Developer Intern",
-];
-
-const STATS = [
-  { label: "Active Hiring", value: "14", unit: "Open Positions", icon: Briefcase, color: "#e8a064" },
-  { label: "Applications Reviewed", value: "2,400+", unit: "This Year", icon: CheckCircle, color: "#c9922a" },
-  { label: "Success Rate", value: "97%", unit: "Placement Rate", icon: Zap, color: "#d4915c" },
-  { label: "Remote Opportunities", value: "100%", unit: "Fully Remote", icon: Globe2, color: "#e8a064" },
-];
-
-const BENEFITS = [
-  { icon: "🚀", label: "Real Projects", desc: "Ship to production" },
-  { icon: "🤖", label: "AI Innovation", desc: "Cutting-edge stack" },
-  { icon: "🌍", label: "Remote Friendly", desc: "Work anywhere" },
-  { icon: "📚", label: "Learning Culture", desc: "Grow every day" },
-  { icon: "💡", label: "Mentorship", desc: "Expert guidance" },
-  { icon: "🏆", label: "Career Growth", desc: "Clear path forward" },
-];
-
-// ─── Particle ─────────────────────────────────────────────────────────────────
-
-function Particle({ x, y, size, delay, duration }: { x: number; y: number; size: number; delay: number; duration: number }) {
-  return (
-    <motion.div
-      className="absolute rounded-full pointer-events-none"
-      style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, background: "rgba(232,160,100,0.4)" }}
-      animate={{ y: [-20, 20, -20], opacity: [0.2, 0.8, 0.2], scale: [1, 1.3, 1] }}
-      transition={{ duration, delay, repeat: Infinity, ease: "easeInOut" as any }}
-    />
+export default function CareerApplication({
+  initialJobs,
+  preselectedJobTitle,
+  preselectedJobId,
+}: CareerApplicationProps) {
+  const [availableJobs, setAvailableJobs] = useState<{ id: string; title: string }[]>(
+    initialJobs || []
   );
-}
 
-// ─── Floating Label Input ─────────────────────────────────────────────────────
+  const defaultPosition =
+    preselectedJobTitle ||
+    (initialJobs && initialJobs[0]?.title) ||
+    "Other / Speculative Application";
 
-interface InputProps {
-  label: string;
-  name: keyof FormData;
-  type?: string;
-  icon: React.ReactNode;
-  value: string;
-  onChange: (name: keyof FormData, value: string) => void;
-  required?: boolean;
-}
+  const [form, setForm] = useState<ApplicationFormData>({
+    fullName: "",
+    email: "",
+    phone: "",
+    position: defaultPosition,
+    jobId: preselectedJobId || (initialJobs && initialJobs[0]?.id),
+    location: "",
+    experience: "",
+    linkedin: "",
+    github: "",
+    portfolio: "",
+    resumeUrl: "",
+    resumeFileName: "",
+    coverLetter: "",
+  });
 
-function FloatingInput({ label, name, type = "text", icon, value, onChange, required }: InputProps) {
-  const [focused, setFocused] = useState(false);
-  const active = focused || value.length > 0;
+  const [resumeMode, setResumeMode] = useState<"upload" | "link">("upload");
+  const [uploadingResume, setUploadingResume] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  return (
-    <div className="relative group">
-      <motion.div
-        className="absolute inset-0 rounded-xl pointer-events-none"
-        animate={{ opacity: focused ? 1 : 0 }}
-        transition={{ duration: 0.2 }}
-        style={{
-          background: "linear-gradient(135deg, rgba(232,160,100,0.15), rgba(201,146,42,0.15))",
-          boxShadow: focused ? "0 0 0 1px rgba(232,160,100,0.5), 0 0 20px rgba(232,160,100,0.2), 0 0 40px rgba(201,146,42,0.1)" : "none",
-        }}
-      />
-      <div
-        className="relative flex items-center rounded-xl border transition-all duration-300"
-        style={{
-          background: "rgba(255,255,255,0.03)",
-          borderColor: focused ? "rgba(232,160,100,0.6)" : "rgba(255,255,255,0.08)",
-          backdropFilter: "blur(12px)",
-        }}
-      >
-        <div className="pl-4 flex-shrink-0" style={{ color: focused ? "#e8a064" : "rgba(255,255,255,0.3)", transition: "color 0.3s" }}>
-          {icon}
-        </div>
-        <div className="relative flex-1 px-3 py-4">
-          <motion.label
-            htmlFor={name}
-            className="absolute left-0 pointer-events-none font-medium tracking-wide"
-            animate={{
-              top: active ? "4px" : "50%",
-              y: active ? "0%" : "-50%",
-              fontSize: active ? "10px" : "13px",
-              color: active ? (focused ? "#e8a064" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
-            }}
-            transition={{ duration: 0.2, ease: "easeOut" as any }}
-          >
-            {label}{required && " *"}
-          </motion.label>
-          <input
-            id={name}
-            name={name}
-            type={type}
-            value={value}
-            onChange={(e) => onChange(name, e.target.value)}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            className="w-full bg-transparent outline-none mt-3 text-white text-sm"
-            style={{ caretColor: "#e8a064" }}
-            autoComplete="off"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-// ─── Select Input ─────────────────────────────────────────────────────────────
-
-function FloatingSelect({ value, onChange }: { value: string; onChange: (name: keyof FormData, value: string) => void }) {
-  const [focused, setFocused] = useState(false);
-  const [open, setOpen] = useState(false);
-  const active = value.length > 0;
-  const ref = useRef<HTMLDivElement>(null);
-
+  // Sync preselected position if props change
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    if (preselectedJobTitle) {
+      setForm((prev) => ({
+        ...prev,
+        position: preselectedJobTitle,
+        jobId: preselectedJobId || prev.jobId,
+      }));
     }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
+  }, [preselectedJobTitle, preselectedJobId]);
 
-  return (
-    <div className="relative" ref={ref}>
-      <motion.div
-        className="absolute inset-0 rounded-xl pointer-events-none"
-        animate={{ opacity: focused ? 1 : 0 }}
-        transition={{ duration: 0.2 }}
-        style={{
-          background: "linear-gradient(135deg, rgba(232,160,100,0.15), rgba(201,146,42,0.15))",
-          boxShadow: focused ? "0 0 0 1px rgba(232,160,100,0.5), 0 0 20px rgba(232,160,100,0.2)" : "none",
-        }}
-      />
-      <button
-        type="button"
-        onClick={() => { setOpen(!open); setFocused(!open); }}
-        className="relative w-full flex items-center rounded-xl border transition-all duration-300 text-left"
-        style={{
-          background: "rgba(255,255,255,0.03)",
-          borderColor: focused ? "rgba(232,160,100,0.6)" : "rgba(255,255,255,0.08)",
-          backdropFilter: "blur(12px)",
-        }}
-      >
-        <div className="pl-4 flex-shrink-0" style={{ color: focused ? "#e8a064" : "rgba(255,255,255,0.3)", transition: "color 0.3s" }}>
-          <Briefcase size={16} />
-        </div>
-        <div className="relative flex-1 px-3 py-4">
-          <motion.span
-            className="absolute left-0 pointer-events-none font-medium tracking-wide"
-            animate={{
-              top: active ? "4px" : "50%",
-              y: active ? "0%" : "-50%",
-              fontSize: active ? "10px" : "13px",
-              color: active ? (focused ? "#e8a064" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
-            }}
-            transition={{ duration: 0.2, ease: "easeOut" as any }}
-          >
-            Position Applying For *
-          </motion.span>
-          <span className="block mt-3 text-sm text-white">{value || ""}</span>
-        </div>
-        <motion.div className="pr-4" animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronDown size={16} style={{ color: "rgba(255,255,255,0.4)" }} />
-        </motion.div>
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.96 }}
-            transition={{ duration: 0.18 }}
-            className="absolute z-50 w-full mt-2 rounded-xl overflow-hidden"
-            style={{
-              background: "rgba(10,12,30,0.96)",
-              border: "1px solid rgba(232,160,100,0.3)",
-              backdropFilter: "blur(20px)",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(232,160,100,0.1)",
-            }}
-          >
-            {POSITIONS.map((pos) => (
-              <button
-                key={pos}
-                type="button"
-                onClick={() => { onChange("position", pos); setOpen(false); setFocused(false); }}
-                className="w-full px-4 py-3 text-left text-sm transition-all duration-150 group flex items-center gap-3"
-                style={{ color: value === pos ? "#e8a064" : "rgba(255,255,255,0.7)" }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(232,160,100,0.1)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ""; }}
-              >
-                <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: value === pos ? "#e8a064" : "rgba(255,255,255,0.2)" }} />
-                {pos}
-              </button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// ─── Textarea ─────────────────────────────────────────────────────────────────
-
-function FloatingTextarea({ value, onChange }: { value: string; onChange: (name: keyof FormData, value: string) => void }) {
-  const [focused, setFocused] = useState(false);
-  const active = focused || value.length > 0;
-
-  return (
-    <div className="relative group">
-      <motion.div
-        className="absolute inset-0 rounded-xl pointer-events-none"
-        animate={{ opacity: focused ? 1 : 0 }}
-        transition={{ duration: 0.2 }}
-        style={{
-          background: "linear-gradient(135deg, rgba(232,160,100,0.15), rgba(201,146,42,0.15))",
-          boxShadow: focused ? "0 0 0 1px rgba(232,160,100,0.5), 0 0 20px rgba(232,160,100,0.2)" : "none",
-        }}
-      />
-      <div
-        className="relative rounded-xl border transition-all duration-300"
-        style={{
-          background: "rgba(255,255,255,0.03)",
-          borderColor: focused ? "rgba(232,160,100,0.6)" : "rgba(255,255,255,0.08)",
-          backdropFilter: "blur(12px)",
-        }}
-      >
-        <div className="relative px-4 pt-4 pb-1">
-          <motion.label
-            htmlFor="coverLetter"
-            className="pointer-events-none font-medium tracking-wide block"
-            animate={{
-              fontSize: active ? "10px" : "13px",
-              color: active ? (focused ? "#e8a064" : "rgba(255,255,255,0.4)") : "rgba(255,255,255,0.35)",
-              marginBottom: active ? "4px" : "0px",
-            }}
-            transition={{ duration: 0.2, ease: "easeOut" as any }}
-          >
-            Cover Letter / Message
-          </motion.label>
-          <textarea
-            id="coverLetter"
-            name="coverLetter"
-            value={value}
-            onChange={(e) => onChange("coverLetter", e.target.value)}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            rows={4}
-            className="w-full bg-transparent outline-none text-white text-sm resize-none"
-            style={{ caretColor: "#e8a064" }}
-            placeholder={focused ? "Tell us about yourself, your passion, and why you want to join Axivon Technologies..." : ""}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Stats Card ───────────────────────────────────────────────────────────────
-
-function StatCard({ stat, index }: { stat: typeof STATS[0]; index: number }) {
-  const IconComponent = stat.icon;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.5 }}
-      viewport={{ once: true }}
-      whileHover={{ y: -4, scale: 1.02 }}
-      className="relative p-4 rounded-2xl overflow-hidden cursor-default"
-      style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.07)",
-        backdropFilter: "blur(12px)",
-      }}
-    >
-      <motion.div
-        className="absolute inset-0 opacity-0 rounded-2xl"
-        whileHover={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        style={{ background: `radial-gradient(ellipse at center, ${stat.color}15 0%, transparent 70%)` }}
-      />
-      <div className="relative flex items-start gap-3">
-        <div className="p-2 rounded-xl flex-shrink-0" style={{ background: `${stat.color}15`, border: `1px solid ${stat.color}30` }}>
-          <IconComponent size={16} style={{ color: stat.color }} />
-        </div>
-        <div>
-          <div className="text-xs font-medium mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>{stat.label}</div>
-          <div className="text-xl font-bold text-white tracking-tight">{stat.value}</div>
-          <div className="text-xs mt-0.5" style={{ color: stat.color }}>{stat.unit}</div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── Benefit Card ─────────────────────────────────────────────────────────────
-
-function BenefitCard({ benefit, index }: { benefit: typeof BENEFITS[0]; index: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      transition={{ delay: index * 0.07, duration: 0.4 }}
-      viewport={{ once: true }}
-      whileHover={{ y: -6, scale: 1.05 }}
-      animate={{ y: [0, -4, 0] }}
-      style={{ animationDelay: `${index * 0.3}s` }}
-      className="relative p-3 rounded-xl cursor-default group"
-    >
-      <motion.div
-        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100"
-        transition={{ duration: 0.3 }}
-        style={{
-          background: "linear-gradient(135deg, rgba(232,160,100,0.15), rgba(201,146,42,0.1))",
-          border: "1px solid rgba(232,160,100,0.3)",
-          boxShadow: "0 0 20px rgba(232,160,100,0.15)",
-        }}
-      />
-      <div
-        className="absolute inset-0 rounded-xl"
-        style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
-      />
-      <div className="relative text-center">
-        <div className="text-2xl mb-1">{benefit.icon}</div>
-        <div className="text-xs font-semibold text-white">{benefit.label}</div>
-        <div className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{benefit.desc}</div>
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── 3D Tilt Card Wrapper ─────────────────────────────────────────────────────
-
-function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [8, -8]), { stiffness: 150, damping: 20 });
-  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-8, 8]), { stiffness: 150, damping: 20 });
-
-  function handleMouse(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = ref.current?.getBoundingClientRect();
-    if (!rect) return;
-    x.set((e.clientX - rect.left) / rect.width - 0.5);
-    y.set((e.clientY - rect.top) / rect.height - 0.5);
-  }
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouse}
-      onMouseLeave={() => { x.set(0); y.set(0); }}
-      style={{ rotateX, rotateY, transformStyle: "preserve-3d", perspective: 1000 }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-// ─── Spotlight ────────────────────────────────────────────────────────────────
-
-function Spotlight() {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
+  // Dynamically fetch jobs if not provided as initialJobs
   useEffect(() => {
-    let frameId: number | null = null;
-    function move(e: MouseEvent) {
-      if (frameId) return;
-      frameId = requestAnimationFrame(() => {
-        frameId = null;
-        x.set(e.clientX);
-        y.set(e.clientY);
+    if (!initialJobs || initialJobs.length === 0) {
+      async function loadActiveJobs() {
+        try {
+          const res = await fetch("/api/v1/public/careers/jobs");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.jobs && data.jobs.length > 0) {
+              setAvailableJobs(data.jobs.map((j: any) => ({ id: j.id, title: j.title })));
+            }
+          }
+        } catch (e) {
+          // Keep static fallback
+        }
+      }
+      loadActiveJobs();
+    }
+  }, [initialJobs]);
+
+  const handleInputChange = (field: keyof ApplicationFormData, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
       });
     }
-    window.addEventListener("mousemove", move, { passive: true });
-    return () => {
-      window.removeEventListener("mousemove", move);
-      if (frameId) cancelAnimationFrame(frameId);
-    };
-  }, [x, y]);
+  };
 
-  return (
-    <motion.div
-      className="fixed inset-0 pointer-events-none z-0"
-      style={{
-        background: useTransform(
-          [x, y],
-          ([lx, ly]) => `radial-gradient(600px circle at ${lx}px ${ly}px, rgba(232,160,100,0.04), transparent 70%)`
-        ),
-      }}
-    />
-  );
-}
+  const handlePositionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedTitle = e.target.value;
+    const found = availableJobs.find((j) => j.title === selectedTitle);
+    setForm((prev) => ({
+      ...prev,
+      position: selectedTitle,
+      jobId: found?.id || undefined,
+    }));
+    if (fieldErrors.position) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next.position;
+        return next;
+      });
+    }
+  };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-export default function CareerApplication() {
-  const [form, setForm] = useState<FormData>({
-    fullName: "", email: "", phone: "", position: "", location: "",
-    linkedin: "", github: "", portfolio: "", resumeUrl: "", coverLetter: "",
-  });
-  const [status, setStatus] = useState<FormStatus>("idle");
+    setUploadingResume(true);
+    setUploadError(null);
+    setUploadSuccess(null);
 
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const handleChange = useCallback((name: keyof FormData, value: string) => {
-    setForm((prev) => ({ ...prev, [name]: value }));
-  }, []);
+    try {
+      const res = await fetch("/api/v1/public/careers/upload-resume", {
+        method: "POST",
+        body: formData,
+      });
 
-  async function handleSubmit(e: React.FormEvent) {
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "File upload failed.");
+      }
+
+      setForm((prev) => ({
+        ...prev,
+        resumeUrl: data.url,
+        resumeFileName: data.filename || file.name,
+      }));
+      setUploadSuccess(file.name);
+      if (fieldErrors.resumeUrl) {
+        setFieldErrors((prev) => {
+          const next = { ...prev };
+          delete next.resumeUrl;
+          return next;
+        });
+      }
+    } catch (err: any) {
+      setUploadError(err.message || "Could not upload file.");
+    } finally {
+      setUploadingResume(false);
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!form.fullName.trim()) {
+      errors.fullName = "Full name is required.";
+    }
+
+    if (!form.email.trim()) {
+      errors.email = "Email address is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+
+    if (!form.position.trim()) {
+      errors.position = "Please select a position.";
+    }
+
+    if (!form.location.trim()) {
+      errors.location = "Location is required.";
+    }
+
+    if (!form.resumeUrl.trim()) {
+      errors.resumeUrl =
+        resumeMode === "upload"
+          ? "Please upload your resume file (PDF or DOCX)."
+          : "Please provide a public Google Drive or portfolio resume link.";
+    } else if (resumeMode === "link" && !/^https?:\/\//i.test(form.resumeUrl.trim())) {
+      errors.resumeUrl = "Resume link must start with http:// or https:// (e.g. Google Drive, Dropbox, Notion).";
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
 
-    if (
-      !form.fullName.trim() ||
-      !form.email.trim() ||
-      !form.position.trim() ||
-      !form.location.trim() ||
-      !form.resumeUrl.trim()
-    ) {
-      alert("Please fill all required fields.");
+    if (!validateForm()) {
       return;
     }
 
-    const emailRegex =
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-if (!emailRegex.test(form.email)) {
-  alert("Please enter a valid email address.");
-  return;
-}
+    setLoading(true);
 
     try {
-      setStatus("loading");
-
       const response = await fetch("/api/careers", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to submit application");
-      }
-
       const data = await response.json();
 
-      if (data.success) {
-        setStatus("success");
-
-        setForm({
-          fullName: "",
-          email: "",
-          phone: "",
-          position: "",
-          location: "",
-          linkedin: "",
-          github: "",
-          portfolio: "",
-          resumeUrl: "",
-          coverLetter: "",
-        });
-      } else {
-        setStatus("error");
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to submit application. Please try again.");
       }
+
+      setSuccess(true);
+      setForm({
+        fullName: "",
+        email: "",
+        phone: "",
+        position: defaultPosition,
+        jobId: preselectedJobId,
+        location: "",
+        experience: "",
+        linkedin: "",
+        github: "",
+        portfolio: "",
+        resumeUrl: "",
+        resumeFileName: "",
+        coverLetter: "",
+      });
+      setUploadSuccess(null);
+    } catch (err: any) {
+      console.error("[Career Application Form]", err);
+      setErrorMessage(
+        err.message ||
+          "Submission failed. Please check your internet connection or email us directly at info@axivontech.in."
+      );
+    } finally {
+      setLoading(false);
     }
-    catch (error) {
-      console.error("Career Form Error:", error);
-
-      setStatus("error");
-
-      alert("Application submission failed. Please try again.");
-    }
-  }
-
-
-
-  const particles = [
-    { x: 12, y: 15, size: 2.4, delay: 0.5, duration: 5.2 },
-    { x: 28, y: 72, size: 3.1, delay: 1.2, duration: 6.8 },
-    { x: 45, y: 33, size: 1.8, delay: 2.1, duration: 4.5 },
-    { x: 67, y: 84, size: 2.6, delay: 0.8, duration: 7.1 },
-    { x: 82, y: 22, size: 3.5, delay: 1.7, duration: 5.9 },
-    { x: 91, y: 65, size: 2.0, delay: 3.0, duration: 6.2 },
-    { x: 15, y: 88, size: 2.8, delay: 2.4, duration: 5.5 },
-    { x: 38, y: 12, size: 3.2, delay: 0.2, duration: 7.4 },
-    { x: 55, y: 58, size: 1.9, delay: 1.9, duration: 4.8 },
-    { x: 74, y: 41, size: 2.5, delay: 3.3, duration: 6.0 },
-    { x: 88, y: 79, size: 3.0, delay: 0.9, duration: 5.7 },
-    { x: 22, y: 45, size: 2.2, delay: 2.7, duration: 6.5 },
-    { x: 61, y: 18, size: 3.4, delay: 1.4, duration: 7.0 },
-    { x: 33, y: 92, size: 2.1, delay: 0.6, duration: 5.1 },
-    { x: 79, y: 52, size: 2.7, delay: 2.0, duration: 6.4 },
-    { x: 5, y: 38, size: 3.3, delay: 3.1, duration: 5.8 },
-    { x: 95, y: 10, size: 1.7, delay: 1.1, duration: 4.6 },
-    { x: 48, y: 76, size: 2.9, delay: 2.5, duration: 6.9 },
-  ];
+  };
 
   return (
-    <section
-      className="relative min-h-screen py-24 overflow-hidden"
-      style={{ background: "#0f0f0f" }}
-    >
-      <Spotlight />
-
-      {/* Ambient orbs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div
-          className="absolute w-[600px] h-[600px] rounded-full"
-          style={{ left: "-10%", top: "-10%", background: "radial-gradient(circle, rgba(232,160,100,0.12) 0%, transparent 70%)" }}
-          animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" as any }}
-        />
-        <motion.div
-          className="absolute w-[500px] h-[500px] rounded-full"
-          style={{ right: "-5%", bottom: "10%", background: "radial-gradient(circle, rgba(201,146,42,0.1) 0%, transparent 70%)" }}
-          animate={{ scale: [1.2, 1, 1.2], opacity: [0.6, 0.3, 0.6] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" as any }}
-        />
-        <motion.div
-          className="absolute w-[300px] h-[300px] rounded-full"
-          style={{ left: "40%", top: "30%", background: "radial-gradient(circle, rgba(212,145,92,0.06) 0%, transparent 70%)" }}
-          animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" as any }}
-        />
-        {particles.map((p, i) => <Particle key={i} {...p} />)}
-      </div>
-
-      {/* Grid overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.025]"
-        style={{
-          backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-xs font-semibold tracking-[0.15em] uppercase"
-            style={{
-              background: "rgba(232,160,100,0.1)",
-              border: "1px solid rgba(232,160,100,0.3)",
-              color: "#d4915c",
-            }}
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <Sparkles size={12} />
-            Career Application
-          </motion.div>
-
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-5 tracking-tight leading-[1.1]">
-            Apply For Your{" "}
-            <motion.span
-              className="inline-block"
-              style={{
-                backgroundImage: "linear-gradient(135deg, #e8a064, #c9922a, #d4915c, #e8a064)",
-                backgroundSize: "300% 100%",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-              animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-            >
-              Dream Role
-            </motion.span>
+    <section id="apply-form" className="py-16 sm:py-24 bg-[#0B0D10] border-b border-[#1E2530]">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="text-center mb-10 sm:mb-14">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#10B981]/10 text-[#10B981] text-xs font-semibold uppercase tracking-wider mb-3">
+            <Send className="w-3.5 h-3.5" />
+            <span>Apply Now</span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl font-bold text-[#F3F5F7] tracking-tight mb-3">
+            Submit Your Application
           </h2>
-
-          <p className="text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-            Take the next step in your career journey.{" "}
-            <span style={{ color: "rgba(255,255,255,0.7)" }}>
-              Join Axivon Technologies and build future-ready products, AI solutions, cloud platforms, and digital experiences.
-            </span>
+          <p className="text-sm sm:text-base text-[#A7B0BC] leading-relaxed font-light max-w-xl mx-auto">
+            Take the first step toward building your technical career with Axivon. Fill out the application form below.
           </p>
-        </motion.div>
-
-        {/* Main Grid */}
-        <div className="grid lg:grid-cols-[1fr_420px] gap-8 xl:gap-12 items-start">
-
-          {/* ── LEFT: Form ── */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7 }}
-            viewport={{ once: true }}
-          >
-            <div
-              className="relative rounded-3xl p-6 sm:p-8"
-              style={{
-                background: "rgba(255,255,255,0.025)",
-                border: "1px solid rgba(255,255,255,0.07)",
-                backdropFilter: "blur(20px)",
-                boxShadow: "0 40px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
-              }}
-            >
-              {/* Glass reflection */}
-              <div className="absolute inset-x-8 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)" }} />
-
-              {/* Animated border beam */}
-              <motion.div
-                className="absolute inset-0 rounded-3xl pointer-events-none"
-                style={{ padding: 1 }}
-                animate={{ opacity: [0.3, 0.7, 0.3] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as any }}
-              >
-                <div
-                  className="w-full h-full rounded-3xl"
-                  style={{ background: "linear-gradient(135deg, rgba(232,160,100,0.2), transparent, rgba(201,146,42,0.2))" }}
-                />
-              </motion.div>
-
-              <div className="relative">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="p-2.5 rounded-xl" style={{ background: "linear-gradient(135deg, rgba(232,160,100,0.2), rgba(201,146,42,0.2))", border: "1px solid rgba(232,160,100,0.3)" }}>
-                    <Send size={18} style={{ color: "#e8a064" }} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Your Application</h3>
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>All fields marked * are required</p>
-                  </div>
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* Row 1 */}
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <FloatingInput label="Full Name" name="fullName" icon={<User size={16} />} value={form.fullName} onChange={handleChange} required />
-                    <FloatingInput label="Email Address" name="email" type="email" icon={<Mail size={16} />} value={form.email} onChange={handleChange} required />
-                  </div>
-
-                  {/* Row 2 */}
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <FloatingInput label="Phone Number" name="phone" type="tel" icon={<Phone size={16} />} value={form.phone} onChange={handleChange} />
-                    <FloatingInput label="Current Location" name="location" icon={<MapPin size={16} />} value={form.location} onChange={handleChange} required />
-                  </div>
-
-                  {/* Position */}
-                  <FloatingSelect value={form.position} onChange={handleChange} />
-
-                  {/* Row 3 */}
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <FloatingInput label="LinkedIn Profile" name="linkedin" type="url" icon={<Link size={16} />} value={form.linkedin} onChange={handleChange} />
-                    <FloatingInput label="GitHub Profile" name="github" type="url" icon={<GitBranch size={16} />} value={form.github} onChange={handleChange} />
-                  </div>
-
-                  {/* Row 4 */}
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <FloatingInput label="Portfolio Website" name="portfolio" type="url" icon={<Globe size={16} />} value={form.portfolio} onChange={handleChange} />
-                    <FloatingInput label="Resume URL" name="resumeUrl" type="url" icon={<FileText size={16} />} value={form.resumeUrl} onChange={handleChange} required />
-                  </div>
-
-                  {/* Cover Letter */}
-                  <FloatingTextarea value={form.coverLetter} onChange={handleChange} />
-
-                  {/* Submit */}
-                  <motion.button
-                    type="submit"
-                    disabled={status === "loading" || status === "success"}
-                    className="relative w-full py-4 rounded-2xl font-semibold text-white overflow-hidden mt-2"
-                    whileHover={status === "idle" ? { scale: 1.01 } : {}}
-                    whileTap={status === "idle" ? { scale: 0.99 } : {}}
-                    style={{
-                      background: status === "success"
-                        ? "linear-gradient(135deg, #059669, #10b981)"
-                        : "linear-gradient(135deg, #e8a064, #c9922a)",
-                      boxShadow: status === "success"
-                        ? "0 0 40px rgba(16,185,129,0.4)"
-                        : "0 0 40px rgba(232,160,100,0.4), 0 0 80px rgba(201,146,42,0.2)",
-                      cursor: status === "idle" ? "pointer" : "default",
-                    }}
-                  >
-                    {/* Shine sweep */}
-                    {status === "idle" && (
-                      <motion.div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{ background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)" }}
-                        animate={{ x: ["-100%", "200%"] }}
-                        transition={{ duration: 3, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
-                      />
-                    )}
-                    <span className="relative flex items-center justify-center gap-2 text-sm tracking-wide">
-                      {status === "loading" && <Loader2 size={18} className="animate-spin" />}
-                      {status === "success" && <CheckCircle size={18} />}
-                      {status === "idle" && <Send size={18} />}
-                      {status === "idle" && "Submit Application"}
-                      {status === "loading" && "Submitting…"}
-                      {status === "success" && "Application Submitted!"}
-                    </span>
-                  </motion.button>
-
-                  <p className="text-center text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
-                    We review every application within 3–5 business days.
-                  </p>
-                </form>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* ── RIGHT: Panel ── */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            viewport={{ once: true }}
-            className="flex flex-col gap-5 lg:sticky lg:top-8"
-          >
-
-            {/* 3D Floating Hiring Dashboard */}
-            <TiltCard>
-              <div
-                className="relative rounded-3xl p-6 overflow-hidden"
-                style={{
-                  background: "linear-gradient(135deg, rgba(232,160,100,0.12) 0%, rgba(201,146,42,0.08) 50%, rgba(212,145,92,0.06) 100%)",
-                  border: "1px solid rgba(232,160,100,0.25)",
-                  backdropFilter: "blur(20px)",
-                  boxShadow: "0 30px 60px rgba(0,0,0,0.4), 0 0 60px rgba(232,160,100,0.08)",
-                  transformStyle: "preserve-3d",
-                }}
-              >
-                {/* Reflective surface */}
-                <div className="absolute inset-x-6 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)" }} />
-                <div className="absolute top-6 right-6 w-20 h-20 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(232,160,100,0.15), transparent)" }} />
-
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-5">
-                    <div>
-                      <div className="text-xs font-semibold tracking-widest uppercase mb-1" style={{ color: "#d4915c" }}>Hiring Dashboard</div>
-                      <h3 className="text-lg font-bold text-white">Active Recruitment</h3>
-                    </div>
-                    <motion.div
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-                      style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)" }}
-                      animate={{ opacity: [1, 0.5, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                      <span className="text-xs text-green-400 font-medium">Live</span>
-                    </motion.div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    {STATS.map((stat, i) => <StatCard key={stat.label} stat={stat} index={i} />)}
-                  </div>
-                </div>
-              </div>
-            </TiltCard>
-
-            {/* Benefits */}
-            <div
-              className="rounded-3xl p-5"
-              style={{
-                background: "rgba(255,255,255,0.025)",
-                border: "1px solid rgba(255,255,255,0.07)",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <Trophy size={14} style={{ color: "#c9922a" }} />
-                <span className="text-sm font-semibold text-white">Why Axivon?</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {BENEFITS.map((b, i) => <BenefitCard key={b.label} benefit={b} index={i} />)}
-              </div>
-            </div>
-
-            {/* CTA card */}
-            <motion.div
-              whileHover={{ scale: 1.01 }}
-              className="relative rounded-2xl p-5 overflow-hidden cursor-pointer"
-              style={{
-                background: "linear-gradient(135deg, rgba(232,160,100,0.2), rgba(201,146,42,0.15))",
-                border: "1px solid rgba(232,160,100,0.3)",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <motion.div
-                className="absolute inset-0 opacity-40"
-                animate={{ backgroundPosition: ["0% 0%", "100% 100%"] }}
-                transition={{ duration: 6, repeat: Infinity, repeatType: "reverse" }}
-                style={{
-                  background: "linear-gradient(135deg, rgba(232,160,100,0.1), rgba(212,145,92,0.05))",
-                  backgroundSize: "200% 200%",
-                }}
-              />
-              <div className="relative flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-xs font-semibold mb-1" style={{ color: "#d4915c" }}>Questions?</div>
-                  <p className="text-sm font-medium text-white">Chat with our talent team before applying.</p>
-                  <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>info@axivontech.in</p>
-                </div>
-                <ArrowUpRight size={20} style={{ color: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
-              </div>
-            </motion.div>
-          </motion.div>
         </div>
+
+        {/* Success Message Card */}
+        {success ? (
+          <div className="p-8 sm:p-12 rounded-2xl bg-[#151A21] border border-[#10B981]/30 text-center space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-7 h-7" />
+            </div>
+            <h3 className="text-2xl font-bold text-[#F3F5F7]">Application Received!</h3>
+            <p className="text-sm sm:text-base text-[#A7B0BC] leading-relaxed max-w-lg mx-auto font-light">
+              Thank you for applying to Axivon Technologies. Our engineering team reviews applications on a rolling basis. If your profile matches our requirements, we will contact you within 3–7 business days.
+            </p>
+            <div className="pt-4">
+              <button
+                type="button"
+                onClick={() => setSuccess(false)}
+                className="px-6 py-2.5 rounded-xl bg-[#10B981] text-[#04130E] font-semibold text-xs transition-colors hover:bg-[#059669]"
+              >
+                Submit Another Application
+              </button>
+            </div>
+          </div>
+        ) : (
+          <form
+            onSubmit={handleSubmit}
+            className="p-6 sm:p-10 rounded-2xl bg-[#151A21] border border-[#29313B] shadow-sm space-y-6"
+            noValidate
+          >
+            {/* Global Error Banner */}
+            {errorMessage && (
+              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span className="leading-relaxed">{errorMessage}</span>
+              </div>
+            )}
+
+            {/* Row 1: Full Name & Email */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <div>
+                <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
+                  Full Name <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-[#566171] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    required
+                    value={form.fullName}
+                    onChange={(e) => handleInputChange("fullName", e.target.value)}
+                    placeholder="e.g. Rahul Sharma"
+                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#10151B] border ${
+                      fieldErrors.fullName ? "border-red-500" : "border-[#29313B]"
+                    } text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-[#10B981] transition-colors`}
+                  />
+                </div>
+                {fieldErrors.fullName && (
+                  <p className="text-[11px] text-red-400 mt-1">{fieldErrors.fullName}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
+                  Email Address <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-[#566171] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    placeholder="you@domain.com"
+                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#10151B] border ${
+                      fieldErrors.email ? "border-red-500" : "border-[#29313B]"
+                    } text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-[#10B981] transition-colors`}
+                  />
+                </div>
+                {fieldErrors.email && (
+                  <p className="text-[11px] text-red-400 mt-1">{fieldErrors.email}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Row 2: Phone & Position */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <div>
+                <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
+                  Phone / WhatsApp Number
+                </label>
+                <div className="relative">
+                  <Phone className="w-4 h-4 text-[#566171] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                    placeholder="+91 98765 43210"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#10151B] border border-[#29313B] text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-[#10B981] transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
+                  Target Position <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <Briefcase className="w-4 h-4 text-[#566171] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <select
+                    value={form.position}
+                    onChange={handlePositionChange}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#10151B] border border-[#29313B] text-xs text-[#F3F5F7] focus:outline-none focus:border-[#10B981] transition-colors"
+                  >
+                    {availableJobs.map((job) => (
+                      <option key={job.id} value={job.title} className="bg-[#151A21] text-white">
+                        {job.title}
+                      </option>
+                    ))}
+                    <option value="General Engineering Speculative" className="bg-[#151A21] text-white">
+                      Other / Speculative Application
+                    </option>
+                  </select>
+                </div>
+                {fieldErrors.position && (
+                  <p className="text-[11px] text-red-400 mt-1">{fieldErrors.position}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Row 3: Location & Experience */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <div>
+                <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
+                  Current City / State <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <MapPin className="w-4 h-4 text-[#566171] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    required
+                    value={form.location}
+                    onChange={(e) => handleInputChange("location", e.target.value)}
+                    placeholder="e.g. Surat, Gujarat, India"
+                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#10151B] border ${
+                      fieldErrors.location ? "border-red-500" : "border-[#29313B]"
+                    } text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-[#10B981] transition-colors`}
+                  />
+                </div>
+                {fieldErrors.location && (
+                  <p className="text-[11px] text-red-400 mt-1">{fieldErrors.location}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
+                  Years of Coding Experience
+                </label>
+                <div className="relative">
+                  <Code2 className="w-4 h-4 text-[#566171] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={form.experience}
+                    onChange={(e) => handleInputChange("experience", e.target.value)}
+                    placeholder="e.g. Student / 6 months / 1 year"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#10151B] border border-[#29313B] text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-[#10B981] transition-colors"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Row 4: Resume Submission (Direct Upload OR Drive Link) */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-medium text-[#A7B0BC]">
+                  Resume / CV <span className="text-red-400">*</span>
+                </label>
+                <div className="flex items-center gap-2 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setResumeMode("upload")}
+                    className={`px-2.5 py-1 rounded-lg border font-medium transition-all ${
+                      resumeMode === "upload"
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                        : "text-[#7E8997] border-transparent hover:text-white"
+                    }`}
+                  >
+                    File Upload (PDF/DOC)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setResumeMode("link")}
+                    className={`px-2.5 py-1 rounded-lg border font-medium transition-all ${
+                      resumeMode === "link"
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                        : "text-[#7E8997] border-transparent hover:text-white"
+                    }`}
+                  >
+                    Google Drive Link
+                  </button>
+                </div>
+              </div>
+
+              {resumeMode === "upload" ? (
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`p-5 rounded-2xl border-2 border-dashed ${
+                      fieldErrors.resumeUrl
+                        ? "border-red-500/50 bg-red-500/5"
+                        : uploadSuccess
+                        ? "border-emerald-500/40 bg-emerald-500/5"
+                        : "border-[#29313B] bg-[#10151B] hover:border-emerald-500/40"
+                    } flex flex-col items-center justify-center text-center cursor-pointer transition-all`}
+                  >
+                    {uploadingResume ? (
+                      <div className="flex items-center gap-2 text-xs text-emerald-400">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Uploading resume securely...</span>
+                      </div>
+                    ) : uploadSuccess ? (
+                      <div className="flex items-center gap-2 text-xs text-emerald-400 font-semibold">
+                        <FileCheck className="w-5 h-5" />
+                        <span>{uploadSuccess} attached!</span>
+                        <span className="text-[10px] text-[#7E8997] underline ml-2">Click to replace</span>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload className="w-5 h-5 text-[#7E8997] mb-2" />
+                        <p className="text-xs font-semibold text-white">Click or drag resume file here</p>
+                        <p className="text-[10px] text-[#7E8997] mt-0.5">Supports PDF, DOC, DOCX up to 10MB</p>
+                      </>
+                    )}
+                  </div>
+                  {uploadError && <p className="text-[11px] text-red-400 mt-1">{uploadError}</p>}
+                  {fieldErrors.resumeUrl && <p className="text-[11px] text-red-400 mt-1">{fieldErrors.resumeUrl}</p>}
+                </div>
+              ) : (
+                <div>
+                  <div className="relative">
+                    <Link2 className="w-4 h-4 text-[#566171] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="url"
+                      required
+                      value={form.resumeUrl}
+                      onChange={(e) => handleInputChange("resumeUrl", e.target.value)}
+                      placeholder="https://drive.google.com/file/d/... or Dropbox link"
+                      className={`w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#10151B] border ${
+                        fieldErrors.resumeUrl ? "border-red-500" : "border-[#29313B]"
+                      } text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-[#10B981] transition-colors`}
+                    />
+                  </div>
+                  <p className="text-[11px] text-[#7E8997] mt-1.5 flex items-center gap-1.5">
+                    <Info className="w-3.5 h-3.5 text-[#D6B779] shrink-0" />
+                    <span>Please ensure link sharing permissions are set to &quot;Anyone with the link can view&quot;.</span>
+                  </p>
+                  {fieldErrors.resumeUrl && <p className="text-[11px] text-red-400 mt-1">{fieldErrors.resumeUrl}</p>}
+                </div>
+              )}
+            </div>
+
+            {/* Row 5: Profile Links */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">LinkedIn Profile</label>
+                <div className="relative">
+                  <Globe className="w-4 h-4 text-[#566171] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="url"
+                    value={form.linkedin}
+                    onChange={(e) => handleInputChange("linkedin", e.target.value)}
+                    placeholder="https://linkedin.com/in/..."
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#10151B] border border-[#29313B] text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-[#10B981] transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">GitHub Profile</label>
+                <div className="relative">
+                  <Code2 className="w-4 h-4 text-[#566171] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="url"
+                    value={form.github}
+                    onChange={(e) => handleInputChange("github", e.target.value)}
+                    placeholder="https://github.com/..."
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#10151B] border border-[#29313B] text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-[#10B981] transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">Portfolio / Website</label>
+                <div className="relative">
+                  <Link2 className="w-4 h-4 text-[#566171] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="url"
+                    value={form.portfolio}
+                    onChange={(e) => handleInputChange("portfolio", e.target.value)}
+                    placeholder="https://yourportfolio.dev"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#10151B] border border-[#29313B] text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-[#10B981] transition-colors"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Row 6: Cover Letter */}
+            <div>
+              <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
+                Brief Cover Note or Personal Projects Overview
+              </label>
+              <textarea
+                rows={4}
+                value={form.coverLetter}
+                onChange={(e) => handleInputChange("coverLetter", e.target.value)}
+                placeholder="Tell us about what you have built, which tools you love using, and why you want to intern at Axivon Technologies..."
+                className="w-full px-4 py-3 rounded-xl bg-[#10151B] border border-[#29313B] text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-[#10B981] transition-colors resize-none leading-relaxed"
+              />
+            </div>
+
+            {/* Submit Action */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 px-6 rounded-xl bg-[#10B981] hover:bg-[#059669] disabled:opacity-50 text-[#04130E] font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#10B981]/15 active:scale-[0.99]"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Submitting Application...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>Submit Application for {form.position}</span>
+                  </>
+                )}
+              </button>
+              <p className="text-[11px] text-[#7E8997] text-center mt-3 font-light">
+                By submitting, you agree to allow Axivon Technologies to process your application data for recruitment purposes.
+              </p>
+            </div>
+          </form>
+        )}
       </div>
     </section>
   );

@@ -91,7 +91,7 @@ export async function generateResponse(
 
   if (intent === 'HUMAN_HANDOFF') {
     return {
-      reply: 'Absolutely — I\'ll connect you with the Axivon team right away.\n\n📞 **WhatsApp/Call**: +91 94732 63768\n📧 **Email**: contact@axivontech.in\n\nAlternatively, I can capture your details here. Would you like that?',
+      reply: 'Absolutely — I\'ll connect you with the Axivon team right away.\n\n📞 **WhatsApp/Call**: +91 94732 63768\n📧 **Email**: info@axivontech.in\n\nAlternatively, I can capture your details here. Would you like that?',
       stateUpdates: { intent, collectedData: extractedData, stage: 'QUALIFYING' },
       showLeadCapture: true,
       leadScore,
@@ -101,7 +101,7 @@ export async function generateResponse(
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    reply = 'For this specific question, it\'s best to speak directly with the Axivon team.\n\n📞 **WhatsApp**: +91 94732 63768\n📧 **Email**: contact@axivontech.in';
+    reply = 'For this specific question, it\'s best to speak directly with the Axivon team.\n\n📞 **WhatsApp**: +91 94732 63768\n📧 **Email**: info@axivontech.in';
     return { reply, stateUpdates: {}, showLeadCapture: false, leadScore, isHumanHandoff: false };
   }
 
@@ -155,7 +155,7 @@ COLLECTED USER DATA SO FAR: ${collectedText || 'None'}`;
 
   } catch (err) {
     console.error('[Gemini]', (err as Error).message);
-    reply = 'I\'m having trouble connecting right now. Please reach out to contact@axivontech.in.';
+    reply = 'I\'m having trouble connecting right now. Please reach out to info@axivontech.in.';
   }
 
   const stateUpdates: Partial<ConversationState> = {

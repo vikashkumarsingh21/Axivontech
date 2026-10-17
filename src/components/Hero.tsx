@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { COMPANY_STATS } from "@/data/company-stats";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -21,8 +22,8 @@ const item = {
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-xl sm:text-2xl font-bold tracking-tight text-[#f4f4f5]">{value}</span>
-      <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.14em] text-[#71717a]">
+      <span className="font-heading text-xl sm:text-2xl font-bold tracking-tight text-[#F3F5F7]">{value}</span>
+      <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7E8997]">
         {label}
       </span>
     </div>
@@ -114,16 +115,16 @@ export default function Hero() {
           >
             {/* Eyebrow */}
             <motion.div variants={item}>
-              <span className="mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.14em] sm:tracking-[0.16em] text-white backdrop-blur-md">
-                <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#e8a064]" />
+              <span className="mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.16em] text-[#F3F5F7] backdrop-blur-md">
+                <Sparkles className="h-3.5 w-3.5 text-[#e8a064]" />
                 Technology &amp; Digital Agency &mdash; India
               </span>
             </motion.div>
 
-            {/* Headline — mobile-specific sizing to prevent 5-6 line wrapping */}
+            {/* Headline — responsive sizing, Manrope heading font */}
             <motion.h1
               variants={item}
-              className="max-w-3xl text-[1.85rem] sm:text-4xl md:text-5xl lg:text-[4rem] font-bold leading-[1.12] sm:leading-[1.08] tracking-tight text-[#f4f4f5]"
+              className="font-heading max-w-3xl text-[2rem] sm:text-4xl md:text-5xl lg:text-[4rem] font-bold leading-[1.12] sm:leading-[1.08] tracking-tight text-[#F3F5F7] text-balance"
             >
               We build digital products that{" "}
               <span className="text-[#e8a064]">
@@ -131,10 +132,10 @@ export default function Hero() {
               </span>
             </motion.h1>
 
-            {/* Sub-copy — tighter on mobile */}
+            {/* Sub-copy */}
             <motion.p
               variants={item}
-              className="mt-4 sm:mt-6 max-w-2xl text-sm sm:text-base lg:text-xl leading-relaxed text-gray-300 font-light"
+              className="mt-4 sm:mt-6 max-w-2xl text-sm sm:text-base lg:text-lg leading-relaxed text-[#A7B0BC] font-light text-pretty"
             >
               Axivon Technologies designs and engineers high-performance websites,
               mobile apps, AI systems, and custom software for startups, healthcare teams,
@@ -148,20 +149,20 @@ export default function Hero() {
             >
               <Link
                 href="/contact#contact-form"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e8a064] px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-semibold text-[#0f0f0f] shadow-[0_4px_20px_rgba(232,160,100,0.30)] transition-all hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#e8a064]"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e8a064] px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-semibold tracking-tight text-[#0f0f0f] shadow-[0_4px_20px_rgba(232,160,100,0.30)] transition-all hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#e8a064]"
               >
                 <span>Start a Project</span>
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </Link>
               <Link
                 href="/portfolio"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-semibold text-white transition-all hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#e8a064]"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-semibold tracking-tight text-[#F3F5F7] transition-all hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#e8a064]"
               >
                 <span>View Selected Work</span>
               </Link>
             </motion.div>
 
-            {/* Capability Badges — fewer visible on mobile, horizontal scroll */}
+            {/* Capability Badges */}
             <motion.div
               variants={item}
               className="mt-8 sm:mt-12 flex flex-wrap items-center justify-center gap-2 sm:gap-3 lg:justify-start"
@@ -175,7 +176,7 @@ export default function Hero() {
               ].map((pill) => (
                 <span
                   key={pill}
-                  className="inline-flex items-center rounded-full border border-white/10 bg-black/40 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-medium text-gray-300"
+                  className="inline-flex items-center rounded-full border border-white/10 bg-black/40 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-medium text-[#A7B0BC]"
                 >
                   {pill}
                 </span>
@@ -187,13 +188,13 @@ export default function Hero() {
               variants={item}
               className="mt-8 sm:mt-12 grid grid-cols-2 gap-5 sm:flex sm:flex-wrap sm:items-center sm:gap-7 border-t border-white/10 pt-6 sm:pt-8 w-full sm:w-auto sm:justify-center lg:justify-start"
             >
-              <Stat value="10+" label="Projects Delivered" />
+              <Stat value={COMPANY_STATS.projectsDelivered.value} label={COMPANY_STATS.projectsDelivered.label} />
               <div className="hidden h-7 w-px bg-white/10 sm:block" />
-              <Stat value="8" label="Core Services" />
+              <Stat value={COMPANY_STATS.coreServices.value} label={COMPANY_STATS.coreServices.label} />
               <div className="hidden h-7 w-px bg-white/10 sm:block" />
-              <Stat value="24/7" label="Support" />
+              <Stat value={COMPANY_STATS.support.value} label={COMPANY_STATS.support.label} />
               <div className="hidden h-7 w-px bg-white/10 sm:block" />
-              <Stat value="100%" label="Code Quality" />
+              <Stat value={COMPANY_STATS.codeQuality.value} label={COMPANY_STATS.codeQuality.label} />
             </motion.div>
 
           </motion.div>

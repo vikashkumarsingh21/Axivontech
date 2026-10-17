@@ -76,7 +76,7 @@ export const servicesData: ServiceData[] = [
       {
         title: "Blazing-Fast Performance",
         description:
-          "Every millisecond matters. We optimise Core Web Vitals, server-side rendering, and asset delivery so your site scores 90+ on Google PageSpeed — reducing bounce rates and boosting rankings.",
+          "Every millisecond matters. We optimize Core Web Vitals, server-side rendering, and asset delivery to maximize speed, reduce bounce rates, and boost search rankings.",
       },
       {
         title: "Conversion-Optimised Architecture",
@@ -174,7 +174,7 @@ export const servicesData: ServiceData[] = [
       {
         question: "What does post-launch support look like?",
         answer:
-          "We offer tiered retainer packages covering bug fixes, feature additions, performance monitoring, and security patches. Our standard SLA guarantees a response to critical issues within 4 business hours.",
+          "We offer tiered retainer packages covering bug fixes, feature additions, performance monitoring, and security updates with prioritized rapid response times.",
       },
     ],
     cta: {
@@ -441,12 +441,12 @@ export const servicesData: ServiceData[] = [
     shortDescription:
       "Scalable, secure, and cost-optimised cloud infrastructure designed to power your business at any scale.",
     heroDescription:
-      "Axivon Technologies designs and manages cloud infrastructure that is resilient, secure, and built for growth. Whether you're migrating a legacy monolith, designing a greenfield cloud-native architecture, or optimising runaway cloud spend, our certified cloud engineers deliver infrastructure you can rely on.",
+      "Axivon Technologies designs and manages cloud infrastructure that is resilient, secure, and built for growth. Whether you're migrating a legacy monolith, designing a greenfield cloud-native architecture, or optimising runaway cloud spend, our cloud engineers deliver infrastructure you can rely on.",
     badge: "AWS · GCP · Azure",
     icon: "Cloud",
     metaTitle: "Cloud Solutions & Infrastructure Services | Axivon Technologies",
     metaDescription:
-      "Expert cloud architecture, migration, DevOps, and optimisation by Axivon Technologies. AWS, GCP, Azure certified engineers. Cut costs and scale confidently.",
+      "Expert cloud architecture, migration, DevOps, and optimization by Axivon Technologies across AWS, GCP, and Azure. Cut costs and scale confidently.",
     benefits: [
       {
         title: "Elastic Scalability",
@@ -469,9 +469,9 @@ export const servicesData: ServiceData[] = [
           "Automated build, test, and deployment pipelines eliminate manual deployments, reduce human error, and let your team ship multiple times per day with confidence.",
       },
       {
-        title: "Security & Compliance",
+        title: "Security & Hardening",
         description:
-          "VPC design, IAM least-privilege policies, WAF, secrets management, and compliance frameworks (SOC 2, ISO 27001, HIPAA) protect your cloud environment from top to bottom.",
+          "VPC design, IAM least-privilege policies, WAF, secrets management, and industry security benchmarks protect your cloud environment from top to bottom.",
       },
       {
         title: "Infrastructure as Code",
@@ -547,9 +547,9 @@ export const servicesData: ServiceData[] = [
           "We use blue-green deployment patterns, database replication, and traffic shifting via load balancers or DNS to migrate workloads incrementally with no downtime for end users.",
       },
       {
-        question: "Are you certified on major cloud platforms?",
+        question: "How do you align with major cloud platforms?",
         answer:
-          "Yes. Our team holds AWS Solutions Architect, GCP Professional Cloud Architect, and Azure Administrator certifications.",
+          "Our team designs and implements architectures adhering directly to the AWS Well-Architected Framework, Google Cloud Architecture Framework, and Microsoft Azure Cloud Adoption Framework.",
       },
     ],
     cta: {

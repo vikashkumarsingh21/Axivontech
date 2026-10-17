@@ -14,6 +14,8 @@ import {
 import { SectionHeader } from "@/components/ui";
 import Image from "next/image";
 
+import { COMPANY_STATS } from "@/data/company-stats";
+
 interface Feature {
   icon: LucideIcon;
   title: string;
@@ -24,6 +26,7 @@ interface Stat {
   end: number;
   suffix: string;
   label: string;
+  staticDisplay?: string;
 }
 
 const FEATURES: Feature[] = [
@@ -66,10 +69,27 @@ const FEATURES: Feature[] = [
 ];
 
 const STATS: Stat[] = [
-  { end: 10,  suffix: "+",  label: "Projects Completed" },
-  { end: 8,   suffix: "+",  label: "Services Offered" },
-  { end: 24,  suffix: "/7", label: "Technical Support" },
-  { end: 100, suffix: "%",  label: "Commitment to Quality" },
+  { 
+    end: COMPANY_STATS.projectsDelivered.numericValue,  
+    suffix: COMPANY_STATS.projectsDelivered.suffix ?? "",  
+    label: COMPANY_STATS.projectsDelivered.label 
+  },
+  { 
+    end: COMPANY_STATS.coreServices.numericValue,   
+    suffix: COMPANY_STATS.coreServices.suffix ?? "",  
+    label: COMPANY_STATS.coreServices.label 
+  },
+  { 
+    end: 24,  
+    suffix: "/7", 
+    label: COMPANY_STATS.support.label,
+    staticDisplay: COMPANY_STATS.support.value // "24/7" displayed directly to prevent "0/7" flash
+  },
+  { 
+    end: COMPANY_STATS.codeQuality.numericValue, 
+    suffix: COMPANY_STATS.codeQuality.suffix ?? "",  
+    label: COMPANY_STATS.codeQuality.label 
+  },
 ];
 
 const headerVariants: Variants = {
@@ -87,36 +107,49 @@ const cardVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" as any } },
 };
 
-// ── Count-up ──────────────────────────────────────────────────────
+// ── Count-up (safely defaults to final verified value for SSR & crawlers) ──
 
-function useCountUp(end: number, startWhen: boolean, duration = 1.6) {
-  const [value, setValue] = useState(0);
+function useCountUp(end: number, startWhen: boolean, shouldAnimate: boolean, duration = 1.4) {
+  // Initialize with 'end' so SSR, crawlers, and initial renders NEVER show 0
+  const [value, setValue] = useState(end);
+
   useEffect(() => {
-    if (!startWhen) return;
+    if (!startWhen || !shouldAnimate) return;
+
+    // Start count-up animation on first in-view if animation is enabled
+    setValue(0);
     let startTime: number | null = null;
     let raf = 0;
+
     const step = (ts: number) => {
       if (startTime === null) startTime = ts;
       const progress = Math.min((ts - startTime) / (duration * 1000), 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setValue(Math.floor(eased * end));
-      if (progress < 1) { raf = requestAnimationFrame(step); }
-      else { setValue(end); }
+      if (progress < 1) { 
+        raf = requestAnimationFrame(step); 
+      } else { 
+        setValue(end); 
+      }
     };
+
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [startWhen, end, duration]);
+  }, [startWhen, end, duration, shouldAnimate]);
+
   return value;
 }
 
-function StatItem({ end, suffix, label, isInView }: Stat & { isInView: boolean }) {
-  const count = useCountUp(end, isInView);
+function StatItem({ end, suffix, label, staticDisplay, isInView, shouldReduceMotion }: Stat & { isInView: boolean; shouldReduceMotion: boolean }) {
+  const count = useCountUp(end, isInView, !shouldReduceMotion && !staticDisplay);
+  const displayString = staticDisplay ?? `${count}${suffix}`;
+
   return (
-    <div className="flex flex-col items-center justify-center gap-1 px-6 py-8 text-center">
-      <span className="text-3xl font-bold text-[#e8a064]">
-        {count}{suffix}
+    <div className="flex flex-col items-center justify-center gap-1.5 px-6 py-8 text-center">
+      <span className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-[#e8a064]">
+        {displayString}
       </span>
-      <span className="text-xs font-medium uppercase tracking-[0.14em] text-[#71717a]">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7E8997]">
         {label}
       </span>
     </div>
@@ -129,13 +162,13 @@ function FeatureCard({ feature }: { feature: Feature }) {
   const Icon = feature.icon;
   return (
     <div className="group flex h-full flex-col rounded-2xl border border-[#262626] bg-[#141414] p-6 transition-all duration-200 hover:border-[rgba(232,160,100,0.25)] hover:bg-[#1c1c1e]">
-      <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-[#1c1c1e] text-[#71717a] transition-colors duration-200 group-hover:bg-[#2a1f14] group-hover:text-[#e8a064]">
+      <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-[#1c1c1e] text-[#A7B0BC] transition-colors duration-200 group-hover:bg-[#2a1f14] group-hover:text-[#e8a064]">
         <Icon className="h-5 w-5" strokeWidth={1.8} />
       </div>
-      <h3 className="mb-2 text-base font-semibold text-[#d4d4d4] group-hover:text-[#f4f4f5] transition-colors">
+      <h3 className="font-heading mb-2 text-base sm:text-lg font-bold tracking-tight text-[#F3F5F7] group-hover:text-[#e8a064] transition-colors">
         {feature.title}
       </h3>
-      <p className="text-sm leading-6 text-[#71717a]">{feature.description}</p>
+      <p className="text-sm leading-relaxed text-[#A7B0BC] font-light text-pretty">{feature.description}</p>
     </div>
   );
 }
@@ -186,7 +219,12 @@ export default function WhyChooseUs() {
             >
               <div className="grid grid-cols-2 divide-x divide-y divide-[#262626]">
                 {STATS.map((stat) => (
-                  <StatItem key={stat.label} {...stat} isInView={isStatsInView} />
+                  <StatItem 
+                    key={stat.label} 
+                    {...stat} 
+                    isInView={isStatsInView} 
+                    shouldReduceMotion={shouldReduceMotion ?? false} 
+                  />
                 ))}
               </div>
             </motion.div>

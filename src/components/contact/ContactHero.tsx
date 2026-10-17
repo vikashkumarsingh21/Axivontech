@@ -49,23 +49,23 @@ export default function ContactHero() {
       >
         <motion.div 
           variants={fadeUp}
-          className="rounded-full border border-[rgba(255,255,255,0.12)] px-4 py-1.5 bg-[#0f0f0f]/50 backdrop-blur-md"
+          className="rounded-full border border-white/10 px-4 py-1.5 bg-[#0f0f0f]/60 backdrop-blur-md"
         >
-          <span className="text-sm font-semibold uppercase tracking-[0.15em] text-[#e8a064]">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#e8a064]">
             Get In Touch
           </span>
         </motion.div>
 
         <motion.h1 
           variants={fadeUp}
-          className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-[#f4f4f5] max-w-3xl"
+          className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#F3F5F7] max-w-3xl leading-[1.12] text-balance"
         >
           Let's Build Something That Matters.
         </motion.h1>
 
         <motion.p 
           variants={fadeUp}
-          className="mt-2 max-w-2xl text-lg sm:text-xl text-[#a1a1aa] leading-relaxed drop-shadow-md"
+          className="mt-2 max-w-2xl text-base sm:text-lg lg:text-xl text-[#A7B0BC] leading-relaxed font-light text-pretty"
         >
           We work with businesses, organizations, and teams to build digital products, software, AI systems, automation, and powerful technology solutions.
         </motion.p>

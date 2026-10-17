@@ -12,7 +12,7 @@ import {
   TrendingUp, Award, Clock, MessageSquare, ChevronDown, 
   ChevronRight, Building, UserCheck, ShieldCheck,
   CreditCard, UserPlus, Image as ImageIcon, LayoutTemplate,
-  X
+  GraduationCap, X
 } from "lucide-react";
 
 type NavItem = {
@@ -46,6 +46,7 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
     "Sales CRM & Leads": true,
     "Business Partner Network": true,
     "Workforce & Operations": false,
+    "Careers & Recruitment": false,
     "Content Management": false,
     "Platform & Governance": false,
   });
@@ -96,6 +97,15 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
         { name: "Work Reports", href: "/admin/work-reports", icon: FileText },
         { name: "Projects", href: "/admin/projects", icon: Briefcase },
         { name: "Tasks", href: "/admin/tasks", icon: CheckSquare },
+      ]
+    },
+    {
+      title: "Careers & Recruitment",
+      icon: GraduationCap,
+      items: [
+        { name: "Job Postings", href: "/admin/careers", icon: Briefcase },
+        { name: "Candidate Applications", href: "/admin/careers/applications", icon: Users },
+        { name: "Page Content Settings", href: "/admin/careers/settings", icon: Settings },
       ]
     },
     {

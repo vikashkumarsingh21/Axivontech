@@ -155,7 +155,7 @@ export const AXIVON_KNOWLEDGE: KnowledgeEntry[] = [
     keywords: ["get quote", "get estimate", "get proposal", "free consultation", "discuss requirements", "talk about project"],
     title: "Getting a Price Quote",
     content:
-      "To get an accurate quote, book a free consultation. Share your project requirements and the Axivon team will provide a detailed estimate within 2-5 business days. Contact via WhatsApp at +91 94732 63768, email at contact@axivontech.in, or fill the contact form at axivontech.in/contact.",
+      "To get an accurate quote, book a free consultation. Share your project requirements and the Axivon team will provide a detailed estimate within 2-5 business days. Contact via WhatsApp at +91 94732 63768, email at info@axivontech.in, or fill the contact form at axivontech.in/contact.",
     priority: 8,
     confidence: "HIGH",
   },
@@ -259,7 +259,7 @@ export const AXIVON_KNOWLEDGE: KnowledgeEntry[] = [
     keywords: ["contact", "email", "phone", "whatsapp", "reach", "talk", "call", "message", "address", "location", "get in touch"],
     title: "Contact Axivon Technologies",
     content:
-      "Contact Axivon Technologies:\n📧 Email: contact@axivontech.in\n📞 WhatsApp/Call: +91 94732 63768\n🌐 Website: https://axivontech.in/contact\n💬 WhatsApp Direct: https://wa.me/919473263768\n\nThe team responds within 24 hours on business days.",
+      "Contact Axivon Technologies:\n📧 Email: info@axivontech.in\n📞 WhatsApp/Call: +91 94732 63768\n🌐 Website: https://axivontech.in/contact\n💬 WhatsApp Direct: https://wa.me/919473263768\n\nThe team responds within 24 hours on business days.",
     priority: 10,
     confidence: "HIGH",
   },

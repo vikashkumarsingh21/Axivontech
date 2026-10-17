@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -61,7 +61,7 @@ const mobileActionsVariants: Variants = {
   open: { opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE_NAV, delay: 0.35 } },
 };
 
-export default function Navbar() {
+export default function Navbar({ careersEnabled = false }: { careersEnabled?: boolean } = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -71,6 +71,10 @@ export default function Navbar() {
   const pathname = usePathname();
   const portfolioContainerRef = useRef<HTMLLIElement>(null);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const navLinks: NavLink[] = useMemo(() => {
+    return NAV_LINKS.filter((link: NavLink) => link.href !== "/careers" || careersEnabled);
+  }, [careersEnabled]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -197,7 +201,7 @@ export default function Navbar() {
             if (!portfolioOpen) setHovered(null);
           }}
         >
-          {NAV_LINKS.map((link) => {
+          {navLinks.map((link) => {
             if (link.hasDropdown) {
               return (
                 <li
@@ -214,16 +218,16 @@ export default function Navbar() {
                       aria-expanded={portfolioOpen}
                       aria-haspopup="true"
                       aria-label="Portfolio menu options"
-                      className={`relative z-10 flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 ${
+                      className={`relative z-10 flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 ${
                         isActive(link.href)
-                          ? "text-[#f4f4f5]"
-                          : "text-[#a1a1aa] hover:text-[#f4f4f5]"
+                          ? "text-[#F3F5F7] font-semibold"
+                          : "text-[#A7B0BC] hover:text-[#F3F5F7]"
                       }`}
                     >
                       <span>{link.label}</span>
                       <ChevronDown
                         className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                          portfolioOpen ? "rotate-180 text-[#e8a064]" : "text-[#71717a]"
+                          portfolioOpen ? "rotate-180 text-[#e8a064]" : "text-[#7E8997]"
                         }`}
                       />
                     </button>
@@ -329,8 +333,8 @@ export default function Navbar() {
                   href={link.href}
                   className={`relative z-10 block rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 ${
                     isActive(link.href)
-                      ? "text-[#f4f4f5]"
-                      : "text-[#a1a1aa] hover:text-[#f4f4f5]"
+                      ? "text-[#F3F5F7] font-semibold"
+                      : "text-[#A7B0BC] hover:text-[#F3F5F7]"
                   }`}
                 >
                   {link.label}
@@ -355,7 +359,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <Link
             href="/login"
-            className="hidden items-center gap-1.5 rounded-full border border-transparent px-3.5 py-2 text-xs font-medium uppercase tracking-[0.12em] text-[#a1a1aa] transition-all hover:border-[#262626] hover:bg-[#141414] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 lg:inline-flex"
+            className="hidden items-center gap-1.5 rounded-full border border-transparent px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#A7B0BC] transition-all hover:border-[#262626] hover:bg-[#141414] hover:text-[#F3F5F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 lg:inline-flex"
           >
             Login
           </Link>
@@ -364,7 +368,7 @@ export default function Navbar() {
             href="/contact#contact-form"
             whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
             whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
-            className="hidden rounded-full bg-[#e8a064] px-5 py-2.5 text-sm font-semibold text-[#0f0f0f] shadow-[0_4px_16px_rgba(232,160,100,0.25)] transition-colors hover:bg-[#f0b07a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 lg:inline-flex"
+            className="hidden rounded-full bg-[#e8a064] px-5 py-2.5 text-sm font-semibold tracking-tight text-[#0f0f0f] shadow-[0_4px_16px_rgba(232,160,100,0.25)] transition-colors hover:bg-[#f0b07a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 lg:inline-flex"
           >
             Book Consultation
           </motion.a>
@@ -459,7 +463,7 @@ export default function Navbar() {
               exit="closed"
               className="flex flex-1 flex-col justify-center gap-1 px-6 sm:px-10 py-6"
             >
-              {NAV_LINKS.map((link) => {
+              {navLinks.map((link) => {
                 if (link.hasDropdown) {
                   return (
                     <motion.li key={link.href} variants={mobileLinkItemVariants} className="flex flex-col">

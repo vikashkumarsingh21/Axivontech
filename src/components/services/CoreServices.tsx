@@ -24,10 +24,10 @@ export default function CoreServices() {
           transition={{ duration: 0.6 }}
           className="mb-16 md:mb-24"
         >
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-heading font-bold tracking-tight text-[#F3F5F7] mb-4 text-balance">
             Core Engineering Services
           </h2>
-          <p className="text-[#a1a1aa] text-lg max-w-2xl">
+          <p className="text-[#A7B0BC] text-base sm:text-lg max-w-2xl leading-relaxed text-pretty">
             Our primary technology disciplines. We build robust, scalable solutions across these core domains to support ambitious businesses.
           </p>
         </motion.div>
@@ -45,15 +45,15 @@ export default function CoreServices() {
               >
                 {/* Number & Title */}
                 <div className="md:w-1/3 shrink-0">
-                  <span className="block text-sm font-bold text-[#e8a064] mb-4 tracking-widest">{number}</span>
-                  <h3 className="text-2xl sm:text-3xl font-semibold text-white group-hover:text-[#e8a064] transition-colors duration-300">
+                  <span className="block text-sm font-mono font-bold text-[#e8a064] mb-4 tracking-widest">{number}</span>
+                  <h3 className="text-2xl sm:text-3xl font-heading font-bold text-[#F3F5F7] group-hover:text-[#e8a064] transition-colors duration-300">
                     {service.title}
                   </h3>
                 </div>
 
                 {/* Description & Action */}
                 <div className="md:w-2/3 flex flex-col items-start">
-                  <p className="text-lg text-[#a1a1aa] leading-relaxed mb-8">
+                  <p className="text-base sm:text-lg text-[#A7B0BC] leading-relaxed mb-8 text-pretty">
                     {service.shortDescription}
                   </p>
                   
@@ -62,14 +62,14 @@ export default function CoreServices() {
                     {service.benefits.slice(0, 4).map((benefit) => (
                       <li key={benefit.title} className="flex items-start gap-3">
                         <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e8a064]" aria-hidden />
-                        <span className="text-sm font-medium text-[#d4d4d4]">{benefit.title}</span>
+                        <span className="text-sm font-medium text-[#A7B0BC]">{benefit.title}</span>
                       </li>
                     ))}
                   </ul>
 
                   <Link
                     href={`/services/${service.slug}`}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-white transition-all duration-300 hover:text-[#e8a064] hover:gap-3"
+                    className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight text-[#F3F5F7] transition-all duration-300 hover:text-[#e8a064] hover:gap-3"
                   >
                     Explore {service.title}
                     <ArrowRight className="h-4 w-4" aria-hidden />

@@ -24,7 +24,7 @@ export function SectionHeader({
   align = "center",
   light = false,
   className,
-  maxWidthClass = "max-w-2xl",
+  maxWidthClass = "max-w-3xl",
 }: SectionHeaderProps) {
   const isCenter = align === "center";
 
@@ -41,8 +41,10 @@ export function SectionHeader({
       {overline && (
         <span
           className={cn(
-            "mb-4 text-[11px] font-semibold uppercase tracking-[0.18em]",
-            light ? "text-[#c47a3a]" : "text-[#e8a064]"
+            "mb-3.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-[0.16em] border",
+            light
+              ? "border-[#e5e5e3] bg-white text-[#c47a3a]"
+              : "border-[rgba(232,160,100,0.25)] bg-[#2a1f14] text-[#e8a064]"
           )}
         >
           {overline}
@@ -50,8 +52,8 @@ export function SectionHeader({
       )}
       <h2
         className={cn(
-          "text-3xl font-bold tracking-tight sm:text-4xl",
-          light ? "text-[#111111]" : "text-[#f4f4f5]"
+          "font-heading text-2xl sm:text-4xl lg:text-[2.65rem] font-bold tracking-tight leading-[1.18] sm:leading-[1.15] text-balance",
+          light ? "text-[#111111]" : "text-[#F3F5F7]"
         )}
       >
         {heading}
@@ -59,8 +61,8 @@ export function SectionHeader({
       {body && (
         <p
           className={cn(
-            "mt-4 text-base leading-7 sm:text-lg",
-            light ? "text-[#525252]" : "text-[#a1a1aa]"
+            "mt-4 text-sm sm:text-base lg:text-lg leading-relaxed font-light text-pretty",
+            light ? "text-[#525252]" : "text-[#A7B0BC]"
           )}
         >
           {body}
@@ -82,7 +84,7 @@ export function Badge({ children, className, light = false }: BadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em]",
+        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] leading-normal",
         light
           ? "border border-[#e5e5e3] bg-white text-[#c47a3a]"
           : "border border-[rgba(232,160,100,0.25)] bg-[#2a1f14] text-[#e8a064]",

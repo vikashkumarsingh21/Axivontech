@@ -14,6 +14,7 @@ model Organization {
   updatedAt         DateTime           @updatedAt
   users             User[]
   portfolioProjects PortfolioProject[]
+  jobPostings       JobPosting[]
 }
 
 model User {
@@ -105,6 +106,11 @@ model User {
   changedApplicationStatuses ApplicationStatusHistory[]     @relation("ApplicationStatusChanger")
 
   loginPagePosters LoginPagePoster[] @relation("PosterCreator")
+
+  // Careers & Recruitment Relations
+  createdJobPostings      JobPosting[]         @relation("JobCreator")
+  reviewedJobApplications CareerApplication[]  @relation("ApplicationReviewerUser")
+  updatedCareersSettings  CareersPageSetting[] @relation("CareersSettingUpdater")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1655,3 +1661,114 @@ model LoginPagePoster {
   @@index([status])
   @@index([displayOrder])
 }
+
+// -----------------------------------------------------------------------------
+// DYNAMIC CAREERS & RECRUITMENT SYSTEM
+// -----------------------------------------------------------------------------
+
+model JobPosting {
+  id               String        @id @default(cuid())
+  organizationId   String?
+  organization     Organization? @relation(fields: [organizationId], references: [id])
+  slug             String        @unique
+  title            String
+  department       String        // Engineering, AI & Automation, Design, Operations, etc.
+  employmentType   String        @default("Internship") // Internship, Full-Time, Part-Time, Contract
+  workArrangement  String        @default("Remote")     // Remote, Hybrid, On-site
+  location         String        @default("Remote (India)")
+  experienceLevel  String        @default("0–1 Years / Freshers Welcome")
+  minExperience    Int?          @default(0)
+  maxExperience    Int?          @default(1)
+  stipend          String?       // e.g. "Performance-Based / Competitive for Interns"
+  salaryRange      String?
+  summary          String        @db.Text
+  description      String        @db.Text
+  responsibilities String[]
+  qualifications   String[]
+  skills           String[]
+  preferredSkills  String[]      @default([])
+  benefits         String[]      @default([])
+  deadline         DateTime?
+  status           String        @default("DRAFT") // DRAFT, PUBLISHED, CLOSED, ARCHIVED
+  isFeatured       Boolean       @default(false)
+  displayOrder     Int           @default(0)
+  seoTitle         String?
+  seoDescription   String?       @db.Text
+  publishedAt      DateTime?
+  closedAt         DateTime?
+  archivedAt       DateTime?
+  createdById      String?
+  createdBy        User?         @relation("JobCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  applications     CareerApplication[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([status])
+  @@index([slug])
+  @@index([department])
+  @@index([isFeatured])
+  @@index([displayOrder])
+  @@index([createdAt])
+}
+
+model CareerApplication {
+  id             String      @id @default(cuid())
+  jobId          String?
+  job            JobPosting? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  jobTitle       String      // Snapshot of job title applied for
+  fullName       String
+  email          String
+  phone          String?
+  location       String?
+  currentRole    String?
+  experience     String?
+  resumeUrl      String      @db.Text
+  resumeFileName String?
+  portfolioUrl   String?
+  linkedinUrl    String?
+  githubUrl      String?
+  coverLetter    String?     @db.Text
+  status         String      @default("NEW") // NEW, UNDER_REVIEW, SHORTLISTED, INTERVIEW, SELECTED, REJECTED
+  adminNotes     String?     @db.Text
+  rating         Int?
+  reviewedById   String?
+  reviewedBy     User?       @relation("ApplicationReviewerUser", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt     DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([status])
+  @@index([jobId])
+  @@index([email])
+  @@index([createdAt])
+}
+
+model CareersPageSetting {
+  id                  String   @id @default("default")
+  careersPageEnabled  Boolean  @default(false)
+  heroEyebrow         String   @default("CAREERS AT AXIVON • WE ARE HIRING INTERNS")
+  heroTitle           String   @default("Build the Future of Enterprise Software & AI")
+  heroDescription     String   @db.Text @default("Join our engineering-driven team building mission-critical SaaS, robotics, IoT, and AI solutions. We offer high-impact remote internships with hands-on production code, direct mentorship, and fast-track career growth.")
+  primaryCtaText      String   @default("Explore Open Positions")
+  secondaryCtaText    String   @default("Submit General Application")
+  statTotalOpenings   String   @default("0")
+  statWorkPolicy      String   @default("100% Remote-First")
+  statExperienceLevel String   @default("0–1 Years Focus")
+  statResponseTime    String   @default("< 48h Response")
+  whyWorkTitle        String   @default("Why Launch Your Career at Axivon")
+  whyWorkSubtitle     String   @default("We don't give interns busywork. From week one, you contribute to real software deployed to production.")
+  culturePillars      Json?
+  hiringSteps         Json?
+  faqs                Json?
+  ctaHeading          String   @default("Don't See the Perfect Match?")
+  ctaDescription      String   @db.Text @default("We are always looking for driven engineers, designers, and innovators. Submit your profile for future openings or speculative roles.")
+  ctaButtonText       String   @default("Send Speculative Application")
+  ctaEmail            String   @default("careers@axivontech.in")
+  seoTitle            String   @default("Careers at Axivon Technologies | Remote Engineering & AI Internships")
+  seoDescription      String   @db.Text @default("Explore remote engineering, AI/ML, and UI/UX internship opportunities at Axivon Technologies. Work on production software with mentorship and high-growth potential.")
+  sectionsVisibility  Json?
+  updatedById         String?
+  updatedBy           User?    @relation("CareersSettingUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  updatedAt           DateTime @updatedAt
+}
+

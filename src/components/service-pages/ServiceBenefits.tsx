@@ -523,8 +523,8 @@ function BenefitCard({
           <div className="flex-1 flex flex-col">
             <div className="flex items-start justify-between mb-2 gap-3">
               <h3
-                className="text-base font-semibold leading-snug"
-                style={{ color: "rgba(255,255,255,0.9)" }}
+                className="text-base font-heading font-semibold leading-snug"
+                style={{ color: "#F3F5F7" }}
               >
                 {title}
               </h3>
@@ -532,15 +532,15 @@ function BenefitCard({
                 size={14}
                 className="flex-shrink-0 mt-0.5 transition-all duration-300"
                 style={{
-                  color: hovered ? accent.primary : "rgba(255,255,255,0.15)",
+                  color: hovered ? accent.primary : "rgba(255,255,255,0.25)",
                   transform: hovered ? "translate(2px, -2px)" : "none",
                 }}
                 aria-hidden
               />
             </div>
             <p
-              className="text-sm leading-relaxed"
-              style={{ color: "rgba(255,255,255,0.42)" }}
+              className="text-sm leading-relaxed text-pretty"
+              style={{ color: "#A7B0BC" }}
             >
               {description}
             </p>
@@ -765,11 +765,11 @@ function SectionHeader({
       {/* Section badge */}
       <motion.div variants={fadeUpVariants} className="mb-5 flex justify-center">
         <div
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-semibold uppercase tracking-widest"
           style={{
             background: "rgba(232,160,100,0.1)",
             border: "1px solid rgba(232,160,100,0.25)",
-            color: "#93c5fd",
+            color: "#e8a064",
           }}
         >
           <motion.div
@@ -785,9 +785,9 @@ function SectionHeader({
       {/* Heading */}
       <motion.h2
         variants={fadeUpVariants}
-        className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight mb-5"
+        className="text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold tracking-tight leading-[1.12] mb-5 text-balance"
       >
-        <span style={{ color: "rgba(255,255,255,0.92)" }}>
+        <span style={{ color: "#F3F5F7" }}>
           Why Businesses Choose Our{" "}
         </span>
         <br className="hidden sm:block" />
@@ -814,8 +814,8 @@ function SectionHeader({
       {/* Description */}
       <motion.p
         variants={fadeUpVariants}
-        className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed"
-        style={{ color: "rgba(255,255,255,0.45)" }}
+        className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed text-pretty"
+        style={{ color: "#A7B0BC" }}
       >
         {getDynamicDescription(service.title)}
       </motion.p>

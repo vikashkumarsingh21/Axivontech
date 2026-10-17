@@ -36,8 +36,8 @@ const INDUSTRIES = [
   {
     icon: Hospital,
     title: "Healthcare",
-    desc: "HIPAA-compliant patient portals, telemedicine tools, and hospital management.",
-    tags: ["Telemed", "Compliance", "EMR"],
+    desc: "Secure patient portals, telemedicine tools, and clinic management systems.",
+    tags: ["Telemed", "Security", "EMR"],
     slug: "healthcare"
   },
   {

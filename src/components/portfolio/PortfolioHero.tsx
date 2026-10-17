@@ -65,31 +65,31 @@ export default function PortfolioHero() {
       >
         <motion.div 
           variants={itemVariants}
-          className="rounded-full border border-[rgba(255,255,255,0.12)] px-4 py-1.5 bg-[#0f0f0f]/50 backdrop-blur-sm"
+          className="rounded-full border border-white/10 px-4 py-1.5 bg-[#0f0f0f]/60 backdrop-blur-sm"
         >
-          <span className="text-sm font-medium tracking-wider text-[#e8a064] uppercase">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#e8a064]">
             Our Work
           </span>
         </motion.div>
 
         <motion.h1 
           variants={itemVariants}
-          className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold tracking-tight text-[#f4f4f5] max-w-3xl"
+          className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#F3F5F7] max-w-3xl leading-[1.12] text-balance"
         >
           Projects that solve real problems.
         </motion.h1>
 
         <motion.p 
           variants={itemVariants}
-          className="max-w-2xl text-lg sm:text-xl text-[#a1a1aa] leading-relaxed drop-shadow-sm"
+          className="max-w-2xl text-base sm:text-lg lg:text-xl text-[#A7B0BC] leading-relaxed font-light text-pretty"
         >
           We design, build, and ship digital products — from smart agriculture platforms to autonomous environmental systems.
         </motion.p>
 
-        <motion.div variants={itemVariants} className="pt-4">
+        <motion.div variants={itemVariants} className="pt-2">
           <Link 
             href="#featured-work"
-            className="inline-flex items-center justify-center rounded-full bg-[#e8a064] px-8 py-4 font-semibold text-[#0f0f0f] transition-colors hover:bg-[#f0b07a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]"
+            className="inline-flex items-center justify-center rounded-full bg-[#e8a064] px-8 py-3.5 text-sm font-semibold tracking-tight text-[#0f0f0f] transition-colors hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]"
           >
             Explore Our Work
           </Link>

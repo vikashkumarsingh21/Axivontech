@@ -61,35 +61,35 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
   return (
     <article className="min-h-screen pb-20">
       {/* Top Banner & Hero */}
-      <header className="bg-gradient-to-b from-[#121218] via-[#0d0d12] to-[#0a0a0c] border-b border-gray-800/80 pt-10 pb-12">
+      <header className="bg-gradient-to-b from-[#12161E] via-[#0E1116] to-[#0B0D10] border-b border-[#1E2530] pt-10 pb-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 space-y-6">
           {/* Breadcrumbs */}
-          <nav className="flex items-center gap-2 text-xs text-gray-400">
-            <Link href="/" className="hover:text-indigo-400 transition-colors">
+          <nav className="flex items-center gap-2 text-xs text-[#7E8997] font-mono">
+            <Link href="/" className="hover:text-emerald-400 transition-colors">
               Home
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-            <Link href="/blog" className="hover:text-indigo-400 transition-colors">
+            <ChevronRight className="w-3.5 h-3.5 text-[#566171]" />
+            <Link href="/blog" className="hover:text-emerald-400 transition-colors">
               Blog
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-            <span className="text-gray-300 font-medium truncate max-w-[200px] sm:max-w-md">
+            <ChevronRight className="w-3.5 h-3.5 text-[#566171]" />
+            <span className="text-[#A7B0BC] font-medium truncate max-w-[200px] sm:max-w-md">
               {post.category}
             </span>
           </nav>
 
           {/* Category Badge & Meta */}
           <div className="flex flex-wrap items-center gap-3">
-            <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold">
+            <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold font-mono uppercase tracking-wider">
               {post.category}
             </span>
-            <div className="flex items-center gap-4 text-xs text-gray-400">
+            <div className="flex items-center gap-4 text-xs text-[#7E8997] font-mono">
               <span className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+                <Calendar className="w-3.5 h-3.5 text-emerald-400" />
                 {post.publishedDate}
               </span>
               <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                <Clock className="w-3.5 h-3.5 text-emerald-400" />
                 {post.readingTime}
               </span>
             </div>
@@ -97,17 +97,17 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
 
           {/* Title & Excerpt */}
           <div className="max-w-4xl space-y-4">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold text-[#F3F5F7] tracking-tight leading-[1.12] text-balance">
               {post.title}
             </h1>
-            <p className="text-base sm:text-lg text-gray-300 leading-relaxed font-light">
+            <p className="text-base sm:text-lg text-[#A7B0BC] leading-relaxed text-pretty font-normal">
               {post.excerpt}
             </p>
           </div>
 
           {/* Author info card */}
           <div className="flex items-center gap-3 pt-2">
-            <div className="relative w-11 h-11 rounded-full overflow-hidden border border-indigo-500/40 bg-gray-900 flex-shrink-0">
+            <div className="relative w-11 h-11 rounded-full overflow-hidden border border-emerald-500/30 bg-[#151A21] flex-shrink-0">
               <Image
                 src={post.author.avatar}
                 alt={post.author.name}
@@ -116,8 +116,8 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
               />
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">{post.author.name}</p>
-              <p className="text-xs text-gray-400">{post.author.role}</p>
+              <p className="text-sm font-semibold text-[#F3F5F7]">{post.author.name}</p>
+              <p className="text-xs text-[#7E8997]">{post.author.role}</p>
             </div>
           </div>
         </div>
@@ -152,30 +152,30 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
 
             {/* Mobile Table of Contents Accordion */}
             {post.toc && post.toc.length > 0 && (
-              <div className="lg:hidden bg-[#121217] border border-gray-800 rounded-xl p-4">
+              <div className="lg:hidden bg-[#111115] border border-[#1E2530] rounded-xl p-4">
                 <button
                   onClick={() => setIsTocMobileOpen(!isTocMobileOpen)}
-                  className="w-full flex items-center justify-between text-sm font-semibold text-white"
+                  className="w-full flex items-center justify-between text-sm font-semibold text-[#F3F5F7]"
                 >
                   <span className="flex items-center gap-2">
-                    <List className="w-4 h-4 text-indigo-400" />
+                    <List className="w-4 h-4 text-emerald-400" />
                     Table of Contents ({post.toc.length} Sections)
                   </span>
                   <ChevronDown
-                    className={`w-4 h-4 text-gray-400 transition-transform ${
+                    className={`w-4 h-4 text-[#7E8997] transition-transform ${
                       isTocMobileOpen ? "rotate-180" : ""
                     }`}
                   />
                 </button>
                 {isTocMobileOpen && (
-                  <nav className="mt-3 pt-3 border-t border-gray-800 space-y-2 text-xs">
+                  <nav className="mt-3 pt-3 border-t border-[#1E2530] space-y-2 text-xs">
                     {post.toc.map((item) => (
                       <a
                         key={item.id}
                         href={`#${item.id}`}
                         onClick={() => setIsTocMobileOpen(false)}
-                        className={`block text-gray-300 hover:text-indigo-400 transition-colors ${
-                          item.level === 3 ? "pl-4 text-gray-400" : "font-medium"
+                        className={`block text-[#A7B0BC] hover:text-emerald-400 transition-colors ${
+                          item.level === 3 ? "pl-4 text-[#7E8997]" : "font-medium"
                         }`}
                       >
                         {item.title}
@@ -188,20 +188,20 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
 
             {/* Article Content HTML */}
             <div
-              className="prose prose-invert max-w-none prose-headings:scroll-mt-24 prose-headings:font-bold prose-headings:text-white prose-h2:text-2xl prose-h2:border-b prose-h2:border-gray-800 prose-h2:pb-3 prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-4 prose-li:text-gray-300 prose-strong:text-white prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline prose-table:w-full prose-table:border-collapse prose-th:border prose-th:border-gray-800 prose-th:bg-gray-900 prose-th:p-3 prose-th:text-white prose-td:border prose-td:border-gray-800 prose-td:p-3 prose-td:text-gray-300"
+              className="prose prose-invert max-w-none prose-readable prose-headings:scroll-mt-24 prose-headings:font-heading prose-headings:font-bold prose-headings:text-[#F3F5F7] prose-headings:tracking-tight prose-h2:text-2xl sm:prose-h2:text-3xl prose-h2:border-b prose-h2:border-[#1E2530] prose-h2:pb-3 prose-h2:mt-12 prose-h2:mb-5 prose-h3:text-xl sm:prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4 prose-p:text-[#A7B0BC] prose-p:leading-[1.74] prose-p:mb-5 prose-li:text-[#A7B0BC] prose-li:leading-[1.7] prose-strong:text-[#F3F5F7] prose-strong:font-semibold prose-a:text-emerald-400 prose-a:font-medium prose-a:no-underline hover:prose-a:underline prose-table:w-full prose-table:border-collapse prose-th:border prose-th:border-[#1E2530] prose-th:bg-[#151A21] prose-th:p-3 prose-th:text-[#F3F5F7] prose-th:font-heading prose-td:border prose-td:border-[#1E2530] prose-td:p-3 prose-td:text-[#A7B0BC]"
               dangerouslySetInnerHTML={{ __html: post.contentHtml }}
             />
 
             {/* Interactive Project Ideas Section (Blog 3 only) */}
             {post.projectIdeas && (
-              <div id="project-ideas-directory" className="space-y-6 pt-8 border-t border-gray-800">
+              <div id="project-ideas-directory" className="space-y-6 pt-8 border-t border-[#1E2530]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold mb-2">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold mb-2 font-mono">
                       <FolderGit2 className="w-3.5 h-3.5" />
                       <span>30 Handpicked Robotics Project Blueprints</span>
                     </div>
-                    <h3 className="text-2xl font-bold text-white">
+                    <h3 className="text-2xl font-heading font-bold text-[#F3F5F7]">
                       Interactive Project Finder
                     </h3>
                   </div>
@@ -287,10 +287,10 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
 
             {/* Interactive FAQs Accordion Section */}
             {post.faqs && post.faqs.length > 0 && (
-              <div id="faqs" className="space-y-6 pt-8 border-t border-gray-800">
+              <div id="faqs" className="space-y-6 pt-8 border-t border-[#1E2530]">
                 <div className="flex items-center gap-2">
-                  <HelpCircle className="w-5 h-5 text-indigo-400" />
-                  <h3 className="text-2xl font-bold text-white">
+                  <HelpCircle className="w-5 h-5 text-emerald-400" />
+                  <h3 className="text-2xl font-heading font-bold text-[#F3F5F7]">
                     Frequently Asked Questions
                   </h3>
                 </div>
@@ -301,21 +301,21 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
                     return (
                       <div
                         key={index}
-                        className="bg-[#121217] border border-gray-800 rounded-xl overflow-hidden transition-colors"
+                        className="bg-[#111115] border border-[#1E2530] rounded-xl overflow-hidden transition-colors"
                       >
                         <button
                           onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                          className="w-full flex items-center justify-between p-4 text-left text-sm font-semibold text-white hover:text-indigo-400 transition-colors"
+                          className="w-full flex items-center justify-between p-4 text-left text-sm font-heading font-semibold text-[#F3F5F7] hover:text-emerald-400 transition-colors"
                         >
                           <span className="pr-4">{faq.question}</span>
                           <ChevronDown
-                            className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${
-                              isOpen ? "rotate-180 text-indigo-400" : ""
+                            className={`w-4 h-4 text-[#7E8997] shrink-0 transition-transform ${
+                              isOpen ? "rotate-180 text-emerald-400" : ""
                             }`}
                           />
                         </button>
                         {isOpen && (
-                          <div className="px-4 pb-4 text-xs sm:text-sm text-gray-300 leading-relaxed border-t border-gray-800/60 pt-3">
+                          <div className="px-4 pb-4 text-xs sm:text-sm text-[#A7B0BC] leading-[1.72] border-t border-[#1E2530] pt-3 text-pretty">
                             {faq.answer}
                           </div>
                         )}
@@ -327,28 +327,28 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
             )}
 
             {/* Soft CTA Box */}
-            <div className="bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-gray-900 border border-indigo-500/30 rounded-2xl p-6 sm:p-8 space-y-4">
-              <div className="flex items-center gap-2 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+            <div className="bg-gradient-to-r from-[#151A21] via-[#1A202A] to-[#151A21] border border-[#29313B] rounded-2xl p-6 sm:p-8 space-y-4">
+              <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold uppercase tracking-wider font-mono">
                 <Sparkles className="w-4 h-4" />
                 <span>Engineering & Consultation Advisory</span>
               </div>
-              <h4 className="text-xl font-bold text-white">
+              <h4 className="text-xl font-heading font-bold text-[#F3F5F7]">
                 Need Help Planning Your Software, AI, or Hardware Architecture?
               </h4>
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#A7B0BC] leading-relaxed text-pretty">
                 Whether you need a custom web application, an enterprise AI integration, or technical guidance for embedded robotics development across India or globally, our remote engineering team is ready to assist.
               </p>
               <div className="pt-2 flex flex-wrap gap-3">
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all shadow-lg shadow-indigo-600/30"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-[#04130E] text-xs font-semibold tracking-tight transition-all shadow-lg shadow-emerald-500/25"
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
                   Schedule Technical Consultation
                 </Link>
                 <Link
                   href="/services/web-development"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-800 text-xs font-semibold transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1B222B] hover:bg-[#202833] text-[#A7B0BC] hover:text-[#F3F5F7] border border-[#29313B] text-xs font-semibold tracking-tight transition-all"
                 >
                   Explore Web Services
                 </Link>
@@ -361,9 +361,9 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
             <div className="sticky top-24 space-y-6">
               {/* Sticky TOC Box */}
               {post.toc && post.toc.length > 0 && (
-                <div className="bg-[#111116] border border-gray-800 rounded-2xl p-5 space-y-4">
-                  <div className="flex items-center gap-2 text-white font-bold text-sm border-b border-gray-800 pb-3">
-                    <List className="w-4 h-4 text-indigo-400" />
+                <div className="bg-[#111116] border border-[#1E2530] rounded-2xl p-5 space-y-4">
+                  <div className="flex items-center gap-2 text-[#F3F5F7] font-heading font-bold text-sm border-b border-[#1E2530] pb-3">
+                    <List className="w-4 h-4 text-emerald-400" />
                     <span>Table of Contents</span>
                   </div>
                   <nav className="space-y-2 text-xs max-h-[60vh] overflow-y-auto pr-2">
@@ -371,8 +371,8 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
                       <a
                         key={item.id}
                         href={`#${item.id}`}
-                        className={`block text-gray-400 hover:text-indigo-400 transition-colors py-1 ${
-                          item.level === 3 ? "pl-3 text-gray-500" : "font-medium"
+                        className={`block text-[#A7B0BC] hover:text-emerald-400 transition-colors py-1 ${
+                          item.level === 3 ? "pl-3 text-[#7E8997]" : "font-medium"
                         }`}
                       >
                         {item.title}
@@ -383,15 +383,15 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
               )}
 
               {/* Keywords Tag Cloud Box */}
-              <div className="bg-[#111116] border border-gray-800 rounded-2xl p-5 space-y-3">
-                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+              <div className="bg-[#111116] border border-[#1E2530] rounded-2xl p-5 space-y-3">
+                <h4 className="text-xs font-mono font-bold text-[#7E8997] uppercase tracking-wider">
                   Target Topics & Technologies
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {post.keywords.map((kw, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 rounded-md bg-gray-900 border border-gray-800 text-gray-300 text-[11px]"
+                      className="px-2.5 py-1 rounded-md bg-[#151A21] border border-[#29313B] text-[#A7B0BC] text-[11px] font-mono"
                     >
                       #{kw}
                     </span>
@@ -400,15 +400,15 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
               </div>
 
               {/* Quick Contact Banner */}
-              <div className="bg-gradient-to-br from-indigo-900/30 to-purple-900/30 border border-indigo-500/20 rounded-2xl p-5 space-y-3 text-center">
-                <BookOpen className="w-8 h-8 text-indigo-400 mx-auto" />
-                <h4 className="text-sm font-bold text-white">Have a Specific Project Requirement?</h4>
-                <p className="text-xs text-gray-300">
+              <div className="bg-gradient-to-br from-[#151A21] to-[#1B222B] border border-[#29313B] rounded-2xl p-5 space-y-3 text-center">
+                <BookOpen className="w-8 h-8 text-emerald-400 mx-auto" />
+                <h4 className="text-sm font-heading font-bold text-[#F3F5F7]">Have a Specific Project Requirement?</h4>
+                <p className="text-xs text-[#A7B0BC] leading-relaxed">
                   Talk directly to our engineering architects in Gujarat.
                 </p>
                 <Link
                   href="/contact"
-                  className="inline-block w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
+                  className="inline-block w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-[#04130E] text-xs font-semibold tracking-tight transition-colors shadow-md shadow-emerald-500/20"
                 >
                   Contact Engineering Team
                 </Link>
@@ -419,19 +419,19 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
 
         {/* Related Articles Section */}
         {relatedPosts.length > 0 && (
-          <section className="mt-20 pt-12 border-t border-gray-800 space-y-8">
+          <section className="mt-20 pt-12 border-t border-[#1E2530] space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400">
+                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-400">
                   Continue Reading
                 </span>
-                <h3 className="text-2xl font-bold text-white mt-1">
+                <h3 className="text-2xl font-heading font-bold text-[#F3F5F7] mt-1">
                   Related Guides & Articles
                 </h3>
               </div>
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors tracking-tight"
               >
                 <span>View All Articles</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -443,23 +443,23 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
                 <Link
                   key={rel.slug}
                   href={`/blog/${rel.slug}`}
-                  className="group bg-[#111115] border border-gray-800 hover:border-indigo-500/40 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col justify-between p-6"
+                  className="group bg-[#111115] border border-[#1E2530] hover:border-emerald-500/40 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col justify-between p-6"
                 >
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between text-xs text-gray-400">
-                      <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-medium">
+                    <div className="flex items-center justify-between text-xs text-[#7E8997] font-mono">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 font-medium">
                         {rel.category}
                       </span>
                       <span>{rel.readingTime}</span>
                     </div>
-                    <h4 className="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors line-clamp-2">
+                    <h4 className="text-lg font-heading font-bold text-[#F3F5F7] group-hover:text-emerald-300 transition-colors line-clamp-2 leading-snug">
                       {rel.title}
                     </h4>
-                    <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-[#A7B0BC] line-clamp-2 leading-relaxed text-pretty">
                       {rel.excerpt}
                     </p>
                   </div>
-                  <div className="pt-4 flex items-center gap-1 text-xs font-semibold text-indigo-400 group-hover:translate-x-1 transition-transform">
+                  <div className="pt-4 flex items-center gap-1 text-xs font-semibold text-emerald-400 group-hover:translate-x-1 transition-transform tracking-tight">
                     <span>Read Article</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </div>
@@ -470,28 +470,28 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
         )}
 
         {/* Strong Bottom CTA Banner */}
-        <div className="mt-16 bg-gradient-to-r from-indigo-900/60 via-purple-900/40 to-black border border-indigo-500/40 rounded-3xl p-8 sm:p-12 text-center space-y-6 shadow-2xl">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold uppercase tracking-wider">
+        <div className="mt-16 bg-gradient-to-r from-[#12161E] via-[#161B24] to-[#0E1116] border border-[#29313B] rounded-3xl p-8 sm:p-12 text-center space-y-6 shadow-2xl">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-mono font-semibold uppercase tracking-wider">
             <Sparkles className="w-4 h-4" />
             <span>Axivon Technologies — Engineering Excellence</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white max-w-2xl mx-auto leading-tight">
+          <h2 className="text-2xl sm:text-4xl font-heading font-extrabold text-[#F3F5F7] max-w-2xl mx-auto leading-tight text-balance">
             Ready to Build Next-Generation Software, AI Systems, or Robotics Projects?
           </h2>
-          <p className="text-xs sm:text-sm text-gray-300 max-w-xl mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#A7B0BC] max-w-xl mx-auto leading-relaxed text-pretty">
             From enterprise web platforms and custom mobile apps to IoT telemetry and school/college robotics solutions, Axivon Technologies provides end-to-end engineering support in Gujarat.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm transition-all shadow-xl shadow-indigo-600/30"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-[#04130E] font-semibold text-xs sm:text-sm tracking-tight transition-all shadow-xl shadow-emerald-500/25"
             >
               <span>Get Free Technical Proposal</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/services"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-800 font-semibold text-xs sm:text-sm transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#151A21] hover:bg-[#1B222B] text-[#A7B0BC] hover:text-[#F3F5F7] border border-[#29313B] font-semibold text-xs sm:text-sm tracking-tight transition-all"
             >
               View Our Services
             </Link>

@@ -496,10 +496,10 @@ function StepCard({
           </motion.div>
 
           {/* Text */}
-          <h3 className="text-base font-semibold mb-2 leading-snug" style={{ color: "rgba(255,255,255,0.9)" }}>
+          <h3 className="text-base font-heading font-semibold mb-2 leading-snug" style={{ color: "#F3F5F7" }}>
             {step.title}
           </h3>
-          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.42)" }}>
+          <p className="text-sm leading-relaxed text-pretty" style={{ color: "#A7B0BC" }}>
             {step.description}
           </p>
         </div>
@@ -770,15 +770,15 @@ function SectionHeader({ service, inView }: { service: ServiceData; inView: bool
       {/* Badge */}
       <motion.div variants={fadeUpVariants} className="flex justify-center mb-5">
         <div
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-semibold uppercase tracking-widest"
           style={{
-            background: "rgba(201,146,42,0.1)",
-            border: "1px solid rgba(201,146,42,0.25)",
-            color: "#c4b5fd",
+            background: "rgba(232,160,100,0.1)",
+            border: "1px solid rgba(232,160,100,0.25)",
+            color: "#e8a064",
           }}
         >
           <motion.div
-            className="w-1.5 h-1.5 rounded-full bg-purple-400"
+            className="w-1.5 h-1.5 rounded-full bg-[#e8a064]"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
             aria-hidden
@@ -791,9 +791,9 @@ function SectionHeader({ service, inView }: { service: ServiceData; inView: bool
       <motion.h2
         variants={fadeUpVariants}
         id="process-heading"
-        className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight mb-5"
+        className="text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold tracking-tight leading-[1.12] mb-5 text-balance"
       >
-        <span style={{ color: "rgba(255,255,255,0.92)" }}>How We Deliver</span>
+        <span style={{ color: "#F3F5F7" }}>How We Deliver</span>
         <br />
         <span
           style={{
@@ -810,8 +810,8 @@ function SectionHeader({ service, inView }: { service: ServiceData; inView: bool
       {/* Description */}
       <motion.p
         variants={fadeUpVariants}
-        className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed"
-        style={{ color: "rgba(255,255,255,0.45)" }}
+        className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed text-pretty"
+        style={{ color: "#A7B0BC" }}
       >
         {getDynamicDescription(service.title)}
       </motion.p>

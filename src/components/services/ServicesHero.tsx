@@ -60,14 +60,14 @@ export default function ServicesHero() {
 
         <motion.h1 
           variants={fadeUp}
-          className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white max-w-4xl leading-[1.1]"
+          className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#F3F5F7] max-w-4xl leading-[1.1] text-balance"
         >
           Technology Built Around Your Business.
         </motion.h1>
 
         <motion.p 
           variants={fadeUp}
-          className="mt-4 max-w-2xl text-lg sm:text-xl text-[#a1a1aa] leading-relaxed"
+          className="mt-4 max-w-2xl text-base sm:text-lg lg:text-xl text-[#A7B0BC] leading-relaxed font-light text-pretty"
         >
           We build digital products, scalable software systems, AI solutions, and intelligent automation designed to solve real business challenges.
         </motion.p>
@@ -75,14 +75,14 @@ export default function ServicesHero() {
         <motion.div variants={fadeUp} className="mt-8 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <Link 
             href="#explore-services"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e8a064] px-8 py-4 text-sm font-semibold text-[#0f0f0f] transition-colors hover:bg-[#d4915c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e8a064] px-8 py-3.5 text-sm font-semibold tracking-tight text-[#0f0f0f] transition-colors hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] w-full sm:w-auto"
           >
             Explore Services
             <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
           <Link 
             href="/contact"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-white/5 border border-white/10 px-8 py-4 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] w-full sm:w-auto backdrop-blur-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-white/5 border border-white/10 px-8 py-3.5 text-sm font-semibold tracking-tight text-[#F3F5F7] transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f] w-full sm:w-auto backdrop-blur-sm"
           >
             Discuss a Project
           </Link>

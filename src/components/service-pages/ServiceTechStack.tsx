@@ -765,10 +765,10 @@ function BottomPanel({ reduced }: { reduced: boolean }) {
                   <Icon size={16} style={{ color: pillar.color }} strokeWidth={1.8} aria-hidden />
                 </div>
                 <div>
-                  <div className="text-sm font-semibold mb-1" style={{ color: "rgba(255,255,255,0.85)" }}>
+                  <div className="text-sm font-heading font-semibold mb-1" style={{ color: "#F3F5F7" }}>
                     {pillar.label}
                   </div>
-                  <div className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.38)" }}>
+                  <div className="text-xs leading-relaxed text-pretty" style={{ color: "#A7B0BC" }}>
                     {pillar.description}
                   </div>
                 </div>
@@ -852,9 +852,9 @@ function SectionHeader({ service, inView }: { service: ServiceData; inView: bool
       <motion.h2
         variants={fadeUpVariants}
         id="techstack-heading"
-        className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight mb-5 text-center"
+        className="text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold tracking-tight leading-[1.12] mb-5 text-center text-balance"
       >
-        <span style={{ color: "rgba(255,255,255,0.92)" }}>Technologies We Use</span>
+        <span style={{ color: "#F3F5F7" }}>Technologies We Use</span>
         <br />
         <span
           style={{
@@ -871,8 +871,8 @@ function SectionHeader({ service, inView }: { service: ServiceData; inView: bool
       {/* Description */}
       <motion.p
         variants={fadeUpVariants}
-        className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed text-center"
-        style={{ color: "rgba(255,255,255,0.44)" }}
+        className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed text-center text-pretty"
+        style={{ color: "#A7B0BC" }}
       >
         {getDynamicDescription(service.title)}
       </motion.p>

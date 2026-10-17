@@ -18,7 +18,7 @@ export default function OrganizationSchema() {
       "@type": "ContactPoint",
       telephone: "+91-9473263768",
       contactType: "customer support",
-      email: "contact@axivontech.in",
+      email: "info@axivontech.in",
       areaServed: "IN",
       availableLanguage: ["English", "Hindi"],
     },

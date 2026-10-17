@@ -41,11 +41,11 @@ const FLAGSHIP_SERVICES: FlagshipService[] = [
     icon: Code2,
     stack: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS", "Node.js", "PostgreSQL"],
     deliverables: [
-      "Sub-second Core Web Vitals & Google 90+ PageSpeed",
+      "Optimized Core Web Vitals & high-speed performance",
       "SSR & Edge-rendered dynamic architectures",
       "Full API & database integrations",
     ],
-    highlight: "99.9% Uptime & Lighthouse 95+",
+    highlight: "High Availability & Performance",
     image: "/assets/images/services/web-engineering.jpg",
   },
   {
@@ -173,7 +173,7 @@ export default function Services() {
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[rgba(232,160,100,0.2)] bg-[#21180f] text-[#e8a064]">
                       <Icon className="h-6 w-6" strokeWidth={1.8} />
                     </div>
-                    <span className="rounded-full border border-[#2e2e2e] bg-[#1a1a1a] px-3 py-1 font-mono text-[11px] font-medium text-[#a1a1aa]">
+                    <span className="rounded-full border border-[#29313B] bg-[#151A21] px-3 py-1 font-mono text-[11px] font-medium text-[#A7B0BC]">
                       {srv.badge}
                     </span>
                   </div>
@@ -191,18 +191,18 @@ export default function Services() {
                   </div>
 
                   {/* Title & Description */}
-                  <h3 className="mb-3 text-xl font-bold tracking-tight text-[#f4f4f5] transition-colors group-hover:text-[#e8a064]">
+                  <h3 className="font-heading mb-2.5 text-xl sm:text-2xl font-bold tracking-tight text-[#F3F5F7] transition-colors group-hover:text-[#e8a064]">
                     {srv.title}
                   </h3>
-                  <p className="mb-6 text-sm leading-6 text-[#a1a1aa]">
+                  <p className="mb-6 text-sm sm:text-base leading-relaxed text-[#A7B0BC] font-light text-pretty">
                     {srv.description}
                   </p>
 
                   {/* Deliverables Checklist */}
-                  <div className="mb-6 space-y-2 border-t border-[#1f1f1f] pt-5">
+                  <div className="mb-6 space-y-2.5 border-t border-[#1f1f1f] pt-5">
                     {srv.deliverables.map((item) => (
-                      <div key={item} className="flex items-start gap-2 text-xs text-[#c4c4c4]">
-                        <CheckCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#e8a064]" />
+                      <div key={item} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#D4D4D8] font-light leading-normal">
+                        <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#e8a064]" />
                         <span>{item}</span>
                       </div>
                     ))}
@@ -213,7 +213,7 @@ export default function Services() {
                     {srv.stack.map((tech) => (
                       <span
                         key={tech}
-                        className="rounded-md border border-[#222222] bg-[#171717] px-2 py-1 font-mono text-[10px] text-[#8e8e93]"
+                        className="rounded-md border border-[#29313B] bg-[#151A21] px-2.5 py-1 font-mono text-[11px] text-[#A7B0BC] font-medium"
                       >
                         {tech}
                       </span>
@@ -223,15 +223,15 @@ export default function Services() {
 
                 {/* Footer Link Action */}
                 <div className="border-t border-[#1f1f1f] pt-4 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[#71717a] group-hover:text-[#a1a1aa]">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#7E8997] group-hover:text-[#A7B0BC]">
                     {srv.highlight}
                   </span>
                   <Link
                     href={srv.href}
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#e8a064] transition-transform group-hover:translate-x-1"
+                    className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold tracking-tight text-[#e8a064] transition-transform group-hover:translate-x-1"
                   >
                     <span>Explore Service Details</span>
-                    <ArrowUpRight className="h-3.5 w-3.5" />
+                    <ArrowUpRight className="h-4 w-4" />
                   </Link>
                 </div>
               </motion.div>
@@ -242,12 +242,12 @@ export default function Services() {
         {/* ── Complementary Specialized Disciplines ─────────────── */}
         <div className="mt-10 sm:mt-14 border-t border-[#1f1f1f] pt-8 sm:pt-12">
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.14em] text-[#71717a]">
+            <h4 className="font-heading text-xs sm:text-sm font-semibold uppercase tracking-[0.14em] text-[#7E8997]">
               Additional Specialized Capabilities
             </h4>
             <Link
               href="/services"
-              className="text-xs font-semibold text-[#e8a064] hover:underline"
+              className="text-xs sm:text-sm font-semibold text-[#e8a064] hover:underline"
             >
               View All 8 Services →
             </Link>
@@ -265,10 +265,10 @@ export default function Services() {
                   <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-[#1c1c1e] text-[#a1a1aa] transition-colors group-hover:text-[#e8a064]">
                     <CompIcon className="h-4 w-4" />
                   </div>
-                  <h5 className="mb-1 text-sm font-semibold text-[#f4f4f5] group-hover:text-[#e8a064] transition-colors">
+                  <h5 className="font-heading mb-1.5 text-sm sm:text-base font-semibold text-[#F3F5F7] group-hover:text-[#e8a064] transition-colors">
                     {comp.title}
                   </h5>
-                  <p className="text-xs leading-5 text-[#8e8e93]">
+                  <p className="text-xs sm:text-sm leading-relaxed text-[#A7B0BC] font-light">
                     {comp.desc}
                   </p>
                 </Link>

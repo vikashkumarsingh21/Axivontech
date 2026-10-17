@@ -57,7 +57,7 @@ export default function ServiceHero({ service }: { service: ServiceData }) {
             className="flex flex-col gap-6"
           >
             <motion.div variants={fadeUp} className="flex items-center gap-3">
-              <span className="inline-flex items-center rounded-full border border-[#e8a064]/30 bg-[#e8a064]/10 px-3 py-1 text-sm font-medium text-[#e8a064]">
+              <span className="inline-flex items-center rounded-full border border-[#e8a064]/30 bg-[#e8a064]/10 px-3.5 py-1 text-xs sm:text-sm font-mono font-semibold tracking-wider text-[#e8a064]">
                 <span className="mr-2 h-2 w-2 rounded-full bg-[#e8a064] animate-pulse" />
                 {service.badge}
               </span>
@@ -65,14 +65,14 @@ export default function ServiceHero({ service }: { service: ServiceData }) {
 
             <motion.h1
               variants={fadeUp}
-              className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white leading-[1.1]"
+              className="text-4xl sm:text-6xl md:text-7xl font-heading font-extrabold tracking-tight text-[#F3F5F7] leading-[1.08] text-balance"
             >
               {service.title}
             </motion.h1>
 
             <motion.p
               variants={fadeUp}
-              className="text-lg md:text-xl text-white/70 max-w-2xl leading-relaxed"
+              className="text-lg md:text-xl text-[#A7B0BC] max-w-2xl leading-relaxed text-pretty font-normal"
             >
               {service.heroDescription}
             </motion.p>
@@ -80,7 +80,7 @@ export default function ServiceHero({ service }: { service: ServiceData }) {
             <motion.div variants={fadeUp} className="flex flex-wrap gap-4 pt-4">
               <Link
                 href="/contact"
-                className="group flex items-center justify-center gap-2 rounded-xl bg-[#e8a064] px-6 py-3.5 text-sm font-semibold text-[#0f0f0f] transition-all hover:bg-[#d4915c]"
+                className="group flex items-center justify-center gap-2 rounded-xl bg-[#e8a064] px-6 py-3.5 text-sm font-semibold tracking-tight text-[#0f0f0f] transition-all hover:bg-[#d4915c] shadow-lg shadow-[#e8a064]/20"
               >
                 Get Free Consultation
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -90,7 +90,7 @@ export default function ServiceHero({ service }: { service: ServiceData }) {
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-white/10"
+                className="group flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3.5 text-sm font-semibold tracking-tight text-white transition-all hover:bg-white/10"
               >
                 <MessageCircle className="h-4 w-4 text-[#25D366]" />
                 WhatsApp Chat

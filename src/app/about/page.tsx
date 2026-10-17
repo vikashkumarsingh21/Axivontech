@@ -60,23 +60,23 @@ export default function AboutPage() {
               <span className="w-8 h-px bg-[#e8a064]/50" />
               About Axivon
             </p>
-            <h1 className="text-5xl md:text-6xl lg:text-[5rem] font-bold leading-[1.05] tracking-tight mb-8">
+            <h1 className="font-heading text-4xl sm:text-5xl lg:text-[4.5rem] font-bold leading-[1.08] tracking-tight text-[#F3F5F7] mb-8 text-balance">
               Building Digital Products, <br className="hidden md:block" />
-              AI Systems &amp; <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">Intelligent Technology.</span>
+              AI Systems &amp; <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400">Intelligent Technology.</span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-300 max-w-2xl leading-relaxed font-light mb-10">
+            <p className="text-lg md:text-xl text-[#A7B0BC] max-w-2xl leading-relaxed font-light mb-10 text-pretty">
               Axivon Technologies builds digital products, AI solutions, automation systems and custom software for businesses that want technology to solve real problems.
             </p>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-5 flex-wrap">
               <Link
                 href="/contact"
-                className="bg-[#e8a064] text-[#1a1a1a] px-8 py-4 rounded-sm font-semibold hover:bg-white transition-colors duration-300"
+                className="inline-flex items-center justify-center rounded-full bg-[#e8a064] px-8 py-3.5 text-sm font-semibold tracking-tight text-[#0f0f0f] shadow-[0_4px_16px_rgba(232,160,100,0.25)] transition-all hover:bg-white"
               >
                 Start a Conversation
               </Link>
               <Link
                 href="#story"
-                className="text-gray-300 hover:text-white flex items-center gap-2 transition-colors duration-300 uppercase tracking-widest text-xs font-semibold"
+                className="text-[#A7B0BC] hover:text-white flex items-center gap-2 transition-colors duration-200 uppercase tracking-widest text-xs font-semibold"
               >
                 Our Story <ArrowRight className="w-4 h-4" />
               </Link>
@@ -95,10 +95,10 @@ export default function AboutPage() {
               </h2>
             </div>
             <div className="lg:col-span-8">
-              <h3 className="text-3xl md:text-4xl font-medium leading-snug mb-8 text-white">
+              <h3 className="font-heading text-2xl sm:text-3xl md:text-4xl font-semibold leading-snug mb-8 text-[#F3F5F7] text-balance">
                 We are a technology company focused on delivering resilient architecture and intuitive user experiences.
               </h3>
-              <div className="text-gray-400 space-y-6 text-lg leading-relaxed max-w-3xl font-light">
+              <div className="text-[#A7B0BC] space-y-6 text-base sm:text-lg leading-relaxed max-w-3xl font-light text-pretty">
                 <p>
                   Axivon Technologies was founded with a vision to help businesses embrace digital transformation through modern technology solutions. We believe every business deserves access to enterprise-grade infrastructure.
                 </p>
@@ -285,7 +285,7 @@ export default function AboutPage() {
                   <span className="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-[#0e0e0e] border-2 border-white/20" />
                   <h4 className="text-xl font-medium text-white mb-2">03. Build & Validate</h4>
                   <p className="text-gray-400 font-light leading-relaxed">
-                    Our engineering team develops the product using modern, scalable practices. Continuous testing guarantees security, performance, and reliability.
+                    Our engineering team develops the product using modern, scalable practices. Continuous testing ensures security, performance, and reliability.
                   </p>
                 </div>
 
