@@ -1,6 +1,23 @@
 import type { MetadataRoute } from "next";
+import { getSeoSettings } from "@/lib/content/content-db";
 
-export default function robots(): MetadataRoute.Robots {
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const seo = await getSeoSettings();
+  const baseUrl = seo.canonicalBase || "https://axivontech.in";
+
+  if (!seo.allowIndexing) {
+    return {
+      rules: [
+        {
+          userAgent: "*",
+          disallow: "/",
+        },
+      ],
+      sitemap: `${baseUrl}/sitemap.xml`,
+      host: baseUrl,
+    };
+  }
+
   return {
     rules: [
       {
@@ -20,7 +37,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://axivontech.in/sitemap.xml",
-    host: "https://axivontech.in",
+    sitemap: `${baseUrl}/sitemap.xml`,
+    host: baseUrl,
   };
 }

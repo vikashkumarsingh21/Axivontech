@@ -14,6 +14,8 @@ export async function GET(req: NextRequest) {
     const qualification = searchParams.get("qualification") || "";
     const ownerId = searchParams.get("ownerId") || "";
     const source = searchParams.get("source") || "";
+    const service = searchParams.get("service") || "";
+    const industry = searchParams.get("industry") || "";
     const from = searchParams.get("from") || "";
     const to = searchParams.get("to") || "";
     const isExport = searchParams.get("export") === "csv";
@@ -30,6 +32,8 @@ export async function GET(req: NextRequest) {
         { phone: { contains: search, mode: "insensitive" } },
         { companyName: { contains: search, mode: "insensitive" } },
         { leadCode: { contains: search, mode: "insensitive" } },
+        { serviceInterest: { contains: search, mode: "insensitive" } },
+        { industry: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -37,6 +41,8 @@ export async function GET(req: NextRequest) {
     if (qualification) where.qualificationStatus = qualification;
     if (ownerId) where.ownerId = ownerId;
     if (source) where.source = source;
+    if (service) where.serviceInterest = { contains: service, mode: "insensitive" };
+    if (industry) where.industry = { contains: industry, mode: "insensitive" };
 
     if (from || to) {
       where.createdAt = {};
@@ -65,7 +71,9 @@ export async function GET(req: NextRequest) {
         "Phone",
         "Company",
         "Service Interest",
+        "Industry",
         "Source",
+        "Campaign / Context",
         "Status",
         "Qualification",
         "Owner",
@@ -79,7 +87,9 @@ export async function GET(req: NextRequest) {
         `"${(l.phone || "").replace(/"/g, '""')}"`,
         `"${(l.companyName || "").replace(/"/g, '""')}"`,
         `"${(l.serviceInterest || "").replace(/"/g, '""')}"`,
+        `"${(l.industry || "").replace(/"/g, '""')}"`,
         `"${l.source}"`,
+        `"${(l.campaign || "").replace(/"/g, '""')}"`,
         `"${l.status}"`,
         `"${l.qualificationStatus}"`,
         `"${(l.owner?.name || "Unassigned").replace(/"/g, '""')}"`,

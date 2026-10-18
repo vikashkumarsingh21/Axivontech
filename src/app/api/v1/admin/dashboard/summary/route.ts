@@ -35,6 +35,11 @@ export async function GET(req: NextRequest) {
       totalEmployees,
       presentToday,
       openTasks,
+      pendingLeaves,
+      workReportsToday,
+      pendingWorkReportsReview,
+      upcomingCompanyHolidaysCount,
+      activeAnnouncementsCount,
       // 5. Recent Leads (Real Data)
       recentLeads,
       // 6. Lead Aggregations for Charts
@@ -97,6 +102,21 @@ export async function GET(req: NextRequest) {
       }).catch(() => 0),
       db.task.count({
         where: { status: { notIn: ["COMPLETED"] } },
+      }).catch(() => 0),
+      db.leaveRequest.count({
+        where: { status: "PENDING" },
+      }).catch(() => 0),
+      db.workReport.count({
+        where: { date: { gte: todayStart } },
+      }).catch(() => 0),
+      db.workReport.count({
+        where: { status: "SUBMITTED" },
+      }).catch(() => 0),
+      db.holiday.count({
+        where: { date: { gte: todayStart }, isCompanyHoliday: true },
+      }).catch(() => 0),
+      db.announcement.count({
+        where: { status: "PUBLISHED" },
       }).catch(() => 0),
 
       // 5. Recent Leads (Real Data)
@@ -224,6 +244,11 @@ export async function GET(req: NextRequest) {
           totalEmployees,
           presentToday,
           openTasks,
+          pendingLeaves,
+          workReportsToday,
+          pendingWorkReportsReview,
+          upcomingCompanyHolidaysCount,
+          activeAnnouncementsCount,
         },
         recentLeads,
         charts: {

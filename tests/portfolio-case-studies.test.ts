@@ -73,8 +73,8 @@ describe("Portfolio Case Studies & SEO Synchronization Tests", () => {
     expect(urls).toContain("https://axivontech.in/reviews");
   });
 
-  it("should enforce robots disallow rules for internal portals and logout endpoint", () => {
-    const config = robots();
+  it("should enforce robots disallow rules for internal portals and logout endpoint", async () => {
+    const config = await robots();
     const rule = Array.isArray(config.rules) ? config.rules[0] : config.rules;
     const disallow = Array.isArray(rule.disallow) ? rule.disallow : [rule.disallow];
 

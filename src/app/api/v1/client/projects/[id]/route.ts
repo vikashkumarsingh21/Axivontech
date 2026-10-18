@@ -40,8 +40,40 @@ export async function GET(
         clientName: true,
         clientEmail: true,
         clientPhone: true,
+        qaStatus: true,
+        deliveredAt: true,
+        completedAt: true,
         createdAt: true,
         updatedAt: true,
+        documents: {
+          where: {
+            isClientVisible: true,
+          },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            category: true,
+            mimeType: true,
+            sizeBytes: true,
+            isImportant: true,
+            createdAt: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+        team: {
+          select: {
+            role: true,
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
         milestones: {
           where: {
             isClientVisible: true,

@@ -30,12 +30,9 @@ export default function FitZoneClassModal({
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [copied, setCopied] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [passCode, setPassCode] = useState("");
 
   if (!session) return null;
-
-  const passCode = `FIT-RES-${session.id.toUpperCase()}-${Math.floor(
-    1000 + Math.random() * 9000
-  )}`;
 
   const handleConfirmReservation = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +41,7 @@ export default function FitZoneClassModal({
       return;
     }
     setErrorMsg("");
+    setPassCode(`FIT-RES-${session.id.toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`);
     setIsConfirmed(true);
   };
 

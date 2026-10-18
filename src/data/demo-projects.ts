@@ -12,6 +12,13 @@ export interface DemoProject {
   demoUrl?: string;
   enquiryType: "View Demo" | "Request a Similar Project";
   accentColor?: string; // Subtle brand accent for visual identity
+  image?: string;
+  gallery?: string[];
+  problemStatement?: string;
+  solutionOverview?: string;
+  techStack?: string[];
+  relatedServiceSlug?: string;
+  displayOrder?: number;
 }
 
 export const DEMO_CATEGORIES = [
@@ -58,6 +65,18 @@ export const DEMO_PROJECTS: DemoProject[] = [
     demoUrl: "/demo-projects/business/corporatepro",
     enquiryType: "View Demo",
     accentColor: "#29483b",
+    image: "/images/demo-projects/corporatepro/hero-advisory.jpg",
+    gallery: [
+      "/images/demo-projects/corporatepro/hero-advisory.jpg",
+      "/images/demo-projects/corporatepro/about-philosophy.jpg",
+      "/images/demo-projects/corporatepro/digital-transformation.jpg",
+      "/images/demo-projects/corporatepro/operations-case-study.jpg",
+    ],
+    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Framer Motion", "Lucide React"],
+    problemStatement: "Multi-practice consulting firms and large B2B enterprises need to project institutional credibility, executive depth, and global service capabilities without suffering from slow legacy CMS architectures.",
+    solutionOverview: "CorporatePro delivers an ultra-fast corporate digital flagship featuring interactive service matrices, leadership dossiers, investor governance repositories, and multi-office locator routing.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 1,
   },
   {
     id: "medicare",
@@ -73,6 +92,18 @@ export const DEMO_PROJECTS: DemoProject[] = [
     enquiryType: "View Demo",
     demoUrl: "/demo-projects/healthcare/medicare",
     accentColor: "#147D78",
+    image: "/images/demo-projects/medicare/hero-consultation.jpg",
+    gallery: [
+      "/images/demo-projects/medicare/hero-consultation.jpg",
+      "/images/demo-projects/medicare/dept-general.jpg",
+      "/images/demo-projects/medicare/dept-cardiology.jpg",
+      "/images/demo-projects/medicare/dept-neurology.jpg",
+    ],
+    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Lucide React", "WCAG AAA Compliant"],
+    problemStatement: "Patients seeking clinical care frequently encounter difficult-to-navigate hospital portals that obscure doctor credentials, OPD schedules, and direct consultation request options.",
+    solutionOverview: "MediCare provides a calming, accessible healthcare portal with real-time doctor specialty filtering, department service hubs, OPD timetable showcases, and streamlined appointment request funnels.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 2,
   },
   {
     id: "foodiehub",
@@ -88,6 +119,18 @@ export const DEMO_PROJECTS: DemoProject[] = [
     enquiryType: "View Demo",
     demoUrl: "/demo-projects/food/foodiehub",
     accentColor: "#B85C38",
+    image: "/images/demo-projects/foodiehub/hero-dish.jpg",
+    gallery: [
+      "/images/demo-projects/foodiehub/hero-dish.jpg",
+      "/images/demo-projects/foodiehub/ambience-interior.jpg",
+      "/images/demo-projects/foodiehub/sig-paneer-tikka.jpg",
+      "/images/demo-projects/foodiehub/private-dining.jpg",
+    ],
+    techStack: ["Next.js 15", "React 19", "Tailwind CSS", "Framer Motion", "Image Optimization"],
+    problemStatement: "Fine dining restaurants require atmospheric storytelling, interactive digital menus with allergen and dietary tagging, and reliable reservation lead capture without paying exorbitant aggregator fees.",
+    solutionOverview: "FoodieHub creates an editorial culinary showcase featuring high-res signature dish presentation, interactive multi-course digital menus with allergen indicators, and direct table reservation workflows.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 3,
   },
   {
     id: "edusmart",
@@ -103,6 +146,18 @@ export const DEMO_PROJECTS: DemoProject[] = [
     enquiryType: "View Demo",
     demoUrl: "/demo-projects/education/edusmart",
     accentColor: "#33243B",
+    image: "/images/demo-projects/edusmart/hero-campus.jpg",
+    gallery: [
+      "/images/demo-projects/edusmart/hero-campus.jpg",
+      "/images/demo-projects/edusmart/campus-library.jpg",
+      "/images/demo-projects/edusmart/academic-seminar.jpg",
+      "/images/demo-projects/edusmart/about-learning.jpg",
+    ],
+    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Lucide React"],
+    problemStatement: "Educational academies and universities need to present multi-tier degree curricula, campus facilities, and admissions deadlines clearly to prospective students and parents.",
+    solutionOverview: "EduSmart (Aurevia Academy) provides an academic digital portal featuring program filtering, curriculum modal views, admissions inquiry forms, faculty directories, and campus life photo galleries.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 4,
   },
   {
     id: "novacart",
@@ -118,6 +173,18 @@ export const DEMO_PROJECTS: DemoProject[] = [
     enquiryType: "View Demo",
     demoUrl: "/demo-projects/ecommerce/novacart",
     accentColor: "#D8F16A",
+    image: "/images/demo-projects/novacart/hero-lifestyle.jpg",
+    gallery: [
+      "/images/demo-projects/novacart/hero-lifestyle.jpg",
+      "/images/demo-projects/novacart/watch-matte-chrono.jpg",
+      "/images/demo-projects/novacart/backpack-commuter.jpg",
+      "/images/demo-projects/novacart/mechanical-keyboard.jpg",
+    ],
+    techStack: ["Next.js 15", "React Context API", "LocalStorage Persistence", "Tailwind CSS", "Framer Motion"],
+    problemStatement: "D2C lifestyle retailers require sub-second catalog responsiveness, dynamic multi-attribute filtering, persistent cart state across sessions, and simulated checkout flows to maximize conversion.",
+    solutionOverview: "NovaCart is an ultra-fast lifestyle e-commerce demonstration featuring live search, faceted category and price filtering, reactive cart and wishlist drawers, discount coupon logic, and interactive checkout simulation.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 5,
   },
   {
     id: "estatevista",
@@ -133,6 +200,18 @@ export const DEMO_PROJECTS: DemoProject[] = [
     enquiryType: "View Demo",
     demoUrl: "/demo-projects/real-estate/estatevista",
     accentColor: "#123C32",
+    image: "/images/demo-projects/estatevista/estatevista-hero.jpg",
+    gallery: [
+      "/images/demo-projects/estatevista/estatevista-hero.jpg",
+      "/images/demo-projects/estatevista/estatevista-1.jpg",
+      "/images/demo-projects/estatevista/estatevista-2.jpg",
+      "/images/demo-projects/estatevista/estatevista-3.jpg",
+    ],
+    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Framer Motion", "Vector CAD Blueprints"],
+    problemStatement: "Ultra-luxury real estate brokerages struggle to convey architectural grandeur through generic real estate templates that lack CAD floor plans, enclave context, or dynamic mortgage telemetry.",
+    solutionOverview: "EstateVista delivers an architectural-grade real estate experience featuring verified high-value property dossiers, vector CAD floor plans with room measurements, enclave guides, interactive mortgage calculators, and private VIP tour booking.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 6,
   },
   {
     id: "staysphere",
@@ -212,6 +291,17 @@ export const DEMO_PROJECTS: DemoProject[] = [
     enquiryType: "View Demo",
     demoUrl: "/demo-projects/fitness/fitzone",
     accentColor: "#FF7138",
+    image: "/assets/images/services/web-engineering.jpg",
+    gallery: [
+      "/assets/images/services/web-engineering.jpg",
+      "/assets/images/services/web-development.jpg",
+      "/assets/images/services/ui-ux-design.jpg",
+    ],
+    techStack: ["Next.js 15", "Framer Motion", "Tailwind 3D Perspective", "TypeScript", "Canvas Graphics"],
+    problemStatement: "Athletic clubs and boutique gyms fail to convert online visitors when websites present static schedule PDFs and generic trainer lists without immersive kinetic energy.",
+    solutionOverview: "FitZone delivers an energetic 3D gym experience featuring dynamic class telemetry, coach biography modals, interactive workout split planning, and VIP free trial lead capture.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 7,
   },
   {
     id: "eventora",
@@ -445,6 +535,17 @@ export const DEMO_PROJECTS: DemoProject[] = [
     demoUrl: "/demo-projects/saas/leadpilot",
     enquiryType: "View Demo",
     accentColor: "#2F806A",
+    image: "/assets/images/services/custom-software-development.jpg",
+    gallery: [
+      "/assets/images/services/custom-software-development.jpg",
+      "/assets/images/services/cloud-solutions.jpg",
+      "/assets/images/services/automation.jpg",
+    ],
+    techStack: ["Next.js 15", "TypeScript", "Lucide React", "Tailwind CSS", "Interactive State"],
+    problemStatement: "B2B sales teams frequently struggle with fragmented customer relationship tracking, manual follow-up reminders, and opaque revenue forecast calculations.",
+    solutionOverview: "LeadPilot provides a high-efficiency sales pipeline cockpit featuring interactive kanban stage boards, contact activity logs, automated deal scoring, and real-time revenue projection metrics.",
+    relatedServiceSlug: "custom-software-development",
+    displayOrder: 8,
   },
   {
     id: "teampulse",
@@ -651,3 +752,69 @@ export const DEMO_PROJECTS: DemoProject[] = [
     enquiryType: "Request a Similar Project",
   },
 ];
+
+/**
+ * Maps a demo project to its verified image URL.
+ * Prefers project.image, falls back to category-matched asset.
+ */
+export function getDemoProjectImage(project: DemoProject): string {
+  if (project.image) return project.image;
+
+  const categoryImages: Record<string, string> = {
+    "Business & Corporate": "/images/demo-projects/corporatepro/hero-advisory.jpg",
+    "Healthcare": "/images/demo-projects/medicare/hero-consultation.jpg",
+    "Restaurants & Food": "/images/demo-projects/foodiehub/hero-dish.jpg",
+    "Education": "/images/demo-projects/edusmart/hero-campus.jpg",
+    "E-commerce": "/images/demo-projects/novacart/hero-lifestyle.jpg",
+    "Real Estate": "/images/demo-projects/estatevista/estatevista-hero.jpg",
+    "Fitness & Wellness": "/assets/images/services/web-engineering.jpg",
+    "Dashboards & Portals": "/assets/images/services/custom-software-development.jpg",
+    "SaaS & Software": "/assets/images/services/custom-software-development.jpg",
+    "Hotels & Travel": "/assets/images/services/services-hero-office.jpg",
+    "AI & Automation": "/assets/images/services/ai-solutions.jpg",
+    "Agriculture & IoT": "/assets/images/services/robotics-iot.jpg",
+    "Creative & Marketing": "/assets/images/services/ui-ux-design.jpg",
+    "Logistics": "/assets/images/services/automation.jpg",
+    "Finance & Accounting": "/assets/images/services/cloud-solutions.jpg",
+    "Events": "/assets/images/services/digital-marketing.jpg",
+    "Beauty & Lifestyle": "/images/demo-projects/novacart/cat-home.jpg",
+    "Local Businesses": "/assets/images/services/web-development.jpg",
+    "Professional Services": "/images/demo-projects/corporatepro/operations-case-study.jpg",
+    "Nonprofit": "/assets/images/services/services-hero-office.jpg",
+  };
+
+  return categoryImages[project.category] || "/assets/images/services/web-development.jpg";
+}
+
+/**
+ * Returns a guaranteed slug for any project.
+ */
+export function getDemoProjectSlug(project: DemoProject): string {
+  return project.slug || project.id.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
+/**
+ * Retrieves a demo project by its unique slug or ID.
+ */
+export function getDemoProjectBySlug(slug: string): DemoProject | undefined {
+  const normalized = slug.toLowerCase().trim();
+  return DEMO_PROJECTS.find(
+    (p) =>
+      (p.slug && p.slug.toLowerCase() === normalized) ||
+      p.id.toLowerCase() === normalized
+  );
+}
+
+/**
+ * Retrieves all live interactive demos.
+ */
+export function getLiveDemoProjects(): DemoProject[] {
+  return DEMO_PROJECTS.filter((p) => p.status === "Live Demo");
+}
+
+/**
+ * Retrieves all featured showcase demos.
+ */
+export function getFeaturedDemoProjects(): DemoProject[] {
+  return DEMO_PROJECTS.filter((p) => p.isFeatured && p.status === "Live Demo");
+}

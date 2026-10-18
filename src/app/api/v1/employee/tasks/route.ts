@@ -7,9 +7,39 @@ export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get('x-user-id');
     const user = await validateActiveUser(userId);
-    const tasks = await db.task.findMany({ where: { userId: user.id }, orderBy: { dueDate: 'asc' } });
+
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get('status');
+    const priority = searchParams.get('priority');
+
+    const where: any = { userId: user.id };
+    if (status && status !== 'ALL') {
+      where.status = status;
+    }
+    if (priority && priority !== 'ALL') {
+      where.priority = priority;
+    }
+
+    const tasks = await db.task.findMany({
+      where,
+      include: {
+        project: {
+          select: { id: true, name: true, status: true },
+        },
+        comments: {
+          include: {
+            user: { select: { id: true, name: true, avatarUrl: true } },
+          },
+          orderBy: { createdAt: 'asc' },
+        },
+      },
+      orderBy: [{ dueDate: 'asc' }, { createdAt: 'desc' }],
+    });
+
     return NextResponse.json({ success: true, tasks });
-  } catch(e) { return handleApiError(e); }
+  } catch (e) {
+    return handleApiError(e);
+  }
 }
 
 export async function PATCH(req: NextRequest) {
@@ -17,15 +47,61 @@ export async function PATCH(req: NextRequest) {
     const userId = req.headers.get('x-user-id');
     const user = await validateActiveUser(userId);
     const { taskId, status } = await req.json();
-    
+
+    const validStatuses = ['TODO', 'IN_PROGRESS', 'BLOCKED', 'COMPLETED'];
+    if (!validStatuses.includes(status)) {
+      throw new ApiError(400, `Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+    }
+
     const task = await db.task.findUnique({ where: { id: taskId } });
     if (!task) throw new ApiError(404, 'Task not found');
     if (task.userId !== user.id) throw new ApiError(403, 'Forbidden');
-    
+
     const updated = await db.task.update({
       where: { id: taskId },
-      data: { status }
+      data: { status },
+      include: {
+        project: { select: { id: true, name: true } },
+        comments: {
+          include: { user: { select: { id: true, name: true, avatarUrl: true } } },
+          orderBy: { createdAt: 'asc' },
+        },
+      },
     });
+
     return NextResponse.json({ success: true, task: updated });
-  } catch(e) { return handleApiError(e); }
+  } catch (e) {
+    return handleApiError(e);
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const userId = req.headers.get('x-user-id');
+    const user = await validateActiveUser(userId);
+    const { taskId, content } = await req.json();
+
+    if (!taskId || !content || !content.trim()) {
+      throw new ApiError(400, 'Task ID and comment content are required');
+    }
+
+    const task = await db.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new ApiError(404, 'Task not found');
+    if (task.userId !== user.id) throw new ApiError(403, 'Forbidden');
+
+    const comment = await db.taskComment.create({
+      data: {
+        taskId,
+        userId: user.id,
+        content: content.trim(),
+      },
+      include: {
+        user: { select: { id: true, name: true, avatarUrl: true } },
+      },
+    });
+
+    return NextResponse.json({ success: true, comment });
+  } catch (e) {
+    return handleApiError(e);
+  }
 }

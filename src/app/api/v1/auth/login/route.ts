@@ -91,8 +91,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Set cookie (only set secure: true when running over HTTPS)
-    const isHttps = req.nextUrl.protocol === "https:";
+    // Set cookie (always secure in production or when forwarded over HTTPS)
+    const isHttps = req.nextUrl.protocol === "https:" || req.headers.get("x-forwarded-proto") === "https";
+    const isSecure = process.env.NODE_ENV === "production" ? true : isHttps;
     const response = NextResponse.json({
       user: {
         id: user.id,
@@ -106,7 +107,7 @@ export async function POST(req: NextRequest) {
       name: "axivon_session",
       value: sessionToken,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production" && isHttps,
+      secure: isSecure,
       sameSite: "lax",
       maxAge: 60 * 60 * 24, // 1 day
       path: "/",

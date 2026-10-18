@@ -41,11 +41,11 @@ export default function MediCareDemoStrip() {
         {/* Right: Direct inquiry CTA */}
         <div className="flex items-center gap-2.5">
           <Link
-            href="/contact?project=MediCare#contact-form"
+            href="/contact?demo=MediCare&industry=Healthcare%20%26%20Medical&service=web-development#contact-form"
             className="group inline-flex items-center gap-1.5 rounded-full bg-[#147D78] px-3.5 py-1 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#0F5C55] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#147D78] focus-visible:ring-offset-1 active:scale-[0.98]"
           >
             <Sparkles className="h-3 w-3 transition-transform group-hover:rotate-12" />
-            <span>Commission a Website Like This</span>
+            <span>Build a Similar Website</span>
             <ExternalLink className="h-3 w-3 opacity-70 transition-opacity group-hover:opacity-100" />
           </Link>
         </div>

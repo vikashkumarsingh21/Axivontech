@@ -41,10 +41,10 @@ export default function LeadPilotDemoStrip() {
             Need a custom B2B CRM or SaaS platform?
           </span>
           <Link
-            href="/contact?project=LeadPilot#contact-form"
+            href="/contact?demo=LeadPilot&industry=SaaS%20%26%20Software&service=custom-software-development#contact-form"
             className="group inline-flex items-center gap-1.5 rounded-full bg-[#2F806A] px-3.5 py-1 text-[11px] font-semibold text-white shadow-xs transition-all hover:bg-[#266b58] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F806A]/60"
           >
-            <span>Build a CRM Like This</span>
+            <span>Build a Similar Platform</span>
             <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
         </div>

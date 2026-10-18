@@ -112,6 +112,14 @@ model User {
   reviewedJobApplications CareerApplication[]  @relation("ApplicationReviewerUser")
   updatedCareersSettings  CareersPageSetting[] @relation("CareersSettingUpdater")
 
+  // Step 4: Website Content Management Relations
+  websiteSettingsUpdated WebsiteSetting[]  @relation("WebsiteSettingUpdater")
+  createdFaqs            WebsiteFaq[]      @relation("FaqCreator")
+  createdServices        WebsiteService[]  @relation("ServiceCreator")
+  createdIndustries      WebsiteIndustry[] @relation("IndustryCreator")
+  createdArticles        WebsiteArticle[]  @relation("ArticleCreator")
+  createdMediaAssets     MediaAsset[]      @relation("MediaCreator")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -622,16 +630,31 @@ model RegularizationRequest {
 }
 
 model Holiday {
-  id          String   @id @default(cuid())
-  name        String
-  date        DateTime @unique @db.Date
-  isOptional  Boolean  @default(false)
-  description String?
+  id                String    @id @default(cuid())
+  name              String
+  date              DateTime  @db.Date
+  isOptional        Boolean   @default(false)
+  description       String?
+  category          String    @default("PUBLIC_HOLIDAY") // PUBLIC_HOLIDAY, COMPANY_HOLIDAY, OPTIONAL_HOLIDAY, FESTIVAL_OR_OBSERVANCE
+  isCompanyHoliday  Boolean   @default(true) // Whether it is an approved day-off for the company
+  source            String    @default("MANUAL") // MANUAL, GOOGLE_CALENDAR, GOVT_IMPORT
+  sourceEventId     String?
+  country           String    @default("IN")
+  state             String?
+  allDay            Boolean   @default(true)
+  year              Int?
+  createdById       String?
+  lastSyncAt        DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([date, name])
   @@index([date])
+  @@index([year])
+  @@index([category])
+  @@index([isCompanyHoliday])
+  @@index([sourceEventId])
 }
 
 model Task {
@@ -1771,4 +1794,146 @@ model CareersPageSetting {
   updatedBy           User?    @relation("CareersSettingUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
   updatedAt           DateTime @updatedAt
 }
+
+// -----------------------------------------------------------------------------
+// STEP 4: WEBSITE CONTENT MANAGEMENT MODELS
+// -----------------------------------------------------------------------------
+
+model WebsiteSetting {
+  id          String    @id @default(cuid())
+  key         String    @unique // e.g. "homepage", "about", "company", "seo"
+  data        Json      // published live data
+  draftData   Json?     // pending draft data
+  status      String    @default("PUBLISHED") // "DRAFT", "PUBLISHED"
+  updatedById String?
+  updatedBy   User?     @relation("WebsiteSettingUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  publishedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  @@index([key])
+  @@index([status])
+}
+
+model WebsiteFaq {
+  id           String    @id @default(cuid())
+  question     String
+  answer       String    @db.Text
+  category     String    @default("GENERAL") // GENERAL, SERVICES, DELIVERY, PRICING, SUPPORT, PARTNERS, CAREERS
+  page         String    @default("GLOBAL")  // GLOBAL, HOME, SERVICES, ABOUT
+  displayOrder Int       @default(0)
+  status       String    @default("PUBLISHED") // DRAFT, PUBLISHED, ARCHIVED
+  createdById  String?
+  createdBy    User?     @relation("FaqCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([category])
+  @@index([page])
+  @@index([status])
+  @@index([displayOrder])
+}
+
+model WebsiteService {
+  id               String    @id @default(cuid())
+  slug             String    @unique
+  title            String
+  badge            String?
+  shortDescription String    @db.Text
+  heroDescription  String    @db.Text
+  icon             String?   @default("Code")
+  displayOrder     Int       @default(0)
+  status           String    @default("PUBLISHED") // DRAFT, PUBLISHED, ARCHIVED
+  benefits         Json?     // Array of { title, description }
+  process          Json?     // Array of { title, description }
+  technologies     Json?     // Array of { name }
+  faqs             Json?     // Array of { question, answer }
+  cta              Json?     // { title, description }
+  metaTitle        String?
+  metaDescription  String?
+  createdById      String?
+  createdBy        User?     @relation("ServiceCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([displayOrder])
+}
+
+model WebsiteIndustry {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  description     String    @db.Text
+  tags            String[]
+  icon            String?   @default("Building2")
+  displayOrder    Int       @default(0)
+  status          String    @default("PUBLISHED") // DRAFT, PUBLISHED, ARCHIVED
+  relatedService  String?
+  metaTitle       String?
+  metaDescription String?
+  createdById     String?
+  createdBy       User?     @relation("IndustryCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([displayOrder])
+}
+
+model WebsiteArticle {
+  id               String    @id @default(cuid())
+  slug             String    @unique
+  title            String
+  excerpt          String    @db.Text
+  contentHtml      String    @db.Text
+  category         String    @default("Web & Custom Software")
+  authorName       String    @default("Axivon Engineering Team")
+  authorRole       String    @default("Core Engineering")
+  authorAvatar     String?
+  readingTime      String    @default("5 min read")
+  featuredImage    String
+  featuredImageAlt String?
+  featured         Boolean   @default(false)
+  status           String    @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  publishedAt      DateTime?
+  keywords         String[]
+  metaTitle        String?
+  metaDescription  String?
+  canonicalUrl     String?
+  createdById      String?
+  createdBy        User?     @relation("ArticleCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([category])
+  @@index([status])
+  @@index([featured])
+  @@index([publishedAt])
+}
+
+model MediaAsset {
+  id           String    @id @default(cuid())
+  filename     String
+  originalName String
+  url          String
+  fileType     String
+  fileSize     Int
+  width        Int?
+  height       Int?
+  altText      String?
+  caption      String?
+  folder       String    @default("general")
+  createdById  String?
+  createdBy    User?     @relation("MediaCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([fileType])
+  @@index([folder])
+  @@index([createdAt])
+}
+
 

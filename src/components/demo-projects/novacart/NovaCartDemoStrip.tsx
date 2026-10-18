@@ -52,11 +52,11 @@ export default function NovaCartDemoStrip() {
           </Link>
 
           <Link
-            href="/contact?project=NovaCart#contact-form"
+            href="/contact?demo=NovaCart&industry=E-Commerce%20%26%20Retail&service=web-development#contact-form"
             className="group inline-flex items-center gap-1.5 rounded-full bg-[#1C1D1A] px-3 py-1 text-[11px] font-semibold text-white shadow-xs transition-all duration-200 hover:bg-[#343630] hover:shadow-sm"
           >
             <Sparkles className="h-3 w-3 text-[#D8F16A]" />
-            <span>Consult Axivon</span>
+            <span>Build a Similar Website</span>
             <ExternalLink className="h-3 w-3 opacity-60" />
           </Link>
         </div>

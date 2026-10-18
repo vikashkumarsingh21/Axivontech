@@ -145,6 +145,46 @@ export async function GET(req: Request) {
       documents.forEach((d) =>
         results.push({ type: "Document", id: d.id, title: d.title, subtitle: d.mimeType || d.visibility, link: `/admin/documents` })
       );
+    } else {
+      // 3. User's Assigned Projects
+      const userProjects = await db.project.findMany({
+        where: {
+          OR: [
+            { members: { some: { userId } } },
+            { tasks: { some: { userId } } },
+          ],
+          AND: [
+            {
+              OR: [
+                { name: { contains: query, mode } },
+                { description: { contains: query, mode } },
+              ],
+            },
+          ],
+        },
+        take,
+        select: { id: true, name: true, status: true },
+      });
+      userProjects.forEach((p) =>
+        results.push({ type: "Project", id: p.id, title: p.name, subtitle: p.status, link: "/employee/projects" })
+      );
+
+      // 4. Company & Department Documents
+      const accessibleDocs = await db.document.findMany({
+        where: {
+          isArchived: false,
+          visibility: { in: ["COMPANY", "DEPARTMENT"] },
+          OR: [
+            { title: { contains: query, mode } },
+            { description: { contains: query, mode } },
+          ],
+        },
+        take,
+        select: { id: true, title: true, category: true },
+      });
+      accessibleDocs.forEach((d) =>
+        results.push({ type: "Document", id: d.id, title: d.title, subtitle: d.category.replace("_", " "), link: "/employee/documents" })
+      );
     }
 
     return NextResponse.json({ data: results, count: results.length });

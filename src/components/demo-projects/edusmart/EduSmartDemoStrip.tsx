@@ -33,11 +33,11 @@ export default function EduSmartDemoStrip() {
         {/* Right: Contextual CTA */}
         <div className="flex items-center gap-3">
           <Link
-            href="/contact?project=EduSmart#contact-form"
+            href="/contact?demo=EduSmart&industry=Education%20%26%20EdTech&service=web-development#contact-form"
             className="inline-flex items-center gap-1.5 rounded-full bg-[#3B2A43] px-3.5 py-1 text-xs font-medium text-[#F7F3EB] shadow-xs transition-all hover:bg-[#4D3857] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B2A43] focus-visible:ring-offset-1"
           >
             <Sparkles className="h-3 w-3 text-[#C4964C]" />
-            <span>Build a Website Like This</span>
+            <span>Build a Similar Website</span>
             <ExternalLink className="h-3 w-3 ml-0.5 text-[#E8DDD0] opacity-80" />
           </Link>
         </div>

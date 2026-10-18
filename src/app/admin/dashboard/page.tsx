@@ -6,7 +6,7 @@ import {
   Users, Briefcase, CheckSquare, Activity, Clock, RefreshCw, 
   AlertCircle, ArrowRight, TrendingUp, UserCheck, ShieldAlert,
   FileCheck2, DollarSign, Award, Plus, Sparkles, ExternalLink,
-  ChevronRight, Calendar, Building2, CheckCircle2
+  ChevronRight, Calendar, Building2, CheckCircle2, Megaphone, FileText
 } from "lucide-react";
 
 interface LeadItem {
@@ -277,6 +277,101 @@ export default function AdminDashboard() {
             {loading ? "—" : summary.totalClients ?? 0}
           </span>
         </Link>
+      </div>
+
+      {/* ── Workforce & Operations Overview Strip ── */}
+      <div className="bg-[#111111] border border-white/10 rounded-2xl p-5 shadow-sm space-y-3">
+        <div className="flex items-center justify-between border-b border-white/5 pb-3">
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-emerald-400" />
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+              Workforce Operations & Pending Actions
+            </h3>
+          </div>
+          <Link href="/admin/attendance" className="text-[11px] text-gray-400 hover:text-emerald-400 transition-colors">
+            Attendance Monitor →
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+          <Link
+            href="/admin/leave"
+            className="flex flex-col p-3 rounded-xl bg-[#161618] border border-white/5 hover:border-amber-500/30 transition-all text-xs group"
+          >
+            <div className="flex items-center justify-between text-gray-400 group-hover:text-amber-400 mb-1">
+              <span className="text-[11px] font-medium">Pending Leaves</span>
+              <Calendar className="w-3.5 h-3.5" />
+            </div>
+            <p className="text-lg font-bold text-white font-mono">
+              {loading ? "—" : summary.pendingLeaves ?? 0}
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/work-reports"
+            className="flex flex-col p-3 rounded-xl bg-[#161618] border border-white/5 hover:border-blue-500/30 transition-all text-xs group"
+          >
+            <div className="flex items-center justify-between text-gray-400 group-hover:text-blue-400 mb-1">
+              <span className="text-[11px] font-medium">Reports Pending</span>
+              <FileText className="w-3.5 h-3.5" />
+            </div>
+            <p className="text-lg font-bold text-white font-mono">
+              {loading ? "—" : summary.pendingWorkReportsReview ?? 0}
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/tasks"
+            className="flex flex-col p-3 rounded-xl bg-[#161618] border border-white/5 hover:border-emerald-500/30 transition-all text-xs group"
+          >
+            <div className="flex items-center justify-between text-gray-400 group-hover:text-emerald-400 mb-1">
+              <span className="text-[11px] font-medium">Open Tasks</span>
+              <CheckSquare className="w-3.5 h-3.5" />
+            </div>
+            <p className="text-lg font-bold text-white font-mono">
+              {loading ? "—" : summary.openTasks ?? 0}
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/attendance"
+            className="flex flex-col p-3 rounded-xl bg-[#161618] border border-white/5 hover:border-emerald-500/30 transition-all text-xs group"
+          >
+            <div className="flex items-center justify-between text-gray-400 group-hover:text-emerald-400 mb-1">
+              <span className="text-[11px] font-medium">Staff Present</span>
+              <Clock className="w-3.5 h-3.5" />
+            </div>
+            <p className="text-lg font-bold text-white font-mono">
+              {loading ? "—" : `${summary.presentToday ?? 0}/${summary.totalEmployees ?? 0}`}
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/calendar"
+            className="flex flex-col p-3 rounded-xl bg-[#161618] border border-white/5 hover:border-purple-500/30 transition-all text-xs group"
+          >
+            <div className="flex items-center justify-between text-gray-400 group-hover:text-purple-400 mb-1">
+              <span className="text-[11px] font-medium">Upcoming Holidays</span>
+              <Calendar className="w-3.5 h-3.5" />
+            </div>
+            <p className="text-lg font-bold text-white font-mono">
+              {loading ? "—" : summary.upcomingCompanyHolidaysCount ?? 0}
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/announcements"
+            className="flex flex-col p-3 rounded-xl bg-[#161618] border border-white/5 hover:border-cyan-500/30 transition-all text-xs group"
+          >
+            <div className="flex items-center justify-between text-gray-400 group-hover:text-cyan-400 mb-1">
+              <span className="text-[11px] font-medium">Announcements</span>
+              <Megaphone className="w-3.5 h-3.5" />
+            </div>
+            <p className="text-lg font-bold text-white font-mono">
+              {loading ? "—" : summary.activeAnnouncementsCount ?? 0}
+            </p>
+          </Link>
+        </div>
       </div>
 
       {/* ── Real Recent Leads Ingestion Table ── */}

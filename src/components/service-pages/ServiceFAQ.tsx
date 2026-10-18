@@ -9,6 +9,7 @@ import {
   useInView,
 } from "framer-motion";
 import { Plus, MessageCircle, CalendarCheck, Sparkles } from "lucide-react";
+import ServiceFAQSchema from "@/components/seo/ServiceFAQSchema";
 const EASE_FAQ = [0.16, 1, 0.3, 1] as const;
 
 /**
@@ -34,6 +35,7 @@ export interface ServiceFAQItem {
 
 export interface ServiceData {
   title: string;
+  slug?: string;
   faqs: ServiceFAQItem[];
   /** Optional overrides — safe to omit entirely. */
   consultationHref?: string;
@@ -430,7 +432,9 @@ export default function ServiceFAQ({ service }: ServiceFAQProps) {
   const inView = useInView(sectionRef, { once: true, amount: 0.15 });
 
   const faqs = service?.faqs ?? [];
-  const consultationHref = service.consultationHref ?? "/contact";
+  const consultationHref =
+    service.consultationHref ??
+    (service.slug ? `/contact?service=${encodeURIComponent(service.slug)}#contact-form` : "/contact#contact-form");
   const whatsappHref = service.whatsappHref ?? "https://wa.me/919473263768";
 
   const handleToggle = (idx: number) => {
@@ -445,6 +449,7 @@ export default function ServiceFAQ({ service }: ServiceFAQProps) {
       className="relative w-full overflow-hidden px-4 py-24 sm:px-6 sm:py-28 lg:px-8"
       style={{ background: "#0f0f0f" }}
     >
+      <ServiceFAQSchema faqs={faqs} />
       <style>{`
         @keyframes axv-spin {
           to { transform: rotate(360deg); }

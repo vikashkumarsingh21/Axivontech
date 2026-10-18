@@ -1,20 +1,45 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { JobRunner } from "@/lib/jobs/runner";
-import { handleApiError } from "@/lib/api-error";
+import { handleApiError, ApiError } from "@/lib/api-error";
+import { requirePermission } from "@/lib/auth/permissions";
+
+async function verifyAuth(req: Request) {
+  const authHeader = req.headers.get("authorization");
+  const cronSecret = process.env.CRON_SECRET || "axivon_cron_secret_internal";
+
+  const isCronAuthorized = authHeader === `Bearer ${cronSecret}`;
+  if (isCronAuthorized) {
+    return { isCron: true };
+  }
+
+  const userId = req.headers.get("x-user-id");
+  if (!userId) {
+    throw new ApiError(401, "Unauthorized cron trigger");
+  }
+
+  const user = await requirePermission(userId, "admin:access");
+  return { isCron: false, user };
+}
 
 export async function POST(req: Request) {
   try {
-    const authHeader = req.headers.get("authorization");
-    const cronSecret = process.env.CRON_SECRET || "axivon_cron_secret_internal";
+    await verifyAuth(req);
+    const results = await JobRunner.processPending();
 
-    // Verify cron secret if provided in auth header, or allow if x-user-id has admin access
-    const isCronAuthorized = authHeader === `Bearer ${cronSecret}`;
-    const userId = req.headers.get("x-user-id");
+    return NextResponse.json({
+      success: true,
+      processedCount: results.length,
+      jobs: results,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error: any) {
+    return handleApiError(error);
+  }
+}
 
-    if (!isCronAuthorized && !userId) {
-      return NextResponse.json({ error: "Unauthorized cron trigger" }, { status: 401 });
-    }
-
+export async function GET(req: Request) {
+  try {
+    await verifyAuth(req);
     const results = await JobRunner.processPending();
 
     return NextResponse.json({

@@ -87,9 +87,9 @@ const TIMELINE: TimelineEntry[] = [
 ];
 
 const ACHIEVEMENTS: AchievementStat[] = [
-  { id: "projects", icon: Rocket, value: "10+", label: "Projects Completed" },
-  { id: "clients", icon: Users2, value: "8+", label: "Happy Clients" },
-  { id: "support", icon: Headphones, value: "24/7", label: "Support" },
+  { id: "projects", icon: Rocket, value: "10+", label: "Projects Delivered" },
+  { id: "services", icon: Cpu, value: "10", label: "Core Services" },
+  { id: "support", icon: Headphones, value: "24/7", label: "Dedicated Support" },
 ];
 
 const containerStagger = {

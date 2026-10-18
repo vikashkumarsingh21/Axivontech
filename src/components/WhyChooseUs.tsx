@@ -72,23 +72,26 @@ const STATS: Stat[] = [
   { 
     end: COMPANY_STATS.projectsDelivered.numericValue,  
     suffix: COMPANY_STATS.projectsDelivered.suffix ?? "",  
-    label: COMPANY_STATS.projectsDelivered.label 
+    label: COMPANY_STATS.projectsDelivered.label,
+    staticDisplay: COMPANY_STATS.projectsDelivered.value,
   },
   { 
     end: COMPANY_STATS.coreServices.numericValue,   
     suffix: COMPANY_STATS.coreServices.suffix ?? "",  
-    label: COMPANY_STATS.coreServices.label 
+    label: COMPANY_STATS.coreServices.label,
+    staticDisplay: COMPANY_STATS.coreServices.value,
   },
   { 
     end: 24,  
     suffix: "/7", 
     label: COMPANY_STATS.support.label,
-    staticDisplay: COMPANY_STATS.support.value // "24/7" displayed directly to prevent "0/7" flash
+    staticDisplay: COMPANY_STATS.support.value,
   },
   { 
     end: COMPANY_STATS.codeQuality.numericValue, 
     suffix: COMPANY_STATS.codeQuality.suffix ?? "",  
-    label: COMPANY_STATS.codeQuality.label 
+    label: COMPANY_STATS.codeQuality.label,
+    staticDisplay: COMPANY_STATS.codeQuality.value,
   },
 ];
 

@@ -131,45 +131,45 @@ export default function EstateVistaPropertyListings({
   };
 
   return (
-    <section id="residences" className="py-16 sm:py-24 bg-[#F9F8F5] relative">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+    <section id="residences" className="py-16 sm:py-24 bg-[#F0EDE5] relative border-b border-[#D5CEC1]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10 pb-6 border-b border-[#E4E0D7]">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10 pb-6 border-b border-[#D5CEC1]">
           <div>
-            <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.24em] text-[#C59B63] mb-2">
+            <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.24em] text-[#B89A63] mb-2">
               <Sparkles className="h-3 w-3" />
-              <span>Verified Real Estate Portfolio</span>
+              <span>Architectural Showcase Portfolio</span>
             </div>
-            <h2 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-[#1A211E]">
+            <h2 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-[#222A25]">
               Curated Architectural Residences
             </h2>
-            <p className="text-sm text-[#5C6661] mt-1 max-w-xl">
+            <p className="text-sm text-[#626B63] mt-1 max-w-xl">
               Filter by property typology, price bracket, and room requirements. Each residence
-              includes verified title history and high-precision architectural floor plans.
+              features architectural specifications, CAD floor plans, and interactive comparisons.
             </p>
           </div>
 
           {/* Results count & Clear button */}
           <div className="flex items-center gap-3 self-start sm:self-end">
-            <span className="text-xs font-semibold text-[#5C6661]">
-              Showing <span className="font-bold text-[#123C32]">{filteredProperties.length}</span> of{" "}
+            <span className="text-xs font-semibold text-[#626B63]">
+              Showing <span className="font-bold text-[#153D32]">{filteredProperties.length}</span> of{" "}
               {properties.length} Estates
             </span>
             {hasActiveFilters && (
               <button
                 type="button"
                 onClick={clearAllFilters}
-                className="flex items-center gap-1.5 rounded-full border border-[#E4E0D7] bg-white px-3 py-1 text-xs font-medium text-[#1A211E] hover:bg-[#F1EFEA] transition-colors"
+                className="flex items-center gap-1.5 rounded-full border border-[#D5CEC1] bg-[#FAF8F2] px-3.5 py-1 text-xs font-semibold text-[#222A25] hover:bg-[#DCD5C8] transition-colors"
               >
-                <RotateCcw className="h-3 w-3 text-[#C59B63]" />
-                <span>Reset</span>
+                <RotateCcw className="h-3 w-3 text-[#B89A63]" />
+                <span>Reset Filters</span>
               </button>
             )}
           </div>
         </div>
 
         {/* ── Category Filter Tabs ──────────────────────────────────── */}
-        <div className="flex flex-wrap items-center gap-2 mb-6">
+        <div className="flex flex-wrap items-center gap-2.5 mb-6">
           {CATEGORIES.map((cat) => {
             const count =
               cat.value === "ALL"
@@ -182,16 +182,16 @@ export default function EstateVistaPropertyListings({
                 key={cat.value}
                 type="button"
                 onClick={() => setSelectedCategory(cat.value)}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all ${
+                className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all ${
                   isSelected
-                    ? "bg-[#123C32] text-white shadow-xs"
-                    : "border border-[#E4E0D7] bg-white text-[#5C6661] hover:border-[#123C32]/40 hover:text-[#1A211E]"
+                    ? "bg-[#153D32] text-white shadow-xs"
+                    : "border border-[#D5CEC1] bg-[#FAF8F2] text-[#626B63] hover:border-[#153D32]/50 hover:text-[#222A25]"
                 }`}
               >
                 <span>{cat.label}</span>
                 <span
-                  className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
-                    isSelected ? "bg-white/20 text-white" : "bg-[#F1EFEA] text-[#7C8882]"
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                    isSelected ? "bg-white/20 text-white" : "bg-[#DCD5C8] text-[#7B817A]"
                   }`}
                 >
                   {count}
@@ -202,16 +202,16 @@ export default function EstateVistaPropertyListings({
         </div>
 
         {/* ── Secondary Filter & Sort Toolbar ──────────────────────── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-10 rounded-2xl border border-[#E4E0D7] bg-white p-3.5 shadow-2xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-10 rounded-2xl border border-[#D5CEC1] bg-[#FAF8F2] p-4 shadow-sm">
           {/* Keyword Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#8FA097]" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#7B817A]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by neighborhood, title..."
-              className="w-full rounded-xl border border-[#E4E0D7] bg-[#F9F8F5] py-2 pl-8 pr-3 text-xs text-[#1A211E] placeholder:text-[#8FA097] focus:border-[#123C32] focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-[#D5CEC1] bg-white py-2.5 pl-9 pr-3 text-xs text-[#222A25] placeholder:text-[#7B817A] focus:border-[#153D32] focus:outline-none"
             />
           </div>
 
@@ -220,14 +220,14 @@ export default function EstateVistaPropertyListings({
             <select
               value={priceTier}
               onChange={(e) => setPriceTier(e.target.value)}
-              className="w-full appearance-none rounded-xl border border-[#E4E0D7] bg-[#F9F8F5] py-2 pl-3 pr-8 text-xs font-medium text-[#1A211E] focus:border-[#123C32] focus:bg-white focus:outline-none cursor-pointer"
+              className="w-full appearance-none rounded-xl border border-[#D5CEC1] bg-white py-2.5 pl-3.5 pr-8 text-xs font-medium text-[#222A25] focus:border-[#153D32] focus:outline-none cursor-pointer"
             >
               <option value="ALL">All Price Tiers</option>
               <option value="UNDER_4M">Under $4,000,000</option>
               <option value="4M_8M">$4M &ndash; $8,000,000</option>
               <option value="OVER_8M">$8,000,000 & Up</option>
             </select>
-            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#8FA097]" />
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#7B817A]" />
           </div>
 
           {/* Bedrooms */}
@@ -235,14 +235,14 @@ export default function EstateVistaPropertyListings({
             <select
               value={bedroomFilter}
               onChange={(e) => setBedroomFilter(e.target.value)}
-              className="w-full appearance-none rounded-xl border border-[#E4E0D7] bg-[#F9F8F5] py-2 pl-3 pr-8 text-xs font-medium text-[#1A211E] focus:border-[#123C32] focus:bg-white focus:outline-none cursor-pointer"
+              className="w-full appearance-none rounded-xl border border-[#D5CEC1] bg-white py-2.5 pl-3.5 pr-8 text-xs font-medium text-[#222A25] focus:border-[#153D32] focus:outline-none cursor-pointer"
             >
               <option value="ALL">Bedrooms (Any)</option>
               <option value="3">3+ Bedrooms</option>
               <option value="4">4+ Bedrooms</option>
               <option value="5">5+ Bedrooms</option>
             </select>
-            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#8FA097]" />
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#7B817A]" />
           </div>
 
           {/* Sort By */}
@@ -250,20 +250,20 @@ export default function EstateVistaPropertyListings({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="w-full appearance-none rounded-xl border border-[#E4E0D7] bg-[#F9F8F5] py-2 pl-3 pr-8 text-xs font-medium text-[#1A211E] focus:border-[#123C32] focus:bg-white focus:outline-none cursor-pointer"
+              className="w-full appearance-none rounded-xl border border-[#D5CEC1] bg-white py-2.5 pl-3.5 pr-8 text-xs font-medium text-[#222A25] focus:border-[#153D32] focus:outline-none cursor-pointer"
             >
               <option value="curated">Sort: Curated Showcase</option>
               <option value="price-asc">Price: Low to High</option>
               <option value="price-desc">Price: High to Low</option>
               <option value="area-desc">Living Area: Largest First</option>
             </select>
-            <ArrowUpDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#8FA097]" />
+            <ArrowUpDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#7B817A]" />
           </div>
         </div>
 
         {/* ── Property Cards Grid ───────────────────────────────────── */}
         {filteredProperties.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 sm:gap-8">
             {filteredProperties.map((property) => (
               <EstateVistaPropertyCard
                 key={property.id}
@@ -279,23 +279,23 @@ export default function EstateVistaPropertyListings({
           </div>
         ) : (
           /* Empty State */
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#E4E0D7] bg-white p-12 text-center max-w-lg mx-auto">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#123C32]/10 text-[#123C32] mb-4">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#D5CEC1] bg-[#FAF8F2] p-12 text-center max-w-lg mx-auto">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#153D32]/10 text-[#153D32] mb-4">
               <Building2 className="h-6 w-6" />
             </div>
-            <h3 className="font-serif text-lg font-bold text-[#1A211E] mb-1">
+            <h3 className="font-serif text-lg font-bold text-[#222A25] mb-1">
               No matching residences found
             </h3>
-            <p className="text-xs text-[#5C6661] mb-6 max-w-sm">
+            <p className="text-xs text-[#626B63] mb-6 max-w-sm">
               We could not find any properties matching your current filter criteria. Try adjusting
               your search query, price tier, or property category.
             </p>
             <button
               type="button"
               onClick={clearAllFilters}
-              className="flex items-center gap-2 rounded-xl bg-[#123C32] px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#0D2D25] transition-all"
+              className="flex items-center gap-2 rounded-xl bg-[#153D32] px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#102C25] transition-all"
             >
-              <RotateCcw className="h-3.5 w-3.5 text-[#C59B63]" />
+              <RotateCcw className="h-3.5 w-3.5 text-[#B89A63]" />
               <span>Reset All Filters</span>
             </button>
           </div>

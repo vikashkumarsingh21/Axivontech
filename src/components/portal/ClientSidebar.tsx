@@ -13,6 +13,8 @@ import {
   User, 
   LogOut, 
   ShieldCheck,
+  LifeBuoy,
+  Bell,
   X 
 } from "lucide-react";
 
@@ -22,6 +24,8 @@ const navItems = [
   { name: "Deliverables & UAT", href: "/client/uat", icon: FolderCheck },
   { name: "Documents", href: "/client/documents", icon: FolderOpen },
   { name: "Invoices & Payments", href: "/client/invoices", icon: CreditCard },
+  { name: "Support & Helpdesk", href: "/client/support", icon: LifeBuoy },
+  { name: "Notifications", href: "/client/notifications", icon: Bell },
   { name: "Account Profile", href: "/client/profile", icon: User },
 ];
 

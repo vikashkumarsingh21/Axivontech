@@ -13,7 +13,7 @@ interface RateLimitRecord {
 const rateLimitStore = new Map<string, RateLimitRecord>();
 
 // Garbage collection for stale keys every 10 minutes
-setInterval(() => {
+const cleanupTimer = setInterval(() => {
   const now = Date.now();
   for (const [key, record] of rateLimitStore.entries()) {
     record.timestamps = record.timestamps.filter((t) => now - t < 3600000);
@@ -22,6 +22,10 @@ setInterval(() => {
     }
   }
 }, 600000);
+
+if (typeof cleanupTimer.unref === "function") {
+  cleanupTimer.unref();
+}
 
 export function isRateLimited(key: string, options: RateLimitOptions): { limited: boolean; remaining: number; resetMs: number } {
   const now = Date.now();
@@ -59,6 +63,7 @@ export function isRateLimited(key: string, options: RateLimitOptions): { limited
 export const RATE_LIMIT_PRESETS = {
   AUTH_LOGIN: { windowMs: 60 * 1000, maxRequests: 5 },          // 5 attempts per min
   PUBLIC_LEADS: { windowMs: 15 * 60 * 1000, maxRequests: 10 },    // 10 leads per 15 min
+  RESUME_UPLOAD: { windowMs: 15 * 60 * 1000, maxRequests: 5 },    // 5 uploads per 15 min
   SENSITIVE_API: { windowMs: 60 * 1000, maxRequests: 30 },        // 30 req per min
   GENERAL_API: { windowMs: 60 * 1000, maxRequests: 100 },         // 100 req per min
 };

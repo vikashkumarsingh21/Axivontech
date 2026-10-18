@@ -17,9 +17,11 @@ import {
   Code2,
 } from "lucide-react";
 
-export default function BlogClientView() {
+export default function BlogClientView({ posts }: { posts?: BlogPost[] } = {}) {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const allPosts = posts && posts.length > 0 ? posts : BLOG_POSTS;
 
   const categories = [
     "All",
@@ -29,7 +31,7 @@ export default function BlogClientView() {
   ];
 
   const filteredPosts = useMemo(() => {
-    return BLOG_POSTS.filter((post) => {
+    return allPosts.filter((post) => {
       const matchesCategory =
         selectedCategory === "All" || post.category === selectedCategory;
       const matchesSearch =

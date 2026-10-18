@@ -41,10 +41,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogPage() {
+import { getPublishedArticles } from "@/lib/content/content-db";
+
+export default async function BlogPage() {
+  const posts = await getPublishedArticles();
+
   return (
     <main className="min-h-screen bg-[#0a0a0c] text-white">
-      <BlogClientView />
+      <BlogClientView posts={posts} />
     </main>
   );
 }

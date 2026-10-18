@@ -145,7 +145,12 @@ function FAQRow({
   );
 }
 
-export default function FAQ() {
+export interface FAQProps {
+  faqs?: FAQItem[];
+}
+
+export default function FAQ({ faqs }: FAQProps = {}) {
+  const items = faqs && faqs.length > 0 ? faqs : FAQ_ITEMS;
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const handleToggle = (index: number) => {
@@ -182,7 +187,7 @@ export default function FAQ() {
           variants={listVariants}
           className="mx-auto flex max-w-3xl flex-col gap-4"
         >
-          {FAQ_ITEMS.map((item, index) => (
+          {items.map((item, index) => (
             <FAQRow
               key={item.question}
               item={item}

@@ -1,20 +1,39 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requirePermission } from "@/lib/auth/permissions";
+import { handleApiError, ApiError } from "@/lib/api-error";
 
-export async function POST(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
-  const params = await props.params;
+export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params;
+    const { id } = await props.params;
     const adminId = req.headers.get("x-user-id");
+    await requirePermission(adminId, "admin:access");
 
-    const leave = await db.leaveRequest.findUnique({ where: { id } });
-    if (!leave) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    if (leave.status !== "PENDING") return NextResponse.json({ error: "Already processed" }, { status: 400 });
+    const leave = await db.leaveRequest.findUnique({
+      where: { id },
+      include: { user: { select: { name: true, email: true } } },
+    });
+    if (!leave) throw new ApiError(404, "Leave request not found");
+    if (leave.status !== "PENDING") throw new ApiError(400, "This leave request has already been processed");
 
-    await db.leaveRequest.update({ where: { id }, data: { status: "APPROVED" } });
+    // Prevent self-approval
+    if (leave.userId === adminId) {
+      throw new ApiError(400, "Administrators cannot approve their own leave requests");
+    }
+
+    const updated = await db.leaveRequest.update({
+      where: { id },
+      data: { status: "APPROVED" },
+    });
 
     await db.notification.create({
-      data: { userId: leave.userId, type: "LEAVE_APPROVED", title: "Leave Approved", message: "Your leave request has been approved.", link: "/employee/leave" },
+      data: {
+        userId: leave.userId,
+        type: "LEAVE_UPDATED",
+        title: "Leave Approved",
+        message: `Your ${leave.leaveType.toLowerCase()} leave request has been approved.`,
+        link: "/employee/leave",
+      },
     });
 
     const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
@@ -30,8 +49,8 @@ export async function POST(req: Request, props: { params: Promise<{ [key: string
       }).catch(() => {});
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, leave: updated });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleApiError(error);
   }
 }

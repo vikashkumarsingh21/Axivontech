@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ChevronRight, ChevronLeft, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { trackPartnerApplication } from "@/lib/analytics";
 
 export default function PartnerApplicationForm() {
   const [step, setStep] = useState(1);
@@ -145,6 +146,10 @@ export default function PartnerApplicationForm() {
       }
 
       setIsSubmitted(true);
+      trackPartnerApplication({
+        businessType: formData.occupation,
+        experienceLevel: formData.yearsOfExperience,
+      });
     } catch (err: unknown) {
       setError((err as Error).message || "An error occurred during submission. Please try again.");
     } finally {

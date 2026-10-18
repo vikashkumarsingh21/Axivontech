@@ -38,6 +38,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 import { SITE_URL, SITE_NAME, DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE } from "@/lib/seo/config";
 import { isCareersPageEnabled } from "@/lib/careers/careers-db";
+import { getSeoSettings } from "@/lib/content/content-db";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -46,72 +47,91 @@ export const viewport: Viewport = {
   themeColor: "#0B0D10",
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
-  manifest: "/manifest.json",
-  title: {
-    default: DEFAULT_TITLE,
-    template: `%s | ${SITE_NAME}`,
-  },
-  description: DEFAULT_DESCRIPTION,
-  keywords: [
-    "Web Development Company",
-    "Mobile App Development",
-    "AI Solutions",
-    "Custom Software Development",
-    "UI UX Design",
-    SITE_NAME,
-  ],
-  authors: [
-    {
-      name: "Vikash Kumar",
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeoSettings();
+  const canonicalUrl = seo.canonicalBase || SITE_URL;
+  const title = seo.defaultTitle || DEFAULT_TITLE;
+  const description = seo.defaultDescription || DEFAULT_DESCRIPTION;
+  const ogImage = seo.defaultOgImage || DEFAULT_OG_IMAGE;
+
+  const verification: { google?: string; other?: Record<string, string> } = {};
+  if (seo.googleSiteVerification?.trim()) {
+    verification.google = seo.googleSiteVerification.trim();
+  }
+  if (seo.bingSiteVerification?.trim()) {
+    verification.other = { "msvalidate.01": seo.bingSiteVerification.trim() };
+  }
+
+  return {
+    metadataBase: new URL(canonicalUrl),
+    icons: {
+      icon: "/favicon.ico",
+      shortcut: "/favicon.ico",
+      apple: "/apple-touch-icon.png",
     },
-  ],
-  creator: SITE_NAME,
-  publisher: SITE_NAME,
-  alternates: {
-    canonical: SITE_URL,
-  },
-  openGraph: {
-    title: DEFAULT_TITLE,
-    description: DEFAULT_DESCRIPTION,
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    locale: "en_US",
-    type: "website",
-    images: [
+    manifest: "/manifest.json",
+    title: {
+      default: title,
+      template: seo.titleTemplate || `%s | ${SITE_NAME}`,
+    },
+    description,
+    keywords: seo.keywords && seo.keywords.length > 0 ? seo.keywords : [
+      "Web Development Company",
+      "Mobile App Development",
+      "AI Solutions",
+      "Custom Software Development",
+      "UI UX Design",
+      SITE_NAME,
+    ],
+    authors: [
       {
-        url: DEFAULT_OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: SITE_NAME,
+        name: "Vikash Kumar",
       },
     ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: DEFAULT_TITLE,
-    description: DEFAULT_DESCRIPTION,
-    images: [DEFAULT_OG_IMAGE],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
-
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: SITE_NAME,
+      locale: "en_US",
+      type: "website",
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: SITE_NAME,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+    robots: {
+      index: seo.allowIndexing,
+      follow: seo.allowIndexing,
+    },
+    verification: Object.keys(verification).length > 0 ? verification : undefined,
+  };
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const careersEnabled = await isCareersPageEnabled();
+  const [careersEnabled, seo] = await Promise.all([
+    isCareersPageEnabled(),
+    getSeoSettings(),
+  ]);
 
   return (
     <html
@@ -125,17 +145,16 @@ export default async function RootLayout({
         <WebSiteSchema />
         <Navbar careersEnabled={careersEnabled} />
 
-  <main className="flex-1">
-    {children}
-  </main>
+        <main className="flex-1">
+          {children}
+        </main>
 
-  <Footer careersEnabled={careersEnabled} />
+        <Footer careersEnabled={careersEnabled} />
 
-  <GoogleAnalytics />
+        <GoogleAnalytics measurementId={seo.gaMeasurementId} />
 
-  <ChatWidget />
-
-</body>
+        <ChatWidget />
+      </body>
     </html>
   );
 }

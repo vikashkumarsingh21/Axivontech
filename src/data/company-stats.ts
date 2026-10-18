@@ -28,8 +28,8 @@ export const COMPANY_STATS = {
   },
   coreServices: {
     id: "services",
-    value: "8",
-    numericValue: 8,
+    value: "10",
+    numericValue: 10,
     suffix: "",
     label: "Core Services",
     description: "Specialized engineering domains across web, mobile, AI, and cloud",
@@ -39,7 +39,7 @@ export const COMPANY_STATS = {
     value: "24/7",
     numericValue: 24,
     suffix: "/7",
-    label: "Support",
+    label: "Dedicated Support",
     description: "Dedicated round-the-clock technical monitoring and response",
   },
   codeQuality: {
@@ -47,7 +47,7 @@ export const COMPANY_STATS = {
     value: "100%",
     numericValue: 100,
     suffix: "%",
-    label: "Code Quality",
+    label: "Code Quality Focus",
     description: "Rigorous type-safety, automated testing, and scalable architecture",
   },
 } as const;

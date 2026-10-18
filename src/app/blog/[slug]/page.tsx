@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BLOG_POSTS } from "@/data/blog-posts";
+import { getPublishedArticleBySlug, getPublishedArticles } from "@/lib/content/content-db";
 import ArticleDetailView from "@/components/blog/ArticleDetailView";
 
 interface PageProps {
@@ -8,14 +9,15 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return BLOG_POSTS.map((post) => ({
+  const posts = await getPublishedArticles();
+  return posts.map((post) => ({
     slug: post.slug,
   }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = BLOG_POSTS.find((p) => p.slug === slug);
+  const post = await getPublishedArticleBySlug(slug);
 
   if (!post) {
     return {
@@ -60,7 +62,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = BLOG_POSTS.find((p) => p.slug === slug);
+  const post = await getPublishedArticleBySlug(slug);
 
   if (!post) {
     notFound();

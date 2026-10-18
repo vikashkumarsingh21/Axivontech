@@ -79,7 +79,7 @@ export default function ServiceHero({ service }: { service: ServiceData }) {
 
             <motion.div variants={fadeUp} className="flex flex-wrap gap-4 pt-4">
               <Link
-                href="/contact"
+                href={`/contact?service=${encodeURIComponent(service.slug)}#contact-form`}
                 className="group flex items-center justify-center gap-2 rounded-xl bg-[#e8a064] px-6 py-3.5 text-sm font-semibold tracking-tight text-[#0f0f0f] transition-all hover:bg-[#d4915c] shadow-lg shadow-[#e8a064]/20"
               >
                 Get Free Consultation

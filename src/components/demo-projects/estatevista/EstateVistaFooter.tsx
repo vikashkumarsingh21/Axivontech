@@ -10,13 +10,13 @@ export default function EstateVistaFooter() {
   };
 
   return (
-    <footer className="bg-[#0A1612] text-[#E4EDE8] border-t border-[#123C32]/40 relative">
+    <footer className="bg-[#0A1612] text-[#E4EDE8] border-t border-[#153D32]/40 relative">
       {/* ── Axivon Conversion Callout Banner ───────────────────────── */}
-      <div className="border-b border-[#123C32]/40 bg-[#0E1F1A]">
+      <div className="border-b border-[#153D32]/40 bg-[#0D1C17]">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-10">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 rounded-2xl border border-[#23584B]/40 bg-[#122A23] p-8 sm:p-10 shadow-lg">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 rounded-2xl border border-[#153D32]/60 bg-[#122620] p-8 sm:p-10 shadow-lg">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#C59B63]/40 bg-[#C59B63]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#C59B63] mb-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#B89A63]/40 bg-[#B89A63]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#B89A63] mb-3">
                 <Sparkles className="h-3 w-3" />
                 <span>Build with Axivon Technologies</span>
               </div>
@@ -33,7 +33,7 @@ export default function EstateVistaFooter() {
             <div className="shrink-0 flex flex-col sm:flex-row gap-3">
               <Link
                 href="/contact?project=EstateVista#contact-form"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#C59B63] hover:bg-[#B58B53] text-[#0A1612] px-6 py-3 text-xs font-bold shadow-md transition-all active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#B89A63] hover:bg-[#A3854E] text-[#0A1612] px-6 py-3 text-xs font-bold shadow-md transition-all active:scale-[0.98]"
               >
                 <span>Discuss Your Real Estate Project</span>
                 <ArrowUpRight className="h-4 w-4" />
@@ -55,14 +55,14 @@ export default function EstateVistaFooter() {
           {/* Brand Column */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#123C32] text-[#C59B63] border border-[#23584B]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#153D32] text-[#B89A63] border border-[#102C25]">
                 <Building2 className="h-5 w-5" />
               </div>
               <div>
                 <span className="font-serif text-xl font-bold tracking-tight text-white block">
                   ESTATEVISTA
                 </span>
-                <span className="text-[9px] font-semibold uppercase tracking-[0.24em] text-[#C59B63]">
+                <span className="text-[9px] font-semibold uppercase tracking-[0.24em] text-[#B89A63]">
                   Prime Realty & Architecture
                 </span>
               </div>
@@ -74,14 +74,14 @@ export default function EstateVistaFooter() {
             </p>
 
             <div className="flex items-center gap-2 text-xs text-[#A3B8AF]">
-              <ShieldCheck className="h-4 w-4 text-[#2E6B56]" />
+              <ShieldCheck className="h-4 w-4 text-[#B89A63]" />
               <span>Full Fiduciary Escrow & Title Verification Protocols</span>
             </div>
           </div>
 
           {/* Typologies */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#C59B63] mb-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#B89A63] mb-4">
               Typologies
             </h4>
             <ul className="space-y-2.5 text-xs text-[#8FA59A]">
@@ -115,7 +115,7 @@ export default function EstateVistaFooter() {
 
           {/* Micro-Markets */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#C59B63] mb-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#B89A63] mb-4">
               Enclaves
             </h4>
             <ul className="space-y-2.5 text-xs text-[#8FA59A]">
@@ -149,7 +149,7 @@ export default function EstateVistaFooter() {
 
           {/* Platform & Portfolio */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#C59B63] mb-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#B89A63] mb-4">
               Demo Platform
             </h4>
             <ul className="space-y-2.5 text-xs text-[#8FA59A]">
@@ -178,7 +178,7 @@ export default function EstateVistaFooter() {
         </div>
 
         {/* ── Bottom Regulatory & Demonstration Disclaimer ───────────── */}
-        <div className="mt-12 pt-8 border-t border-[#123C32]/40 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#6E8278]">
+        <div className="mt-12 pt-8 border-t border-[#153D32]/40 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#6E8278]">
           <p className="max-w-3xl leading-relaxed">
             &copy; {new Date().getFullYear()} EstateVista Realty &middot; A digital demonstration
             created by Axivon Technologies. Property names, specifications, valuations, and
@@ -190,10 +190,10 @@ export default function EstateVistaFooter() {
             type="button"
             onClick={scrollToTop}
             aria-label="Scroll back to top"
-            className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-[#A3B8AF] hover:text-white hover:border-[#C59B63]/60 transition-all shrink-0"
+            className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-[#A3B8AF] hover:text-white hover:border-[#B89A63]/60 transition-all shrink-0"
           >
             <span>Top</span>
-            <ArrowUp className="h-3 w-3 text-[#C59B63]" />
+            <ArrowUp className="h-3 w-3 text-[#B89A63]" />
           </button>
         </div>
       </div>

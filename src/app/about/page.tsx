@@ -31,7 +31,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AboutPage() {
+import { getAboutPageContent } from "@/lib/content/content-db";
+
+export default async function AboutPage() {
+  const content = await getAboutPageContent();
+
   return (
     <main className="bg-[#0a0a0a] text-white selection:bg-[#e8a064] selection:text-[#0a0a0a] min-h-screen font-sans">
       
@@ -58,14 +62,13 @@ export default function AboutPage() {
           <div className="max-w-4xl">
             <p className="text-[#e8a064] font-semibold tracking-widest text-xs uppercase mb-6 flex items-center gap-3">
               <span className="w-8 h-px bg-[#e8a064]/50" />
-              About Axivon
+              {content.hero.eyebrow}
             </p>
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-[4.5rem] font-bold leading-[1.08] tracking-tight text-[#F3F5F7] mb-8 text-balance">
-              Building Digital Products, <br className="hidden md:block" />
-              AI Systems &amp; <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400">Intelligent Technology.</span>
+              {content.hero.headline}
             </h1>
             <p className="text-lg md:text-xl text-[#A7B0BC] max-w-2xl leading-relaxed font-light mb-10 text-pretty">
-              Axivon Technologies builds digital products, AI solutions, automation systems and custom software for businesses that want technology to solve real problems.
+              {content.hero.subcopy}
             </p>
             <div className="flex items-center gap-5 flex-wrap">
               <Link

@@ -19,20 +19,56 @@ import {
   X,
   User,
   Shield,
+  Calendar,
+  HelpCircle,
+  ListChecks,
 } from "lucide-react";
 
-const navItems = [
-  { name: "Dashboard", href: "/employee/dashboard", icon: LayoutDashboard },
-  { name: "Attendance", href: "/employee/attendance", icon: CalendarCheck },
-  { name: "Projects", href: "/employee/projects", icon: Briefcase },
-  { name: "Tasks", href: "/employee/tasks", icon: CheckSquare },
-  { name: "Work Reports", href: "/employee/work-reports", icon: FileText },
-  { name: "Leave", href: "/employee/leave", icon: Coffee },
-  { name: "Notifications", href: "/employee/notifications", icon: Bell },
-  { name: "Announcements", href: "/employee/announcements", icon: Megaphone },
-  { name: "Documents", href: "/employee/documents", icon: FolderOpen },
-  { name: "Profile", href: "/employee/profile", icon: User },
-  { name: "Settings", href: "/employee/settings", icon: Settings },
+interface NavGroup {
+  label: string;
+  items: {
+    name: string;
+    href: string;
+    icon: any;
+    badge?: string;
+  }[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    label: "Workspace",
+    items: [
+      { name: "Dashboard", href: "/employee/dashboard", icon: LayoutDashboard },
+      { name: "My Attendance", href: "/employee/attendance", icon: CalendarCheck },
+      { name: "My Tasks", href: "/employee/tasks", icon: CheckSquare },
+      { name: "Work Reports", href: "/employee/work-reports", icon: FileText },
+      { name: "Projects", href: "/employee/projects", icon: Briefcase },
+    ],
+  },
+  {
+    label: "Schedule & Leave",
+    items: [
+      { name: "Company Calendar", href: "/employee/calendar", icon: Calendar },
+      { name: "Leave Management", href: "/employee/leave", icon: Coffee },
+    ],
+  },
+  {
+    label: "Organization Hub",
+    items: [
+      { name: "Announcements", href: "/employee/announcements", icon: Megaphone },
+      { name: "Document Center", href: "/employee/documents", icon: FolderOpen },
+      { name: "Notifications", href: "/employee/notifications", icon: Bell },
+    ],
+  },
+  {
+    label: "Account & Support",
+    items: [
+      { name: "My Profile", href: "/employee/profile", icon: User },
+      { name: "Onboarding Checklist", href: "/employee/onboarding", icon: ListChecks },
+      { name: "Help & Support", href: "/employee/support", icon: HelpCircle },
+      { name: "Settings", href: "/employee/settings", icon: Settings },
+    ],
+  },
 ];
 
 interface EmployeeSidebarProps {
@@ -78,39 +114,46 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
         </button>
       </div>
 
-      {/* Nav Items */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.href);
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              onClick={onClose}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
-                active
-                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25"
-                  : "text-[#A7B0BC] hover:text-[#F3F5F7] hover:bg-[#202833] border border-transparent"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <Icon
-                  className={`w-4 h-4 shrink-0 transition-colors ${
+      {/* Nav Items Grouped */}
+      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
+        {navGroups.map((group) => (
+          <div key={group.label} className="space-y-1">
+            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#566171]">
+              {group.label}
+            </div>
+            {group.items.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={onClose}
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all group ${
                     active
-                      ? "text-emerald-500"
-                      : "text-[#566171] group-hover:text-[#A7B0BC]"
+                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25"
+                      : "text-[#A7B0BC] hover:text-[#F3F5F7] hover:bg-[#202833] border border-transparent"
                   }`}
-                  strokeWidth={active ? 2.2 : 1.8}
-                />
-                <span>{item.name}</span>
-              </div>
-              {active && (
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              )}
-            </Link>
-          );
-        })}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon
+                      className={`w-4 h-4 shrink-0 transition-colors ${
+                        active
+                          ? "text-emerald-500"
+                          : "text-[#566171] group-hover:text-[#A7B0BC]"
+                      }`}
+                      strokeWidth={active ? 2.2 : 1.8}
+                    />
+                    <span>{item.name}</span>
+                  </div>
+                  {active && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       {/* Logout Footer */}

@@ -1,22 +1,37 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { handleApiError } from "@/lib/api-error";
+import { requirePermission } from "@/lib/auth/permissions";
+import { handleApiError, ApiError } from "@/lib/api-error";
 
-export async function POST(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
-  const params = await props.params;
+export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params;
+    const { id } = await props.params;
     const adminId = req.headers.get("x-user-id");
-    const body = await req.json();
+    await requirePermission(adminId, "admin:access");
 
-    const leave = await db.leaveRequest.findUnique({ where: { id } });
-    if (!leave) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    if (leave.status !== "PENDING") return NextResponse.json({ error: "Already processed" }, { status: 400 });
+    const body = await req.json().catch(() => ({}));
+    const reason = body.reason?.trim() || "Your leave request was not approved at this time.";
 
-    await db.leaveRequest.update({ where: { id }, data: { status: "REJECTED" } });
+    const leave = await db.leaveRequest.findUnique({
+      where: { id },
+      include: { user: { select: { name: true, email: true } } },
+    });
+    if (!leave) throw new ApiError(404, "Leave request not found");
+    if (leave.status !== "PENDING") throw new ApiError(400, "This leave request has already been processed");
+
+    const updated = await db.leaveRequest.update({
+      where: { id },
+      data: { status: "REJECTED" },
+    });
 
     await db.notification.create({
-      data: { userId: leave.userId, type: "SYSTEM", title: "Leave Rejected", message: body.reason || "Your leave request has been rejected.", link: "/employee/leave" },
+      data: {
+        userId: leave.userId,
+        type: "LEAVE_UPDATED",
+        title: "Leave Request Rejected",
+        message: reason,
+        link: "/employee/leave",
+      },
     });
 
     const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
@@ -28,11 +43,11 @@ export async function POST(req: Request, props: { params: Promise<{ [key: string
         entityType: "LEAVE",
         entityId: id,
         title: "Leave Request Rejected",
-        message: body.reason ? `Your leave was rejected: ${body.reason}` : "Your leave request has been rejected.",
+        message: reason,
       }).catch(() => {});
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, leave: updated });
   } catch (error: any) {
     return handleApiError(error);
   }

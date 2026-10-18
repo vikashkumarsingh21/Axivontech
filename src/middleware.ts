@@ -4,7 +4,11 @@ import { jwtVerify } from "jose";
 
 // Need to duplicate secret resolution for Edge runtime compatibility
 // process.env.SESSION_SECRET is available in Edge middleware if defined in .env
-const secretKey = new TextEncoder().encode(process.env.SESSION_SECRET || "");
+const rawSecret = process.env.SESSION_SECRET || "";
+if (!rawSecret && process.env.NODE_ENV === "production") {
+  console.error("[CRITICAL SECURITY]: SESSION_SECRET is not configured in production.");
+}
+const secretKey = new TextEncoder().encode(rawSecret || "fallback-dev-session-secret-at-least-32-chars-long");
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

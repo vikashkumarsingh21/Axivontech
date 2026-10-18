@@ -16,16 +16,65 @@ export async function POST(req: NextRequest) {
   try {
     const userId = req.headers.get('x-user-id');
     const user = await validateActiveUser(userId);
-    const { date, summary, tasksCompleted, workPerformed, hoursWorked } = await req.json();
-    
-    const reportDate = new Date(date);
-    reportDate.setHours(0,0,0,0);
-    
+    const {
+      date,
+      summary,
+      tasksCompleted,
+      workPerformed,
+      challenges,
+      nextSteps,
+      hoursWorked,
+    } = await req.json();
+
+    if (!summary?.trim() || !workPerformed?.trim()) {
+      throw new ApiError(400, 'Summary and detailed work performed are required');
+    }
+
+    const reportDate = date ? new Date(date) : new Date();
+    reportDate.setHours(0, 0, 0, 0);
+
     const report = await db.workReport.upsert({
       where: { userId_date: { userId: user.id, date: reportDate } },
-      update: { summary, tasksCompleted, workPerformed, hoursWorked: Number(hoursWorked) },
-      create: { userId: user.id, date: reportDate, summary, tasksCompleted, workPerformed, hoursWorked: Number(hoursWorked) }
+      update: {
+        summary: summary.trim(),
+        tasksCompleted: tasksCompleted?.trim() || null,
+        workPerformed: workPerformed.trim(),
+        challenges: challenges?.trim() || null,
+        nextSteps: nextSteps?.trim() || null,
+        hoursWorked: hoursWorked ? Number(hoursWorked) : 8,
+        status: 'SUBMITTED',
+      },
+      create: {
+        userId: user.id,
+        date: reportDate,
+        summary: summary.trim(),
+        tasksCompleted: tasksCompleted?.trim() || null,
+        workPerformed: workPerformed.trim(),
+        challenges: challenges?.trim() || null,
+        nextSteps: nextSteps?.trim() || null,
+        hoursWorked: hoursWorked ? Number(hoursWorked) : 8,
+        status: 'SUBMITTED',
+      },
     });
+
+    // Emit platform event to notify supervisors & trigger automations
+    try {
+      const { EventBus } = await import("@/lib/events/bus");
+      await EventBus.emit({
+        eventType: "WORK_REPORT_SUBMITTED",
+        actorId: user.id,
+        entityType: "WORK_REPORT",
+        entityId: report.id,
+        title: `Work Report: ${user.name}`,
+        message: `${user.name} submitted work report for ${reportDate.toLocaleDateString()}. Summary: ${summary.slice(0, 100)}`,
+        metadata: { date: reportDate, hoursWorked: report.hoursWorked, reportId: report.id },
+      });
+    } catch (eventBusErr) {
+      console.error("[EventBus] Work report submitted emission failed:", eventBusErr);
+    }
+
     return NextResponse.json({ success: true, report });
-  } catch(e) { return handleApiError(e); }
+  } catch (e) {
+    return handleApiError(e);
+  }
 }

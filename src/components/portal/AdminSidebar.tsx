@@ -6,13 +6,14 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  LayoutDashboard, Users, CalendarCheck, Briefcase, 
+  LayoutDashboard, Users, CalendarCheck, Calendar, Briefcase, 
   CheckSquare, FileText, Coffee, Bell, Megaphone, 
   FolderOpen, Activity, Settings, LogOut, DollarSign,
   TrendingUp, Award, Clock, MessageSquare, ChevronDown, 
   ChevronRight, Building, UserCheck, ShieldCheck,
   CreditCard, UserPlus, Image as ImageIcon, LayoutTemplate,
-  GraduationCap, X
+  GraduationCap, X, Sparkles, Home, Layers, Building2, Info,
+  HelpCircle, BookOpen, Globe, Sliders, BarChart3, LineChart, FileSpreadsheet
 } from "lucide-react";
 
 type NavItem = {
@@ -74,6 +75,15 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
       ]
     },
     {
+      title: "Business Intelligence",
+      icon: BarChart3,
+      badge: "BI",
+      items: [
+        { name: "BI Dashboard", href: "/admin/analytics", icon: LineChart, isHighlight: true },
+        { name: "Reports Centre", href: "/admin/reports", icon: FileSpreadsheet },
+      ]
+    },
+    {
       title: "Business Partner Network",
       icon: UserCheck,
       badge: "Partner",
@@ -93,6 +103,7 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
       items: [
         { name: "Employees", href: "/admin/employees", icon: Users },
         { name: "Attendance", href: "/admin/attendance", icon: CalendarCheck },
+        { name: "Calendar & Holidays", href: "/admin/calendar", icon: Calendar },
         { name: "Leave Approvals", href: "/admin/leave", icon: Coffee },
         { name: "Work Reports", href: "/admin/work-reports", icon: FileText },
         { name: "Projects", href: "/admin/projects", icon: Briefcase },
@@ -111,8 +122,19 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
     {
       title: "Content Management",
       icon: LayoutTemplate,
+      badge: "CMS",
       items: [
-        { name: "Login Page Posters", href: "/admin/content/login-posters", icon: ImageIcon },
+        { name: "Content Overview", href: "/admin/content", icon: LayoutDashboard },
+        { name: "Homepage Content", href: "/admin/content/homepage", icon: Home },
+        { name: "Services Catalog", href: "/admin/content/services", icon: Layers },
+        { name: "Industry Sectors", href: "/admin/content/industries", icon: Building2 },
+        { name: "About & Company", href: "/admin/content/about", icon: Info },
+        { name: "FAQ Directory", href: "/admin/content/faqs", icon: HelpCircle },
+        { name: "Blog Articles", href: "/admin/content/blog", icon: BookOpen },
+        { name: "Media Library", href: "/admin/content/media", icon: ImageIcon },
+        { name: "SEO Settings", href: "/admin/content/seo", icon: Globe },
+        { name: "Demo Projects", href: "/admin/content/demo-projects", icon: Sparkles },
+        { name: "Login Posters", href: "/admin/content/login-posters", icon: Sliders },
       ]
     },
     {

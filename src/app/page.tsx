@@ -4,6 +4,8 @@ import Hero from "@/components/Hero";
 import HomeFAQSchema from "@/components/seo/HomeFAQSchema";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
+import { getHomepageContent, getPublishedFaqs, getSeoSettings } from "@/lib/content/content-db";
+
 const Services = dynamic(() => import("@/components/Services"));
 const WhyChooseUs = dynamic(() => import("@/components/WhyChooseUs"));
 const IndustriesWeServe = dynamic(() => import("@/components/IndustriesWeServe"));
@@ -13,33 +15,39 @@ const FAQ = dynamic(() => import("@/components/FAQ"));
 const ClientReviews = dynamic(() => import("@/components/ClientReviews"));
 const CTA = dynamic(() => import("@/components/CTA"));
 
-export const metadata: Metadata = createPageMetadata({
-  title: "Axivon Technologies — We Build Digital Products That Move Businesses Forward",
-  description:
-    "Axivon Technologies designs and engineers websites, mobile apps, AI systems, and custom software for startups, schools, healthcare teams, and growing businesses.",
-  path: "/",
-  keywords: [
-    "Software Development Agency",
-    "Web Design Patna",
-    "App Developers India",
-    "Custom AI Integration",
-    "Full-Stack Development",
-  ],
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getHomepageContent();
+  const seo = await getSeoSettings();
 
-export default function Home() {
+  const title = content.seo?.title || seo.defaultTitle;
+  const description = content.seo?.description || seo.defaultDescription;
+  const keywords = content.seo?.keywords?.length ? content.seo.keywords : seo.keywords;
+
+  return createPageMetadata({
+    title,
+    description,
+    path: "/",
+    keywords,
+    noindex: !seo.allowIndexing,
+  });
+}
+
+export default async function Home() {
+  const content = await getHomepageContent();
+  const faqs = await getPublishedFaqs("ALL", "HOME");
+
   return (
     <>
-      <HomeFAQSchema />
-      <Hero />
-      <Services />
-      <WhyChooseUs />
-      <IndustriesWeServe />
-      <Portfolio />
-      <Process />
-      <ClientReviews />
-      <FAQ />
-      <CTA />
+      <HomeFAQSchema faqs={faqs} />
+      {content.sectionsVisibility.hero && <Hero content={content.hero} />}
+      {content.sectionsVisibility.services && <Services />}
+      {content.sectionsVisibility.whyChooseUs && <WhyChooseUs />}
+      {content.sectionsVisibility.industries && <IndustriesWeServe />}
+      {content.sectionsVisibility.portfolio && <Portfolio />}
+      {content.sectionsVisibility.process && <Process />}
+      {content.sectionsVisibility.reviews && <ClientReviews />}
+      {content.sectionsVisibility.faq && <FAQ faqs={faqs} />}
+      {content.sectionsVisibility.cta && <CTA />}
     </>
   );
 }

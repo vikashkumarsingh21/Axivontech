@@ -104,7 +104,7 @@ export default function EstateVistaClientView() {
   const comparedProperties = ESTATEVISTA_PROPERTIES.filter((p) => compareIds.includes(p.id));
 
   return (
-    <div className="demo-light-theme min-h-screen bg-[#F9F8F5] text-[#1A211E] font-sans antialiased selection:bg-[#123C32]/15 selection:text-[#123C32]">
+    <div className="demo-light-theme min-h-screen bg-[#F0EDE5] text-[#222A25] font-sans antialiased selection:bg-[#153D32]/15 selection:text-[#153D32]">
       {/* 1. Axivon Demo Strip */}
       <EstateVistaDemoStrip />
 

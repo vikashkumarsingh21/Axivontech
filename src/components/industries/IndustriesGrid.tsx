@@ -107,7 +107,7 @@ export default function IndustriesGrid() {
 
               <div className="pt-6 border-t border-[#262626] mt-auto">
                 <Link
-                  href="/contact"
+                  href={`/contact?industry=${encodeURIComponent(ind.title)}#contact-form`}
                   className="inline-flex items-center gap-2 text-sm font-semibold text-[#f4f4f5] group-hover:text-[#e8a064] transition-colors"
                 >
                   Discuss your project <ArrowRight className="w-4 h-4" />

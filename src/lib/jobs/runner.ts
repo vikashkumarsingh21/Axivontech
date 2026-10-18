@@ -154,6 +154,78 @@ export class JobRunner {
             break;
           }
 
+          // ─── Task Deadline Reminders ────────────────────────────────────
+          case "TASK_DEADLINE_CHECK": {
+            const now = new Date();
+            const next24h = new Date(now.getTime() + 24 * 60 * 60_000);
+            const dueTasks = await db.task.findMany({
+              where: {
+                dueDate: { gte: now, lte: next24h },
+                status: { in: ["TODO", "IN_PROGRESS", "BLOCKED"] },
+              },
+              include: { user: true, project: true },
+            });
+
+            for (const task of dueTasks) {
+              if (!task.userId) continue;
+              try {
+                const { NotificationService } = await import("@/lib/events/bus");
+                await NotificationService.create({
+                  userId: task.userId,
+                  type: "TASK_DEADLINE_APPROACHING",
+                  title: `Task Due Soon: ${task.title}`,
+                  message: `Task "${task.title}" is due on ${task.dueDate?.toLocaleDateString() || "today"}.`,
+                  link: "/employee/tasks",
+                  entityType: "TASK",
+                  entityId: task.id,
+                  priority: "HIGH",
+                  dedupKey: `TASK_DUE::${task.id}::${now.toISOString().slice(0, 10)}`,
+                });
+              } catch (e: unknown) {
+                console.error(`[JobRunner] TASK_DEADLINE_CHECK failed for task ${task.id}:`, (e as Error).message);
+              }
+            }
+            break;
+          }
+
+          // ─── Milestone Deadline Reminders ────────────────────────────────
+          case "MILESTONE_DEADLINE_CHECK": {
+            const now = new Date();
+            const next48h = new Date(now.getTime() + 48 * 60 * 60_000);
+            const dueMilestones = await db.partnerProjectMilestone.findMany({
+              where: {
+                targetDate: { gte: now, lte: next48h },
+                status: { in: ["NOT_STARTED", "IN_PROGRESS"] },
+              },
+              include: { partnerProject: true },
+            });
+
+            for (const m of dueMilestones) {
+              try {
+                const members = await db.partnerProjectMember.findMany({
+                  where: { partnerProjectId: m.partnerProjectId },
+                });
+                const { NotificationService } = await import("@/lib/events/bus");
+                for (const member of members) {
+                  await NotificationService.create({
+                    userId: member.userId,
+                    type: "MILESTONE_DEADLINE_APPROACHING",
+                    title: `Milestone Due Soon: ${m.title}`,
+                    message: `Milestone "${m.title}" for ${m.partnerProject?.projectName || "project"} is due on ${m.targetDate?.toLocaleDateString() || "soon"}.`,
+                    link: `/client/projects/${m.partnerProjectId}`,
+                    entityType: "MILESTONE",
+                    entityId: m.id,
+                    priority: "HIGH",
+                    dedupKey: `MILESTONE_DUE::${m.id}::${member.userId}::${now.toISOString().slice(0, 10)}`,
+                  });
+                }
+              } catch (e: unknown) {
+                console.error(`[JobRunner] MILESTONE_DEADLINE_CHECK failed for milestone ${m.id}:`, (e as Error).message);
+              }
+            }
+            break;
+          }
+
           default:
             console.warn(`[JobRunner] Unknown job type: ${job.jobType}`);
         }

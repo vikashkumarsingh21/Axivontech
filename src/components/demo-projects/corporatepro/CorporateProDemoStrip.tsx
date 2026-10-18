@@ -35,10 +35,10 @@ export default function CorporateProDemoStrip() {
             Need an editorial corporate presence?
           </span>
           <Link
-            href="/contact?project=CorporatePro#contact-form"
+            href="/contact?demo=CorporatePro&industry=Corporate%20%26%20Consulting&service=web-development#contact-form"
             className="group inline-flex items-center gap-1.5 rounded-full bg-[#B87352] px-3.5 py-1 text-[11px] font-semibold text-white shadow-xs transition-all hover:bg-[#a66444] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B87352]/60"
           >
-            <span>Commission This Platform</span>
+            <span>Build a Similar Website</span>
             <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
         </div>

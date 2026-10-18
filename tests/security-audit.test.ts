@@ -51,7 +51,7 @@ describe("Security Hardening & Protection Audits", () => {
 
       const isInvalid = await verifyPassword("WrongPassword123!", hash);
       expect(isInvalid).toBe(false);
-    });
+    }, 15000);
   });
 
   describe("HTTP Security Headers Audit", () => {

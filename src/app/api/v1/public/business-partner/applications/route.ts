@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
 import crypto from "crypto";
 import { JobRunner } from "@/lib/jobs/runner";
 
@@ -64,6 +65,15 @@ function generateApplicationId() {
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
+    const rateLimit = isRateLimited(`bp_apply:${ip}`, RATE_LIMIT_PRESETS.PUBLIC_LEADS);
+    if (rateLimit.limited) {
+      throw new ApiError(
+        429,
+        `Too many applications submitted from this IP. Please try again in ${Math.ceil(rateLimit.resetMs / 60000)} minutes.`
+      );
+    }
+
     // Basic payload size check
     const contentLength = req.headers.get("content-length");
     if (contentLength && parseInt(contentLength) > 50000) {

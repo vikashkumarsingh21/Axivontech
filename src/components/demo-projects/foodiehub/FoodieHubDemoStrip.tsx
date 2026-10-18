@@ -34,11 +34,11 @@ export default function FoodieHubDemoStrip() {
         {/* Right: Direct inquiry CTA */}
         <div className="flex items-center gap-3">
           <Link
-            href="/contact?project=FoodieHub#contact-form"
+            href="/contact?demo=FoodieHub&industry=Hospitality%20%26%20Dining&service=web-development#contact-form"
             className="group inline-flex items-center gap-1.5 rounded-full bg-[#B85C38] px-3.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-white shadow-sm transition-all hover:bg-[#9E4826] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B85C38]"
           >
             <Sparkles className="h-3 w-3 text-[#F8F3EA]" />
-            <span>Launch Your Concept</span>
+            <span>Build a Similar Website</span>
             <ExternalLink className="h-3 w-3 opacity-70 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
         </div>

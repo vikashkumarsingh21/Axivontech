@@ -12,6 +12,7 @@ interface Lead {
   phone?: string | null;
   companyName?: string | null;
   serviceInterest?: string | null;
+  industry?: string | null;
   source: string;
   status: string;
   qualificationStatus: string;
@@ -36,6 +37,8 @@ export default function LeadsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [sourceFilter, setSourceFilter] = useState("");
+  const [serviceFilter, setServiceFilter] = useState("");
+  const [industryFilter, setIndustryFilter] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -63,6 +66,8 @@ export default function LeadsPage() {
       if (search) params.set("search", search);
       if (statusFilter) params.set("status", statusFilter);
       if (sourceFilter) params.set("source", sourceFilter);
+      if (serviceFilter) params.set("service", serviceFilter);
+      if (industryFilter) params.set("industry", industryFilter);
       params.set("page", page.toString());
       params.set("limit", "15");
 
@@ -78,7 +83,7 @@ export default function LeadsPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, sourceFilter, page]);
+  }, [search, statusFilter, sourceFilter, serviceFilter, industryFilter, page]);
 
   useEffect(() => {
     fetchLeads();
@@ -242,9 +247,51 @@ export default function LeadsPage() {
             >
               <option value="">All Sources</option>
               <option value="WEBSITE_CONTACT">Website Contact</option>
+              <option value="DEMO_SHOWCASE">Demo Showcase</option>
               <option value="CONSULTATION">Consultation</option>
               <option value="REFERRAL">Referral</option>
+              <option value="PARTNER">Partner</option>
               <option value="MANUAL">Manual Entry</option>
+            </select>
+
+            <select
+              value={serviceFilter}
+              onChange={(e) => {
+                setServiceFilter(e.target.value);
+                setPage(1);
+              }}
+              className="bg-[#1a1a1a] border border-white/10 text-gray-300 text-sm rounded-xl px-3 py-2 focus:outline-none"
+            >
+              <option value="">All Services</option>
+              <option value="Web Development">Web Development</option>
+              <option value="Mobile App Development">Mobile App Development</option>
+              <option value="AI Solutions">AI Solutions</option>
+              <option value="Cloud Solutions">Cloud Solutions</option>
+              <option value="SEO Services">SEO Services</option>
+              <option value="Digital Marketing">Digital Marketing</option>
+              <option value="UI/UX Design">UI/UX Design</option>
+              <option value="Custom Software">Custom Software</option>
+              <option value="Automation">Workflow Automation</option>
+              <option value="Robotics">Robotics & IoT</option>
+            </select>
+
+            <select
+              value={industryFilter}
+              onChange={(e) => {
+                setIndustryFilter(e.target.value);
+                setPage(1);
+              }}
+              className="bg-[#1a1a1a] border border-white/10 text-gray-300 text-sm rounded-xl px-3 py-2 focus:outline-none"
+            >
+              <option value="">All Industries</option>
+              <option value="Healthcare">Healthcare</option>
+              <option value="Real Estate">Real Estate</option>
+              <option value="E-Commerce">E-Commerce</option>
+              <option value="Education">Education</option>
+              <option value="Fitness">Fitness & Wellness</option>
+              <option value="Restaurants">Restaurants & Food</option>
+              <option value="Corporate">Corporate & B2B</option>
+              <option value="SaaS">SaaS & Software</option>
             </select>
           </div>
         </div>
@@ -299,7 +346,14 @@ export default function LeadsPage() {
                     </td>
                     <td className="px-5 py-4">
                       <div className="text-white text-sm">{lead.companyName || "—"}</div>
-                      <div className="text-xs text-gray-500">{lead.serviceInterest || "General Inquiry"}</div>
+                      <div className="text-xs text-gray-500 flex items-center gap-1.5 flex-wrap mt-0.5">
+                        <span>{lead.serviceInterest || "General Inquiry"}</span>
+                        {lead.industry && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-gray-400">
+                            {lead.industry}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-5 py-4 text-xs text-gray-300">
                       <span className="bg-white/5 px-2 py-1 rounded-md border border-white/5">

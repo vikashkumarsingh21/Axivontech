@@ -357,6 +357,48 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
           </div>
         </div>
 
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 pt-4 border-t border-white/5 text-xs">
+          <div>
+            <span className="text-gray-500 block mb-1">Industry</span>
+            <span className="text-white">{lead.industry || "—"}</span>
+          </div>
+          <div>
+            <span className="text-gray-500 block mb-1">Budget & Timeline</span>
+            <span className="text-white">
+              {lead.budget ? `₹${lead.budget.toLocaleString("en-IN")}` : "Flexible"}
+              {lead.timeline ? ` • ${lead.timeline}` : ""}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-500 block mb-1">Campaign / Context</span>
+            <span className="text-white font-mono text-[11px] truncate block" title={lead.campaign || ""}>
+              {lead.campaign || "Direct / Organic"}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-500 block mb-1">Website / Platform</span>
+            {lead.website ? (
+              <a
+                href={lead.website.startsWith("http") ? lead.website : `https://${lead.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-red-400 hover:underline truncate block"
+              >
+                {lead.website}
+              </a>
+            ) : (
+              <span className="text-gray-500">—</span>
+            )}
+          </div>
+        </div>
+
+        {lead.businessNeed && (
+          <div className="mt-4 p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs">
+            <span className="text-blue-400 font-semibold block mb-1">Context / Business Need:</span>
+            <p className="text-blue-100 leading-relaxed whitespace-pre-wrap">{lead.businessNeed}</p>
+          </div>
+        )}
+
         {lead.message && (
           <div className="mt-4 p-3.5 rounded-xl bg-[#18181b] border border-white/5 text-xs">
             <span className="text-gray-400 font-semibold block mb-1">Inquiry / Message:</span>

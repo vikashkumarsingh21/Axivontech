@@ -88,9 +88,66 @@ export async function hasPermission(userId: string, requiredPermission: string):
 }
 
 export async function requirePermission(userId: string | null, requiredPermission: string) {
-  const user = await validateActiveUser(userId);
+  if (!userId) {
+    throw new ApiError(401, "Unauthorized");
+  }
 
-  const allowed = await hasPermission(user.id, requiredPermission);
+  // Consolidated single-query fetch for both active user verification and RBAC evaluation
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      status: true,
+      requiredDailyMinutes: true,
+      department: true,
+      designation: true,
+      organizationId: true,
+      userRoles: {
+        include: {
+          role: {
+            include: {
+              rolePermissions: {
+                include: {
+                  permission: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!user) {
+    throw new ApiError(401, "Unauthorized: User not found");
+  }
+
+  if (user.status === "INACTIVE") {
+    throw new ApiError(
+      403,
+      "ACCOUNT_INACTIVE: Your account is currently inactive. Please contact your administrator."
+    );
+  }
+
+  // Superuser and administrative role authorization bypass
+  let allowed = false;
+  for (const ur of user.userRoles) {
+    const roleName = ur.role.name;
+    if (roleName === "FOUNDER" || roleName === "CO_FOUNDER" || roleName === "ADMIN") {
+      allowed = true;
+      break;
+    }
+    for (const rp of ur.role.rolePermissions) {
+      if (rp.permission.name === requiredPermission) {
+        allowed = true;
+        break;
+      }
+    }
+    if (allowed) break;
+  }
+
   if (!allowed) {
     throw new ApiError(403, `Forbidden: Requires ${requiredPermission} permission`);
   }

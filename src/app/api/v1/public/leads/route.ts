@@ -1,27 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
-
-// Simple in-memory rate limiting map for public lead intake (10 requests per 15 mins per IP)
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const record = rateLimitMap.get(ip);
-  if (!record || now > record.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + 15 * 60 * 1000 });
-    return true;
-  }
-  if (record.count >= 10) return false;
-  record.count += 1;
-  return true;
-}
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
-    if (!checkRateLimit(ip)) {
-      throw new ApiError(429, "Too many lead submissions from this IP. Please try again later.");
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
+    const rateLimit = isRateLimited(ip, RATE_LIMIT_PRESETS.PUBLIC_LEADS);
+    if (rateLimit.limited) {
+      throw new ApiError(429, `Too many lead submissions from this IP. Please try again in ${Math.ceil(rateLimit.resetMs / 60000)} minutes.`);
     }
 
     const body = await req.json().catch(() => ({}));
@@ -30,12 +17,25 @@ export async function POST(req: NextRequest) {
     const rawPhone = body.phone || body.mobile;
     const rawCompany = body.companyName || body.company;
     const rawService = body.serviceInterest || body.service || body.subject;
+    const demoProject = body.demoProject || body.demo || body.project || null;
+    const landingPage = body.landingPage || body.sourcePage || null;
+    const referrer = body.referrer || null;
+    const utmSource = body.utm_source || body.utmSource || null;
+    const utmMedium = body.utm_medium || body.utmMedium || null;
+    const utmCampaign = body.utm_campaign || body.utmCampaign || null;
+    const rawWebsite = body.website || body.websiteUrl || null;
+
     const { 
       whatsapp, designation, 
-      industry, city, state, country, companySize, website, 
+      industry, city, state, country, companySize, 
       message, budget, timeline, contactMethod, notes,
       source, campaign, referralCode 
     } = body;
+
+    // Honeypot spam defense: automated bots filling hidden trap fields receive 200 without database insertion
+    if (body.honeypot || body._gotcha || body.website_trap) {
+      return NextResponse.json({ success: true, leadCode: "LD-SPAM-PREVENTED" }, { status: 200 });
+    }
 
     // Server-side validation
     if (!rawName || typeof rawName !== "string" || rawName.trim().length === 0) {
@@ -53,6 +53,9 @@ export async function POST(req: NextRequest) {
     const cleanPhone = rawPhone ? String(rawPhone).trim() : null;
     const cleanCompany = rawCompany && typeof rawCompany === "string" ? rawCompany.trim() : null;
     const cleanService = rawService && typeof rawService === "string" ? rawService.trim() : null;
+    const cleanWebsite = rawWebsite && typeof rawWebsite === "string" ? rawWebsite.trim() : null;
+    const cleanIndustry = industry && typeof industry === "string" ? industry.trim() : null;
+    const cleanDemoProject = demoProject && typeof demoProject === "string" ? demoProject.trim() : null;
 
     // Process Referral Code
     let ownerId: string | null = null;
@@ -117,6 +120,10 @@ export async function POST(req: NextRequest) {
       parsedBudget = budget;
     }
 
+    const resolvedCampaign = campaign ? String(campaign).trim() : (utmCampaign ? `${utmSource || "campaign"}:${utmCampaign}` : (cleanDemoProject ? `demo:${cleanDemoProject}` : null));
+    const resolvedNotes = notes ? String(notes).trim() : (cleanDemoProject ? `Related Demo: ${cleanDemoProject}${landingPage ? ` | Inbound Page: ${landingPage}` : ""}` : (landingPage ? `Inbound Page: ${landingPage}` : null));
+    const resolvedBusinessNeed = body.businessNeed ? String(body.businessNeed).trim() : (cleanDemoProject ? `Inquiry for custom build based on ${cleanDemoProject} demo` : null);
+
     // Create Lead + LeadActivity in transaction
     const [lead] = await db.$transaction([
       db.lead.create({
@@ -128,19 +135,20 @@ export async function POST(req: NextRequest) {
           whatsapp: whatsapp ? String(whatsapp).trim() : null,
           designation: designation ? String(designation).trim() : null,
           companyName: cleanCompany,
-          industry: industry ? String(industry).trim() : null,
+          industry: cleanIndustry,
           city: city ? String(city).trim() : null,
           state: state ? String(state).trim() : null,
           country: country ? String(country).trim() : null,
           companySize: companySize ? String(companySize).trim() : null,
-          website: website ? String(website).trim() : null,
+          website: cleanWebsite,
           serviceInterest: cleanService,
           message: message ? String(message).trim() : null,
+          businessNeed: resolvedBusinessNeed,
           budget: parsedBudget,
           timeline: timeline ? String(timeline).trim() : null,
-          qualificationNotes: notes ? String(notes).trim() : null,
+          qualificationNotes: resolvedNotes,
           source: leadSource,
-          campaign: campaign ? String(campaign).trim() : null,
+          campaign: resolvedCampaign,
           status: "NEW",
           qualificationStatus: "UNQUALIFIED",
           isDuplicate,
@@ -155,9 +163,18 @@ export async function POST(req: NextRequest) {
       data: {
         leadId: lead.id,
         type: "LEAD_CREATED",
-        title: `New lead received via ${leadSource}`,
-        notes: isDuplicate ? `Flagged as duplicate: ${duplicateReason}` : "Created from public form intake.",
-        metadata: { ip, source: leadSource, isDuplicate },
+        title: cleanDemoProject ? `New inquiry for demo ${cleanDemoProject} via ${leadSource}` : `New lead received via ${leadSource}`,
+        notes: isDuplicate ? `Flagged as duplicate: ${duplicateReason}` : (cleanDemoProject ? `Created from demo inquiry for ${cleanDemoProject}.` : "Created from public form intake."),
+        metadata: {
+          ip,
+          source: leadSource,
+          isDuplicate,
+          demoProject: cleanDemoProject,
+          industry: cleanIndustry,
+          landingPage,
+          referrer,
+          utm: { source: utmSource, medium: utmMedium, campaign: utmCampaign },
+        },
       },
     });
 
@@ -205,11 +222,31 @@ export async function POST(req: NextRequest) {
         data: recipientIds.map((userId) => ({
           userId,
           type: "SYSTEM",
-          title: `New Lead: ${lead.name}`,
-          message: `${lead.companyName ? `${lead.companyName} — ` : ""}${lead.serviceInterest || "General Inquiry"} (${lead.leadCode})`,
+          title: cleanDemoProject ? `New Demo Lead: ${lead.name}` : `New Lead: ${lead.name}`,
+          message: `${lead.companyName ? `${lead.companyName} — ` : ""}${cleanDemoProject ? `[Demo: ${cleanDemoProject}] ` : ""}${lead.serviceInterest || "General Inquiry"} (${lead.leadCode})`,
           link: `/admin/crm/leads/${lead.id}`,
         })),
       });
+    }
+
+    // Emit platform event to trigger automations & activity logging
+    try {
+      const { EventBus } = await import("@/lib/events/bus");
+      await EventBus.emit({
+        eventType: "NEW_LEAD",
+        recipientId: recipientIds[0] || null,
+        entityType: "LEAD",
+        entityId: lead.id,
+        title: cleanDemoProject ? `New Demo Lead: ${lead.name}` : `New Lead: ${lead.name}`,
+        message: `${lead.companyName ? `${lead.companyName} — ` : ""}${lead.serviceInterest || "General Inquiry"} (${lead.leadCode})`,
+        metadata: {
+          leadCode: lead.leadCode,
+          source: lead.source,
+          demoProject: cleanDemoProject,
+        },
+      });
+    } catch (eventBusErr) {
+      console.error("[EventBus] Lead event emission failed:", eventBusErr);
     }
 
     // Try to send email

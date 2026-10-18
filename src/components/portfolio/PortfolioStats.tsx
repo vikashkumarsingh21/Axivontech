@@ -83,14 +83,14 @@ const STATS: readonly StatDefinition[] = [
     id: "domains",
     icon: Cpu,
     label: "Core Services",
-    target: 8,
+    target: 10,
     suffix: "",
     accent: ["#c9922a", "#e8a064"],
   },
   {
     id: "support",
     icon: Headphones,
-    label: "Technical Support",
+    label: "Dedicated Support",
     target: 24,
     secondaryTarget: 7,
     divider: "/",
@@ -99,7 +99,7 @@ const STATS: readonly StatDefinition[] = [
   {
     id: "quality",
     icon: ShieldCheck,
-    label: "Code Quality",
+    label: "Code Quality Focus",
     target: 100,
     suffix: "%",
     accent: ["#d4915c", "#c9922a"],
@@ -131,14 +131,14 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-/** Animates a number from 0 to `target` once `shouldStart` becomes true. */
+/** Animates a number from target once `shouldStart` becomes true. */
 function useCountUp(
   target: number,
   shouldStart: boolean,
   options?: { duration?: number; decimals?: number; reduceMotion?: boolean }
 ): number {
   const { duration = 2, decimals = 0, reduceMotion = false } = options ?? {};
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(target);
   const hasStarted = useRef(false);
 
   useEffect(() => {

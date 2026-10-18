@@ -35,10 +35,10 @@ export default function FitZoneDemoStrip() {
             Need an immersive gym, fitness, or wellness platform?
           </span>
           <Link
-            href="/contact?project=FitZone#contact-form"
+            href="/contact?demo=FitZone&industry=Fitness%20%26%20Athletics&service=web-development#contact-form"
             className="group inline-flex items-center gap-1.5 rounded-full bg-[#FF7138] hover:bg-[#e65d26] px-3.5 py-1 text-[11px] font-bold text-white shadow-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7138]/60 active:scale-[0.98]"
           >
-            <span>Commission This Platform</span>
+            <span>Build a Similar Website</span>
             <ArrowUpRight className="h-3 w-3 text-white transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
         </div>
