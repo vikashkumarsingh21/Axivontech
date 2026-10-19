@@ -1,28 +1,41 @@
 import type { Metadata } from "next";
-import PrivacyPolicyHero from "@/components/legal/PrivacyPolicyHero";
-import PrivacyPolicyContent from "@/components/legal/PrivacyPolicyContent";
+import { notFound } from "next/navigation";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { createPageMetadata } from "@/lib/seo/metadata";
+import { getPublishedPolicyBySlug } from "@/lib/legal/legal-db";
+import LegalPageLayout from "@/components/legal/LegalPageLayout";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Privacy Policy",
   description:
-    "Learn about how Axivon Technologies collects, protects, and manages your personal information and privacy rights.",
+    "Comprehensive privacy policy for Axivon Technologies detailing personal data collection, processing, DPDP Act 2023 compliance, cookies, security, and data subject rights.",
   path: "/privacy-policy",
-  keywords: ["Privacy Policy", "Data Protection", "User Privacy"],
+  keywords: ["Privacy Policy", "DPDP Act 2023", "Data Protection", "Information Technology Act", "Data Principal Rights"],
 });
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const policy = await getPublishedPolicyBySlug("privacy-policy");
+
+  if (!policy) {
+    notFound();
+  }
+
+  const related = [
+    { slug: "cookie-policy", title: "Cookie Policy", category: "PRIVACY_DATA" },
+    { slug: "ai-usage", title: "AI Privacy & Usage Notice", category: "PRIVACY_DATA" },
+    { slug: "privacy-requests", title: "Data Subject Privacy Rights Portal", category: "PRIVACY_DATA" },
+  ];
+
   return (
-    <main className="overflow-hidden bg-[#0f0f0f]">
+    <main className="overflow-hidden bg-[#0B0D10]">
       <BreadcrumbSchema
         items={[
           { name: "Home", url: "https://axivontech.in" },
-          { name: "Privacy Policy", url: "https://axivontech.in/privacy-policy" },
+          { name: "Legal & Privacy Center", url: "https://axivontech.in/legal" },
+          { name: policy.title, url: "https://axivontech.in/privacy-policy" },
         ]}
       />
-      <PrivacyPolicyHero />
-      <PrivacyPolicyContent />
+      <LegalPageLayout policy={policy} relatedPolicies={related} />
     </main>
   );
 }

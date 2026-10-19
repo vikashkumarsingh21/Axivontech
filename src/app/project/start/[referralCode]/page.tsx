@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { CheckCircle2, ChevronRight, ChevronLeft, Check, FileText } from "lucide-react";
+import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 
 export default function ProjectOnboardingForm() {
   const params = useParams();
@@ -14,6 +15,8 @@ export default function ProjectOnboardingForm() {
   const [error, setError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [projectCode, setProjectCode] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const turnstileRef = useRef<TurnstileWidgetRef>(null);
 
   const [formData, setFormData] = useState({
     // Step 1: Client Information
@@ -114,7 +117,7 @@ export default function ProjectOnboardingForm() {
       const response = await fetch("/api/v1/public/project-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, referralCode }),
+        body: JSON.stringify({ ...formData, referralCode, captchaToken }),
       });
 
       const data = await response.json();
@@ -124,9 +127,13 @@ export default function ProjectOnboardingForm() {
         setIsSuccess(true);
         window.scrollTo(0, 0);
       } else {
-        setError(data.message || "Failed to submit request. Please try again.");
+        turnstileRef.current?.reset();
+        setCaptchaToken("");
+        setError(data.message || data.error || "Failed to submit request. Please try again.");
       }
     } catch (err) {
+      turnstileRef.current?.reset();
+      setCaptchaToken("");
       setError("An unexpected error occurred. Please check your connection and try again.");
     } finally {
       setIsSubmitting(false);
@@ -634,6 +641,28 @@ export default function ProjectOnboardingForm() {
                     </div>
                   </div>
                 )}
+
+                {/* Honeypot field for bot deterrence */}
+                <input
+                  type="text"
+                  name="website_trap"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  className="hidden"
+                  aria-hidden="true"
+                  style={{ display: "none" }}
+                />
+
+                {/* Cloudflare Turnstile Verification */}
+                <div className="flex justify-center pt-4">
+                  <TurnstileWidget
+                    ref={turnstileRef}
+                    action="project_request"
+                    onVerify={(token) => setCaptchaToken(token)}
+                    onExpire={() => setCaptchaToken("")}
+                    onError={() => setCaptchaToken("")}
+                  />
+                </div>
               </div>
             </div>
           )}

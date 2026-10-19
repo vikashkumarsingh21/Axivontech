@@ -120,6 +120,10 @@ model User {
   createdArticles        WebsiteArticle[]  @relation("ArticleCreator")
   createdMediaAssets     MediaAsset[]      @relation("MediaCreator")
 
+  // Legal & Privacy Relations
+  publishedPolicies        LegalPolicy[]    @relation("PolicyPublisher")
+  assignedPrivacyRequests  PrivacyRequest[] @relation("PrivacyRequestAssignee")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -1934,6 +1938,94 @@ model MediaAsset {
   @@index([fileType])
   @@index([folder])
   @@index([createdAt])
+}
+
+// -----------------------------------------------------------------------------
+// LEGAL, POLICIES & PRIVACY COMPLIANCE
+// -----------------------------------------------------------------------------
+
+model LegalPolicy {
+  id               String          @id @default(cuid())
+  slug             String          @unique
+  title            String
+  category         String          @default("CORE_LEGAL") // CORE_LEGAL, COMMERCIAL, PRIVACY_DATA, PROGRAM_TERMS, COMPLIANCE
+  summary          String          @db.Text
+  content          String          @db.Text
+  version          String          @default("1.0.0")
+  status           String          @default("PUBLISHED") // DRAFT, IN_REVIEW, APPROVED, PUBLISHED, ARCHIVED
+  effectiveDate    DateTime        @default(now())
+  lastReviewedAt   DateTime        @default(now())
+  reviewedBy       String?
+  publishedAt      DateTime?
+  publishedById    String?
+  publishedBy      User?           @relation("PolicyPublisher", fields: [publishedById], references: [id], onDelete: SetNull)
+  requiresApproval Boolean         @default(false)
+  missingDetails   String[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  versions         PolicyVersion[]
+
+  @@index([slug])
+  @@index([category])
+  @@index([status])
+  @@index([publishedAt])
+}
+
+model PolicyVersion {
+  id            String      @id @default(cuid())
+  policyId      String
+  policy        LegalPolicy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  version       String
+  title         String
+  content       String      @db.Text
+  summary       String?     @db.Text
+  changeLog     String?     @db.Text
+  publishedAt   DateTime    @default(now())
+  publishedById String?
+  createdAt     DateTime    @default(now())
+
+  @@index([policyId])
+  @@index([version])
+}
+
+model PrivacyRequest {
+  id                String    @id @default(cuid())
+  referenceId       String    @unique // e.g. PR-2026-ABCD12
+  category          String    // ACCESS, CORRECTION, ERASURE, WITHDRAW_CONSENT, GRIEVANCE
+  status            String    @default("PENDING") // PENDING, UNDER_REVIEW, FULFILLED, REJECTED
+  requesterName     String
+  requesterEmail    String
+  requesterPhone    String?
+  requestDetails    String    @db.Text
+  verificationToken String?
+  isVerified        Boolean   @default(false)
+  resolutionNotes   String?   @db.Text
+  assignedToId      String?
+  assignedTo        User?     @relation("PrivacyRequestAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  resolvedAt        DateTime?
+  ipAddress         String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([referenceId])
+  @@index([category])
+  @@index([status])
+  @@index([requesterEmail])
+  @@index([createdAt])
+}
+
+model UserConsentRecord {
+  id             String   @id @default(cuid())
+  consentKey     String   @unique // anonymous identifier
+  categories     Json     // { necessary: true, preferences: boolean, analytics: boolean, marketing: boolean }
+  consentVersion String   @default("1.0")
+  ipHash         String?
+  userAgent      String?
+  timestamp      DateTime @default(now())
+
+  @@index([consentKey])
+  @@index([timestamp])
 }
 
 

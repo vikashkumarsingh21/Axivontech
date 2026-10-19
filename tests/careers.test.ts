@@ -147,6 +147,7 @@ describe("Careers API Validations When Recruitment is Active (ON)", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         fullName: "Test Candidate",
+        captchaToken: "1x00000000000000000000AA",
         // missing email, position, location, resumeUrl
       }),
     });
@@ -170,6 +171,7 @@ describe("Careers API Validations When Recruitment is Active (ON)", () => {
         position: "Frontend Developer Intern",
         location: "Patna, Bihar",
         resumeUrl: "https://drive.google.com/test-resume",
+        captchaToken: "1x00000000000000000000AA",
       }),
     });
 
@@ -202,6 +204,7 @@ describe("Careers API Validations When Recruitment is Active (ON)", () => {
         github: "https://github.com/ananya-dev",
         portfolio: "https://ananya.dev",
         coverLetter: "Excited about modern Next.js and Tailwind development at Axivon.",
+        captchaToken: "1x00000000000000000000AA",
       }),
     });
 
@@ -218,6 +221,7 @@ describe("Careers API Validations When Recruitment is Active (ON)", () => {
   it("should reject resume upload requests without a file payload", async () => {
     const { POST: uploadHandler } = await import("@/app/api/v1/public/careers/upload-resume/route");
     const formData = new FormData();
+    formData.append("captchaToken", "1x00000000000000000000AA");
     const request = new Request("http://localhost:3000/api/v1/public/careers/upload-resume", {
       method: "POST",
       body: formData,
@@ -233,6 +237,7 @@ describe("Careers API Validations When Recruitment is Active (ON)", () => {
   it("should reject executable or disallowed file extensions for resume uploads", async () => {
     const { POST: uploadHandler } = await import("@/app/api/v1/public/careers/upload-resume/route");
     const formData = new FormData();
+    formData.append("captchaToken", "1x00000000000000000000AA");
     const maliciousFile = new File(["malicious script"], "payload.exe", { type: "application/x-msdownload" });
     formData.append("file", maliciousFile);
 

@@ -13,7 +13,7 @@ import {
   ChevronRight, Building, UserCheck, ShieldCheck,
   CreditCard, UserPlus, Image as ImageIcon, LayoutTemplate,
   GraduationCap, X, Sparkles, Home, Layers, Building2, Info,
-  HelpCircle, BookOpen, Globe, Sliders, BarChart3, LineChart, FileSpreadsheet, Bot, Zap
+  HelpCircle, BookOpen, Globe, Sliders, BarChart3, LineChart, FileSpreadsheet, Bot, Zap, Scale
 } from "lucide-react";
 
 type NavItem = {
@@ -135,6 +135,7 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
         { name: "SEO Settings", href: "/admin/content/seo", icon: Globe },
         { name: "Demo Projects", href: "/admin/content/demo-projects", icon: Sparkles },
         { name: "Login Posters", href: "/admin/content/login-posters", icon: Sliders },
+        { name: "Legal & Policies", href: "/admin/content/legal", icon: Scale },
       ]
     },
     {

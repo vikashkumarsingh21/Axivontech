@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 
 export function ChangePasswordForm() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string>("");
+  const turnstileRef = useRef<TurnstileWidgetRef>(null);
   
   const [formData, setFormData] = useState({
     currentPassword: "",
@@ -33,11 +36,13 @@ export function ChangePasswordForm() {
       const res = await fetch("/api/v1/employee/profile/password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, captchaToken }),
       });
 
       const data = await res.json();
       if (!res.ok) {
+        turnstileRef.current?.reset();
+        setCaptchaToken("");
         throw new Error(data.error || "Failed to change password");
       }
 
@@ -45,6 +50,8 @@ export function ChangePasswordForm() {
       setFormData({ currentPassword: "", newPassword: "", confirmPassword: "" });
       setTimeout(() => setIsOpen(false), 3000);
     } catch (err: any) {
+      turnstileRef.current?.reset();
+      setCaptchaToken("");
       setError(err.message || "Failed to change password");
     } finally {
       setLoading(false);
@@ -105,6 +112,29 @@ export function ChangePasswordForm() {
             minLength={8}
             value={formData.confirmPassword}
             onChange={(e) => setFormData(prev => ({...prev, confirmPassword: e.target.value}))}
+          />
+        </div>
+
+        {/* Honeypot field for bot deterrence */}
+        <input
+          type="text"
+          name="website_trap"
+          tabIndex={-1}
+          autoComplete="off"
+          className="hidden"
+          aria-hidden="true"
+          style={{ display: "none" }}
+        />
+
+        {/* Cloudflare Turnstile Verification */}
+        <div className="pt-2 flex justify-center">
+          <TurnstileWidget
+            ref={turnstileRef}
+            action="change_password"
+            size="compact"
+            onVerify={(token) => setCaptchaToken(token)}
+            onExpire={() => setCaptchaToken("")}
+            onError={() => setCaptchaToken("")}
           />
         </div>
         

@@ -93,8 +93,62 @@ export class EmailService {
           body = body.replace(regex, String(val));
         }
       } else {
-        if (variables.title) subject = String(variables.title);
-        if (variables.message) body = String(variables.message);
+        if (templateKey === "NEW_WEBSITE_LEAD") {
+          subject = variables.title || `[New Lead] ${variables.name || "Client"} - ${variables.service || "Inquiry"} (${variables.leadCode || ""})`;
+          body = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background: #ffffff; color: #111827;">
+              <div style="border-bottom: 2px solid #10b981; padding-bottom: 12px; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #111827; font-size: 20px;">New Inbound Project Lead Received</h2>
+                <span style="font-size: 13px; color: #6b7280; font-family: monospace;">Reference ID: ${variables.leadCode || "N/A"}</span>
+              </div>
+              <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px;">
+                <tr><td style="padding: 8px 0; color: #6b7280; width: 140px;"><strong>Client Name:</strong></td><td>${variables.name || "N/A"}</td></tr>
+                <tr><td style="padding: 8px 0; color: #6b7280;"><strong>Email Address:</strong></td><td><a href="mailto:${variables.email}">${variables.email || "N/A"}</a></td></tr>
+                <tr><td style="padding: 8px 0; color: #6b7280;"><strong>Phone Number:</strong></td><td>${variables.phone || "N/A"}</td></tr>
+                <tr><td style="padding: 8px 0; color: #6b7280;"><strong>Company / Brand:</strong></td><td>${variables.company || "Independent"}</td></tr>
+                <tr><td style="padding: 8px 0; color: #6b7280;"><strong>Required Service:</strong></td><td><strong>${variables.service || "General Inquiry"}</strong></td></tr>
+                ${variables.budget ? `<tr><td style="padding: 8px 0; color: #6b7280;"><strong>Budget:</strong></td><td>${variables.budget}</td></tr>` : ""}
+                ${variables.timeline ? `<tr><td style="padding: 8px 0; color: #6b7280;"><strong>Timeline:</strong></td><td>${variables.timeline}</td></tr>` : ""}
+                <tr><td style="padding: 8px 0; color: #6b7280;"><strong>Source:</strong></td><td>${variables.source || "WEBSITE_CONTACT"}</td></tr>
+              </table>
+              <div style="background: #f9fafb; border-left: 4px solid #10b981; padding: 14px; margin-bottom: 24px; border-radius: 4px;">
+                <strong style="display: block; margin-bottom: 6px; font-size: 13px; color: #374151;">Project Brief &amp; Requirements:</strong>
+                <p style="margin: 0; white-space: pre-wrap; font-size: 14px; color: #1f2937;">${variables.message || "No description provided."}</p>
+              </div>
+              ${variables.link ? `
+              <div style="text-align: center; margin-top: 24px;">
+                <a href="${variables.link}" style="background: #10b981; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Open Lead in AXIVON ONE CRM &rarr;</a>
+              </div>` : ""}
+            </div>
+          `;
+        } else if (templateKey === "LEAD_ACKNOWLEDGEMENT") {
+          subject = variables.title || `Thank you for contacting Axivon Technologies [${variables.leadCode || ""}]`;
+          body = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background: #ffffff; color: #111827;">
+              <div style="border-bottom: 2px solid #10b981; padding-bottom: 12px; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #111827; font-size: 20px;">Thank You for Reaching Out</h2>
+                <span style="font-size: 13px; color: #6b7280; font-family: monospace;">Reference Code: ${variables.leadCode || "N/A"}</span>
+              </div>
+              <p style="font-size: 14px; line-height: 1.6; color: #374151;">
+                Hello <strong>${variables.name || "there"}</strong>,
+              </p>
+              <p style="font-size: 14px; line-height: 1.6; color: #374151;">
+                We have received your project inquiry for <strong>${variables.service || "our services"}</strong>. Our senior solutions architecture team is reviewing your requirements and will reach out to you within 24 hours.
+              </p>
+              <div style="background: #f9fafb; padding: 14px; border-radius: 8px; margin: 20px 0; font-size: 13px; color: #4b5563;">
+                <strong>Direct Contact Channels:</strong><br />
+                Email: <a href="mailto:contact@axivontech.in">contact@axivontech.in</a><br />
+                WhatsApp: <a href="https://wa.me/919157226367">+91 91572 26367</a>
+              </div>
+              <p style="font-size: 12px; color: #9ca3af; margin-top: 24px; border-top: 1px solid #f3f4f6; padding-top: 12px;">
+                &copy; ${new Date().getFullYear()} Axivon Technologies. All rights reserved.
+              </p>
+            </div>
+          `;
+        } else {
+          if (variables.title) subject = String(variables.title);
+          if (variables.message) body = String(variables.message);
+        }
       }
     }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { trackLeadSubmission, trackWhatsAppClick } from "@/lib/analytics";
+import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 
 interface FormData {
   service: string;
@@ -98,7 +99,7 @@ const TIMELINE_OPTIONS = ["Immediate (ASAP)", "1-2 Months", "3-6 Months", "Flexi
 const BUDGET_OPTIONS = ["Under ₹25,000", "₹25,000 - ₹50,000", "₹50,000 - ₹1,50,000", "₹1,50,000 - ₹5,00,000", "₹5,00,000+"];
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^[+]?[\d\s-]{7,15}$/;
+const PHONE_REGEX = /^[+]?[\d\s().-]{7,20}$/;
 
 export default function ContactForm() {
   const searchParams = useSearchParams();
@@ -108,6 +109,9 @@ export default function ContactForm() {
   const [errorMsg, setErrorMsg] = useState("");
   const [assignedLeadCode, setAssignedLeadCode] = useState<string | null>(null);
   const [contextSource, setContextSource] = useState<{ label: string; type: "demo" | "service" | "industry" } | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string>("");
+  const [turnstileStatus, setTurnstileStatus] = useState<"loading" | "ready" | "verified" | "error" | "expired">("loading");
+  const turnstileRef = useRef<TurnstileWidgetRef>(null);
 
   useEffect(() => {
     const demoParam = searchParams.get("demo") || searchParams.get("project");
@@ -143,6 +147,21 @@ export default function ContactForm() {
       }));
     }
   }, [searchParams]);
+
+  // Pre-warm Cloudflare Turnstile script early so it is ready by Step 3
+  useEffect(() => {
+    if (typeof window !== "undefined" && !window.turnstile) {
+      const scriptId = "cloudflare-turnstile-script";
+      if (!document.getElementById(scriptId)) {
+        const script = document.createElement("script");
+        script.id = scriptId;
+        script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    }
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -198,7 +217,22 @@ export default function ContactForm() {
     e.preventDefault();
     setErrorMsg("");
 
-    if (!validateStep1() || !validateStep2()) {
+    if (!validateStep1()) {
+      setCurrentStep(1);
+      return;
+    }
+    if (!validateStep2()) {
+      setCurrentStep(2);
+      return;
+    }
+
+    if (!captchaToken) {
+      setCurrentStep(3);
+      if (turnstileStatus === "loading") {
+        setErrorMsg("Security check is finalizing. Please wait a moment and try again.");
+      } else {
+        setErrorMsg("Please complete the security check challenge before submitting.");
+      }
       return;
     }
 
@@ -227,6 +261,7 @@ export default function ContactForm() {
         utm_medium: searchParams.get("utm_medium") || undefined,
         utm_campaign: searchParams.get("utm_campaign") || undefined,
         referralCode: searchParams.get("ref") || searchParams.get("referralCode") || undefined,
+        captchaToken: captchaToken || undefined,
       };
 
       const response = await fetch("/api/v1/public/leads", {
@@ -238,6 +273,8 @@ export default function ContactForm() {
       const responseData = await response.json().catch(() => ({}));
 
       if (!response.ok) {
+        turnstileRef.current?.reset();
+        setCaptchaToken("");
         throw new Error(responseData.error || responseData.message || "Submission failed. Please check your inputs.");
       }
 
@@ -252,6 +289,8 @@ export default function ContactForm() {
         budget: formData.budget,
       });
     } catch (err: any) {
+      turnstileRef.current?.reset();
+      setCaptchaToken("");
       setStatus("error");
       setErrorMsg(err?.message || "Something went wrong submitting your request. Please try again or email us directly.");
     }
@@ -739,6 +778,47 @@ export default function ContactForm() {
                           </div>
                         </div>
 
+                        {/* Honeypot field for bot deterrence */}
+                        <input
+                          type="text"
+                          name="website_trap"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          className="hidden"
+                          aria-hidden="true"
+                          style={{ display: "none" }}
+                        />
+
+                        {/* Cloudflare Turnstile Verification */}
+                        <div className="pt-2 flex flex-col items-center sm:items-start">
+                          <TurnstileWidget
+                            ref={turnstileRef}
+                            action="contact_form"
+                            onVerify={(token) => {
+                              setCaptchaToken(token);
+                              setTurnstileStatus("verified");
+                              setErrorMsg("");
+                            }}
+                            onExpire={() => {
+                              setCaptchaToken("");
+                              setTurnstileStatus("expired");
+                            }}
+                            onError={() => {
+                              setCaptchaToken("");
+                              setTurnstileStatus("error");
+                            }}
+                          />
+                        </div>
+
+                        {/* DPDP Act Privacy Notice */}
+                        <p className="text-[11px] text-[#7E8997] leading-relaxed">
+                          By submitting this project inquiry, you agree to the processing of your contact details in accordance with our{" "}
+                          <Link href="/privacy-policy" target="_blank" className="text-[#e8a064] hover:underline font-medium">
+                            Privacy Policy
+                          </Link>{" "}
+                          and the India DPDP Act 2023.
+                        </p>
+
                         {/* Step 3 Controls */}
                         <div className="pt-2 flex items-center justify-between border-t border-[#1e1e1e]">
                           <button
@@ -752,13 +832,18 @@ export default function ContactForm() {
 
                           <button
                             type="submit"
-                            disabled={status === "loading"}
+                            disabled={status === "loading" || (!captchaToken && turnstileStatus === "loading")}
                             className="inline-flex items-center justify-center gap-2 bg-[#e8a064] text-[#0f0f0f] px-8 py-3.5 rounded-full text-xs font-bold hover:bg-[#d4915c] transition-colors disabled:opacity-60"
                           >
                             {status === "loading" ? (
                               <>
                                 <Loader2 className="h-4 w-4 animate-spin" />
                                 <span>Securing Inquiry...</span>
+                              </>
+                            ) : (!captchaToken && turnstileStatus === "loading") ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <span>Verifying Security Check...</span>
                               </>
                             ) : (
                               <>

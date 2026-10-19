@@ -22,6 +22,7 @@ import {
   ArrowRight,
   ShieldCheck,
   RefreshCw,
+  Scale,
 } from "lucide-react";
 
 interface ContentStatSummary {
@@ -173,6 +174,14 @@ export default function ContentManagementHubPage() {
       icon: Sliders,
       stat: "Active",
       badgeColor: "text-red-400 bg-red-500/10 border-red-500/20",
+    },
+    {
+      title: "Legal & Policy Center",
+      description: "Manage statutory legal policies, DPDP Act 2023 compliance, terms of service, and privacy requests.",
+      href: "/admin/content/legal",
+      icon: Scale,
+      stat: "Compliant",
+      badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
     },
   ];
 

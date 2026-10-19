@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
+import { verifyFormProtection } from "@/lib/captcha";
 import crypto from "crypto";
 import { JobRunner } from "@/lib/jobs/runner";
 
@@ -80,7 +81,17 @@ export async function POST(req: Request) {
       throw new ApiError(413, "Payload too large");
     }
 
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
+
+    // Server-side anti-bot & CAPTCHA protection
+    const protection = await verifyFormProtection(req, body, {
+      action: "partner_application",
+      rateLimitPreset: RATE_LIMIT_PRESETS.PUBLIC_LEADS,
+    });
+    if (!protection.success && protection.errorResponse) {
+      return protection.errorResponse;
+    }
+
     const data = applicationSchema.parse(body);
 
     // Duplicate application check

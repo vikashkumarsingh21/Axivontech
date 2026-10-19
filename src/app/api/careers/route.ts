@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isCareersPageEnabled } from "@/lib/careers/careers-db";
+import { verifyFormProtection } from "@/lib/captcha";
+import { RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
 
 const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwk0wNZz3agHASmWb3PUXfYRvijng6rN7SLPf2AoiHnLdpo-gxEKSnCqKOT25rht-Mg/exec";
@@ -20,7 +22,16 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
+
+    // Server-side anti-bot & CAPTCHA protection
+    const protection = await verifyFormProtection(req, body, {
+      action: "career_application",
+      rateLimitPreset: RATE_LIMIT_PRESETS.PUBLIC_LEADS,
+    });
+    if (!protection.success && protection.errorResponse) {
+      return protection.errorResponse;
+    }
 
     const fullName = typeof body.fullName === "string" ? body.fullName.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, FormEvent, FocusEvent } from 'react';
+import { useState, useRef, FormEvent, FocusEvent } from 'react';
 import { motion } from 'framer-motion';
 import { Star, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 
 interface ReviewFormProps {
   id?: string;
@@ -36,6 +37,8 @@ export default function ReviewForm({ id }: ReviewFormProps) {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [globalError, setGlobalError] = useState<string>('');
+  const [captchaToken, setCaptchaToken] = useState<string>('');
+  const turnstileRef = useRef<TurnstileWidgetRef>(null);
 
   const errors: Record<string, string> = {};
   if (touched.rating && rating === 0) errors.rating = 'Please select a rating.';
@@ -98,15 +101,20 @@ export default function ReviewForm({ id }: ReviewFormProps) {
           service: formData.service || undefined,
           publicConsent: formData.consent,
           website: formData.website || undefined,
+          captchaToken: captchaToken || undefined,
         })
       });
 
       if (!response.ok) {
+        turnstileRef.current?.reset();
+        setCaptchaToken('');
         throw new Error('Failed to submit review');
       }
 
       setStatus('success');
     } catch (err) {
+      turnstileRef.current?.reset();
+      setCaptchaToken('');
       console.error(err);
       setStatus('idle');
       setGlobalError('An error occurred while submitting your review. Please try again later.');
@@ -304,10 +312,25 @@ export default function ReviewForm({ id }: ReviewFormProps) {
               </div>
             </div>
             <span className="text-sm text-[#a1a1aa] leading-relaxed">
-              I agree that my review, name, and the information I provide may be displayed publicly on the AXIVON website. <span className="text-[#e8a064]">*</span>
+              I agree that my review, name, and the information I provide may be displayed publicly on the AXIVON website in accordance with the{" "}
+              <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-[#e8a064] hover:underline">
+                Privacy Policy
+              </a>
+              . <span className="text-[#e8a064]">*</span>
             </span>
           </label>
           {errors.consent && <p className="text-xs text-red-400 pl-8">{errors.consent}</p>}
+        </div>
+
+        {/* Turnstile Anti-Bot Verification */}
+        <div className="pt-2">
+          <TurnstileWidget
+            ref={turnstileRef}
+            action="review_submission"
+            onVerify={(token) => setCaptchaToken(token)}
+            onExpire={() => setCaptchaToken('')}
+            onError={() => setCaptchaToken('')}
+          />
         </div>
 
         <div className="pt-4">

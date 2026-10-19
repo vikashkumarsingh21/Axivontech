@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, ChevronLeft, ChevronRight, AlertCircle, Lock, Mail, CheckCircle2, X } from "lucide-react";
+import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 
 // Types
 interface Poster {
@@ -27,6 +28,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [loggedOutNotice, setLoggedOutNotice] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const turnstileRef = useRef<TurnstileWidgetRef>(null);
   const router = useRouter();
 
   // Poster carousel state
@@ -160,12 +163,14 @@ export default function LoginPage() {
       const res = await fetch("/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, captchaToken }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
+        turnstileRef.current?.reset();
+        setCaptchaToken("");
         throw new Error(data.error || "Login failed");
       }
 
@@ -179,6 +184,8 @@ export default function LoginPage() {
         router.push("/employee/dashboard");
       }
     } catch (err: any) {
+      turnstileRef.current?.reset();
+      setCaptchaToken("");
       setError(err.message || "An unexpected error occurred.");
     } finally {
       setLoading(false);
@@ -345,6 +352,33 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
+            </motion.div>
+
+            {/* Honeypot trap input */}
+            <input
+              type="text"
+              name="website_trap"
+              tabIndex={-1}
+              autoComplete="off"
+              className="hidden"
+              aria-hidden="true"
+              style={{ display: "none" }}
+            />
+
+            {/* Cloudflare Turnstile Verification */}
+            <motion.div
+              initial={prefersReduced ? false : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: prefersReduced ? 0 : 0.4, delay: prefersReduced ? 0 : 0.35 }}
+              className="flex justify-center pt-1"
+            >
+              <TurnstileWidget
+                ref={turnstileRef}
+                action="auth_login"
+                onVerify={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken("")}
+                onError={() => setCaptchaToken("")}
+              />
             </motion.div>
 
             {/* Sign In Button */}

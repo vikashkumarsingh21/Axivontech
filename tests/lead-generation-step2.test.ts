@@ -148,6 +148,7 @@ describe("STEP 2: Client Lead Generation, Inquiry Automation & CRM Tests", () =>
         utm_source: "linkedin",
         utm_medium: "cpc",
         utm_campaign: "realty_showcase",
+        captchaToken: "1x00000000000000000000AA",
       };
 
       const req = new NextRequest("http://localhost:3000/api/v1/public/leads", {
@@ -168,7 +169,7 @@ describe("STEP 2: Client Lead Generation, Inquiry Automation & CRM Tests", () =>
       const req = new NextRequest("http://localhost:3000/api/v1/public/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-forwarded-for": "192.168.1.11" },
-        body: JSON.stringify({ email: "test@example.com" }),
+        body: JSON.stringify({ email: "test@example.com", captchaToken: "1x00000000000000000000AA" }),
       });
 
       const res = await publicLeadsPOST(req);
@@ -181,7 +182,7 @@ describe("STEP 2: Client Lead Generation, Inquiry Automation & CRM Tests", () =>
       const req = new NextRequest("http://localhost:3000/api/v1/public/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-forwarded-for": "192.168.1.12" },
-        body: JSON.stringify({ name: "Rohan Patel", email: "not-an-email" }),
+        body: JSON.stringify({ name: "Rohan Patel", email: "not-an-email", captchaToken: "1x00000000000000000000AA" }),
       });
 
       const res = await publicLeadsPOST(req);
@@ -196,6 +197,7 @@ describe("STEP 2: Client Lead Generation, Inquiry Automation & CRM Tests", () =>
         email: "duplicate@example.com",
         phone: "+91 99999 88888",
         message: "Second inquiry for custom ERP software.",
+        captchaToken: "1x00000000000000000000AA",
       };
 
       const req = new NextRequest("http://localhost:3000/api/v1/public/leads", {
@@ -237,6 +239,7 @@ describe("STEP 2: Client Lead Generation, Inquiry Automation & CRM Tests", () =>
           phone: "+91 91234 56789",
           subject: "Telemedicine Platform",
           message: "Looking for an appointment portal similar to MediCare demo.",
+          captchaToken: "1x00000000000000000000AA",
         }),
       });
 

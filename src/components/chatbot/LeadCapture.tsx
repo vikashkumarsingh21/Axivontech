@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 
 interface LeadCaptureProps {
   onComplete: (name: string) => void;
@@ -19,6 +20,8 @@ export function LeadCapture({ onComplete, onCancel }: LeadCaptureProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string>("");
+  const turnstileRef = useRef<TurnstileWidgetRef>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +52,7 @@ export function LeadCapture({ onComplete, onCancel }: LeadCaptureProps) {
           serviceInterest: formData.serviceInterest.trim() || undefined,
           message: formData.message.trim() || undefined,
           source: "WEBSITE_CHATBOT",
+          captchaToken: captchaToken || undefined,
         }),
       });
 
@@ -59,9 +63,13 @@ export function LeadCapture({ onComplete, onCancel }: LeadCaptureProps) {
           onComplete(cleanName);
         }, 1500);
       } else {
+        turnstileRef.current?.reset();
+        setCaptchaToken("");
         setError(data.error || "Failed to submit request. Please try again.");
       }
     } catch {
+      turnstileRef.current?.reset();
+      setCaptchaToken("");
       setError("Network connection issue. Please check your connection and retry.");
     } finally {
       setLoading(false);
@@ -161,12 +169,36 @@ export function LeadCapture({ onComplete, onCancel }: LeadCaptureProps) {
           />
         </div>
 
-        {error && (
-          <div className="flex items-center gap-1.5 p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[11px]">
-            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
+        {/* Honeypot field for anti-bot protection */}
+        <input
+          type="text"
+          name="website_trap"
+          tabIndex={-1}
+          autoComplete="off"
+          className="hidden"
+          aria-hidden="true"
+          style={{ display: "none" }}
+        />
+
+        {/* Cloudflare Turnstile Verification */}
+        <div className="flex justify-center pt-1 overflow-hidden">
+          <TurnstileWidget
+            ref={turnstileRef}
+            action="chatbot_lead"
+            size="compact"
+            onVerify={(token) => setCaptchaToken(token)}
+            onExpire={() => setCaptchaToken("")}
+            onError={() => setCaptchaToken("")}
+          />
+        </div>
+
+        <p className="text-[10px] text-[#7E8997] text-center leading-tight">
+          By submitting, you agree to our{" "}
+          <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-[#10B981] hover:underline">
+            Privacy Policy
+          </a>{" "}
+          under the DPDP Act 2023.
+        </p>
 
         <div className="flex items-center gap-2 pt-1">
           <button

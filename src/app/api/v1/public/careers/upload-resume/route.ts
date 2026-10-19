@@ -4,24 +4,27 @@ import path from "path";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { isCareersPageEnabled } from "@/lib/careers/careers-db";
 import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
+import { verifyFormProtection } from "@/lib/captcha";
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
-    const rateLimit = isRateLimited(`resume_upload:${ip}`, RATE_LIMIT_PRESETS.RESUME_UPLOAD);
-    if (rateLimit.limited) {
-      throw new ApiError(
-        429,
-        `Too many uploads from this IP. Please wait ${Math.ceil(rateLimit.resetMs / 60000)} minutes before trying again.`
-      );
-    }
-
     const enabled = await isCareersPageEnabled();
     if (!enabled) {
       throw new ApiError(403, "Recruitment is currently closed and resume uploads are not accepted at this time.");
     }
 
     const formData = await req.formData();
+    const token = (formData.get("captchaToken") || formData.get("turnstileToken") || req.headers.get("x-captcha-token")) as string | null;
+
+    // Server-side anti-bot & CAPTCHA protection
+    const protection = await verifyFormProtection(req, { captchaToken: token }, {
+      action: "resume_upload",
+      rateLimitPreset: RATE_LIMIT_PRESETS.RESUME_UPLOAD,
+    });
+    if (!protection.success && protection.errorResponse) {
+      return protection.errorResponse;
+    }
+
     const file = formData.get("file") as File | null;
 
     if (!file) {

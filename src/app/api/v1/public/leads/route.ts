@@ -2,16 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
+import { verifyFormProtection } from "@/lib/captcha";
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
-    const rateLimit = isRateLimited(ip, RATE_LIMIT_PRESETS.PUBLIC_LEADS);
-    if (rateLimit.limited) {
-      throw new ApiError(429, `Too many lead submissions from this IP. Please try again in ${Math.ceil(rateLimit.resetMs / 60000)} minutes.`);
+    const body = await req.json().catch(() => ({}));
+
+    // Server-side anti-bot, rate limiting, and Turnstile CAPTCHA verification
+    const protection = await verifyFormProtection(req, body, {
+      action: ["lead_inbound", "contact_form", "contact_inquiry", "chatbot_lead", "referral_lead"],
+      rateLimitPreset: RATE_LIMIT_PRESETS.PUBLIC_LEADS,
+    });
+    if (!protection.success && protection.errorResponse) {
+      return protection.errorResponse;
     }
 
-    const body = await req.json().catch(() => ({}));
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
     const rawName = body.name || body.fullName || body.contactName;
     const rawEmail = body.email;
     const rawPhone = body.phone || body.mobile;
@@ -256,17 +262,36 @@ export async function POST(req: NextRequest) {
         to: process.env.COMPANY_CONTACT_EMAIL || "info@axivontech.in",
         templateKey: "NEW_WEBSITE_LEAD",
         variables: {
+          title: `New Project Lead: ${lead.name} (${lead.leadCode})`,
           name: lead.name,
           email: lead.email,
           phone: lead.phone || "N/A",
           company: lead.companyName || "N/A",
           service: lead.serviceInterest || "N/A",
           message: lead.message || "N/A",
+          budget: parsedBudget ? `₹${parsedBudget.toLocaleString()}` : "Not specified",
+          timeline: lead.timeline || "Flexible",
           source: lead.source,
           leadCode: lead.leadCode,
           link: `${process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in"}/admin/crm/leads/${lead.id}`,
         }
       });
+
+      // Send automated client receipt acknowledgement
+      if (lead.email) {
+        await EmailService.send({
+          to: lead.email,
+          templateKey: "LEAD_ACKNOWLEDGEMENT",
+          variables: {
+            title: `Thank you for contacting Axivon Technologies [${lead.leadCode}]`,
+            name: lead.name,
+            leadCode: lead.leadCode,
+            service: lead.serviceInterest || "Custom Software Development",
+          }
+        }).catch((ackErr) => {
+          console.warn("[EmailService] Client receipt acknowledgement dispatch skipped/failed:", ackErr);
+        });
+      }
     } catch (emailError) {
       console.error("[Email Error] Failed to send new lead email:", emailError);
       // Lead is still safely stored in CRM. Log the failure activity.

@@ -1,15 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { ChevronRight, ChevronLeft, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { trackPartnerApplication } from "@/lib/analytics";
+import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 
 export default function PartnerApplicationForm() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const turnstileRef = useRef<TurnstileWidgetRef>(null);
 
   const [formData, setFormData] = useState({
     // Step 1
@@ -117,7 +120,8 @@ export default function PartnerApplicationForm() {
         } : null,
         motivation: formData.motivation,
         contribution: formData.contribution,
-        additionalInfo: formData.additionalInfo
+        additionalInfo: formData.additionalInfo,
+        captchaToken: captchaToken || undefined,
       };
 
       const res = await fetch("/api/v1/public/business-partner/applications", {
@@ -128,6 +132,8 @@ export default function PartnerApplicationForm() {
 
       const data = await res.json();
       if (!res.ok) {
+        turnstileRef.current?.reset();
+        setCaptchaToken("");
         let errorMessage = data.message || data.error || "Failed to submit application";
         
         // If there are specific validation details from Zod, append the first one
@@ -151,6 +157,8 @@ export default function PartnerApplicationForm() {
         experienceLevel: formData.yearsOfExperience,
       });
     } catch (err: unknown) {
+      turnstileRef.current?.reset();
+      setCaptchaToken("");
       setError((err as Error).message || "An error occurred during submission. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -348,6 +356,28 @@ export default function PartnerApplicationForm() {
             <div className="bg-[#111] p-4 border-l-2 border-[#e8a064] text-xs text-gray-400">
               <p className="mb-2">I confirm that the information provided is accurate.</p>
               <p>I agree that AXIVON may use this information to review my Business Partner application as per the <Link href="/privacy-policy" className="text-[#e8a064] hover:underline">Privacy Policy</Link> and <Link href="/business-partner/policy" className="text-[#e8a064] hover:underline">Partner Policy</Link>.</p>
+            </div>
+
+            {/* Honeypot field for bot deterrence */}
+            <input
+              type="text"
+              name="website_trap"
+              tabIndex={-1}
+              autoComplete="off"
+              className="hidden"
+              aria-hidden="true"
+              style={{ display: "none" }}
+            />
+
+            {/* Cloudflare Turnstile Verification */}
+            <div className="flex justify-center pt-2">
+              <TurnstileWidget
+                ref={turnstileRef}
+                action="partner_application"
+                onVerify={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken("")}
+                onError={() => setCaptchaToken("")}
+              />
             </div>
           </div>
         )}

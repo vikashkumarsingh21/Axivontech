@@ -33,9 +33,14 @@ const COMPANY_LINKS: FooterLink[] = [
 ];
 
 const LEGAL_LINKS: FooterLink[] = [
+  { label: "Legal Center", href: "/legal" },
   { label: "Privacy Policy", href: "/privacy-policy" },
-  { label: "Terms & Conditions", href: "/terms-and-conditions" },
-  { label: "Cookies Policy", href: "/cookie-policy" },
+  { label: "Terms & Conditions", href: "/terms" },
+  { label: "Cookie Policy", href: "/cookie-policy" },
+  { label: "Refund Policy", href: "/refund-cancellation-policy" },
+  { label: "Security", href: "/security-policy" },
+  { label: "Privacy Rights", href: "/privacy-requests" },
+  { label: "Cookie Settings", href: "/cookie-preferences" },
 ];
 
 const SERVICE_LINKS: FooterLink[] = [

@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { validateActiveUser } from "@/lib/auth/permissions";
 import { verifyPassword, hashPassword } from "@/lib/auth/password";
 import { handleApiError, ApiError } from "@/lib/api-error";
+import { verifyFormProtection } from "@/lib/captcha";
 
 const changePasswordSchema = z
   .object({
@@ -25,6 +26,15 @@ export async function POST(req: NextRequest) {
     const user = await validateActiveUser(userId);
 
     const body = await req.json();
+
+    // Verify Turnstile CAPTCHA & honeypot anti-bot protection
+    const protectionResult = await verifyFormProtection(req, body, {
+      action: "change_password",
+    });
+    if (!protectionResult.success) {
+      return protectionResult.response!;
+    }
+
     const { currentPassword, newPassword } = changePasswordSchema.parse(body);
 
     // Fetch current password hash

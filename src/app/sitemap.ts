@@ -28,10 +28,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/demo-projects/saas/leadpilot`, lastModified, changeFrequency: "weekly", priority: 0.8 },
     { url: `${baseUrl}/blog`, lastModified, changeFrequency: "weekly", priority: 0.8 },
     { url: `${baseUrl}/contact`, lastModified, changeFrequency: "monthly", priority: 0.8 },
-    // Legal pages
-    { url: `${baseUrl}/privacy-policy`, lastModified, changeFrequency: "yearly", priority: 0.3 },
-    { url: `${baseUrl}/cookie-policy`, lastModified, changeFrequency: "yearly", priority: 0.3 },
+    // Legal & Compliance Pages
+    { url: `${baseUrl}/legal`, lastModified, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${baseUrl}/privacy-policy`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/terms`, lastModified, changeFrequency: "yearly", priority: 0.4 },
     { url: `${baseUrl}/terms-and-conditions`, lastModified, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${baseUrl}/cookie-policy`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/disclaimer`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/legal/company-information`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/refund-cancellation-policy`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/service-delivery-policy`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/payment-terms`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/intellectual-property`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/acceptable-use-policy`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/security-policy`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/privacy-requests`, lastModified, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${baseUrl}/ai-usage`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/careers-privacy`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/business-partner-terms`, lastModified, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${baseUrl}/accessibility`, lastModified, changeFrequency: "yearly", priority: 0.4 },
   ];
 
   // Dynamic Service Pages from CMS

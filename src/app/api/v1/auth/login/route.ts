@@ -5,6 +5,7 @@ import { verifyPassword } from "@/lib/auth/password";
 import { signSession } from "@/lib/auth/session";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
+import { verifyFormProtection } from "@/lib/captcha";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -29,6 +30,15 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+
+    // Verify Turnstile CAPTCHA & honeypot anti-bot protection
+    const protectionResult = await verifyFormProtection(req, body, {
+      action: "auth_login",
+    });
+    if (!protectionResult.success) {
+      return protectionResult.response!;
+    }
+
     const { email, password } = loginSchema.parse(body);
 
     const user = await db.user.findUnique({

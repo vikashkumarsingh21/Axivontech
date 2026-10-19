@@ -10,6 +10,8 @@ import WebSiteSchema from "@/components/seo/WebSiteSchema";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import dynamic from 'next/dynamic';
 import NextTopLoader from 'nextjs-toploader';
+import CookieConsentBanner from "@/components/legal/CookieConsentBanner";
+import CookieSettingsButton from "@/components/legal/CookieSettingsButton";
 
 const ChatWidget = dynamic(() => import('@/components/chatbot/ChatWidget'));
 
@@ -154,6 +156,8 @@ export default async function RootLayout({
         <GoogleAnalytics measurementId={seo.gaMeasurementId} />
 
         <ChatWidget />
+        <CookieConsentBanner />
+        <CookieSettingsButton />
       </body>
     </html>
   );

@@ -1,19 +1,22 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
+import { verifyFormProtection } from "@/lib/captcha";
 
 export async function POST(req: Request) {
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
-    const rateLimit = isRateLimited(ip, RATE_LIMIT_PRESETS.PUBLIC_LEADS);
-    if (rateLimit.limited) {
-      return NextResponse.json(
-        { success: false, message: `Too many submissions from this IP. Please try again in ${Math.ceil(rateLimit.resetMs / 60000)} minutes.` },
-        { status: 429 }
-      );
+    const data = await req.json().catch(() => ({}));
+
+    // Server-side anti-bot & CAPTCHA protection
+    const protection = await verifyFormProtection(req, data, {
+      action: ["contact_inquiry", "contact_form", "lead_inbound"],
+      rateLimitPreset: RATE_LIMIT_PRESETS.PUBLIC_LEADS,
+    });
+    if (!protection.success && protection.errorResponse) {
+      return protection.errorResponse;
     }
 
-    const data = await req.json();
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
     const { name, email, phone, subject, message, company, service } = data;
 
     if (!name || typeof name !== "string" || !name.trim()) {
@@ -100,6 +103,29 @@ export async function POST(req: Request) {
             link: `/admin/crm/leads/${lead.id}`,
           })),
         }).catch(() => {});
+      }
+
+      // 3. Dispatch Email Notification
+      try {
+        const { EmailService } = await import("@/lib/email/service");
+        await EmailService.send({
+          to: process.env.COMPANY_CONTACT_EMAIL || "info@axivontech.in",
+          templateKey: "NEW_WEBSITE_LEAD",
+          variables: {
+            title: `New Website Inquiry: ${lead.name} (${lead.leadCode})`,
+            name: lead.name,
+            email: lead.email,
+            phone: lead.phone || "N/A",
+            company: lead.companyName || "N/A",
+            service: lead.serviceInterest || "General Contact",
+            message: lead.message || "N/A",
+            source: lead.source,
+            leadCode: lead.leadCode,
+            link: `${process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in"}/admin/crm/leads/${lead.id}`,
+          },
+        });
+      } catch (emailErr) {
+        console.error("[Email Error] Failed to send contact email:", emailErr);
       }
 
     return NextResponse.json({

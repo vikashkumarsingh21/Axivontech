@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { handleApiError } from "@/lib/api-error";
 import { z } from "zod";
+import { verifyFormProtection } from "@/lib/captcha";
 
 // ─── Public GET: Only approved reviews ───────────────────────────────
 export async function GET(req: Request) {
@@ -94,11 +95,20 @@ const submitReviewSchema = z.object({
   }),
   // Honeypot field — should always be empty
   website: z.string().max(0).optional(),
+  captchaToken: z.string().optional(),
 });
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
+
+    // Server-side anti-bot & CAPTCHA protection
+    const protection = await verifyFormProtection(req, body, {
+      action: "review_submission",
+    });
+    if (!protection.success && protection.errorResponse) {
+      return protection.errorResponse;
+    }
 
     // Honeypot check
     if (body.website) {

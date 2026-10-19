@@ -286,6 +286,7 @@ describe("AI Chatbot UI/UX: System & Interface Integrity Tests", () => {
           serviceInterest: "AI Solutions & Automation",
           message: "Looking for intelligent customer support automation.",
           source: "WEBSITE_CHATBOT",
+          captchaToken: "1x00000000000000000000AA",
         }),
       });
 

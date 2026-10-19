@@ -21,6 +21,7 @@ import {
   Check,
   FileCheck
 } from "lucide-react";
+import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 
 interface ApplicationFormData {
   fullName: string;
@@ -84,6 +85,8 @@ export default function CareerApplication({
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [captchaToken, setCaptchaToken] = useState<string>("");
+  const turnstileRef = useRef<TurnstileWidgetRef>(null);
 
   // Sync preselected position if props change
   useEffect(() => {
@@ -154,6 +157,9 @@ export default function CareerApplication({
 
     const formData = new FormData();
     formData.append("file", file);
+    if (captchaToken) {
+      formData.append("captchaToken", captchaToken);
+    }
 
     try {
       const res = await fetch("/api/v1/public/careers/upload-resume", {
@@ -234,12 +240,14 @@ export default function CareerApplication({
       const response = await fetch("/api/careers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, captchaToken }),
       });
 
       const data = await response.json();
 
       if (!response.ok || !data.success) {
+        turnstileRef.current?.reset();
+        setCaptchaToken("");
         throw new Error(data.message || "Failed to submit application. Please try again.");
       }
 
@@ -261,6 +269,8 @@ export default function CareerApplication({
       });
       setUploadSuccess(null);
     } catch (err: any) {
+      turnstileRef.current?.reset();
+      setCaptchaToken("");
       console.error("[Career Application Form]", err);
       setErrorMessage(
         err.message ||
@@ -611,6 +621,28 @@ export default function CareerApplication({
               />
             </div>
 
+            {/* Honeypot field for bot deterrence */}
+            <input
+              type="text"
+              name="website_trap"
+              tabIndex={-1}
+              autoComplete="off"
+              className="hidden"
+              aria-hidden="true"
+              style={{ display: "none" }}
+            />
+
+            {/* Turnstile Anti-Bot Verification */}
+            <div className="flex justify-center pt-2">
+              <TurnstileWidget
+                ref={turnstileRef}
+                action="career_application"
+                onVerify={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken("")}
+                onError={() => setCaptchaToken("")}
+              />
+            </div>
+
             {/* Submit Action */}
             <div className="pt-2">
               <button
@@ -631,7 +663,11 @@ export default function CareerApplication({
                 )}
               </button>
               <p className="text-[11px] text-[#7E8997] text-center mt-3 font-light">
-                By submitting, you agree to allow Axivon Technologies to process your application data for recruitment purposes.
+                By submitting, you agree to allow Axivon Technologies to process your application data in accordance with our{" "}
+                <a href="/careers-privacy" target="_blank" rel="noopener noreferrer" className="text-[#10B981] hover:underline font-medium">
+                  Applicant Privacy Notice
+                </a>{" "}
+                and the India DPDP Act 2023.
               </p>
             </div>
           </form>

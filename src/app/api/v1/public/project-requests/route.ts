@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
+import { verifyFormProtection } from "@/lib/captcha";
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 function checkRateLimit(ip: string): boolean {
@@ -23,6 +24,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json().catch(() => ({}));
+
+    // Server-verified CAPTCHA and anti-bot check
+    const protectionResult = await verifyFormProtection(req, body, {
+      action: "project_request",
+    });
+    if (!protectionResult.success) {
+      return protectionResult.response!;
+    }
     const {
       clientName, clientEmail, clientPhone, clientWhatsapp, clientDesignation,
       companyName, industry, businessAddress, city, state, country, website, companySize, gstNumber, regNumber,

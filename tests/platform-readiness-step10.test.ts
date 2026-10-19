@@ -173,6 +173,7 @@ describe("Step 10: Final Platform-Wide Audit & Production Readiness", () => {
           phone: "+91 9876543210",
           message: "Need a custom cloud ERP solution.",
           serviceInterest: "Cloud Solutions",
+          captchaToken: "1x00000000000000000000AA",
         }),
       });
 
