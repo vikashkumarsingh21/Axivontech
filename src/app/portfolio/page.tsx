@@ -49,17 +49,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PortfolioPage() {
+import { getPublishedPortfolioProjects } from "@/lib/content/content-db";
+
+export default async function PortfolioPage() {
+  const projects = await getPublishedPortfolioProjects();
+
   return (
     <main className="bg-[#0f0f0f]">
       {/* Clean editorial hero */}
       <PortfolioHero />
 
       {/* Asymmetric featured project showcase */}
-      <FeaturedWork />
+      <FeaturedWork projects={projects} />
 
       {/* Filterable project grid with all projects */}
-      <ProjectGrid />
+      <ProjectGrid projects={projects} />
 
       {/* Process / approach timeline */}
       <HowWeBuild />

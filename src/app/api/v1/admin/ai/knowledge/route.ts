@@ -6,8 +6,7 @@ import { handleApiError, ApiError } from "@/lib/api-error";
 export async function GET(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
-    // For now we reuse an existing admin permission
-    await requirePermission(userId, "crm.lead.view");
+    await requirePermission(userId, "admin:access");
 
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") || "";
@@ -54,7 +53,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const userId = req.headers.get("x-user-id");
-    await requirePermission(userId, "crm.lead.create");
+    await requirePermission(userId, "admin:access");
 
     const body = await req.json();
     const { title, category, content, sourceType, sourceReference, tags, status } = body;

@@ -29,7 +29,14 @@ export const metadata: Metadata = createPageMetadata({
   ],
 });
 
-export default function ServicesPage() {
+import { getPublishedServices, getPublishedFaqs } from "@/lib/content/content-db";
+
+export default async function ServicesPage() {
+  const [services, faqs] = await Promise.all([
+    getPublishedServices(),
+    getPublishedFaqs("SERVICES", "SERVICES"),
+  ]);
+
   return (
     <main className="bg-[#0f0f0f] overflow-hidden">
       <BreadcrumbSchema
@@ -46,7 +53,7 @@ export default function ServicesPage() {
       <SolutionAreas />
 
       {/* 03 - Core Services */}
-      <CoreServices />
+      <CoreServices services={services} />
 
       {/* 04 - Explore Services */}
       <ServiceExplorer />
@@ -64,7 +71,7 @@ export default function ServicesPage() {
       <RelatedWork />
 
       {/* 09 - FAQ */}
-      <ServicesFAQ />
+      <ServicesFAQ faqs={faqs} />
 
       {/* 10 - Final Conversion CTA */}
       <ServicesCTA />

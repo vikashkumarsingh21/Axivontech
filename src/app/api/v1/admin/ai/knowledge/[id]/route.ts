@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ [key: str
   const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
-    await requirePermission(userId, "crm.lead.view");
+    await requirePermission(userId, "admin:access");
     const document = await db.knowledgeDocument.findUnique({
       where: { id: params.id },
       include: {
@@ -26,7 +26,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ [key: s
   const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
-    await requirePermission(userId, "crm.lead.create");
+    await requirePermission(userId, "admin:access");
 
     const body = await req.json();
     const { title, category, content, sourceType, sourceReference, tags, status } = body;
@@ -61,7 +61,18 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ [key: 
   const params = await props.params;
   try {
     const userId = req.headers.get("x-user-id");
-    await requirePermission(userId, "crm.lead.create");
+    await requirePermission(userId, "admin:access");
+
+    const existing = await db.knowledgeDocument.findUnique({ where: { id: params.id } });
+    if (!existing) throw new ApiError(404, "Knowledge document not found.");
+
+    const { searchParams } = new URL(req.url);
+    const permanent = searchParams.get("permanent") === "true";
+
+    if (permanent) {
+      await db.knowledgeDocument.delete({ where: { id: params.id } });
+      return NextResponse.json({ success: true, message: "Document permanently deleted." });
+    }
 
     await db.knowledgeDocument.update({
       where: { id: params.id },

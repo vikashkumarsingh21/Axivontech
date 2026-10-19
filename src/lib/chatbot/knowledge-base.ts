@@ -1,4 +1,5 @@
-import { db } from '@/lib/db';
+import { db } from "@/lib/db";
+
 export type ChatIntent =
   | "GENERAL_INFORMATION"
   | "SERVICE_INFORMATION"
@@ -11,12 +12,13 @@ export type ChatIntent =
 
 export interface KnowledgeEntry {
   id: string;
-  category: "COMPANY" | "SERVICES" | "PROCESS" | "PRICING" | "FAQ" | "PORTFOLIO" | "TECHNOLOGY" | "CONTACT" | "INDUSTRIES";
-  keywords: string[];
+  category: string;
   title: string;
   content: string;
-  priority: number;
-  confidence: "HIGH" | "MEDIUM" | "LOW";
+  tags: string[];
+  sourceType: string;
+  sourceReference?: string | null;
+  version: number;
 }
 
 export interface LeadData {
@@ -35,316 +37,427 @@ export interface LeadData {
   requirementSummary?: string;
 }
 
-export const AXIVON_KNOWLEDGE: KnowledgeEntry[] = [
-  // ── COMPANY ──────────────────────────────────────────────────────────────────
+/**
+ * ── AUTHORITATIVE KNOWLEDGE RETRIEVAL ─────────────────────────────────────────
+ * Retrieves ONLY currently published knowledge from the database.
+ * Does NOT merge with static duplicate shadow arrays to ensure that deleted
+ * or unpublished documents are immediately excluded.
+ */
+export async function getPublishedKnowledge(): Promise<KnowledgeEntry[]> {
+  try {
+    const docs = await db.knowledgeDocument.findMany({
+      where: { status: "PUBLISHED" },
+      select: {
+        id: true,
+        title: true,
+        category: true,
+        content: true,
+        tags: true,
+        sourceType: true,
+        sourceReference: true,
+        version: true,
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    return docs.map((d) => ({
+      id: d.id,
+      title: d.title,
+      category: d.category,
+      content: d.content,
+      tags: d.tags || [],
+      sourceType: d.sourceType,
+      sourceReference: d.sourceReference,
+      version: d.version,
+    }));
+  } catch (error) {
+    console.error("[KnowledgeBase] Failed to fetch published knowledge:", error);
+    return [];
+  }
+}
+
+/**
+ * Verified initial knowledge definitions derived strictly from authoritative
+ * repository sources (src/app/about/page.tsx, src/components/Footer.tsx, src/app/services).
+ * Used exclusively for idempotent seeding into the database.
+ */
+export const VERIFIED_SEED_KNOWLEDGE: Array<{
+  title: string;
+  category: string;
+  content: string;
+  tags: string[];
+  sourceType: string;
+  sourceReference: string;
+}> = [
   {
-    id: "company-overview",
+    title: "About Axivon Technologies & Mission",
     category: "COMPANY",
-    keywords: ["axivon", "company", "about", "who", "what", "founded", "overview", "technologies"],
-    title: "About Axivon Technologies",
     content:
-      "Axivon Technologies is a premier Indian technology company specializing in Website Development, Mobile App Development, AI Solutions, Custom Software, UI/UX Design, Cloud & DevOps, SEO, IoT, and Robotics. Founded by Vikash Kumar (Founder & CEO) and Pathan Rokhiya Khanam (Co-Founder), the company serves startups, SMEs, and enterprises across India and internationally. Axivon operates with a team of expert engineers, designers, and product specialists focused on delivering measurable results.",
-    priority: 9,
-    confidence: "HIGH",
+      "Axivon Technologies is an Indian technology company specializing in Website Development, Mobile App Development, AI Solutions, Custom Software Development, UI/UX Design, Cloud & DevOps, and SEO. Founded with a mission to help modern businesses embrace digital transformation with enterprise-grade, resilient architecture and intuitive user experiences. Axivon partners with startups, growing mid-market companies, and established enterprises across industries.",
+    tags: ["axivon", "about", "mission", "company", "overview", "technologies"],
+    sourceType: "WEBSITE_PAGE",
+    sourceReference: "/about",
   },
   {
-    id: "founder-info",
+    title: "Leadership Team & Founders",
     category: "COMPANY",
-    keywords: ["founder", "ceo", "vikash", "rokhiya", "team", "leadership", "owner", "co-founder", "pathan"],
-    title: "Axivon Leadership Team",
     content:
-      "Axivon Technologies is led by Vikash Kumar, Founder & CEO, who oversees strategic direction, software architecture, and AI innovation. Pathan Rokhiya Khanam is the Co-Founder, responsible for operational excellence, client experience, and business growth. Together they lead a team of engineers, designers, and product professionals.",
-    priority: 8,
-    confidence: "HIGH",
-  },
-  // ── SERVICES ─────────────────────────────────────────────────────────────────
-  {
-    id: "service-web-development",
-    category: "SERVICES",
-    keywords: ["website", "web", "react", "next", "frontend", "backend", "landing page", "business website", "ecommerce", "portfolio site", "web app"],
-    title: "Web Development",
-    content:
-      "Axivon builds high-performance websites and web applications using Next.js, React 19, TypeScript, and Tailwind CSS. Services include business websites, landing pages, e-commerce portals, SaaS platforms, and enterprise web apps. All sites are SEO-optimized, mobile-responsive, and built for speed and security.",
-    priority: 9,
-    confidence: "HIGH",
+      "Axivon Technologies leadership:\n- Vikas Kumar (Founder): Focuses on Strategic Direction, Software Architecture, and AI Innovation. 'Building purposeful digital solutions that turn ambitious ideas into market leadership.'\n- P. Rokhiya Khanam (Co-Founder): Focuses on Operational Excellence, Client Experience, and Business Growth. 'Ensuring every client engagement achieves real business results and flawless execution.'",
+    tags: ["founder", "ceo", "vikas kumar", "rokhiya khanam", "leadership", "team", "co-founder"],
+    sourceType: "WEBSITE_PAGE",
+    sourceReference: "/about",
   },
   {
-    id: "service-mobile-app",
+    title: "Web Development Services",
     category: "SERVICES",
-    keywords: ["mobile", "app", "android", "ios", "flutter", "react native", "application", "smartphone", "play store", "app store", "cross-platform"],
-    title: "Mobile App Development",
     content:
-      "Axivon builds native and cross-platform mobile applications for iOS and Android using React Native and Flutter. Apps include ordering apps, booking systems, delivery apps, loyalty apps, healthcare apps, education apps, and custom business apps. Complete with cloud backend, push notifications, payment integrations, and App Store/Play Store publishing.",
-    priority: 9,
-    confidence: "HIGH",
+      "Axivon engineers high-performance web applications, business websites, SaaS platforms, and custom portals using modern technologies including Next.js, React, TypeScript, and Tailwind CSS. All web applications are engineered for search engine optimization (SEO), sub-second load times, responsive mobile-first layouts, and enterprise security.",
+    tags: ["web development", "website", "nextjs", "react", "frontend", "backend", "saas", "portal"],
+    sourceType: "WEBSITE_PAGE",
+    sourceReference: "/services/web-development",
   },
   {
-    id: "service-ai-solutions",
+    title: "Mobile App Development Services",
     category: "SERVICES",
-    keywords: ["ai", "artificial intelligence", "machine learning", "chatbot", "llm", "automation", "ml", "gpt", "nlp", "intelligent", "prediction", "recommendation"],
-    title: "AI Solutions",
     content:
-      "Axivon delivers custom AI solutions including AI chatbots, intelligent automation, predictive analytics, custom LLM integrations, computer vision, NLP systems, and AI-powered dashboards. Suitable for businesses wanting to automate processes, gain insights from data, or build AI-first products.",
-    priority: 9,
-    confidence: "HIGH",
+      "Axivon builds native and cross-platform mobile applications for iOS and Android using Flutter and React Native. Solutions range from on-demand booking systems, consumer marketplaces, healthcare applications, and enterprise workflow tools with cloud synchronization, push notifications, and App Store / Google Play publishing support.",
+    tags: ["mobile app", "android", "ios", "flutter", "react native", "smartphone", "application"],
+    sourceType: "WEBSITE_PAGE",
+    sourceReference: "/services/mobile-app-development",
   },
   {
-    id: "service-custom-software",
+    title: "AI Solutions & Automation",
     category: "SERVICES",
-    keywords: ["custom software", "erp", "crm", "management system", "enterprise", "workflow", "internal tool", "business software", "saas", "platform"],
-    title: "Custom Software Development",
     content:
-      "Axivon builds tailor-made software solutions including CRMs, ERPs, SaaS platforms, business management systems, internal tools, and workflow automation systems. Built with scalable architecture, role-based access control, and integration capabilities. Ideal when off-the-shelf solutions do not fit your business model.",
-    priority: 9,
-    confidence: "HIGH",
+      "Axivon delivers bespoke Artificial Intelligence and machine learning integrations, including conversational AI assistants, workflow automation, natural language processing, predictive analytics, and intelligent business intelligence dashboards to automate manual processes and extract actionable business insights.",
+    tags: ["ai", "artificial intelligence", "machine learning", "automation", "chatbot", "llm", "nlp"],
+    sourceType: "WEBSITE_PAGE",
+    sourceReference: "/services/ai-solutions",
   },
   {
-    id: "service-uiux",
+    title: "Custom Software & Cloud DevOps",
     category: "SERVICES",
-    keywords: ["ui", "ux", "design", "figma", "wireframe", "prototype", "user experience", "user interface", "visual design", "mockup"],
-    title: "UI/UX Design",
     content:
-      "Axivon provides comprehensive UI/UX design services including user research, wireframing, interactive prototypes, design systems, and pixel-perfect visual design using Figma. Designs are optimized for conversion, usability, and brand consistency.",
-    priority: 8,
-    confidence: "HIGH",
+      "Axivon architects and develops tailored software platforms, internal operations tools, CRMs, and ERPs designed for specific business models when off-the-shelf software falls short. Services include cloud infrastructure management (AWS, GCP), containerization (Docker, Kubernetes), and CI/CD automated deployments.",
+    tags: ["custom software", "crm", "erp", "cloud", "devops", "aws", "docker", "scalability"],
+    sourceType: "WEBSITE_PAGE",
+    sourceReference: "/services",
   },
   {
-    id: "service-cloud-devops",
-    category: "SERVICES",
-    keywords: ["cloud", "aws", "gcp", "devops", "server", "deployment", "hosting", "docker", "kubernetes", "ci/cd", "infrastructure"],
-    title: "Cloud & DevOps",
-    content:
-      "Axivon offers cloud infrastructure setup and DevOps services including AWS/GCP cloud architecture, Docker containerization, Kubernetes orchestration, CI/CD pipeline automation, and managed deployments with 99.9% uptime SLA management.",
-    priority: 8,
-    confidence: "HIGH",
-  },
-  {
-    id: "service-seo",
-    category: "SERVICES",
-    keywords: ["seo", "search engine", "google ranking", "digital marketing", "keywords", "organic traffic", "content marketing"],
     title: "SEO & Digital Marketing",
-    content:
-      "Axivon's SEO and digital marketing services help businesses rank higher on Google through technical SEO audits, keyword strategy, on-page optimization, content marketing, link building, and performance tracking. Results-driven campaigns for sustainable organic growth.",
-    priority: 8,
-    confidence: "HIGH",
-  },
-  {
-    id: "service-iot-robotics",
     category: "SERVICES",
-    keywords: ["iot", "robotics", "embedded", "arduino", "raspberry pi", "sensors", "hardware", "automation hardware", "smart device"],
-    title: "IoT & Robotics",
     content:
-      "Axivon designs and develops IoT solutions and robotics projects including smart sensors, automated systems, real-time monitoring platforms, agricultural IoT, environmental monitoring, and educational robotics. Projects include Arduino/Raspberry Pi systems with cloud dashboards.",
-    priority: 8,
-    confidence: "HIGH",
+      "Axivon provides technical SEO audits, search engine marketing (SEM), keyword positioning, structured data optimization, content strategy, and performance analytics to increase qualified organic search visibility and digital customer acquisition.",
+    tags: ["seo", "digital marketing", "sem", "google ranking", "organic search", "analytics"],
+    sourceType: "WEBSITE_PAGE",
+    sourceReference: "/services/seo-services",
   },
-  // ── PRICING ──────────────────────────────────────────────────────────────────
   {
-    id: "pricing-general",
+    title: "Project Pricing & Estimation Policy",
     category: "PRICING",
-    keywords: ["price", "cost", "pricing", "quote", "budget", "estimate", "how much", "charge", "fee", "rate", "affordable", "rupees", "inr", "₹", "lakh", "thousand"],
-    title: "Project Pricing at Axivon",
     content:
-      "Axivon Technologies projects start from ₹15,000 for basic websites. Mobile apps and custom software typically start from ₹50,000 onwards. AI solutions and complex enterprise software vary based on scope. Final pricing depends on features, complexity, integrations, timeline, and technology stack. An exact quotation requires a free consultation call. Axivon does not offer guaranteed discounts or fixed-price promises without a detailed scope review.",
-    priority: 9,
-    confidence: "HIGH",
+      "At Axivon Technologies, all project pricing is custom-scoped based on architectural complexity, feature requirements, integrations, design specifications, and delivery timelines. Axivon does not offer one-size-fits-all fixed packages or unverified guarantees. Every engagement begins with a free discovery consultation call, after which our engineering team delivers a structured proposal detailing the scope, timeline, and investment.",
+    tags: ["pricing", "cost", "quote", "budget", "estimate", "fee", "how much", "consultation"],
+    sourceType: "WEBSITE_PAGE",
+    sourceReference: "/contact",
   },
   {
-    id: "pricing-consultation",
-    category: "PRICING",
-    keywords: ["get quote", "get estimate", "get proposal", "free consultation", "discuss requirements", "talk about project"],
-    title: "Getting a Price Quote",
-    content:
-      "To get an accurate quote, book a free consultation. Share your project requirements and the Axivon team will provide a detailed estimate within 2-5 business days. Contact via WhatsApp at +91 94732 63768, email at info@axivontech.in, or fill the contact form at axivontech.in/contact.",
-    priority: 8,
-    confidence: "HIGH",
-  },
-  // ── PROCESS ──────────────────────────────────────────────────────────────────
-  {
-    id: "process-overview",
+    title: "Development Process & Methodology",
     category: "PROCESS",
-    keywords: ["process", "how", "work", "steps", "methodology", "approach", "workflow", "development process", "how do you build"],
-    title: "Axivon Development Process",
     content:
-      "Axivon follows a 6-stage process: 1. Discovery — understand your requirements, goals, and constraints. 2. Planning — architecture, technology selection, and project roadmap. 3. UI/UX Design — wireframes, prototypes, and visual design. 4. Development — agile sprints with regular demos. 5. Testing — QA, performance, and security testing. 6. Deployment & Support — go-live, training, and ongoing maintenance.",
-    priority: 8,
-    confidence: "HIGH",
+      "Axivon follows an outcome-driven development methodology:\n1. Discovery & Requirement Analysis: Deep understanding of business goals, technical constraints, and user personas.\n2. Architecture & Roadmap: Technical architecture specification, database design, and sprint milestones.\n3. UI/UX Design: Wireframes, interactive prototypes, and conversion-optimized design systems.\n4. Agile Development: Sprint-based implementation with frequent milestone demos.\n5. QA & Security Testing: Performance auditing, automated regression, and security verification.\n6. Deployment & Post-Launch Support: Production launch, monitoring, and ongoing maintenance.",
+    tags: ["process", "methodology", "agile", "workflow", "steps", "discovery", "timeline"],
+    sourceType: "WEBSITE_PAGE",
+    sourceReference: "/about",
   },
   {
-    id: "process-timeline",
-    category: "PROCESS",
-    keywords: ["timeline", "duration", "time", "how long", "weeks", "months", "delivery", "deadline", "launch"],
-    title: "Project Timelines",
-    content:
-      "Typical timelines: Simple business websites — 2 to 4 weeks. E-commerce sites — 4 to 8 weeks. Mobile apps (basic) — 6 to 12 weeks. Custom software platforms — 3 to 6 months. AI/ML projects — 4 to 8 months. Timelines depend on scope, complexity, and client feedback speed.",
-    priority: 8,
-    confidence: "HIGH",
-  },
-  // ── FAQ ──────────────────────────────────────────────────────────────────────
-  {
-    id: "faq-maintenance",
-    category: "FAQ",
-    keywords: ["maintenance", "support", "after", "post-launch", "bug", "update", "ongoing", "hosting", "manage"],
-    title: "Post-Launch Support & Maintenance",
-    content:
-      "Axivon provides post-launch maintenance and support packages including bug fixes, security updates, performance monitoring, and feature enhancements. Support is available via WhatsApp, email, and scheduled calls. Maintenance plans are customized based on project type.",
-    priority: 7,
-    confidence: "HIGH",
-  },
-  {
-    id: "faq-nda-ip",
-    category: "FAQ",
-    keywords: ["nda", "intellectual property", "ip", "ownership", "code", "source code", "confidential", "rights"],
-    title: "NDA & IP Ownership",
-    content:
-      "Axivon signs NDAs and IP assignment agreements for all client projects. All source code and intellectual property transfers to the client upon final payment. Axivon takes confidentiality very seriously.",
-    priority: 7,
-    confidence: "HIGH",
-  },
-  {
-    id: "faq-services-all",
-    category: "FAQ",
-    keywords: ["services", "offer", "what do you do", "what can you build", "capabilities", "what axivon does"],
-    title: "All Axivon Services",
-    content:
-      "Axivon Technologies offers: Web Development, Mobile App Development (iOS & Android), AI Solutions & Chatbots, Custom Software Development, UI/UX Design, Cloud & DevOps, SEO & Digital Marketing, IoT Solutions, and Robotics. From startups to enterprises, Axivon delivers end-to-end digital solutions.",
-    priority: 9,
-    confidence: "HIGH",
-  },
-  // ── PORTFOLIO ─────────────────────────────────────────────────────────────────
-  {
-    id: "portfolio-overview",
-    category: "PORTFOLIO",
-    keywords: ["portfolio", "project", "work", "built", "example", "past work", "case study", "client"],
-    title: "Axivon Portfolio Overview",
-    content:
-      "Axivon has built several impactful projects including: Axivon Technologies (company website), Krishi Drishti (AI smart irrigation for agriculture), JalMitra (solar-powered water cleaning system with AI), and Nani Tathagat (business automation & lead generation platform). View the full portfolio at axivontech.in/portfolio.",
-    priority: 8,
-    confidence: "HIGH",
-  },
-  {
-    id: "portfolio-krishi-drishti",
-    category: "PORTFOLIO",
-    keywords: ["krishi drishti", "agriculture", "farm", "irrigation", "iot agriculture", "smart farming", "agri"],
-    title: "Portfolio: Krishi Drishti",
-    content:
-      "Krishi Drishti is an AI-powered smart irrigation platform built by Axivon. Features: IoT sensor monitoring, weather analytics, automated irrigation control, real-time agricultural insights. Live at krishi-drishti.onrender.com. Technologies: HTML, CSS, JavaScript, Firebase, Node.js, IoT.",
-    priority: 7,
-    confidence: "HIGH",
-  },
-  {
-    id: "portfolio-jalmitra",
-    category: "PORTFOLIO",
-    keywords: ["jalmitra", "water", "solar", "environment", "cleaning", "environmental technology", "waste"],
-    title: "Portfolio: JalMitra",
-    content:
-      "JalMitra is a smart AI-based solar water cleaning system to remove floating waste from water bodies using automation and environmental monitoring. Live at jal-mitraafrontend.onrender.com. Technologies: HTML, CSS, JavaScript, Firebase, Node.js, AI, IoT.",
-    priority: 7,
-    confidence: "HIGH",
-  },
-  {
-    id: "portfolio-nani-tathagat",
-    category: "PORTFOLIO",
-    keywords: ["nani tathagat", "business automation", "lead generation", "sales", "marketing automation"],
-    title: "Portfolio: Nani Tathagat",
-    content:
-      "Nani Tathagat is a business automation and lead generation platform for streamlining operations, marketing, sales, and customer engagement. Live at nanitathagat.in. Technologies: HTML, CSS, JavaScript, Node.js, SQL, Bootstrap, Google Apps Script.",
-    priority: 7,
-    confidence: "HIGH",
-  },
-  // ── CONTACT ──────────────────────────────────────────────────────────────────
-  {
-    id: "contact-info",
+    title: "Official Contact Channels & Inquiries",
     category: "CONTACT",
-    keywords: ["contact", "email", "phone", "whatsapp", "reach", "talk", "call", "message", "address", "location", "get in touch"],
-    title: "Contact Axivon Technologies",
     content:
-      "Contact Axivon Technologies:\n📧 Email: info@axivontech.in\n📞 WhatsApp/Call: +91 94732 63768\n🌐 Website: https://axivontech.in/contact\n💬 WhatsApp Direct: https://wa.me/919473263768\n\nThe team responds within 24 hours on business days.",
-    priority: 10,
-    confidence: "HIGH",
+      "Official Contact Details for Axivon Technologies:\n- Email: info@axivontech.in\n- WhatsApp / Phone: +91 9473263768 (Direct WhatsApp: https://wa.me/919473263768)\n- Website & Inquiries: https://axivontech.in/contact\n- Office Hours: Business days, responses typically within 24 hours.",
+    tags: ["contact", "email", "phone", "whatsapp", "reach", "support", "office"],
+    sourceType: "WEBSITE_PAGE",
+    sourceReference: "/contact",
   },
-  // ── TECHNOLOGY ───────────────────────────────────────────────────────────────
   {
-    id: "technology-stack",
-    category: "TECHNOLOGY",
-    keywords: ["technology", "stack", "tools", "language", "framework", "typescript", "python", "flutter", "react", "node", "postgres", "firebase", "aws"],
-    title: "Axivon Technology Stack",
+    title: "Portfolio & Verified Case Studies",
+    category: "PORTFOLIO",
     content:
-      "Axivon uses a modern tech stack: Frontend: Next.js, React, TypeScript, Tailwind CSS, Framer Motion. Backend: Node.js, Python, Express, Prisma, REST APIs, GraphQL. Mobile: React Native, Flutter. Databases: PostgreSQL, MySQL, MongoDB, Firebase. Cloud: AWS, GCP, Vercel, Render. AI: Gemini, OpenAI, custom ML models. IoT: Arduino, Raspberry Pi, MQTT.",
-    priority: 8,
-    confidence: "HIGH",
-  },
-  // ── INDUSTRIES ───────────────────────────────────────────────────────────────
-  {
-    id: "industries-served",
-    category: "INDUSTRIES",
-    keywords: ["industry", "sector", "restaurant", "hotel", "hospital", "school", "education", "startup", "business", "retail", "manufacturing", "agriculture", "healthcare", "logistics"],
-    title: "Industries Served by Axivon",
-    content:
-      "Axivon serves many industries: Restaurants & Food (ordering, table booking, delivery), Retail & E-commerce, Healthcare & Clinics, Education & EdTech, Agriculture & AgriTech, Startups & SaaS, Manufacturing & Operations, Logistics & Supply Chain, Real Estate, and General Business Services. Solutions are customized for each industry.",
-    priority: 8,
-    confidence: "HIGH",
+      "Notable verified projects delivered by Axivon Technologies:\n- Krishi Drishti: Smart AI & IoT-enabled agricultural irrigation system.\n- JalMitra: Solar-powered automated water cleaning system with environmental monitoring.\n- Nani Tathagat: Business workflow automation and lead capture platform.\nFull portfolio and interactive demonstrations are accessible at https://axivontech.in/portfolio.",
+    tags: ["portfolio", "case studies", "krishi drishti", "jalmitra", "nani tathagat", "past work"],
+    sourceType: "WEBSITE_PAGE",
+    sourceReference: "/portfolio",
   },
 ];
 
-// ── Knowledge Search (keyword TF-IDF style) ──────────────────────────────────
-export function searchKnowledge(query: string, topK = 3): KnowledgeEntry[] {
+/**
+ * ── IDEMPOTENT INITIAL KNOWLEDGE SEEDING ─────────────────────────────────────
+ * Seeds verified initial records into the database without overwriting
+ * existing administrator edits. Requires administrative authorization.
+ */
+export async function seedInitialKnowledge(userId?: string | null): Promise<{
+  success: boolean;
+  seededCount: number;
+  skippedCount: number;
+  existingCount: number;
+  errors: string[];
+}> {
+  const errors: string[] = [];
+  let seededCount = 0;
+  let skippedCount = 0;
+
+  try {
+    const existingDocs = await db.knowledgeDocument.findMany({
+      select: { title: true },
+    });
+    const existingTitles = new Set(existingDocs.map((d) => d.title.trim().toLowerCase()));
+
+    for (const seed of VERIFIED_SEED_KNOWLEDGE) {
+      const normalizedTitle = seed.title.trim().toLowerCase();
+      if (existingTitles.has(normalizedTitle)) {
+        skippedCount++;
+        continue;
+      }
+
+      try {
+        await db.knowledgeDocument.create({
+          data: {
+            title: seed.title,
+            category: seed.category,
+            content: seed.content,
+            tags: seed.tags,
+            sourceType: seed.sourceType,
+            sourceReference: seed.sourceReference,
+            status: "PUBLISHED",
+            version: 1,
+            createdById: userId || null,
+            updatedById: userId || null,
+          },
+        });
+        seededCount++;
+        existingTitles.add(normalizedTitle);
+      } catch (insertErr) {
+        errors.push(`Failed to insert '${seed.title}': ${(insertErr as Error).message}`);
+      }
+    }
+
+    return {
+      success: errors.length === 0,
+      seededCount,
+      skippedCount,
+      existingCount: existingDocs.length,
+      errors,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      seededCount,
+      skippedCount,
+      existingCount: 0,
+      errors: [(err as Error).message],
+    };
+  }
+}
+
+/**
+ * ── MULTI-FIELD RELEVANCE SEARCH ──────────────────────────────────────────────
+ * Searches verified published documents using keyword overlap, title match,
+ * category match, and content term frequency.
+ */
+export function searchKnowledge(
+  query: string,
+  documents: KnowledgeEntry[],
+  topK = 4
+): Array<{ entry: KnowledgeEntry; score: number; confidence: "HIGH" | "MEDIUM" | "LOW" }> {
+  if (!query || documents.length === 0) return [];
+
   const q = query.toLowerCase();
-  const words = q.split(/\s+/).filter((w) => w.length > 2);
-  const scored = AXIVON_KNOWLEDGE.map((entry) => {
+  const words = q
+    .split(/[^a-zA-Z0-9]+/)
+    .map((w) => w.trim())
+    .filter((w) => w.length > 2);
+
+  const scored = documents.map((entry) => {
     let score = 0;
-    for (const kw of entry.keywords) {
-      if (q.includes(kw)) score += entry.priority * 2;
+    const titleLower = entry.title.toLowerCase();
+    const contentLower = entry.content.toLowerCase();
+    const categoryLower = entry.category.toLowerCase();
+    const tagsLower = entry.tags.map((t) => t.toLowerCase());
+
+    // 1. Tag matching (+5 points for exact tag match, +2 for tag word match)
+    for (const tag of tagsLower) {
+      if (q.includes(tag)) {
+        score += 5;
+      } else {
+        const tagWords = tag.split(/[^a-zA-Z0-9]+/).filter((tw) => tw.length > 2);
+        for (const tw of tagWords) {
+          if (words.includes(tw)) score += 2;
+        }
+      }
     }
+
+    // 2. Title matching (+4 points for exact substring, +3 per word)
+    if (q.includes(titleLower) || titleLower.includes(q)) score += 8;
     for (const w of words) {
-      if (entry.content.toLowerCase().includes(w)) score += 1;
-      if (entry.title.toLowerCase().includes(w)) score += 2;
+      if (titleLower.includes(w)) score += 3;
     }
-    return { entry, score };
+
+    // 3. Category matching (+3 points)
+    if (q.includes(categoryLower)) score += 3;
+
+    // 4. Content keyword matching (+2 points per matching word)
+    for (const w of words) {
+      if (contentLower.includes(w)) score += 2;
+    }
+
+    let confidence: "HIGH" | "MEDIUM" | "LOW" = "LOW";
+    if (score >= 10) confidence = "HIGH";
+    else if (score >= 4) confidence = "MEDIUM";
+
+    return { entry, score, confidence };
   });
+
   return scored
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, topK)
-    .map((s) => s.entry);
+    .slice(0, topK);
 }
 
-// ── Intent Detection ─────────────────────────────────────────────────────────
+/**
+ * ── INTENT DETECTION ─────────────────────────────────────────────────────────
+ * Classifies user intent based on user query and recent conversational history.
+ */
 export function detectIntent(
   message: string,
   history: Array<{ role: string; content: string }> = []
 ): ChatIntent {
   const m = message.toLowerCase();
 
-  const humanTriggers = ["speak to human", "talk to someone", "real person", "live agent", "call me", "escalate", "complaint", "i want to talk"];
+  const humanTriggers = [
+    "human agent",
+    "human support",
+    "speak to human",
+    "speak to a human",
+    "talk to a human",
+    "talk to human",
+    "talk to someone",
+    "real person",
+    "live agent",
+    "call me",
+    "escalate",
+    "complaint",
+    "i want to talk",
+    "speak with someone",
+  ];
   if (humanTriggers.some((t) => m.includes(t))) return "HUMAN_HANDOFF";
 
-  const pricingTriggers = ["price", "cost", "how much", "budget", "quote", "pricing", "estimate", "charge", "fee", "₹", "rupees", "inr", "lakh"];
+  const pricingTriggers = [
+    "price",
+    "pricing",
+    "cost",
+    "how much",
+    "budget",
+    "quote",
+    "quotation",
+    "estimate",
+    "charge",
+    "fee",
+    "rates",
+    "package",
+    "charges",
+  ];
   if (pricingTriggers.some((t) => m.includes(t))) return "PRICING";
 
-  const portfolioTriggers = ["portfolio", "past work", "example", "previous project", "case study", "built before", "show me work"];
+  const portfolioTriggers = [
+    "portfolio",
+    "past work",
+    "example",
+    "previous project",
+    "case study",
+    "built before",
+    "show me work",
+    "samples",
+    "demos",
+    "krishi drishti",
+    "jalmitra",
+    "nani tathagat",
+  ];
   if (portfolioTriggers.some((t) => m.includes(t))) return "PORTFOLIO";
 
-  const projectTriggers = ["i want", "i need", "build", "create", "develop", "make", "need an app", "need a website", "need software", "looking for", "planning to", "want to create", "want to build"];
+  const projectTriggers = [
+    "i want to build",
+    "i need a website",
+    "i need an app",
+    "i want to create",
+    "build a website",
+    "build an app",
+    "develop an app",
+    "looking for development",
+    "need custom software",
+    "hire developer",
+    "start a project",
+    "get a proposal",
+  ];
   if (projectTriggers.some((t) => m.includes(t))) return "PROJECT_INQUIRY";
 
-  const serviceTriggers = ["service", "offer", "provide", "do you do", "can you", "mobile app", "web development", "ai solution", "seo", "cloud", "iot", "robotics", "software"];
-  if (serviceTriggers.some((t) => m.includes(t))) return "SERVICE_INFORMATION";
-
-  const leadTriggers = ["contact me", "get in touch", "send details", "book consultation", "schedule call", "free consultation"];
+  const leadTriggers = [
+    "contact me",
+    "get in touch",
+    "schedule a call",
+    "book consultation",
+    "send proposal",
+    "call me back",
+    "my email is",
+    "my phone is",
+  ];
   if (leadTriggers.some((t) => m.includes(t))) return "LEAD_CAPTURE";
 
-  // Context-aware — if recent msgs are about a project, continuation counts as PROJECT_INQUIRY
+  const serviceTriggers = [
+    "services",
+    "offer",
+    "what do you do",
+    "what can you build",
+    "capabilities",
+    "web development",
+    "mobile app",
+    "ai solution",
+    "cloud",
+    "devops",
+    "seo",
+    "ui/ux",
+    "design",
+  ];
+  if (serviceTriggers.some((t) => m.includes(t))) return "SERVICE_INFORMATION";
+
+  // Context-aware continuation check
   const recentContext = history.slice(-4).map((h) => h.content.toLowerCase()).join(" ");
-  if (recentContext.includes("project") || recentContext.includes("app") || recentContext.includes("website") || recentContext.includes("build")) {
-    const continueTerms = ["restaurant", "hospital", "school", "retail", "ecommerce", "startup", "yes", "ordering", "booking", "delivery", "features", "month", "week", "budget", "lakh"];
+  if (
+    recentContext.includes("project") ||
+    recentContext.includes("app") ||
+    recentContext.includes("website") ||
+    recentContext.includes("build")
+  ) {
+    const continueTerms = [
+      "restaurant",
+      "hospital",
+      "school",
+      "ecommerce",
+      "startup",
+      "features",
+      "timeline",
+      "budget",
+      "weeks",
+      "months",
+    ];
     if (continueTerms.some((t) => m.includes(t))) return "PROJECT_INQUIRY";
   }
 
   return "UNKNOWN";
 }
 
-// ── Lead Scoring ─────────────────────────────────────────────────────────────
+/**
+ * ── LEAD SCORING ─────────────────────────────────────────────────────────────
+ */
 export function scoreLead(data: LeadData): "HOT" | "WARM" | "COLD" {
   let score = 0;
   if (data.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) score += 3;
@@ -355,40 +468,60 @@ export function scoreLead(data: LeadData): "HOT" | "WARM" | "COLD" {
   if (data.features) score += 1;
   if (data.industry) score += 1;
   if (data.company) score += 1;
-  if (score >= 9) return "HOT";
-  if (score >= 5) return "WARM";
+
+  if (score >= 8) return "HOT";
+  if (score >= 4) return "WARM";
   return "COLD";
 }
 
-// ── Conversation Summary ─────────────────────────────────────────────────────
+/**
+ * ── CONVERSATION SUMMARY ─────────────────────────────────────────────────────
+ */
 export function generateConversationSummary(
   data: LeadData,
   messages: Array<{ role: string; content: string }>
 ): string {
   const parts: string[] = [];
-  if (data.industry) parts.push(`${data.industry} business`);
-  if (data.projectType) parts.push(`looking for ${data.projectType}`);
-  if (data.features) parts.push(`with features: ${data.features}`);
-  if (data.platform) parts.push(`on ${data.platform}`);
-  if (data.budget) parts.push(`budget approx. ${data.budget}`);
-  if (data.timeline) parts.push(`timeline ${data.timeline}`);
-  if (data.existingSystem) parts.push(`existing system: ${data.existingSystem}`);
+  if (data.industry) parts.push(`Industry: ${data.industry}`);
+  if (data.projectType) parts.push(`Project: ${data.projectType}`);
+  if (data.features) parts.push(`Features: ${data.features}`);
+  if (data.platform) parts.push(`Platform: ${data.platform}`);
+  if (data.budget) parts.push(`Budget: ${data.budget}`);
+  if (data.timeline) parts.push(`Timeline: ${data.timeline}`);
+  if (data.existingSystem) parts.push(`Current System: ${data.existingSystem}`);
+
   return parts.length > 0
-    ? parts.join(". ") + "."
-    : `Chatbot inquiry with ${messages.length} messages exchanged.`;
+    ? parts.join(" | ")
+    : `Inquiry with ${messages.length} messages exchanged.`;
 }
 
+/**
+ * ── DYNAMIC PORTFOLIO KNOWLEDGE ──────────────────────────────────────────────
+ */
 export async function getDynamicPortfolioKnowledge(): Promise<string> {
   try {
     const projects = await db.portfolioProject.findMany({
-      where: { status: 'PUBLISHED' },
-      select: { title: true, category: true, industry: true, shortDescription: true, technologies: true, slug: true }
+      where: { status: "PUBLISHED" },
+      select: {
+        title: true,
+        category: true,
+        industry: true,
+        shortDescription: true,
+        technologies: true,
+        slug: true,
+      },
+      take: 10,
     });
-    if (projects.length === 0) return '';
-    return projects.map(p => 
-      `Project: ${p.title} (${p.category} / ${p.industry})\nDescription: ${p.shortDescription}\nTech: ${p.technologies.join(", ")}\nURL: /portfolio/${p.slug}`
-    ).join("\n\n");
-  } catch (e) {
-    return '';
+    if (projects.length === 0) return "";
+    return projects
+      .map(
+        (p) =>
+          `Project: ${p.title} (${p.category} / ${p.industry})\nDescription: ${p.shortDescription}\nTech: ${p.technologies.join(
+            ", "
+          )}\nURL: https://axivontech.in/portfolio/${p.slug}`
+      )
+      .join("\n\n");
+  } catch {
+    return "";
   }
 }

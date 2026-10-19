@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { SectionHeader } from "@/components/ui";
+import type { ServiceData } from "@/lib/content/content-db";
 
 interface FlagshipService {
   id: string;
@@ -28,6 +29,10 @@ interface FlagshipService {
   deliverables: string[];
   highlight: string;
   image: string;
+}
+
+interface ServicesProps {
+  services?: ServiceData[];
 }
 
 const FLAGSHIP_SERVICES: FlagshipService[] = [
@@ -128,8 +133,35 @@ const COMPLEMENTARY_SERVICES = [
   },
 ];
 
-export default function Services() {
+export default function Services({ services }: ServicesProps = {}) {
   const shouldReduceMotion = useReducedMotion();
+
+  // If dynamic services are provided from DB, overlay updated fields
+  const displayedFlagship: FlagshipService[] = services && services.length > 0
+    ? FLAGSHIP_SERVICES.map((staticSrv) => {
+        const match = services.find(
+          (s) =>
+            s.slug === staticSrv.id ||
+            s.slug === "web-development" && staticSrv.id === "web-dev" ||
+            s.slug === "mobile-app-development" && staticSrv.id === "mobile-dev" ||
+            staticSrv.href.endsWith(s.slug)
+        );
+        if (!match) return staticSrv;
+        return {
+          ...staticSrv,
+          title: match.title || staticSrv.title,
+          badge: match.badge || staticSrv.badge,
+          description: match.shortDescription || staticSrv.description,
+          stack: match.technologies && match.technologies.length > 0
+            ? match.technologies.map((t: any) => (typeof t === "string" ? t : t.name || ""))
+            : staticSrv.stack,
+          deliverables:
+            match.benefits && match.benefits.length > 0
+              ? match.benefits.map((b: any) => (typeof b === "string" ? b : (b.title || b.description || "")))
+              : staticSrv.deliverables,
+        };
+      })
+    : FLAGSHIP_SERVICES;
 
   return (
     <section id="services" className="relative bg-[#0a0a0a] py-14 sm:py-20 lg:py-28 border-t border-[#1f1f1f]">
@@ -156,7 +188,7 @@ export default function Services() {
 
         {/* ── Flagship Services: Alternating Editorial Showcase ───── */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {FLAGSHIP_SERVICES.map((srv, idx) => {
+          {displayedFlagship.map((srv, idx) => {
             const Icon = srv.icon;
             return (
               <motion.div
@@ -200,24 +232,32 @@ export default function Services() {
 
                   {/* Deliverables Checklist */}
                   <div className="mb-6 space-y-2.5 border-t border-[#1f1f1f] pt-5">
-                    {srv.deliverables.map((item) => (
-                      <div key={item} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#D4D4D8] font-light leading-normal">
-                        <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#e8a064]" />
-                        <span>{item}</span>
-                      </div>
-                    ))}
+                    {srv.deliverables.map((item: any, itemIdx: number) => {
+                      const text = typeof item === "string" ? item : (item?.title || item?.name || item?.description || "");
+                      if (!text) return null;
+                      return (
+                        <div key={`${srv.id}-deliv-${itemIdx}`} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#D4D4D8] font-light leading-normal">
+                          <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#e8a064]" />
+                          <span>{text}</span>
+                        </div>
+                      );
+                    })}
                   </div>
 
                   {/* Technology Stack Tags */}
                   <div className="flex flex-wrap gap-1.5 mb-6">
-                    {srv.stack.map((tech) => (
-                      <span
-                        key={tech}
-                        className="rounded-md border border-[#29313B] bg-[#151A21] px-2.5 py-1 font-mono text-[11px] text-[#A7B0BC] font-medium"
-                      >
-                        {tech}
-                      </span>
-                    ))}
+                    {srv.stack.map((tech: any, techIdx: number) => {
+                      const text = typeof tech === "string" ? tech : (tech?.name || "");
+                      if (!text) return null;
+                      return (
+                        <span
+                          key={`${srv.id}-tech-${techIdx}`}
+                          className="rounded-md border border-[#29313B] bg-[#151A21] px-2.5 py-1 font-mono text-[11px] text-[#A7B0BC] font-medium"
+                        >
+                          {text}
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
 

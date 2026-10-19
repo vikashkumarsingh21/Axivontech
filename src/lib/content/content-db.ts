@@ -1,7 +1,11 @@
 import { db } from "@/lib/db";
 import { COMPANY_STATS } from "@/data/company-stats";
 import { servicesData, getServiceBySlug as getStaticServiceBySlug, ServiceData } from "@/data/services";
+export type { ServiceData };
 import { BLOG_POSTS, BlogPost } from "@/data/blog-posts";
+import { portfolioProjects, getProjectBySlug as getStaticPortfolioProjectBySlug } from "@/data/portfolio";
+import { PortfolioProject } from "@/data/portfolio/types";
+import { Building2 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -619,7 +623,7 @@ export async function getPublishedServices(): Promise<ServiceData[]> {
 
     if (dbServices.length > 0) {
       // Map DB services to ServiceData interface
-      return dbServices.map((s) => ({
+      const mappedDb: ServiceData[] = dbServices.map((s) => ({
         slug: s.slug as any,
         title: s.title,
         badge: s.badge || "Professional Service",
@@ -637,6 +641,10 @@ export async function getPublishedServices(): Promise<ServiceData[]> {
           description: "Contact our team for a tailored quotation.",
         },
       }));
+
+      const dbSlugs = new Set(mappedDb.map((s) => s.slug));
+      const remainingStatic = servicesData.filter((s) => !dbSlugs.has(s.slug));
+      return [...mappedDb, ...remainingStatic];
     }
   } catch (error) {
     // Fall back to static
@@ -684,7 +692,7 @@ export async function getPublishedServiceBySlug(slug: string): Promise<ServiceDa
 }
 
 /**
- * Retrieves published industries.
+ * Retrieves published industries, merging database records with default catalog.
  */
 export async function getPublishedIndustries(): Promise<IndustryItem[]> {
   try {
@@ -694,7 +702,7 @@ export async function getPublishedIndustries(): Promise<IndustryItem[]> {
     });
 
     if (dbIndustries.length > 0) {
-      return dbIndustries.map((ind) => ({
+      const mappedDb: IndustryItem[] = dbIndustries.map((ind) => ({
         id: ind.id,
         slug: ind.slug,
         title: ind.title,
@@ -707,6 +715,10 @@ export async function getPublishedIndustries(): Promise<IndustryItem[]> {
         metaTitle: ind.metaTitle,
         metaDescription: ind.metaDescription,
       }));
+
+      const dbSlugs = new Set(mappedDb.map((i) => i.slug));
+      const remainingStatic = DEFAULT_INDUSTRIES.filter((i) => !dbSlugs.has(i.slug));
+      return [...mappedDb, ...remainingStatic];
     }
   } catch (error) {
     // Fall back to default
@@ -797,5 +809,118 @@ export async function getPublishedArticleBySlug(slug: string): Promise<BlogPost 
     // Fall back to static
   }
   return BLOG_POSTS.find((p) => p.slug === slug) || null;
+}
+
+function sanitizePortfolioProject(p: PortfolioProject): PortfolioProject {
+  return {
+    ...p,
+    icon: typeof p.icon === "string" ? p.icon : (p.visual || "business"),
+  };
+}
+
+/**
+ * Retrieves published portfolio projects from DB, merging with static catalogue.
+ */
+export async function getPublishedPortfolioProjects(): Promise<PortfolioProject[]> {
+  try {
+    const dbProjects = await db.portfolioProject.findMany({
+      where: { status: "PUBLISHED" },
+      orderBy: { displayOrder: "asc" },
+    });
+
+    if (dbProjects.length > 0) {
+      const mappedDb: PortfolioProject[] = dbProjects.map((p) => {
+        const staticMatch = getStaticPortfolioProjectBySlug(p.slug);
+        return {
+          id: p.id,
+          slug: p.slug,
+          title: p.title,
+          category: p.category,
+          industry: p.industry,
+          shortDescription: p.shortDescription,
+          fullDescription: p.fullDescription || p.shortDescription,
+          problem: p.problem || "Business process efficiency challenge.",
+          solution: p.solution || "Custom software engineered by Axivon Technologies.",
+          features: p.features || [],
+          technologies: p.technologies || [],
+          status: (p.status === "PUBLISHED" ? "Live" : "In Development") as any,
+          duration: staticMatch?.duration || "4-8 weeks",
+          completionDate: p.publishedAt ? p.publishedAt.toISOString().split("T")[0] : "2026",
+          client: p.client || staticMatch?.client || "Enterprise Client",
+          role: staticMatch?.role || "Full-Stack Development & Architecture",
+          liveUrl: p.liveUrl || staticMatch?.liveUrl || "https://axivontech.in",
+          githubUrl: p.githubUrl || staticMatch?.githubUrl || "https://github.com/vikashkumarsingh21/Axivontech",
+          thumbnail: p.thumbnail || staticMatch?.thumbnail || "/assets/images/services/web-development.jpg",
+          heroImage: p.heroImage || staticMatch?.heroImage || "/assets/images/services/web-development.jpg",
+          gallery: p.gallery || staticMatch?.gallery || [],
+          icon: staticMatch?.visual || "business",
+          accentPrimary: staticMatch?.accentPrimary || "#10B981",
+          accentSecondary: staticMatch?.accentSecondary || "#059669",
+          visual: staticMatch?.visual || "business",
+          featured: p.featured,
+          seoTitle: p.seoTitle || `${p.title} | Portfolio | Axivon Technologies`,
+          seoDescription: p.seoDescription || p.shortDescription,
+        };
+      });
+
+      const dbSlugs = new Set(mappedDb.map((p) => p.slug));
+      const remainingStatic = portfolioProjects
+        .filter((p) => !dbSlugs.has(p.slug))
+        .map(sanitizePortfolioProject);
+      return [...mappedDb, ...remainingStatic];
+    }
+  } catch {
+    // fallback
+  }
+  return portfolioProjects.map(sanitizePortfolioProject);
+}
+
+/**
+ * Retrieves a single published portfolio project by slug.
+ */
+export async function getPublishedPortfolioProjectBySlug(slug: string): Promise<PortfolioProject | null> {
+  try {
+    const project = await db.portfolioProject.findFirst({
+      where: { slug, status: "PUBLISHED" },
+    });
+
+    if (project) {
+      const staticMatch = getStaticPortfolioProjectBySlug(slug);
+      return {
+        id: project.id,
+        slug: project.slug,
+        title: project.title,
+        category: project.category,
+        industry: project.industry,
+        shortDescription: project.shortDescription,
+        fullDescription: project.fullDescription || project.shortDescription,
+        problem: project.problem || "Operational friction in legacy workflows.",
+        solution: project.solution || "Custom software engineered by Axivon Technologies.",
+        features: project.features || [],
+        technologies: project.technologies || [],
+        status: (project.status === "PUBLISHED" ? "Live" : "In Development") as any,
+        duration: staticMatch?.duration || "4-8 weeks",
+        completionDate: project.publishedAt ? project.publishedAt.toISOString().split("T")[0] : "2026",
+        client: project.client || staticMatch?.client || "Enterprise Client",
+        role: staticMatch?.role || "Full-Stack Development & Architecture",
+        liveUrl: project.liveUrl || staticMatch?.liveUrl || "https://axivontech.in",
+        githubUrl: project.githubUrl || staticMatch?.githubUrl || "https://github.com/vikashkumarsingh21/Axivontech",
+        thumbnail: project.thumbnail || staticMatch?.thumbnail || "/assets/images/services/web-development.jpg",
+        heroImage: project.heroImage || staticMatch?.heroImage || "/assets/images/services/web-development.jpg",
+        gallery: project.gallery || staticMatch?.gallery || [],
+        icon: staticMatch?.visual || "business",
+        accentPrimary: staticMatch?.accentPrimary || "#10B981",
+        accentSecondary: staticMatch?.accentSecondary || "#059669",
+        visual: staticMatch?.visual || "business",
+        featured: project.featured,
+        seoTitle: project.seoTitle || `${project.title} | Portfolio | Axivon Technologies`,
+        seoDescription: project.seoDescription || project.shortDescription,
+      };
+    }
+  } catch {
+    // fallback
+  }
+  const staticProject = getStaticPortfolioProjectBySlug(slug);
+  return staticProject ? sanitizePortfolioProject(staticProject) : null;
 }
 

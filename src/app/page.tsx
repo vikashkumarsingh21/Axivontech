@@ -4,7 +4,14 @@ import Hero from "@/components/Hero";
 import HomeFAQSchema from "@/components/seo/HomeFAQSchema";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
-import { getHomepageContent, getPublishedFaqs, getSeoSettings } from "@/lib/content/content-db";
+import {
+  getHomepageContent,
+  getPublishedFaqs,
+  getSeoSettings,
+  getPublishedServices,
+  getPublishedIndustries,
+  getPublishedPortfolioProjects,
+} from "@/lib/content/content-db";
 
 const Services = dynamic(() => import("@/components/Services"));
 const WhyChooseUs = dynamic(() => import("@/components/WhyChooseUs"));
@@ -33,21 +40,26 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const content = await getHomepageContent();
-  const faqs = await getPublishedFaqs("ALL", "HOME");
+  const [content, faqs, services, industries, projects] = await Promise.all([
+    getHomepageContent(),
+    getPublishedFaqs("ALL", "HOME"),
+    getPublishedServices(),
+    getPublishedIndustries(),
+    getPublishedPortfolioProjects(),
+  ]);
 
   return (
     <>
       <HomeFAQSchema faqs={faqs} />
       {content.sectionsVisibility.hero && <Hero content={content.hero} />}
-      {content.sectionsVisibility.services && <Services />}
+      {content.sectionsVisibility.services && <Services services={services} />}
       {content.sectionsVisibility.whyChooseUs && <WhyChooseUs />}
-      {content.sectionsVisibility.industries && <IndustriesWeServe />}
-      {content.sectionsVisibility.portfolio && <Portfolio />}
+      {content.sectionsVisibility.industries && <IndustriesWeServe industries={industries} />}
+      {content.sectionsVisibility.portfolio && <Portfolio projects={projects} />}
       {content.sectionsVisibility.process && <Process />}
       {content.sectionsVisibility.reviews && <ClientReviews />}
       {content.sectionsVisibility.faq && <FAQ faqs={faqs} />}
-      {content.sectionsVisibility.cta && <CTA />}
+      {content.sectionsVisibility.cta && <CTA content={content.closingCta} />}
     </>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { EmployeeSidebar } from "./EmployeeSidebar";
 import { EmployeeNavbar } from "./EmployeeNavbar";
+import { PortalAIAssistant } from "@/components/portal-ai/PortalAIAssistant";
 
 interface EmployeePortalClientProps {
   children: React.ReactNode;
@@ -47,6 +48,7 @@ export function EmployeePortalClient({ children }: EmployeePortalClientProps) {
           </div>
         </main>
       </div>
+      <PortalAIAssistant portalRole="EMPLOYEE" />
     </div>
   );
 }

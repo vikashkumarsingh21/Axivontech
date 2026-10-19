@@ -6,9 +6,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { featuredProjects } from "@/data/portfolio";
+import type { PortfolioProject } from "@/data/portfolio/types";
 import ImagePlaceholder from "@/components/ui/ImagePlaceholder";
 
-export default function FeaturedWork() {
+interface FeaturedWorkProps {
+  projects?: PortfolioProject[];
+}
+
+export default function FeaturedWork({ projects }: FeaturedWorkProps = {}) {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
   const shouldReduceMotion = useReducedMotion();
@@ -23,7 +28,9 @@ export default function FeaturedWork() {
   };
 
   // Pick the first 2 featured projects for the asymmetric showcase
-  const showcased = featuredProjects.slice(0, 2);
+  const featuredList = projects && projects.length > 0 ? projects.filter((p) => p.featured) : [];
+  const fallbackList = projects && projects.length > 0 ? projects : featuredProjects;
+  const showcased = featuredList.length >= 2 ? featuredList.slice(0, 2) : fallbackList.slice(0, 2);
 
   return (
     <section

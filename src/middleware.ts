@@ -37,6 +37,9 @@ export async function middleware(req: NextRequest) {
   const isCrmRoute = pathname.startsWith("/crm");
   const isCrmApiRoute = pathname.startsWith("/api/v1/crm");
 
+  // Protect /analytics API routes
+  const isAnalyticsApiRoute = pathname.startsWith("/api/v1/analytics");
+
   // General authenticated APIs (applicable to all authenticated roles)
   const isGeneralAuthApiRoute =
     pathname.startsWith("/api/v1/me") ||
@@ -47,6 +50,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/api/v1/preferences") ||
     pathname.startsWith("/api/v1/automations") ||
     pathname.startsWith("/api/v1/announcements") ||
+    pathname.startsWith("/api/v1/portal-ai") ||
     pathname.startsWith("/api/v1/search");
 
   const isProtectedApiRoute =
@@ -56,6 +60,7 @@ export async function middleware(req: NextRequest) {
     isBrokerApiRoute ||
     isClientApiRoute ||
     isCrmApiRoute ||
+    isAnalyticsApiRoute ||
     isGeneralAuthApiRoute;
   const isProtectedRoute =
     isEmployeeRoute ||
@@ -90,8 +95,8 @@ export async function middleware(req: NextRequest) {
       // Role based basic checks
       const role = payload.role as string;
       
-      if ((isAdminRoute || isAdminApiRoute) && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
-        if (isAdminApiRoute) {
+      if ((isAdminRoute || isAdminApiRoute || isAnalyticsApiRoute) && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
+        if (isAdminApiRoute || isAnalyticsApiRoute) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
         return NextResponse.redirect(role === "BROKER" ? new URL("/broker/dashboard", req.url) : new URL("/employee/dashboard", req.url));
@@ -175,6 +180,7 @@ export const config = {
     "/api/v1/preferences/:path*",
     "/api/v1/automations/:path*",
     "/api/v1/announcements/:path*",
+    "/api/v1/portal-ai/:path*",
     "/api/v1/search/:path*",
   ],
 };

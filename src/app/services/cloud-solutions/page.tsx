@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-
+import { notFound } from "next/navigation";
 import { getServiceBySlug } from "@/data/services";
+import { getPublishedServiceBySlug } from "@/lib/content/content-db";
 
 import ServiceHero from "@/components/service-pages/ServiceHero";
 import ServiceBenefits from "@/components/service-pages/ServiceBenefits";
@@ -11,15 +12,15 @@ import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
-const service = getServiceBySlug("cloud-solutions");
+const SLUG = "cloud-solutions";
 
-if (!service) {
-  throw new Error("Cloud Solutions service not found");
-}
+export async function generateMetadata(): Promise<Metadata> {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) return {};
 
-export const metadata: Metadata = {
-  title: service.metaTitle,
-  description: service.metaDescription,
+  return {
+    title: service.metaTitle,
+    description: service.metaDescription,
 
   keywords: [
     "Cloud Solutions",
@@ -55,46 +56,48 @@ export const metadata: Metadata = {
     canonical: "https://axivontech.in/services/cloud-solutions",
   },
 
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+    robots: {
       index: true,
       follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
     },
-  },
-};
+  };
+}
 
-export default function CloudSolutionsPage() {
+export default async function CloudSolutionsPage() {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) notFound();
+
   return (
     <main className="overflow-hidden bg-[#0f0f0f]">
-
       <ServiceSchema
         name={service.title}
         description={service.metaDescription}
-        url="https://axivontech.in/services/cloud-solutions"
+        url={`https://axivontech.in/services/${SLUG}`}
       />
 
       <BreadcrumbSchema
-              items={[
-                {
-                  name: "Home",
-                  url: "https://axivontech.in",
-                },
-                {
-                  name: "Services",
-                  url: "https://axivontech.in/services",
-                },
-                {
-                  name: "Cloud Solutions",
-                  url: "https://axivontech.in/services/cloud-solutions",
-                },
-              ]}
-            />
-
+        items={[
+          {
+            name: "Home",
+            url: "https://axivontech.in",
+          },
+          {
+            name: "Services",
+            url: "https://axivontech.in/services",
+          },
+          {
+            name: service.title,
+            url: `https://axivontech.in/services/${SLUG}`,
+          },
+        ]}
+      />
 
       {/* Hero Section */}
       <ServiceHero service={service} />

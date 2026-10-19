@@ -3,6 +3,7 @@
 import React, { useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import type { FaqItem } from "@/lib/content/content-db";
 
 const FAQS = [
   {
@@ -27,10 +28,19 @@ const FAQS = [
   },
 ];
 
-export default function ContactFAQ() {
+interface ContactFAQProps {
+  faqs?: FaqItem[];
+}
+
+export default function ContactFAQ({ faqs }: ContactFAQProps = {}) {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-50px" });
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  const displayedFaqs =
+    faqs && faqs.length > 0
+      ? faqs.map((f) => ({ question: f.question, answer: f.answer }))
+      : FAQS;
 
   return (
     <section ref={sectionRef} className="bg-[#111111] py-20 sm:py-14 sm:py-20 lg:py-32 border-b border-[#1e1e1e]">
@@ -47,7 +57,7 @@ export default function ContactFAQ() {
         </motion.div>
 
         <div className="space-y-4">
-          {FAQS.map((faq, index) => {
+          {displayedFaqs.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
               <motion.div

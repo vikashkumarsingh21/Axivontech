@@ -27,6 +27,7 @@ import {
   CheckCircle2,
   Clock,
   FlaskConical,
+  Building2,
 } from "lucide-react";
 
 import type { Variants } from "framer-motion";
@@ -441,7 +442,7 @@ function ProjectCard({ project, index, reduced }: { project: PortfolioProject; i
     setHovered(false);
   }, [mouseX, mouseY]);
 
-  const Icon = project.icon;
+  const Icon = (typeof project.icon === "function" ? project.icon : Building2) as React.ElementType;
   const statusStyle = STATUS_STYLES[project.status];
   const StatusIcon = statusStyle.icon;
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { ClientSidebar } from "@/components/portal/ClientSidebar";
 import { PortalHeader } from "@/components/portal/PortalHeader";
+import { PortalAIAssistant } from "@/components/portal-ai/PortalAIAssistant";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -94,6 +95,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </div>
         </main>
       </div>
+      <PortalAIAssistant portalRole="CLIENT" />
     </div>
   );
 }

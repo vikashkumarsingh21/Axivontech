@@ -5,15 +5,21 @@ import { motion, useInView, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { servicesData } from "@/data/services";
+import type { ServiceData } from "@/lib/content/content-db";
 
-export default function CoreServices() {
+interface CoreServicesProps {
+  services?: ServiceData[];
+}
+
+export default function CoreServices({ services }: CoreServicesProps = {}) {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
   const shouldReduceMotion = useReducedMotion();
 
   // Select the top 4 pillar services for this editorial section
+  const source = services && services.length > 0 ? services : servicesData;
   const PILLAR_SLUGS = ["web-development", "mobile-app-development", "ai-solutions", "custom-software-development"];
-  const pillarServices = servicesData.filter(s => PILLAR_SLUGS.includes(s.slug));
+  const pillarServices = source.filter((s) => PILLAR_SLUGS.includes(s.slug));
 
   return (
     <section ref={sectionRef} className="bg-[#0f0f0f] py-20 sm:py-32">
@@ -59,10 +65,10 @@ export default function CoreServices() {
                   
                   {/* Key Benefits List */}
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 mb-10 w-full">
-                    {service.benefits.slice(0, 4).map((benefit) => (
-                      <li key={benefit.title} className="flex items-start gap-3">
+                    {service.benefits.slice(0, 4).map((benefit: any) => (
+                      <li key={benefit.title || benefit} className="flex items-start gap-3">
                         <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e8a064]" aria-hidden />
-                        <span className="text-sm font-medium text-[#A7B0BC]">{benefit.title}</span>
+                        <span className="text-sm font-medium text-[#A7B0BC]">{benefit.title || benefit}</span>
                       </li>
                     ))}
                   </ul>

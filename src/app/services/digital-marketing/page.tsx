@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-
+import { notFound } from "next/navigation";
 import { getServiceBySlug } from "@/data/services";
+import { getPublishedServiceBySlug } from "@/lib/content/content-db";
 
 import ServiceHero from "@/components/service-pages/ServiceHero";
 import ServiceBenefits from "@/components/service-pages/ServiceBenefits";
@@ -11,15 +12,15 @@ import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
-const service = getServiceBySlug("digital-marketing");
+const SLUG = "digital-marketing";
 
-if (!service) {
-  throw new Error("Digital Marketing service not found");
-}
+export async function generateMetadata(): Promise<Metadata> {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) return {};
 
-export const metadata: Metadata = {
-  title: service.metaTitle,
-  description: service.metaDescription,
+  return {
+    title: service.metaTitle,
+    description: service.metaDescription,
 
   keywords: [
     "Digital Marketing Services",
@@ -54,47 +55,48 @@ export const metadata: Metadata = {
     canonical: "https://axivontech.in/services/digital-marketing",
   },
 
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+    robots: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
-  },
-};
+  };
+}
 
-export default function DigitalMarketingPage() {
+export default async function DigitalMarketingPage() {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) notFound();
+
   return (
     <main className="overflow-hidden bg-[#0f0f0f]">
-
       <ServiceSchema
         name={service.title}
         description={service.metaDescription}
-        url="https://axivontech.in/services/digital-marketing"
+        url={`https://axivontech.in/services/${SLUG}`}
       />
 
       <BreadcrumbSchema
-              items={[
-                {
-                  name: "Home",
-                  url: "https://axivontech.in",
-                },
-                {
-                  name: "Services",
-                  url: "https://axivontech.in/services",
-                },
-                {
-                  name: "Digital Marketing",
-                  url: "https://axivontech.in/services/digital-marketing",
-                },
-              ]}
-            />
-      
-
+        items={[
+          {
+            name: "Home",
+            url: "https://axivontech.in",
+          },
+          {
+            name: "Services",
+            url: "https://axivontech.in/services",
+          },
+          {
+            name: service.title,
+            url: `https://axivontech.in/services/${SLUG}`,
+          },
+        ]}
+      />
 
       {/* Hero Section */}
       <ServiceHero service={service} />

@@ -87,7 +87,7 @@ export interface PortfolioProject {
   // UI Settings
   // ==========================================
 
-  icon: LucideIcon;
+  icon?: LucideIcon | string;
 
   accentPrimary: string;
 

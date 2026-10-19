@@ -1,77 +1,67 @@
 import type { Metadata } from "next";
-
+import { notFound } from "next/navigation";
 import { getServiceBySlug } from "@/data/services";
+import { getPublishedServiceBySlug } from "@/lib/content/content-db";
 
 import ServiceHero from "@/components/service-pages/ServiceHero";
 import ServiceBenefits from "@/components/service-pages/ServiceBenefits";
 import ServiceProcess from "@/components/service-pages/ServiceProcess";
 import ServiceTechStack from "@/components/service-pages/ServiceTechStack";
 import ServiceFAQ from "@/components/service-pages/ServiceFAQ";
-// import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
-const service = getServiceBySlug("web-development");
+const SLUG = "web-development";
 
-if (!service) {
-  throw new Error("Web Development service not found");
+export async function generateMetadata(): Promise<Metadata> {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) return {};
+
+  return {
+    title: service.metaTitle,
+    description: service.metaDescription,
+    alternates: {
+      canonical: `https://axivontech.in/services/${SLUG}`,
+    },
+    openGraph: {
+      title: service.metaTitle,
+      description: service.metaDescription,
+      url: `https://axivontech.in/services/${SLUG}`,
+      siteName: "Axivon Technologies",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: service.metaTitle,
+      description: service.metaDescription,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+    keywords: [
+      "Website Development Company",
+      "Web Development Company",
+      "Custom Website Development",
+      "Business Website Development",
+      "Next.js Development",
+      "React Development",
+      "SEO Friendly Website",
+      "Axivon Technologies",
+    ],
+  };
 }
 
-export const metadata: Metadata = {
-  title: service.metaTitle,
+export default async function WebDevelopmentPage() {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) notFound();
 
-  description: service.metaDescription,
-
-  alternates: {
-    canonical:
-      "https://axivontech.in/services/web-development",
-  },
-
-  openGraph: {
-    title: service.metaTitle,
-
-    description: service.metaDescription,
-
-    url: "https://axivontech.in/services/web-development",
-
-    siteName: "Axivon Technologies",
-
-    type: "website",
-  },
-
-  twitter: {
-    card: "summary_large_image",
-
-    title: service.metaTitle,
-
-    description: service.metaDescription,
-  },
-
-  robots: {
-    index: true,
-    follow: true,
-  },
-
-  keywords: [
-    "Website Development Company",
-    "Web Development Company",
-    "Custom Website Development",
-    "Business Website Development",
-    "Next.js Development",
-    "React Development",
-    "SEO Friendly Website",
-    "Axivon Technologies",
-  ],
-};
-
-export default function WebDevelopmentPage() {
   return (
     <main className="overflow-hidden bg-[#0f0f0f]">
-      
       <ServiceSchema
         name={service.title}
         description={service.metaDescription}
-        url="https://axivontech.in/services/web-development"
+        url={`https://axivontech.in/services/${SLUG}`}
       />
 
       <BreadcrumbSchema
@@ -85,8 +75,8 @@ export default function WebDevelopmentPage() {
             url: "https://axivontech.in/services",
           },
           {
-            name: "Web Development",
-            url: "https://axivontech.in/services/web-development",
+            name: service.title,
+            url: `https://axivontech.in/services/${SLUG}`,
           },
         ]}
       />
@@ -105,7 +95,6 @@ export default function WebDevelopmentPage() {
 
       {/* FAQ Section */}
       <ServiceFAQ service={service} />
-
     </main>
   );
 }

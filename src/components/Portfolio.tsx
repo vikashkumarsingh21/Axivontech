@@ -13,6 +13,7 @@ import { FaGithub } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
 import { SectionHeader } from "@/components/ui";
+import type { PortfolioProject } from "@/data/portfolio/types";
 
 interface Project {
   id: string;
@@ -26,6 +27,10 @@ interface Project {
   icon: LucideIcon;
   image: string;
   imageAlt: string;
+}
+
+interface PortfolioProps {
+  projects?: PortfolioProject[];
 }
 
 const PROJECTS: Project[] = [
@@ -102,7 +107,29 @@ const cardVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" as any } },
 };
 
-export default function Portfolio() {
+export default function Portfolio({ projects }: PortfolioProps = {}) {
+  const displayedProjects: Project[] =
+    projects && projects.length > 0
+      ? projects.slice(0, 4).map((p) => {
+          const staticMatch = PROJECTS.find((sp) => sp.id === p.id || sp.id === p.slug);
+          return {
+            id: p.id || p.slug,
+            title: p.title,
+            category: p.category,
+            description: p.shortDescription || staticMatch?.description || "",
+            status: (p.status === "Live" ? "Live" : p.status === "In Development" ? "In Development" : "Completed") as any,
+            technologies: p.technologies && p.technologies.length > 0 ? p.technologies : staticMatch?.technologies || [],
+            liveUrl: p.liveUrl || staticMatch?.liveUrl || "https://axivontech.in",
+            githubUrl: p.githubUrl || staticMatch?.githubUrl || "https://github.com/vikashkumarsingh21/Axivontech",
+            icon: staticMatch?.icon || Building2,
+            image:
+              p.thumbnail && !p.thumbnail.includes("placeholder")
+                ? p.thumbnail
+                : staticMatch?.image || "/assets/images/portfolio/axivon-studio.jpg",
+            imageAlt: `${p.title} - ${p.category}`,
+          };
+        })
+      : PROJECTS;
 
   return (
     <section id="portfolio" className="relative bg-[#0f0f0f] py-14 sm:py-20 lg:py-28 border-t border-[#1f1f1f]">
@@ -134,7 +161,7 @@ export default function Portfolio() {
           variants={gridVariants}
           className="grid grid-cols-1 gap-8 lg:grid-cols-2"
         >
-          {PROJECTS.map((project) => {
+          {displayedProjects.map((project) => {
             const Icon = project.icon;
             return (
               <motion.div

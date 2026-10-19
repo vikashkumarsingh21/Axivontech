@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import IndustriesHero from "@/components/industries/IndustriesHero";
+import { getPublishedIndustries } from "@/lib/content/content-db";
 
 const IndustriesGrid = dynamic(() => import("@/components/industries/IndustriesGrid"));
 const CTA = dynamic(() => import("@/components/CTA"));
@@ -14,14 +15,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function IndustriesPage() {
+export default async function IndustriesPage() {
+  const industries = await getPublishedIndustries();
+
   return (
     <main className="bg-[#0f0f0f] overflow-hidden">
       {/* 1. Hero */}
       <IndustriesHero />
 
       {/* 2. Grid */}
-      <IndustriesGrid />
+      <IndustriesGrid industries={industries} />
 
       {/* 3. CTA */}
       <CTA />

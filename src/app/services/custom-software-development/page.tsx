@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-
+import { notFound } from "next/navigation";
 import { getServiceBySlug } from "@/data/services";
+import { getPublishedServiceBySlug } from "@/lib/content/content-db";
 
 import ServiceHero from "@/components/service-pages/ServiceHero";
 import ServiceBenefits from "@/components/service-pages/ServiceBenefits";
@@ -11,15 +12,15 @@ import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
-const service = getServiceBySlug("custom-software-development");
+const SLUG = "custom-software-development";
 
-if (!service) {
-  throw new Error("Custom Software Development service not found");
-}
+export async function generateMetadata(): Promise<Metadata> {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) return {};
 
-export const metadata: Metadata = {
-  title: service.metaTitle,
-  description: service.metaDescription,
+  return {
+    title: service.metaTitle,
+    description: service.metaDescription,
 
   keywords: [
     "Custom Software Development",
@@ -66,34 +67,37 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-};
+  };
+}
 
-export default function CustomSoftwareDevelopmentPage() {
+export default async function CustomSoftwareDevelopmentPage() {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) notFound();
+
   return (
     <main className="overflow-hidden bg-[#0f0f0f]">
-
       <ServiceSchema
         name={service.title}
         description={service.metaDescription}
-        url="https://axivontech.in/services/custom-software-development"
+        url={`https://axivontech.in/services/${SLUG}`}
       />
 
       <BreadcrumbSchema
-              items={[
-                {
-                  name: "Home",
-                  url: "https://axivontech.in",
-                },
-                {
-                  name: "Services",
-                  url: "https://axivontech.in/services",
-                },
-                {
-                  name: "Custom Software Development",
-                  url: "https://axivontech.in/services/custom-software-development",
-                },
-              ]}
-            />
+        items={[
+          {
+            name: "Home",
+            url: "https://axivontech.in",
+          },
+          {
+            name: "Services",
+            url: "https://axivontech.in/services",
+          },
+          {
+            name: service.title,
+            url: `https://axivontech.in/services/${SLUG}`,
+          },
+        ]}
+      />
 
       {/* Hero Section */}
       <ServiceHero service={service} />

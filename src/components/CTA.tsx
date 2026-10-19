@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Clock, Mail, MessageCircle, Rocket, Shield, Zap } from "lucide-react";
 import { Badge } from "@/components/ui";
+import type { HomepageContent } from "@/lib/content/content-db";
 
 const WHATSAPP_LINK = "https://wa.me/919473263768";
 const CONSULTATION_LINK = "/contact#contact-form";
@@ -15,7 +16,11 @@ const TRUST_SIGNALS = [
   { icon: Clock, label: "Flexible engagement models" },
 ];
 
-export default function CTA() {
+interface CTAProps {
+  content?: HomepageContent["closingCta"];
+}
+
+export default function CTA({ content }: CTAProps = {}) {
   return (
     <section
       id="contact-cta"
@@ -63,13 +68,17 @@ export default function CTA() {
               </div>
 
               <h2 className="text-3xl font-semibold tracking-[-0.03em] text-[#f4f4f5] sm:text-4xl lg:text-5xl">
-                Let&apos;s build a digital presence that{" "}
-                <span className="text-gradient-amber">earns trust.</span>
+                {content?.heading || (
+                  <>
+                    Let&apos;s build a digital presence that{" "}
+                    <span className="text-gradient-amber">earns trust.</span>
+                  </>
+                )}
               </h2>
 
               <p className="mt-5 max-w-lg text-base leading-7 text-[#a1a1aa] sm:text-lg">
-                Whether you need a website, mobile app, AI solution, or digital marketing, Axivon
-                Technologies helps you move from idea to implementation with clarity.
+                {content?.subheading ||
+                  "Whether you need a website, mobile app, AI solution, or digital marketing, Axivon Technologies helps you move from idea to implementation with clarity."}
               </p>
 
               {/* Trust signals */}
@@ -88,21 +97,21 @@ export default function CTA() {
             {/* Right — actions */}
             <div className="flex flex-col gap-5">
               <a
-                href={CONSULTATION_LINK}
+                href={content?.primaryButtonLink || CONSULTATION_LINK}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#e8a064] px-7 py-4 text-sm font-semibold text-[#0f0f0f] shadow-[0_4px_20px_rgba(232,160,100,0.3)] transition-all hover:bg-[#f0b07a] hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#e8a064]"
               >
-                <span>Get Free Consultation</span>
+                <span>{content?.primaryButtonText || "Get Free Consultation"}</span>
                 <ArrowRight className="h-4 w-4" strokeWidth={2} />
               </a>
 
               <a
-                href={WHATSAPP_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={content?.secondaryButtonLink || WHATSAPP_LINK}
+                target={content?.secondaryButtonLink?.startsWith("http") ? "_blank" : undefined}
+                rel={content?.secondaryButtonLink?.startsWith("http") ? "noopener noreferrer" : undefined}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#303030] bg-[#141414]/80 px-7 py-4 text-sm font-semibold text-[#d4d4d4] backdrop-blur-sm transition-all hover:border-[rgba(232,160,100,0.4)] hover:text-[#e8a064] hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#e8a064]"
               >
                 <MessageCircle className="h-4 w-4 text-[#e8a064]" strokeWidth={2} />
-                <span>Chat On WhatsApp</span>
+                <span>{content?.secondaryButtonText || "Chat On WhatsApp"}</span>
               </a>
 
               <div className="mt-2 flex items-center justify-center gap-2 text-sm text-[#71717a]">

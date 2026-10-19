@@ -102,12 +102,28 @@ export default async function AboutPage() {
                 We are a technology company focused on delivering resilient architecture and intuitive user experiences.
               </h3>
               <div className="text-[#A7B0BC] space-y-6 text-base sm:text-lg leading-relaxed max-w-3xl font-light text-pretty">
-                <p>
-                  Axivon Technologies was founded with a vision to help businesses embrace digital transformation through modern technology solutions. We believe every business deserves access to enterprise-grade infrastructure.
-                </p>
-                <p>
-                  Whether we are engineering complex custom software, developing consumer mobile applications, or implementing machine learning automation, our focus remains on outcomes rather than just deliverables.
-                </p>
+                {content.mission && (
+                  <p>
+                    <strong className="text-white font-medium block text-xs uppercase tracking-wider text-[#e8a064] mb-1">Our Mission</strong>
+                    {content.mission}
+                  </p>
+                )}
+                {content.vision && (
+                  <p>
+                    <strong className="text-white font-medium block text-xs uppercase tracking-wider text-[#e8a064] mb-1">Our Vision</strong>
+                    {content.vision}
+                  </p>
+                )}
+                {!content.mission && !content.vision && (
+                  <>
+                    <p>
+                      Axivon Technologies was founded with a vision to help businesses embrace digital transformation through modern technology solutions. We believe every business deserves access to enterprise-grade infrastructure.
+                    </p>
+                    <p>
+                      Whether we are engineering complex custom software, developing consumer mobile applications, or implementing machine learning automation, our focus remains on outcomes rather than just deliverables.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -128,46 +144,41 @@ export default async function AboutPage() {
             </div>
             <div className="lg:col-span-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
-                {/* Principle 1 */}
-                <div>
-                  <div className="w-10 h-10 border border-white/10 rounded-sm flex items-center justify-center mb-6">
-                    <span className="text-[#e8a064] font-mono text-sm">01</span>
+                {(content.values && content.values.length > 0
+                  ? content.values
+                  : [
+                      {
+                        title: "Understand the Problem First",
+                        description:
+                          "We don't write code until we deeply understand the business context. Solutions are only valuable if they solve the right problem.",
+                      },
+                      {
+                        title: "Build for Real Users",
+                        description:
+                          "Technology should adapt to humans, not the other way around. We prioritize usability, accessibility, and intuitive design.",
+                      },
+                      {
+                        title: "Keep Systems Maintainable",
+                        description:
+                          "We architect clean, scalable codebases. A successful product is one that can evolve safely long after the initial launch.",
+                      },
+                      {
+                        title: "Measure Outcomes",
+                        description:
+                          "We rely on data and analytics to validate our decisions. Every deployment is an opportunity to learn and improve.",
+                      },
+                    ]
+                ).map((val, idx) => (
+                  <div key={val.title}>
+                    <div className="w-10 h-10 border border-white/10 rounded-sm flex items-center justify-center mb-6">
+                      <span className="text-[#e8a064] font-mono text-sm">
+                        {String(idx + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <h4 className="text-xl font-medium mb-3">{val.title}</h4>
+                    <p className="text-gray-400 font-light leading-relaxed">{val.description}</p>
                   </div>
-                  <h4 className="text-xl font-medium mb-3">Understand the Problem First</h4>
-                  <p className="text-gray-400 font-light leading-relaxed">
-                    We don't write code until we deeply understand the business context. Solutions are only valuable if they solve the right problem.
-                  </p>
-                </div>
-                {/* Principle 2 */}
-                <div>
-                  <div className="w-10 h-10 border border-white/10 rounded-sm flex items-center justify-center mb-6">
-                    <span className="text-[#e8a064] font-mono text-sm">02</span>
-                  </div>
-                  <h4 className="text-xl font-medium mb-3">Build for Real Users</h4>
-                  <p className="text-gray-400 font-light leading-relaxed">
-                    Technology should adapt to humans, not the other way around. We prioritize usability, accessibility, and intuitive design.
-                  </p>
-                </div>
-                {/* Principle 3 */}
-                <div>
-                  <div className="w-10 h-10 border border-white/10 rounded-sm flex items-center justify-center mb-6">
-                    <span className="text-[#e8a064] font-mono text-sm">03</span>
-                  </div>
-                  <h4 className="text-xl font-medium mb-3">Keep Systems Maintainable</h4>
-                  <p className="text-gray-400 font-light leading-relaxed">
-                    We architect clean, scalable codebases. A successful product is one that can evolve safely long after the initial launch.
-                  </p>
-                </div>
-                {/* Principle 4 */}
-                <div>
-                  <div className="w-10 h-10 border border-white/10 rounded-sm flex items-center justify-center mb-6">
-                    <span className="text-[#e8a064] font-mono text-sm">04</span>
-                  </div>
-                  <h4 className="text-xl font-medium mb-3">Measure Outcomes</h4>
-                  <p className="text-gray-400 font-light leading-relaxed">
-                    We rely on data and analytics to validate our decisions. Every deployment is an opportunity to learn and improve.
-                  </p>
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -323,21 +334,23 @@ export default async function AboutPage() {
             <div className="flex flex-col group">
               <div className="relative aspect-[4/5] w-full max-w-[280px] mb-8 overflow-hidden bg-[#111] border border-white/10 rounded-sm">
                 <Image
-                  src="/assets/images/team/vikas-kumar-founder.jpg"
-                  alt="Vikas Kumar, Founder of Axivon Technologies"
+                  src={content.founder?.image || "/assets/images/team/vikas-kumar-founder.jpg"}
+                  alt={`${content.founder?.name || "Vikas Kumar"}, ${content.founder?.role || "Founder"} of Axivon Technologies`}
                   fill
                   className="object-cover object-top"
                 />
               </div>
-              <h4 className="text-2xl font-medium text-white mb-1">Vikas Kumar</h4>
-              <p className="text-[#e8a064] text-sm font-semibold mb-4">Founder</p>
+              <h4 className="text-2xl font-medium text-white mb-1">{content.founder?.name || "Vikas Kumar"}</h4>
+              <p className="text-[#e8a064] text-sm font-semibold mb-4">{content.founder?.role || "Founder"}</p>
               <div className="text-gray-400 font-light leading-relaxed space-y-4 max-w-sm">
                 <p>
-                  <strong className="text-gray-300 font-medium">Focus:</strong> Strategic Direction, Software Architecture & AI Innovation
+                  <strong className="text-gray-300 font-medium">Focus:</strong> {content.founder?.bio || "Strategic Direction, Software Architecture & AI Innovation"}
                 </p>
-                <p className="italic text-gray-500 border-l-2 border-[#e8a064]/30 pl-4 py-1">
-                  "Building purposeful digital solutions that turn ambitious ideas into market leadership."
-                </p>
+                {content.founder?.quote && (
+                  <p className="italic text-gray-500 border-l-2 border-[#e8a064]/30 pl-4 py-1">
+                    "{content.founder.quote}"
+                  </p>
+                )}
               </div>
             </div>
 
@@ -379,27 +392,35 @@ export default async function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/5 border border-white/5">
-            <div className="bg-[#0e0e0e] p-8">
-              <span className="text-[#e8a064] font-mono text-xl mb-4 block">2026</span>
-              <h4 className="text-lg font-medium text-white mb-3">Company Founded</h4>
-              <p className="text-gray-500 text-sm font-light leading-relaxed">
-                Axivon Technologies launched with a mission to make modern, future-ready technology accessible to every business.
-              </p>
-            </div>
-            <div className="bg-[#0e0e0e] p-8">
-              <span className="text-[#e8a064] font-mono text-xl mb-4 block">2026</span>
-              <h4 className="text-lg font-medium text-white mb-3">First Client Project</h4>
-              <p className="text-gray-500 text-sm font-light leading-relaxed">
-                Successfully delivered our first major enterprise software project, establishing our reputation for quality.
-              </p>
-            </div>
-            <div className="bg-[#0e0e0e] p-8">
-              <span className="text-[#e8a064] font-mono text-xl mb-4 block">2026</span>
-              <h4 className="text-lg font-medium text-white mb-3">Website Launch</h4>
-              <p className="text-gray-500 text-sm font-light leading-relaxed">
-                Launched our official digital presence, reflecting our capabilities in web, mobile, and AI technologies.
-              </p>
-            </div>
+            {(content.milestones && content.milestones.length > 0
+              ? content.milestones
+              : [
+                  {
+                    year: "2026",
+                    title: "Company Founded",
+                    description:
+                      "Axivon Technologies launched with a mission to make modern, future-ready technology accessible to every business.",
+                  },
+                  {
+                    year: "2026",
+                    title: "First Client Project",
+                    description:
+                      "Successfully delivered our first major enterprise software project, establishing our reputation for quality.",
+                  },
+                  {
+                    year: "2026",
+                    title: "Website Launch",
+                    description:
+                      "Launched our official digital presence, reflecting our capabilities in web, mobile, and AI technologies.",
+                  },
+                ]
+            ).map((m, idx) => (
+              <div key={idx} className="bg-[#0e0e0e] p-8">
+                <span className="text-[#e8a064] font-mono text-xl mb-4 block">{m.year}</span>
+                <h4 className="text-lg font-medium text-white mb-3">{m.title}</h4>
+                <p className="text-gray-500 text-sm font-light leading-relaxed">{m.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

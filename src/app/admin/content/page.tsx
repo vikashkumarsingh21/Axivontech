@@ -33,6 +33,8 @@ interface ContentStatSummary {
   reviewsCount: number;
   mediaCount: number;
   demoProjectsCount: number;
+  postersCount: number;
+  mediaBytesFormatted: string;
 }
 
 export default function ContentManagementHubPage() {
@@ -45,34 +47,41 @@ export default function ContentManagementHubPage() {
     reviewsCount: 0,
     mediaCount: 4,
     demoProjectsCount: 47,
+    postersCount: 0,
+    mediaBytesFormatted: "0.0 MB",
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadStats() {
-      try {
-        const [srvRes, indRes, faqRes, artRes, medRes] = await Promise.allSettled([
-          fetch("/api/v1/admin/content/services").then((r) => r.json()),
-          fetch("/api/v1/admin/content/industries").then((r) => r.json()),
-          fetch("/api/v1/admin/content/faqs").then((r) => r.json()),
-          fetch("/api/v1/admin/content/blog").then((r) => r.json()),
-          fetch("/api/v1/admin/content/media").then((r) => r.json()),
-        ]);
-
-        setStats((prev) => ({
-          ...prev,
-          servicesCount: srvRes.status === "fulfilled" && srvRes.value?.stats?.total ? srvRes.value.stats.total : prev.servicesCount,
-          industriesCount: indRes.status === "fulfilled" && indRes.value?.stats?.total ? indRes.value.stats.total : prev.industriesCount,
-          faqsCount: faqRes.status === "fulfilled" && faqRes.value?.stats?.total ? faqRes.value.stats.total : prev.faqsCount,
-          articlesCount: artRes.status === "fulfilled" && artRes.value?.stats?.total ? artRes.value.stats.total : prev.articlesCount,
-          mediaCount: medRes.status === "fulfilled" && medRes.value?.stats?.total ? medRes.value.stats.total : prev.mediaCount,
-        }));
-      } catch {
-        // use defaults
-      } finally {
-        setLoading(false);
+  const loadStats = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/v1/admin/content/summary");
+      if (res.ok) {
+        const data = await res.json();
+        const s = data.summary;
+        if (s) {
+          setStats({
+            homepageStatus: s.settings?.homepage ? "CUSTOMIZED" : "DEFAULT",
+            servicesCount: s.services?.total ?? 10,
+            industriesCount: s.industries?.total ?? 8,
+            faqsCount: s.faqs?.total ?? 8,
+            articlesCount: s.articles?.total ?? 3,
+            reviewsCount: 0,
+            mediaCount: s.media?.count ?? 0,
+            demoProjectsCount: s.portfolio?.total ?? 47,
+            postersCount: s.posters?.total ?? 0,
+            mediaBytesFormatted: `${s.media?.totalMb || "0.0"} MB`,
+          });
+        }
       }
+    } catch {
+      // safe fallback
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadStats();
   }, []);
 

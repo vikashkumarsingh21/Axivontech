@@ -192,9 +192,12 @@ export function calculateComparison(
     if (current === 0) {
       percentage = 0;
       direction = "FLAT";
-    } else {
+    } else if (current > 0) {
       percentage = null; // Cannot calculate percentage on 0 denominator
       direction = "UP";
+    } else {
+      percentage = null;
+      direction = "DOWN";
     }
   } else {
     percentage = Math.round(((current - previous) / Math.abs(previous)) * 100 * 10) / 10;

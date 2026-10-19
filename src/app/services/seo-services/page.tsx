@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-
+import { notFound } from "next/navigation";
 import { getServiceBySlug } from "@/data/services";
+import { getPublishedServiceBySlug } from "@/lib/content/content-db";
 
 import ServiceHero from "@/components/service-pages/ServiceHero";
 import ServiceBenefits from "@/components/service-pages/ServiceBenefits";
@@ -11,58 +12,61 @@ import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
-const service = getServiceBySlug("seo-services");
+const SLUG = "seo-services";
 
-if (!service) {
-  throw new Error("SEO Services not found");
+export async function generateMetadata(): Promise<Metadata> {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) return {};
+
+  return {
+    title: service.metaTitle,
+    description: service.metaDescription,
+    keywords: [
+      "SEO Services",
+      "Search Engine Optimization",
+      "Technical SEO",
+      "On Page SEO",
+      "Off Page SEO",
+      "Local SEO",
+      "Google Ranking",
+      "Website SEO",
+      "SEO Agency India",
+      "SEO Company Bihar",
+      "Digital Marketing Services",
+      "Axivon Technologies",
+    ],
+    openGraph: {
+      title: service.metaTitle,
+      description: service.metaDescription,
+      type: "website",
+      siteName: "Axivon Technologies",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: service.metaTitle,
+      description: service.metaDescription,
+    },
+    alternates: {
+      canonical: `https://axivontech.in/services/${SLUG}`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
 }
 
-export const metadata: Metadata = {
-  title: service.metaTitle,
-  description: service.metaDescription,
+export default async function SEOServicesPage() {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) notFound();
 
-  keywords: [
-    "SEO Services",
-    "Search Engine Optimization",
-    "Technical SEO",
-    "On Page SEO",
-    "Off Page SEO",
-    "Local SEO",
-    "Google Ranking",
-    "Website SEO",
-    "SEO Agency India",
-    "SEO Company Bihar",
-    "Digital Marketing Services",
-    "Axivon Technologies",
-  ],
-
-  openGraph: {
-    title: service.metaTitle,
-    description: service.metaDescription,
-    type: "website",
-    siteName: "Axivon Technologies",
-  },
-
-  twitter: {
-    card: "summary_large_image",
-    title: service.metaTitle,
-    description: service.metaDescription,
-  },
-
-  alternates: {
-    canonical: "https://axivontech.in/services/seo-services",
-  },
-};
-
-export default function SEOServicesPage() {
   return (
     <main className="overflow-hidden bg-[#0f0f0f]">
       <ServiceSchema
         name={service.title}
         description={service.metaDescription}
-        url="https://axivontech.in/services/seo-services"
+        url={`https://axivontech.in/services/${SLUG}`}
       />
-
 
       <BreadcrumbSchema
         items={[
@@ -75,8 +79,8 @@ export default function SEOServicesPage() {
             url: "https://axivontech.in/services",
           },
           {
-            name: "SEO Services",
-            url: "https://axivontech.in/services/seo-services",
+            name: service.title,
+            url: `https://axivontech.in/services/${SLUG}`,
           },
         ]}
       />

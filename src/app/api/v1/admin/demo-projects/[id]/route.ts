@@ -75,40 +75,77 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       image,
     } = body;
 
-    // Check if record exists in database
+    let savedProject;
     try {
       const existing = await db.portfolioProject.findFirst({
         where: { OR: [{ id }, { slug: id }] },
       });
 
       if (existing) {
-        const updated = await db.portfolioProject.update({
+        savedProject = await db.portfolioProject.update({
           where: { id: existing.id },
           data: {
             ...(name && { title: name.trim() }),
             ...(shortDescription && { shortDescription: shortDescription.trim() }),
             ...(category && { category: category.trim(), industry: category.trim() }),
-            ...(status && { status: status === "Live Demo" ? "PUBLISHED" : "COMING_SOON" }),
+            ...(status && { status: status === "Live Demo" || status === "PUBLISHED" ? "PUBLISHED" : "COMING_SOON" }),
             ...(isFeatured !== undefined && { featured: Boolean(isFeatured) }),
             ...(displayOrder !== undefined && { displayOrder: Number(displayOrder) }),
             ...(problemStatement && { problem: problemStatement.trim() }),
-            ...(solutionOverview && { solution: solutionOverview.trim() }),
+            ...(solutionOverview && { solution: solutionOverview.trim(), fullDescription: solutionOverview.trim() }),
             ...(features && { features }),
             ...(techStack && { technologies: techStack }),
             ...(image && { heroImage: image, thumbnail: image }),
           },
         });
+      } else {
+        const staticProj = getDemoProjectBySlug(id);
+        const resolvedSlug = staticProj ? getDemoProjectSlug(staticProj) : id.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
-        return NextResponse.json({
-          success: true,
-          project: {
-            ...updated,
-            name: updated.title,
+        savedProject = await db.portfolioProject.create({
+          data: {
+            slug: resolvedSlug,
+            title: name?.trim() || staticProj?.name || id,
+            category: category?.trim() || staticProj?.category || "Business",
+            industry: category?.trim() || staticProj?.category || "Business",
+            shortDescription: shortDescription?.trim() || staticProj?.shortDescription || "",
+            fullDescription: solutionOverview?.trim() || staticProj?.solutionOverview || "",
+            problem: problemStatement?.trim() || staticProj?.problemStatement || "",
+            solution: solutionOverview?.trim() || staticProj?.solutionOverview || "",
+            features: features || staticProj?.features || [],
+            technologies: techStack || staticProj?.techStack || ["Next.js", "TypeScript"],
+            liveUrl: staticProj?.demoUrl || null,
+            thumbnail: image || (staticProj ? getDemoProjectImage(staticProj) : "/assets/images/services/web-development.jpg"),
+            heroImage: image || (staticProj ? getDemoProjectImage(staticProj) : "/assets/images/services/web-development.jpg"),
+            gallery: image ? [image] : [],
+            status: status === "Live Demo" || status === "PUBLISHED" ? "PUBLISHED" : "COMING_SOON",
+            featured: isFeatured !== undefined ? Boolean(isFeatured) : Boolean(staticProj?.isFeatured),
+            displayOrder: displayOrder !== undefined ? Number(displayOrder) : (staticProj?.displayOrder || 0),
+            createdById: userId,
+            publishedAt: status === "Live Demo" || status === "PUBLISHED" ? new Date() : null,
           },
         });
       }
+
+      try {
+        const { revalidatePath } = await import("next/cache");
+        revalidatePath("/portfolio");
+        revalidatePath("/demo-projects");
+        revalidatePath(`/portfolio/${savedProject.slug}`);
+        revalidatePath(`/demo-projects/${savedProject.slug}`);
+      } catch {
+        // safe
+      }
+
+      return NextResponse.json({
+        success: true,
+        project: {
+          ...savedProject,
+          name: savedProject.title,
+        },
+      });
     } catch {
-      // Database unavailable or project is from static catalogue
+      // Fallback
     }
 
     // Static project overlay response
@@ -155,6 +192,14 @@ export async function DELETE(req: NextRequest, { params }: Params) {
           where: { id: existing.id },
           data: { status: "ARCHIVED", archivedAt: new Date() },
         });
+
+        try {
+          const { revalidatePath } = await import("next/cache");
+          revalidatePath("/portfolio");
+          revalidatePath("/demo-projects");
+        } catch {
+          // safe
+        }
 
         return NextResponse.json({ success: true, message: "Project archived successfully." });
       }

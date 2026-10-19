@@ -26,7 +26,11 @@ export const metadata: Metadata = createPageMetadata({
   ],
 });
 
-export default function ContactPage() {
+import { getPublishedFaqs } from "@/lib/content/content-db";
+
+export default async function ContactPage() {
+  const faqs = await getPublishedFaqs("ALL", "CONTACT");
+
   return (
     <main className="bg-[#0f0f0f]">
       <BreadcrumbSchema
@@ -54,7 +58,7 @@ export default function ContactPage() {
       <ContactPresence />
       
       {/* Section 07 */}
-      <ContactFAQ />
+      <ContactFAQ faqs={faqs} />
       
       {/* Section 08 */}
       <ContactCTA />

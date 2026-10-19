@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ExecutiveSidebar } from "./ExecutiveSidebar";
 import { PortalHeader } from "./PortalHeader";
+import { PortalAIAssistant } from "@/components/portal-ai/PortalAIAssistant";
 
 interface ExecutivePortalClientProps {
   userName: string;
@@ -64,6 +65,7 @@ export function ExecutivePortalClient({
           </div>
         </main>
       </div>
+      <PortalAIAssistant portalRole={userRole} />
     </div>
   );
 }

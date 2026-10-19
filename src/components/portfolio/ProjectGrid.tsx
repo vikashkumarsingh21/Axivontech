@@ -9,11 +9,16 @@ import { PortfolioProject } from '@/data/portfolio/types';
 import ImagePlaceholder from '@/components/ui/ImagePlaceholder';
 import ProjectFilters from './ProjectFilters';
 
-export default function ProjectGrid() {
+interface ProjectGridProps {
+  projects?: PortfolioProject[];
+}
+
+export default function ProjectGrid({ projects }: ProjectGridProps = {}) {
   const [activeCategory, setActiveCategory] = useState('All');
   const shouldReduceMotion = useReducedMotion();
 
-  const filteredProjects = portfolioProjects.filter((project: PortfolioProject) => 
+  const source = projects && projects.length > 0 ? projects : portfolioProjects;
+  const filteredProjects = source.filter((project: PortfolioProject) => 
     activeCategory === 'All' ? true : project.category === activeCategory
   );
 

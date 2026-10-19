@@ -18,6 +18,7 @@ import {
   FileImage,
   Shield,
   Edit,
+  Upload,
 } from "lucide-react";
 
 interface MediaAssetItem {
@@ -46,6 +47,8 @@ export default function MediaLibraryPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [editingAsset, setEditingAsset] = useState<MediaAssetItem | null>(null);
+  const [uploadMode, setUploadMode] = useState<"file" | "url">("file");
+  const [uploading, setUploading] = useState(false);
   const [uploadForm, setUploadForm] = useState({
     filename: "",
     url: "",
@@ -120,6 +123,36 @@ export default function MediaLibraryPage() {
       alert(err.message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", uploadForm.folder || "general");
+      formData.append("altText", uploadForm.altText || "");
+      formData.append("caption", uploadForm.caption || "");
+
+      const res = await fetch("/api/v1/admin/content/media/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error || "Failed to upload file");
+      }
+
+      setShowUploadModal(false);
+      fetchAssets();
+    } catch (err: any) {
+      alert(err.message || "Failed to upload file");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -317,51 +350,109 @@ export default function MediaLibraryPage() {
             >
               <div className="bg-[#111111] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
-                  <h2 className="text-sm font-semibold text-white">Register / Upload Media Asset</h2>
+                  <h2 className="text-sm font-semibold text-white">Upload / Register Media Asset</h2>
                   <button onClick={() => setShowUploadModal(false)} className="text-gray-500 hover:text-white">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                <div className="p-6 space-y-4">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-1.5">Asset Filename *</label>
-                    <input
-                      type="text"
-                      value={uploadForm.filename}
-                      onChange={(e) => setUploadForm({ ...uploadForm, filename: e.target.value })}
-                      placeholder="e.g. client-project-hero.jpg"
-                      className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-lg text-xs text-white focus:outline-none focus:border-red-500/40"
-                    />
+                <div className="px-6 pt-4">
+                  <div className="flex items-center gap-2 p-1 bg-white/[0.04] border border-white/[0.06] rounded-lg">
+                    <button
+                      type="button"
+                      onClick={() => setUploadMode("file")}
+                      className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
+                        uploadMode === "file"
+                          ? "bg-red-600 text-white shadow-xs"
+                          : "text-gray-400 hover:text-white"
+                      }`}
+                    >
+                      Direct File Upload
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUploadMode("url")}
+                      className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
+                        uploadMode === "url"
+                          ? "bg-red-600 text-white shadow-xs"
+                          : "text-gray-400 hover:text-white"
+                      }`}
+                    >
+                      URL / External Path
+                    </button>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-gray-400 mb-1.5">Public Asset URL or Path *</label>
-                    <input
-                      type="text"
-                      value={uploadForm.url}
-                      onChange={(e) => setUploadForm({ ...uploadForm, url: e.target.value })}
-                      placeholder="e.g. /assets/images/... or https://..."
-                      className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-lg text-xs text-white focus:outline-none focus:border-red-500/40 font-mono"
-                    />
-                  </div>
+                <div className="p-6 space-y-4">
+                  {uploadMode === "file" ? (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-2">Select Image File</label>
+                      <div className="border-2 border-dashed border-white/10 hover:border-red-500/40 rounded-xl p-8 text-center transition-colors bg-white/[0.01]">
+                        <input
+                          type="file"
+                          id="media-file-input"
+                          className="hidden"
+                          accept="image/jpeg,image/png,image/webp,image/svg+xml,image/gif,application/pdf"
+                          onChange={handleFileUpload}
+                          disabled={uploading}
+                        />
+                        <label htmlFor="media-file-input" className="cursor-pointer flex flex-col items-center">
+                          {uploading ? (
+                            <Loader2 className="w-8 h-8 text-red-500 animate-spin mb-3" />
+                          ) : (
+                            <Upload className="w-8 h-8 text-gray-500 hover:text-red-400 mb-3 transition-colors" />
+                          )}
+                          <span className="text-sm font-semibold text-white">
+                            {uploading ? "Uploading media file..." : "Click or drag image file here"}
+                          </span>
+                          <span className="text-xs text-gray-500 mt-1">JPEG, PNG, WebP, SVG, GIF up to 10MB</span>
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1.5">Asset Filename *</label>
+                        <input
+                          type="text"
+                          value={uploadForm.filename}
+                          onChange={(e) => setUploadForm({ ...uploadForm, filename: e.target.value })}
+                          placeholder="e.g. client-project-hero.jpg"
+                          className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-lg text-xs text-white focus:outline-none focus:border-red-500/40"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1.5">Public Asset URL or Path *</label>
+                        <input
+                          type="text"
+                          value={uploadForm.url}
+                          onChange={(e) => setUploadForm({ ...uploadForm, url: e.target.value })}
+                          placeholder="e.g. /assets/images/... or https://..."
+                          className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-lg text-xs text-white focus:outline-none focus:border-red-500/40 font-mono"
+                        />
+                      </div>
+                    </>
+                  )}
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1.5">File Format</label>
-                      <select
-                        value={uploadForm.fileType}
-                        onChange={(e) => setUploadForm({ ...uploadForm, fileType: e.target.value })}
-                        className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-lg text-xs text-gray-300 focus:outline-none"
-                      >
-                        <option value="image/jpeg">JPEG (.jpg, .jpeg)</option>
-                        <option value="image/png">PNG (.png)</option>
-                        <option value="image/webp">WebP (.webp)</option>
-                        <option value="image/svg+xml">SVG (.svg)</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-400 mb-1.5">Category Folder</label>
+                    {uploadMode === "url" && (
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1.5">File Format</label>
+                        <select
+                          value={uploadForm.fileType}
+                          onChange={(e) => setUploadForm({ ...uploadForm, fileType: e.target.value })}
+                          className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-lg text-xs text-gray-300 focus:outline-none"
+                        >
+                          <option value="image/jpeg">JPEG (.jpg, .jpeg)</option>
+                          <option value="image/png">PNG (.png)</option>
+                          <option value="image/webp">WebP (.webp)</option>
+                          <option value="image/svg+xml">SVG (.svg)</option>
+                        </select>
+                      </div>
+                    )}
+                    <div className={uploadMode === "file" ? "col-span-2" : ""}>
+                      <label className="block text-xs font-medium text-gray-400 mb-1.5">Target Category Folder</label>
                       <select
                         value={uploadForm.folder}
                         onChange={(e) => setUploadForm({ ...uploadForm, folder: e.target.value })}
@@ -395,14 +486,16 @@ export default function MediaLibraryPage() {
                   >
                     Cancel
                   </button>
-                  <button
-                    onClick={handleRegisterAsset}
-                    disabled={saving}
-                    className="flex items-center gap-1.5 h-9 px-4 bg-red-600 hover:bg-red-500 text-xs font-semibold text-white rounded-lg transition-colors"
-                  >
-                    {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                    <span>Register Asset</span>
-                  </button>
+                  {uploadMode === "url" && (
+                    <button
+                      onClick={handleRegisterAsset}
+                      disabled={saving}
+                      className="flex items-center gap-1.5 h-9 px-4 bg-red-600 hover:bg-red-500 text-xs font-semibold text-white rounded-lg transition-colors"
+                    >
+                      {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                      <span>Register Asset</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>

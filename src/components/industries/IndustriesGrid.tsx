@@ -16,7 +16,27 @@ import {
   Lightbulb,
 } from "lucide-react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, type LucideIcon } from "lucide-react";
+import type { IndustryItem } from "@/lib/content/content-db";
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  School,
+  GraduationCap,
+  Landmark,
+  Hospital,
+  HeartPulse,
+  Hotel,
+  UtensilsCrossed,
+  BookOpenCheck,
+  Store,
+  ShoppingBag,
+  Building2,
+  Lightbulb,
+};
+
+interface IndustriesGridProps {
+  industries?: IndustryItem[];
+}
 
 const INDUSTRIES = [
   {
@@ -77,12 +97,23 @@ const INDUSTRIES = [
   }
 ];
 
-export default function IndustriesGrid() {
+export default function IndustriesGrid({ industries }: IndustriesGridProps = {}) {
+  const displayIndustries =
+    industries && industries.length > 0
+      ? industries.map((ind) => ({
+          icon: ICON_MAP[ind.icon] || Building2,
+          title: ind.title,
+          desc: ind.description,
+          tags: ind.tags && ind.tags.length > 0 ? ind.tags : ["Engineering", "Cloud", "Solutions"],
+          slug: ind.slug,
+        }))
+      : INDUSTRIES;
+
   return (
     <section id="industries" className="py-24 bg-[#0a0a0c] relative">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {INDUSTRIES.map((ind, i) => (
+          {displayIndustries.map((ind, i) => (
             <motion.div
               key={ind.title}
               initial={{ opacity: 0, y: 20 }}

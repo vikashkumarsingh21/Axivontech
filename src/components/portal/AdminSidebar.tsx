@@ -13,7 +13,7 @@ import {
   ChevronRight, Building, UserCheck, ShieldCheck,
   CreditCard, UserPlus, Image as ImageIcon, LayoutTemplate,
   GraduationCap, X, Sparkles, Home, Layers, Building2, Info,
-  HelpCircle, BookOpen, Globe, Sliders, BarChart3, LineChart, FileSpreadsheet
+  HelpCircle, BookOpen, Globe, Sliders, BarChart3, LineChart, FileSpreadsheet, Bot, Zap
 } from "lucide-react";
 
 type NavItem = {
@@ -145,6 +145,8 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
         { name: "Announcements", href: "/admin/announcements", icon: Megaphone },
         { name: "Notifications", href: "/admin/notifications", icon: Bell },
         { name: "Documents Repository", href: "/admin/documents", icon: FolderOpen },
+        { name: "Automation Center", href: "/admin/automations", icon: Zap, isHighlight: true },
+        { name: "AI Assistant & Knowledge", href: "/admin/ai/knowledge", icon: Bot, isHighlight: true },
         { name: "Audit & Activity Logs", href: "/admin/activity", icon: Activity },
         { name: "Payment Settings", href: "/admin/settings/payment", icon: CreditCard },
         { name: "General Settings", href: "/admin/settings", icon: Settings },

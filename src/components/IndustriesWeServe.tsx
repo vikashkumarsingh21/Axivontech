@@ -20,11 +20,31 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { SectionHeader } from "@/components/ui";
+import type { IndustryItem } from "@/lib/content/content-db";
 
 interface Industry {
   icon: LucideIcon;
   label: string;
   description: string;
+}
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  School,
+  GraduationCap,
+  Landmark,
+  Hospital,
+  HeartPulse,
+  Hotel,
+  UtensilsCrossed,
+  BookOpenCheck,
+  Store,
+  ShoppingBag,
+  Building2,
+  Lightbulb,
+};
+
+interface IndustriesWeServeProps {
+  industries?: IndustryItem[];
 }
 
 const INDUSTRIES: Industry[] = [
@@ -66,8 +86,17 @@ const imageVariants: Variants = {
   visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" as any } },
 };
 
-export default function IndustriesWeServe() {
+export default function IndustriesWeServe({ industries }: IndustriesWeServeProps = {}) {
   const shouldReduceMotion = useReducedMotion();
+
+  const displayIndustries: Industry[] =
+    industries && industries.length > 0
+      ? industries.map((ind) => ({
+          icon: ICON_MAP[ind.icon] || Building2,
+          label: ind.title,
+          description: ind.description,
+        }))
+      : INDUSTRIES;
 
   return (
     <section className="bg-[#0f0f0f] py-14 sm:py-20 lg:py-28 relative">
@@ -108,7 +137,7 @@ export default function IndustriesWeServe() {
               variants={gridVariants}
               className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3"
             >
-              {INDUSTRIES.map((industry) => {
+              {displayIndustries.map((industry) => {
                 const Icon = industry.icon;
                 return (
                   <motion.div

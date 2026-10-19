@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-
+import { notFound } from "next/navigation";
 import { getServiceBySlug } from "@/data/services";
+import { getPublishedServiceBySlug } from "@/lib/content/content-db";
 
 import ServiceHero from "@/components/service-pages/ServiceHero";
 import ServiceBenefits from "@/components/service-pages/ServiceBenefits";
@@ -11,15 +12,15 @@ import CTA from "@/components/CTA";
 import ServiceSchema from "@/components/seo/ServiceSchema";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
-const service = getServiceBySlug("ui-ux-design");
+const SLUG = "ui-ux-design";
 
-if (!service) {
-  throw new Error("UI/UX Design service not found");
-}
+export async function generateMetadata(): Promise<Metadata> {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) return {};
 
-export const metadata: Metadata = {
-  title: service.metaTitle,
-  description: service.metaDescription,
+  return {
+    title: service.metaTitle,
+    description: service.metaDescription,
 
   keywords: [
     "UI UX Design",
@@ -55,27 +56,30 @@ export const metadata: Metadata = {
     canonical: "https://axivontech.in/services/ui-ux-design",
   },
 
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+    robots: {
       index: true,
       follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
     },
-  },
-};
+  };
+}
 
-export default function UIUXDesignPage() {
+export default async function UIUXDesignPage() {
+  const service = (await getPublishedServiceBySlug(SLUG)) || getServiceBySlug(SLUG);
+  if (!service) notFound();
+
   return (
     <main className="overflow-hidden bg-[#0f0f0f]">
-
       <ServiceSchema
         name={service.title}
         description={service.metaDescription}
-        url="https://axivontech.in/services/ui-ux-design"
+        url={`https://axivontech.in/services/${SLUG}`}
       />
 
       <BreadcrumbSchema
@@ -89,8 +93,8 @@ export default function UIUXDesignPage() {
             url: "https://axivontech.in/services",
           },
           {
-            name: "ui-ux-design",
-            url: "https://axivontech.in/services/ui-ux-design",
+            name: service.title,
+            url: `https://axivontech.in/services/${SLUG}`,
           },
         ]}
       />
