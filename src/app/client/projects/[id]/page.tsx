@@ -458,6 +458,50 @@ export default function ClientProjectWorkspacePage({
       {/* Tab 2: Deliverables & UAT */}
       {activeTab === "deliverables" && (
         <div className="space-y-6">
+          {/* Official Delivery & Verification Report Banner */}
+          {project.documents.some((d) => d.category === "CLIENT_REPORT") && (
+            <div className="bg-gradient-to-r from-emerald-950/40 via-[#101318] to-emerald-950/20 border border-emerald-500/30 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      Official Certification
+                    </span>
+                    <span className="text-xs text-gray-400 font-mono">
+                      {project.projectCode}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-white mt-1">
+                    Verified Project Delivery & Verification Report
+                  </h3>
+                  <p className="text-xs text-[#7E8997] mt-0.5">
+                    Truth-grounded completion report certifying milestone deliverables, QA validation, and formal handover executed by Axivon Technologies.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {project.documents
+                  .filter((d) => d.category === "CLIENT_REPORT")
+                  .map((rep) => (
+                    <Link
+                      key={rep.id}
+                      href={`/api/v1/client/projects/${project.id}/documents/${rep.id}/download`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button variant="primary" size="sm" className="whitespace-nowrap">
+                        <Download className="w-3.5 h-3.5 mr-1.5" />
+                        <span>Download Official Report</span>
+                      </Button>
+                    </Link>
+                  ))}
+              </div>
+            </div>
+          )}
+
           {/* UAT Status Alert */}
           <div className="bg-[#151A21] border border-[#29313B] rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>

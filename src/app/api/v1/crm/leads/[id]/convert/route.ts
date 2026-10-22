@@ -88,46 +88,46 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
       }
 
       let partnerProject = null;
+      let brokerProfile = null;
       
-      // Phase 5: Create Confirmed Project onboarding record if lead is from a Partner
+      // Look up broker attribution if lead was submitted by a Partner
       if (lead.source === "PARTNER" && lead.ownerId) {
-        const brokerProfile = await tx.brokerProfile.findUnique({
+        brokerProfile = await tx.brokerProfile.findUnique({
           where: { userId: lead.ownerId },
         });
-
-        if (brokerProfile) {
-          const todayStr = new Date().toISOString().replace(/-/g, "").slice(0, 8);
-          const projectCount = await tx.partnerProject.count();
-          const projectCode = `PRJ-${todayStr}-${String(projectCount + 1).padStart(4, "0")}`;
-
-          partnerProject = await tx.partnerProject.create({
-            data: {
-              projectCode,
-              brokerProfileId: brokerProfile.id,
-              clientName: lead.name,
-              clientEmail: lead.email,
-              clientPhone: lead.phone || "",
-              clientWhatsapp: lead.whatsapp,
-              clientDesignation: lead.designation,
-              companyName: lead.companyName || lead.name,
-              industry: lead.industry || "Other",
-              city: lead.city || "",
-              state: lead.state || "",
-              country: lead.country || "",
-              website: lead.website,
-              companySize: lead.companySize,
-              projectName: opportunityName || `${lead.companyName || lead.name} — Project`,
-              requiredService: lead.serviceInterest || "General Services",
-              detailedRequirement: lead.message || "Details to be gathered during onboarding",
-              expectedTimeline: lead.timeline || "TBD",
-              projectBudget: lead.budget ? String(lead.budget) : "TBD",
-              status: "PROJECT_REQUESTED", // Starting status for Partner Project lifecycle
-              leadId: lead.id,
-              opportunityId: opportunity?.id,
-            },
-          });
-        }
       }
+
+      // Create Project onboarding record for both Partner and Direct clients
+      const todayStr = new Date().toISOString().replace(/-/g, "").slice(0, 8);
+      const projectCount = await tx.partnerProject.count();
+      const projectCode = `PRJ-${todayStr}-${String(projectCount + 1).padStart(4, "0")}`;
+
+      partnerProject = await tx.partnerProject.create({
+        data: {
+          projectCode,
+          brokerProfileId: brokerProfile ? brokerProfile.id : null,
+          clientName: lead.name,
+          clientEmail: lead.email,
+          clientPhone: lead.phone || "",
+          clientWhatsapp: lead.whatsapp,
+          clientDesignation: lead.designation,
+          companyName: lead.companyName || lead.name,
+          industry: lead.industry || "Other",
+          city: lead.city || "",
+          state: lead.state || "",
+          country: lead.country || "",
+          website: lead.website,
+          companySize: lead.companySize,
+          projectName: opportunityName || `${lead.companyName || lead.name} — Project`,
+          requiredService: lead.serviceInterest || "General Services",
+          detailedRequirement: lead.message || "Details to be gathered during onboarding",
+          expectedTimeline: lead.timeline || "TBD",
+          projectBudget: lead.budget ? String(lead.budget) : "TBD",
+          status: "PROJECT_REQUESTED", // Starting status for Project lifecycle
+          leadId: lead.id,
+          opportunityId: opportunity?.id,
+        },
+      });
 
       // Update Lead status to CONVERTED and preserve attribution
       const updatedLead = await tx.lead.update({
@@ -171,17 +171,29 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
         },
       });
       
-      // Notify Partner if applicable
-      if (partnerProject && lead.ownerId) {
-         await tx.notification.create({
-           data: {
-             userId: lead.ownerId,
-             type: "SYSTEM",
-             title: "Lead Converted to Project",
-             message: `Your lead ${lead.name} has been successfully qualified and converted to Project ${partnerProject.projectCode}.`,
-             link: `/broker/projects/${partnerProject.id}`,
-           }
-         });
+      // Notify Partner or Admin
+      if (partnerProject) {
+        if (brokerProfile && lead.ownerId) {
+          await tx.notification.create({
+            data: {
+              userId: lead.ownerId,
+              type: "SYSTEM",
+              title: "Lead Converted to Project",
+              message: `Your lead ${lead.name} has been successfully qualified and converted to Project ${partnerProject.projectCode}.`,
+              link: `/broker/projects/${partnerProject.id}`,
+            }
+          });
+        } else {
+          await tx.notification.create({
+            data: {
+              userId: actor.id,
+              type: "SYSTEM",
+              title: "Direct Client Project Initialized",
+              message: `Direct lead ${lead.name} has been converted to Project ${partnerProject.projectCode}. Direct contracts, pricing, and milestones are ready to be configured.`,
+              link: `/admin/crm/partner-projects`,
+            }
+          });
+        }
       }
 
       return { lead: updatedLead, client, opportunity, partnerProject };

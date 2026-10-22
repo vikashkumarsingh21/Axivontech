@@ -68,16 +68,18 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
         }
       });
       
-      // 4. Notify Partner
-      await tx.notification.create({
-        data: {
-          userId: project.brokerProfile.userId,
-          type: "SYSTEM",
-          title: "Project Pricing Finalized",
-          message: `The final pricing and advance amount for ${project.projectCode} has been calculated.`,
-          link: `/broker/projects/${project.id}`,
-        }
-      });
+      // 4. Notify Partner if broker-referred
+      if (project.brokerProfile?.userId) {
+        await tx.notification.create({
+          data: {
+            userId: project.brokerProfile.userId,
+            type: "SYSTEM",
+            title: "Project Pricing Finalized",
+            message: `The final pricing and advance amount for ${project.projectCode} has been calculated.`,
+            link: `/broker/projects/${project.id}`,
+          }
+        });
+      }
 
       return { project: updatedProject };
     });

@@ -34,6 +34,29 @@ function formatTime(dt: string | null) {
   return new Date(dt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
 }
 
+function formatDateStr(dateVal: string | Date | null | undefined): string {
+  if (!dateVal) return "—";
+  if (typeof dateVal === "string") {
+    const match = dateVal.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      const [year, month, day] = match[0].split("-").map(Number);
+      const d = new Date(year, month - 1, day);
+      return d.toLocaleDateString("en-IN", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+  }
+  return new Date(dateVal).toLocaleDateString("en-IN", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export default function AttendancePage() {
   const [today, setToday] = useState<any>(null);
   const [policy, setPolicy] = useState<any>(null);
@@ -56,18 +79,25 @@ export default function AttendancePage() {
 
   const loadData = () => {
     setLoading(true);
+    setError("");
     fetch("/api/v1/employee/attendance")
-      .then((res) => res.json())
+      .then(async (res) => {
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+          throw new Error(data?.error || `Server error (${res.status})`);
+        }
+        return data;
+      })
       .then((data) => {
-        if (data.success) {
+        if (data?.success) {
           setToday(data.today);
           setPolicy(data.policy);
           setRecords(data.records || []);
         } else {
-          setError(data.error || "Failed to load attendance");
+          setError(data?.error || "Failed to load attendance");
         }
       })
-      .catch(() => setError("Failed to load attendance"))
+      .catch((err: any) => setError(err.message || "Failed to load attendance"))
       .finally(() => setLoading(false));
   };
 
@@ -175,8 +205,10 @@ export default function AttendancePage() {
     );
   }
 
-  const reqMins = today?.requiredMinutes || 480;
-  const netMins = today?.netMinutes || 0;
+  const reqMins = today?.requiredMinutes ?? 480;
+  const netMins = today?.netMinutes ?? today?.workedMinutes ?? 0;
+  const remainingMinutes = Math.max(0, reqMins - netMins);
+  const isTargetMet = netMins >= reqMins && reqMins > 0;
   const progressPercent = Math.min(100, Math.round((netMins / reqMins) * 100));
 
   return (
@@ -217,7 +249,7 @@ export default function AttendancePage() {
                 Daily Work Window
               </span>
               <span className="px-2 py-0.5 rounded text-[10px] bg-[#1B222B] text-[#F3F5F7] font-mono border border-[#29313B]">
-                {policy?.workWindowStart || "06:00 AM"} &rarr; {policy?.workWindowEnd || "11:00 PM"}
+                {policy?.workWindowStart || "06:00 AM"} → {policy?.workWindowEnd || "11:00 PM"}
               </span>
             </div>
             <p className="text-xs text-[#A7B0BC] mt-0.5">
@@ -229,16 +261,24 @@ export default function AttendancePage() {
         <div className="flex items-center gap-2 text-xs text-[#7E8997]">
           <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>
-            Grace: <strong>{policy?.graceMinutes || 15}m</strong> &bull; Cutoff:{" "}
+            Grace: <strong>{policy?.graceMinutes || 15}m</strong> • Cutoff:{" "}
             <strong>{policy?.cutoffTime || "11:00 PM"}</strong>
           </span>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl flex items-center gap-3 text-sm">
-          <AlertCircle className="w-5 h-5 shrink-0" />
-          <span>{error}</span>
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl flex items-center justify-between gap-3 text-sm">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <span>{error}</span>
+          </div>
+          <button
+            onClick={loadData}
+            className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 text-xs font-semibold transition-colors shrink-0"
+          >
+            Retry
+          </button>
         </div>
       )}
 
@@ -406,10 +446,10 @@ export default function AttendancePage() {
             </span>
             <div
               className={`text-xl font-bold font-mono ${
-                today?.remainingMinutes > 0 ? "text-[#FBBF24]" : "text-emerald-400"
+                isTargetMet ? "text-emerald-400" : "text-[#FBBF24]"
               }`}
             >
-              {today?.remainingMinutes > 0 ? formatMinutes(today.remainingMinutes) : "0h 0m (Met)"}
+              {isTargetMet ? "0h 0m (Met)" : formatMinutes(remainingMinutes)}
             </div>
             <p className="text-[10px] text-[#566171]">Target balance</p>
           </div>
@@ -419,7 +459,15 @@ export default function AttendancePage() {
               Check In / Out
             </span>
             <div className="text-sm font-semibold text-[#F3F5F7] mt-1 font-mono">
-              {formatTime(today?.checkInAt)} &rarr; {formatTime(today?.checkOutAt)}
+              {today?.checkInAt ? formatTime(today.checkInAt) : "—"}{" "}
+              <span className="text-[#566171]">→</span>{" "}
+              {today?.checkOutAt ? (
+                formatTime(today.checkOutAt)
+              ) : today?.checkInAt ? (
+                <span className="text-emerald-400">Active</span>
+              ) : (
+                "—"
+              )}
             </div>
             <p className="text-[10px] text-[#566171]">
               {today?.isLate ? (
@@ -444,7 +492,7 @@ export default function AttendancePage() {
 
         {records.length === 0 ? (
           <div className="text-sm text-[#7E8997] py-8 text-center border border-dashed border-[#29313B] rounded-xl">
-            No attendance records found for this period.
+            {error ? "Unable to load attendance records due to server error." : "No attendance records found for this period."}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -466,12 +514,7 @@ export default function AttendancePage() {
                 {records.map((r: any) => (
                   <tr key={r.id} className="hover:bg-[#1B222B]/60 transition-colors">
                     <td className="py-3.5 px-4 font-semibold text-[#F3F5F7]">
-                      {new Date(r.date).toLocaleDateString("en-IN", {
-                        weekday: "short",
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
+                      {formatDateStr(r.date)}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-xs">
                       {r.checkInAt ? formatTime(r.checkInAt) : "—"}

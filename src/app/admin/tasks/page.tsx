@@ -86,7 +86,7 @@ export default function AdminTasksPage() {
   const loadDependencies = async () => {
     try {
       const [empRes, projRes] = await Promise.all([
-        fetch("/api/v1/admin/employees?limit=100"),
+        fetch("/api/v1/admin/employees?limit=100&includeAdmins=true"),
         fetch("/api/v1/admin/projects"),
       ]);
       if (empRes.ok) {

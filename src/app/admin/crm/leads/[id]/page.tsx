@@ -72,7 +72,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
   };
 
   const loadEmployees = async () => {
-    const res = await fetch("/api/v1/admin/employees?limit=100").catch(() => null);
+    const res = await fetch("/api/v1/admin/employees?limit=100&includeAdmins=true").catch(() => null);
     if (res) {
       const d = await res.json();
       setEmployees(d.data || []);

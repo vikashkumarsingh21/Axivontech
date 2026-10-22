@@ -55,8 +55,8 @@ export default function AdminPartnerProjectsPage() {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Confirmed Projects (Partner Sourced)</h1>
-        <p className="text-sm text-gray-400">Projects requested directly by Brokers via Type B onboarding forms.</p>
+        <h1 className="text-2xl font-bold text-white tracking-tight">Client Projects</h1>
+        <p className="text-sm text-gray-400">Manage all client projects across Direct Acquisition and Partner Referrals.</p>
       </div>
 
       <div className="bg-[#111] border border-white/10 rounded-xl overflow-hidden">
@@ -120,10 +120,16 @@ export default function AdminPartnerProjectsPage() {
                     </td>
                     <td className="px-6 py-4">{proj.companyName}</td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <UserCircle size={14} className="text-gray-500" />
-                        <span className="text-gray-300 text-xs">{proj.brokerProfile?.user?.name || "Unknown"}</span>
-                      </div>
+                      {proj.brokerProfile?.user?.name ? (
+                        <div className="flex items-center gap-1.5">
+                          <UserCircle size={14} className="text-gray-400" />
+                          <span className="text-gray-300 text-xs">{proj.brokerProfile.user.name}</span>
+                        </div>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                          Direct Client
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded text-[10px] font-bold ${STATUS_COLORS[proj.status] || "bg-gray-500/10 text-gray-400"}`}>

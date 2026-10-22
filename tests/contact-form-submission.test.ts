@@ -97,6 +97,8 @@ describe("Contact Form & Lead Submission Verification Suite", () => {
       timeline: "1-2 Months",
       message: "We need an intelligent workflow automation engine for medical diagnostics records.",
       source: "WEBSITE_CONTACT",
+      privacyPolicyAcknowledged: true,
+      policyVersion: "1.0.0",
       captchaToken: "1x00000000000000000000AA", // Cloudflare test pass key
     };
 
@@ -149,6 +151,8 @@ describe("Contact Form & Lead Submission Verification Suite", () => {
       service: "E-Commerce Development",
       subject: "E-Commerce Development",
       message: "Looking for an omnichannel marketplace platform.",
+      privacyPolicyAcknowledged: true,
+      policyVersion: "1.0.0",
       captchaToken: "1x00000000000000000000AA",
     };
 
@@ -196,6 +200,8 @@ describe("Contact Form & Lead Submission Verification Suite", () => {
         phone,
         service: "Cloud Solutions",
         message: "Testing phone format acceptance.",
+        privacyPolicyAcknowledged: true,
+        policyVersion: "1.0.0",
         captchaToken: "1x00000000000000000000AA",
       };
 

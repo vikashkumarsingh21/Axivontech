@@ -30,18 +30,8 @@ export async function GET(req: NextRequest) {
     const settings = await getCalendarSettings();
 
     // 2. Fetch holidays from database; if none exist for queryYear, auto-sync once!
-    let holidays = await db.holiday.findMany({
-      where: {
-        date: {
-          gte: startOfGrid,
-          lte: endOfGrid,
-        },
-      },
-      orderBy: { date: "asc" },
-    });
-
-    if (holidays.length === 0) {
-      await syncHolidays(queryYear);
+    let holidays: any[] = [];
+    try {
       holidays = await db.holiday.findMany({
         where: {
           date: {
@@ -51,6 +41,22 @@ export async function GET(req: NextRequest) {
         },
         orderBy: { date: "asc" },
       });
+
+      if (holidays.length === 0) {
+        await syncHolidays(queryYear);
+        holidays = await db.holiday.findMany({
+          where: {
+            date: {
+              gte: startOfGrid,
+              lte: endOfGrid,
+            },
+          },
+          orderBy: { date: "asc" },
+        });
+      }
+    } catch (holErr) {
+      console.warn("[Calendar API] Holiday query or sync skipped due to schema/connection limitation:", holErr);
+      holidays = [];
     }
 
     // 3. Fetch current employee's leaves (strictly isolated to user.id for privacy)

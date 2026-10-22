@@ -60,15 +60,17 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
         },
       });
 
-      await tx.notification.create({
-        data: {
-          userId: project.brokerProfile.userId,
-          type: "SYSTEM",
-          title: "Project Approved",
-          message: `Your project ${project.projectCode} has been approved!`,
-          link: `/broker/projects/${id}`,
-        },
-      });
+      if (project.brokerProfile?.userId) {
+        await tx.notification.create({
+          data: {
+            userId: project.brokerProfile.userId,
+            type: "SYSTEM",
+            title: "Project Approved",
+            message: `Your project ${project.projectCode} has been approved!`,
+            link: `/broker/projects/${id}`,
+          },
+        });
+      }
 
       return { alreadyApproved: false, project: updated };
     });

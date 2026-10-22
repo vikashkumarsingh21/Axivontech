@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { validateActiveUser } from "@/lib/auth/permissions";
 import { AttendanceService } from "@/lib/services/attendance.service";
+import { getUtcCalendarDate, isSameCalendarDay } from "@/lib/date-utils";
 
 export async function GET(req: NextRequest) {
   try {
@@ -12,10 +13,9 @@ export async function GET(req: NextRequest) {
     const policy = await AttendanceService.getPolicy();
     const requiredMinutes = user.requiredDailyMinutes || policy.defaultRequiredMinutes || 480;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getUtcCalendarDate();
 
-    // Fetch up to 60 days history
+    // Fetch up to 90 days history
     const records = await db.attendance.findMany({
       where: { userId: user.id },
       include: {
@@ -24,36 +24,56 @@ export async function GET(req: NextRequest) {
         },
         regularization: true,
       },
-      orderBy: { date: "desc" },
-      take: 60,
+      orderBy: [{ date: "desc" }, { checkInAt: "desc" }],
+      take: 90,
     });
 
-    const todayRecord = records.find(
-      (r) => new Date(r.date).getTime() === today.getTime()
-    );
+    // Locate ongoing active session (where checkOutAt is null)
+    const activeSession = records.find((r) => !r.checkOutAt && !!r.checkInAt);
 
-    // Check if user is on approved leave today
-    const todayLeave = await db.leaveRequest.findFirst({
-      where: {
-        userId: user.id,
-        status: "APPROVED",
-        startDate: { lte: today },
-        endDate: { gte: today },
-      },
-    });
+    // Today's record is either the active session or today's calendar day record
+    const todayRecord =
+      activeSession ||
+      records.find(
+        (r) => isSameCalendarDay(r.date, today) || (r.checkInAt && isSameCalendarDay(r.checkInAt, today))
+      );
 
-    // Check if today is a holiday
-    const todayHoliday = await db.holiday.findFirst({
-      where: { date: today },
-    });
+    // Check if user is on approved leave today (safely handled with try/catch)
+    let todayLeave = null;
+    try {
+      todayLeave = await db.leaveRequest.findFirst({
+        where: {
+          userId: user.id,
+          status: "APPROVED",
+          startDate: { lte: today },
+          endDate: { gte: today },
+        },
+        select: { id: true, leaveType: true },
+      });
+    } catch {
+      todayLeave = null;
+    }
 
-    const isWeeklyOff = policy.weeklyOffDays.includes(today.getDay());
+    // Check if today is a holiday (safe query preventing P2022 column mismatch crashes)
+    let todayHoliday = null;
+    try {
+      todayHoliday = await db.holiday.findFirst({
+        where: { date: today },
+        select: { id: true, name: true, date: true },
+      });
+    } catch {
+      todayHoliday = null;
+    }
+
+    const isWeeklyOff = Array.isArray(policy?.weeklyOffDays)
+      ? policy.weeklyOffDays.includes(today.getDay())
+      : false;
 
     const calc = AttendanceService.calculateDay({
       checkInAt: todayRecord?.checkInAt || null,
       checkOutAt: todayRecord?.checkOutAt || null,
       breaks: todayRecord?.breaks || [],
-      requiredDailyMinutes: requiredMinutes,
+      requiredDailyMinutes: todayRecord?.requiredDailyMinutes || requiredMinutes,
       policy,
       isLeave: !!todayLeave,
       isHoliday: !!todayHoliday,
@@ -64,12 +84,15 @@ export async function GET(req: NextRequest) {
     // Format historical records
     const history = records.map((r) => {
       const reqMins = r.requiredDailyMinutes || requiredMinutes;
+      const isActive = !r.checkOutAt && !!r.checkInAt;
+
       const rCalc = AttendanceService.calculateDay({
         checkInAt: r.checkInAt,
         checkOutAt: r.checkOutAt,
         breaks: r.breaks || [],
         requiredDailyMinutes: reqMins,
         policy,
+        referenceTime: new Date(),
       });
 
       return {
@@ -84,7 +107,7 @@ export async function GET(req: NextRequest) {
         requiredMinutes: reqMins,
         remainingMinutes: rCalc.remainingMinutes,
         differenceMinutes: rCalc.netMinutes - reqMins,
-        status: rCalc.completionStatus,
+        status: isActive ? "IN_PROGRESS" : rCalc.completionStatus,
         completionStatus: rCalc.completionStatus,
         isLate: rCalc.isLate,
         lateMinutes: rCalc.lateMinutes,
@@ -115,14 +138,14 @@ export async function GET(req: NextRequest) {
         breakMinutes: calc.breakMinutes,
         workedMinutes: calc.netMinutes,
         netMinutes: calc.netMinutes,
-        requiredMinutes,
+        requiredMinutes: todayRecord?.requiredDailyMinutes || requiredMinutes,
         remainingMinutes: calc.remainingMinutes,
-        differenceMinutes: calc.netMinutes - requiredMinutes,
+        differenceMinutes: calc.netMinutes - (todayRecord?.requiredDailyMinutes || requiredMinutes),
         isLate: calc.isLate,
         lateMinutes: calc.lateMinutes,
         isEarlyExit: calc.isEarlyExit,
         earlyExitMinutes: calc.earlyExitMinutes,
-        status: calc.completionStatus,
+        status: todayRecord?.checkInAt ? (activeSession ? "IN_PROGRESS" : calc.completionStatus) : "NOT_STARTED",
         completionStatus: calc.completionStatus,
         breaks: todayRecord?.breaks || [],
         isLeave: !!todayLeave,
@@ -147,37 +170,95 @@ export async function POST(req: NextRequest) {
     const policy = await AttendanceService.getPolicy();
     const requiredMinutes = user.requiredDailyMinutes || policy.defaultRequiredMinutes || 480;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getUtcCalendarDate();
+    const endOfToday = new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1);
+    const now = new Date();
 
-    const existing = await db.attendance.findFirst({
-      where: { userId: user.id, date: today },
+    // 1. Locate any ongoing active session for this user (where checkOutAt is null)
+    const activeSession = await db.attendance.findFirst({
+      where: {
+        userId: user.id,
+        checkOutAt: null,
+      },
       include: {
         breaks: {
           orderBy: { startTime: "asc" },
         },
       },
+      orderBy: { checkInAt: "desc" },
     });
 
-    const now = new Date();
+    // 2. Locate today's record (may already have checkOutAt set)
+    const todayRecord =
+      (activeSession && (isSameCalendarDay(activeSession.date, today) || (activeSession.checkInAt && isSameCalendarDay(activeSession.checkInAt, today))))
+        ? activeSession
+        : await db.attendance.findFirst({
+            where: {
+              userId: user.id,
+              OR: [
+                { date: today },
+                { checkInAt: { gte: today, lte: endOfToday } },
+              ],
+            },
+            include: {
+              breaks: {
+                orderBy: { startTime: "asc" },
+              },
+            },
+            orderBy: { checkInAt: "desc" },
+          });
 
     // ─── 1. CHECK-IN ────────────────────────────────────────────────────────
     if (action === "check-in") {
-      if (existing && !existing.checkOutAt) {
-        throw new ApiError(400, "You are already checked in for today");
+      // If there is already an active session for today
+      if (activeSession && (isSameCalendarDay(activeSession.date, today) || (activeSession.checkInAt && isSameCalendarDay(activeSession.checkInAt, today)))) {
+        throw new ApiError(400, "You already have an active check-in session for today");
+      }
+
+      // If there was an active session from a previous day left open, cleanly close it first
+      if (activeSession) {
+        const danglingBreak = activeSession.breaks.find((b) => !b.endTime);
+        if (danglingBreak) {
+          const bDuration = Math.max(1, Math.floor((now.getTime() - new Date(danglingBreak.startTime).getTime()) / 60000));
+          await db.attendanceBreak.update({
+            where: { id: danglingBreak.id },
+            data: { endTime: now, durationMinutes: bDuration },
+          });
+        }
+        const updatedBreaks = await db.attendanceBreak.findMany({ where: { attendanceId: activeSession.id } });
+        const prevCalc = AttendanceService.calculateDay({
+          checkInAt: activeSession.checkInAt,
+          checkOutAt: now,
+          breaks: updatedBreaks,
+          requiredDailyMinutes: activeSession.requiredDailyMinutes || requiredMinutes,
+          policy,
+        });
+        await db.attendance.update({
+          where: { id: activeSession.id },
+          data: {
+            checkOutAt: now,
+            grossMinutes: prevCalc.grossMinutes,
+            breakMinutes: prevCalc.breakMinutes,
+            netMinutes: prevCalc.netMinutes,
+            totalMinutes: prevCalc.netMinutes,
+            status: prevCalc.completionStatus,
+            completionStatus: prevCalc.completionStatus,
+          },
+        });
       }
 
       let record;
-      if (existing) {
-        // Re-opening / updating check-in
+      if (todayRecord) {
+        // Re-opening / updating today's attendance record
         record = await db.attendance.update({
-          where: { id: existing.id },
+          where: { id: todayRecord.id },
           data: {
-            checkInAt: existing.checkInAt || now,
+            checkInAt: todayRecord.checkInAt || now,
             checkOutAt: null,
             requiredDailyMinutes: requiredMinutes,
             status: "IN_PROGRESS",
-            notes: notes || existing.notes,
+            completionStatus: "INCOMPLETE",
+            notes: notes || todayRecord.notes,
           },
           include: { breaks: true },
         });
@@ -219,20 +300,23 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Target active session for break or checkout
+    const activeTarget = activeSession || (todayRecord && !todayRecord.checkOutAt ? todayRecord : null);
+
     // ─── 2. BREAK-START ─────────────────────────────────────────────────────
     if (action === "break-start") {
-      if (!existing || existing.checkOutAt) {
+      if (!activeTarget) {
         throw new ApiError(400, "You must be checked in to start a break");
       }
 
-      const activeBreak = existing.breaks.find((b) => !b.endTime);
-      if (activeBreak) {
+      const ongoingBreak = activeTarget.breaks.find((b) => !b.endTime);
+      if (ongoingBreak) {
         throw new ApiError(400, "You already have an ongoing active break");
       }
 
       const newBreak = await db.attendanceBreak.create({
         data: {
-          attendanceId: existing.id,
+          attendanceId: activeTarget.id,
           startTime: now,
           type: breakType || "LUNCH",
           notes,
@@ -248,22 +332,22 @@ export async function POST(req: NextRequest) {
 
     // ─── 3. BREAK-END ───────────────────────────────────────────────────────
     if (action === "break-end") {
-      if (!existing) {
+      if (!activeTarget) {
         throw new ApiError(400, "No active attendance record found");
       }
 
-      const activeBreak = existing.breaks.find((b) => !b.endTime);
-      if (!activeBreak) {
+      const ongoingBreak = activeTarget.breaks.find((b) => !b.endTime);
+      if (!ongoingBreak) {
         throw new ApiError(400, "No active break found to end");
       }
 
       const durationMinutes = Math.max(
         1,
-        Math.floor((now.getTime() - new Date(activeBreak.startTime).getTime()) / 60000)
+        Math.floor((now.getTime() - new Date(ongoingBreak.startTime).getTime()) / 60000)
       );
 
       await db.attendanceBreak.update({
-        where: { id: activeBreak.id },
+        where: { id: ongoingBreak.id },
         data: {
           endTime: now,
           durationMinutes,
@@ -272,19 +356,19 @@ export async function POST(req: NextRequest) {
 
       // Recalculate attendance
       const updatedBreaks = await db.attendanceBreak.findMany({
-        where: { attendanceId: existing.id },
+        where: { attendanceId: activeTarget.id },
       });
 
       const calc = AttendanceService.calculateDay({
-        checkInAt: existing.checkInAt,
-        checkOutAt: existing.checkOutAt,
+        checkInAt: activeTarget.checkInAt,
+        checkOutAt: activeTarget.checkOutAt,
         breaks: updatedBreaks,
-        requiredDailyMinutes: requiredMinutes,
+        requiredDailyMinutes: activeTarget.requiredDailyMinutes || requiredMinutes,
         policy,
       });
 
       await db.attendance.update({
-        where: { id: existing.id },
+        where: { id: activeTarget.id },
         data: {
           breakMinutes: calc.breakMinutes,
           netMinutes: calc.netMinutes,
@@ -301,19 +385,19 @@ export async function POST(req: NextRequest) {
 
     // ─── 4. CHECK-OUT ───────────────────────────────────────────────────────
     if (action === "check-out") {
-      if (!existing || existing.checkOutAt) {
+      if (!activeTarget) {
         throw new ApiError(400, "You are not currently checked in");
       }
 
       // Close any active break automatically upon check-out
-      const activeBreak = existing.breaks.find((b) => !b.endTime);
-      if (activeBreak) {
+      const ongoingBreak = activeTarget.breaks.find((b) => !b.endTime);
+      if (ongoingBreak) {
         const breakDuration = Math.max(
           1,
-          Math.floor((now.getTime() - new Date(activeBreak.startTime).getTime()) / 60000)
+          Math.floor((now.getTime() - new Date(ongoingBreak.startTime).getTime()) / 60000)
         );
         await db.attendanceBreak.update({
-          where: { id: activeBreak.id },
+          where: { id: ongoingBreak.id },
           data: {
             endTime: now,
             durationMinutes: breakDuration,
@@ -322,26 +406,28 @@ export async function POST(req: NextRequest) {
       }
 
       const allBreaks = await db.attendanceBreak.findMany({
-        where: { attendanceId: existing.id },
+        where: { attendanceId: activeTarget.id },
       });
 
+      const targetRequiredMinutes = activeTarget.requiredDailyMinutes || requiredMinutes;
+
       const calc = AttendanceService.calculateDay({
-        checkInAt: existing.checkInAt,
+        checkInAt: activeTarget.checkInAt,
         checkOutAt: now,
         breaks: allBreaks,
-        requiredDailyMinutes: requiredMinutes,
+        requiredDailyMinutes: targetRequiredMinutes,
         policy,
       });
 
       const record = await db.attendance.update({
-        where: { id: existing.id },
+        where: { id: activeTarget.id },
         data: {
           checkOutAt: now,
           grossMinutes: calc.grossMinutes,
           breakMinutes: calc.breakMinutes,
           netMinutes: calc.netMinutes,
           totalMinutes: calc.netMinutes,
-          requiredDailyMinutes: requiredMinutes,
+          requiredDailyMinutes: targetRequiredMinutes,
           remainingMinutes: calc.remainingMinutes,
           lateMinutes: calc.lateMinutes,
           earlyExitMinutes: calc.earlyExitMinutes,
@@ -349,7 +435,7 @@ export async function POST(req: NextRequest) {
           isEarlyExit: calc.isEarlyExit,
           status: calc.completionStatus,
           completionStatus: calc.completionStatus,
-          notes: notes || existing.notes,
+          notes: notes || activeTarget.notes,
         },
         include: {
           breaks: true,

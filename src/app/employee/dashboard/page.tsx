@@ -9,8 +9,6 @@ import {
   AlertCircle,
   Loader2,
   ArrowRight,
-  Play,
-  Square,
   Coffee,
   Calendar,
   Megaphone,
@@ -46,8 +44,6 @@ export default function EmployeeDashboard() {
   const [user, setUser] = useState<any>(null);
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [punchLoading, setPunchLoading] = useState(false);
-  const [punchMsg, setPunchMsg] = useState<string | null>(null);
 
   const fetchDashboard = useCallback(async () => {
     try {
@@ -69,27 +65,6 @@ export default function EmployeeDashboard() {
   useEffect(() => {
     fetchDashboard();
   }, [fetchDashboard]);
-
-  // Handle Quick Punch In/Out from Dashboard
-  const handleQuickPunch = async (action: "check-in" | "check-out") => {
-    setPunchLoading(true);
-    setPunchMsg(null);
-    try {
-      const res = await fetch("/api/v1/employee/attendance", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, notes: "Logged from Dashboard quick punch" }),
-      });
-      const resData = await res.json();
-      if (!res.ok) throw new Error(resData.error || "Action failed");
-      setPunchMsg(resData.message || (action === "check-in" ? "Checked in successfully" : "Checked out successfully"));
-      fetchDashboard();
-    } catch (e: any) {
-      setPunchMsg(e.message);
-    } finally {
-      setPunchLoading(false);
-    }
-  };
 
   const handleTaskStatus = async (taskId: string, newStatus: string) => {
     try {
@@ -141,32 +116,19 @@ export default function EmployeeDashboard() {
               day: "numeric",
               year: "numeric",
             })}
-            {" "}&bull; Here is your daily work agenda and team updates.
+            {" "}• Here is your daily work agenda and team updates.
           </p>
         </div>
 
-        {/* Quick Punch Button in Header */}
+        {/* Centralized My Attendance & Work Report Links in Header */}
         <div className="flex items-center gap-2">
-          {!isCheckedIn && !isCheckedOut && (
-            <button
-              onClick={() => handleQuickPunch("check-in")}
-              disabled={punchLoading}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-[#04130E] font-bold text-xs shadow-xs transition-all disabled:opacity-50"
-            >
-              {punchLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-              <span>Check In Now</span>
-            </button>
-          )}
-          {isCheckedIn && (
-            <button
-              onClick={() => handleQuickPunch("check-out")}
-              disabled={punchLoading}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-bold text-xs shadow-xs transition-all disabled:opacity-50"
-            >
-              {punchLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Square className="w-4 h-4" />}
-              <span>Check Out</span>
-            </button>
-          )}
+          <Link
+            href="/employee/attendance"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-[#04130E] text-xs font-bold transition-all shadow-xs"
+          >
+            <Clock className="w-3.5 h-3.5" />
+            <span>My Attendance</span>
+          </Link>
           <Link
             href="/employee/work-reports"
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1B222B] hover:bg-[#202833] border border-[#29313B] text-xs font-semibold text-[#F3F5F7] transition-all"
@@ -176,18 +138,6 @@ export default function EmployeeDashboard() {
           </Link>
         </div>
       </div>
-
-      {punchMsg && (
-        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-            <span>{punchMsg}</span>
-          </div>
-          <button onClick={() => setPunchMsg(null)} className="text-[#A7B0BC] hover:text-white text-xs">
-            Dismiss
-          </button>
-        </div>
-      )}
 
       {/* ── 2. Top Metric Cards ─────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -200,17 +150,17 @@ export default function EmployeeDashboard() {
           <div>
             <div className="text-xl sm:text-2xl font-bold text-[#F3F5F7]">
               {isCheckedIn
-                ? `Checked In &bull; ${formatTime(attendance.checkInAt)}`
+                ? `Checked In • ${formatTime(attendance.checkInAt)}`
                 : isCheckedOut
                 ? "Shift Completed"
                 : "Not Checked In"}
             </div>
             <p className="text-xs text-[#7E8997] mt-0.5">
               {isCheckedIn
-                ? "Active session running"
+                ? `Live worked: ${formatMinutes(attendance.netMinutes || attendance.grossMinutes || 0)}`
                 : isCheckedOut
-                ? `Out at ${formatTime(attendance.checkOutAt)} (${formatMinutes(attendance.netMinutes || attendance.grossMinutes)})`
-                : "Standard target: 8h 0m"}
+                ? `Out at ${formatTime(attendance.checkOutAt)} (${formatMinutes(attendance.netMinutes || attendance.grossMinutes || 0)})`
+                : `Target: ${formatMinutes(user?.requiredDailyMinutes || attendance?.requiredDailyMinutes || 480)}`}
             </p>
           </div>
           <Link
@@ -436,7 +386,7 @@ export default function EmployeeDashboard() {
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-[#F3F5F7]">{data.todayWorkReport.summary}</span>
                   <span className="text-[#7E8997]">
-                    {data.todayWorkReport.hoursWorked || 8} hrs logged
+                    {data.todayWorkReport.hoursWorked ?? (user?.requiredDailyMinutes ? Math.round(user.requiredDailyMinutes / 60) : 8)} hrs logged
                   </span>
                 </div>
                 <p className="text-xs text-[#A7B0BC] line-clamp-2">

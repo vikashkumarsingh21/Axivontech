@@ -22,6 +22,8 @@ import {
 import Link from "next/link";
 import { trackLeadSubmission, trackWhatsAppClick } from "@/lib/analytics";
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
+import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
+import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 
 interface FormData {
   service: string;
@@ -112,6 +114,13 @@ export default function ContactForm() {
   const [captchaToken, setCaptchaToken] = useState<string>("");
   const [turnstileStatus, setTurnstileStatus] = useState<"loading" | "ready" | "verified" | "error" | "expired">("loading");
   const turnstileRef = useRef<TurnstileWidgetRef>(null);
+
+  // Dual Mandatory Form Protection States
+  const [policyAcknowledged, setPolicyAcknowledged] = useState(false);
+  const [policyError, setPolicyError] = useState<string | null>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState<string>("");
+  const [recaptchaError, setRecaptchaError] = useState<string | null>(null);
+  const [recaptchaResetCount, setRecaptchaResetCount] = useState<number>(0);
 
   useEffect(() => {
     const demoParam = searchParams.get("demo") || searchParams.get("project");
@@ -226,13 +235,18 @@ export default function ContactForm() {
       return;
     }
 
-    if (!captchaToken) {
+    // Mandatory Check 1: Policy Acknowledgement
+    if (!policyAcknowledged) {
       setCurrentStep(3);
-      if (turnstileStatus === "loading") {
-        setErrorMsg("Security check is finalizing. Please wait a moment and try again.");
-      } else {
-        setErrorMsg("Please complete the security check challenge before submitting.");
-      }
+      setPolicyError("Please acknowledge the Privacy Policy before submitting this form.");
+      return;
+    }
+
+    // Mandatory Check 2: CAPTCHA Verification
+    const effectiveToken = recaptchaToken || captchaToken;
+    if (!effectiveToken) {
+      setCurrentStep(3);
+      setRecaptchaError("Please complete the human verification before submitting.");
       return;
     }
 
@@ -261,7 +275,10 @@ export default function ContactForm() {
         utm_medium: searchParams.get("utm_medium") || undefined,
         utm_campaign: searchParams.get("utm_campaign") || undefined,
         referralCode: searchParams.get("ref") || searchParams.get("referralCode") || undefined,
-        captchaToken: captchaToken || undefined,
+        privacyPolicyAcknowledged: true,
+        policyVersion: "1.0.0",
+        recaptchaToken: effectiveToken,
+        captchaToken: effectiveToken,
       };
 
       const response = await fetch("/api/v1/public/leads", {
@@ -275,6 +292,8 @@ export default function ContactForm() {
       if (!response.ok) {
         turnstileRef.current?.reset();
         setCaptchaToken("");
+        setRecaptchaToken("");
+        setRecaptchaResetCount((prev) => prev + 1);
         throw new Error(responseData.error || responseData.message || "Submission failed. Please check your inputs.");
       }
 
@@ -789,34 +808,47 @@ export default function ContactForm() {
                           style={{ display: "none" }}
                         />
 
-                        {/* Cloudflare Turnstile Verification */}
-                        <div className="pt-2 flex flex-col items-center sm:items-start">
-                          <TurnstileWidget
-                            ref={turnstileRef}
-                            action="contact_form"
-                            onVerify={(token) => {
-                              setCaptchaToken(token);
-                              setTurnstileStatus("verified");
-                              setErrorMsg("");
+                        {/* Dual Mandatory Checks: 1. Privacy Policy Acknowledgement */}
+                        <div className="pt-2">
+                          <RequiredPolicyAcknowledgement
+                            checked={policyAcknowledged}
+                            onChange={(val) => {
+                              setPolicyAcknowledged(val);
+                              setPolicyError(null);
                             }}
-                            onExpire={() => {
-                              setCaptchaToken("");
-                              setTurnstileStatus("expired");
-                            }}
-                            onError={() => {
-                              setCaptchaToken("");
-                              setTurnstileStatus("error");
-                            }}
+                            error={policyError}
+                            showVersionBadge={true}
+                            policyVersion="1.0.0"
                           />
                         </div>
 
-                        {/* DPDP Act Privacy Notice */}
+                        {/* Dual Mandatory Checks: 2. Real Google reCAPTCHA v2 Checkbox */}
+                        <div className="pt-2 flex flex-col items-center sm:items-start">
+                          <GoogleRecaptchaWidget
+                            onVerify={(token) => {
+                              setRecaptchaToken(token);
+                              setCaptchaToken(token);
+                              setRecaptchaError(null);
+                              setErrorMsg("");
+                            }}
+                            onExpire={() => {
+                              setRecaptchaToken("");
+                              setCaptchaToken("");
+                              setRecaptchaError("Verification expired. Please tick the checkbox again.");
+                            }}
+                            onError={() => {
+                              setRecaptchaToken("");
+                              setCaptchaToken("");
+                              setRecaptchaError("Verification provider error. Please try again.");
+                            }}
+                            resetTrigger={recaptchaResetCount}
+                            errorMessage={recaptchaError}
+                          />
+                        </div>
+
+                        {/* DPDP Act 2023 Statutory Disclosure */}
                         <p className="text-[11px] text-[#7E8997] leading-relaxed">
-                          By submitting this project inquiry, you agree to the processing of your contact details in accordance with our{" "}
-                          <Link href="/privacy-policy" target="_blank" className="text-[#e8a064] hover:underline font-medium">
-                            Privacy Policy
-                          </Link>{" "}
-                          and the India DPDP Act 2023.
+                          Your submission is processed securely in compliance with the Digital Personal Data Protection (DPDP) Act 2023. We never sell your personal information.
                         </p>
 
                         {/* Step 3 Controls */}

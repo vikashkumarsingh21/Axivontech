@@ -22,6 +22,8 @@ import {
   FileCheck
 } from "lucide-react";
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
+import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
+import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 
 interface ApplicationFormData {
   fullName: string;
@@ -86,6 +88,9 @@ export default function CareerApplication({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [captchaToken, setCaptchaToken] = useState<string>("");
+  const [policyAcknowledged, setPolicyAcknowledged] = useState(false);
+  const [policyError, setPolicyError] = useState<string | null>(null);
+  const [recaptchaResetCount, setRecaptchaResetCount] = useState<number>(0);
   const turnstileRef = useRef<TurnstileWidgetRef>(null);
 
   // Sync preselected position if props change
@@ -234,13 +239,30 @@ export default function CareerApplication({
       return;
     }
 
+    if (!policyAcknowledged) {
+      setPolicyError("Please acknowledge the Applicant Privacy Policy before submitting.");
+      setErrorMessage("Please acknowledge the Applicant Privacy Policy before submitting.");
+      return;
+    }
+
+    if (!captchaToken) {
+      setErrorMessage("Please complete the human verification before submitting.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const response = await fetch("/api/careers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, captchaToken }),
+        body: JSON.stringify({
+          ...form,
+          privacyPolicyAcknowledged: true,
+          policyVersion: "1.0.0",
+          recaptchaToken: captchaToken,
+          captchaToken,
+        }),
       });
 
       const data = await response.json();
@@ -248,6 +270,7 @@ export default function CareerApplication({
       if (!response.ok || !data.success) {
         turnstileRef.current?.reset();
         setCaptchaToken("");
+        setRecaptchaResetCount((prev) => prev + 1);
         throw new Error(data.message || "Failed to submit application. Please try again.");
       }
 
@@ -632,14 +655,40 @@ export default function CareerApplication({
               style={{ display: "none" }}
             />
 
-            {/* Turnstile Anti-Bot Verification */}
+            {/* Dual Mandatory Checks: 1. Applicant Privacy Policy Acknowledgement */}
+            <div className="pt-2">
+              <RequiredPolicyAcknowledgement
+                checked={policyAcknowledged}
+                onChange={(val) => {
+                  setPolicyAcknowledged(val);
+                  setPolicyError(null);
+                  setErrorMessage(null);
+                }}
+                error={policyError}
+                policySlug="careers-privacy"
+                policyTitle="Applicant Privacy Notice"
+                policyHref="/careers-privacy"
+                showVersionBadge={true}
+                policyVersion="1.0.0"
+              />
+            </div>
+
+            {/* Dual Mandatory Checks: 2. Google reCAPTCHA v2 Checkbox */}
             <div className="flex justify-center pt-2">
-              <TurnstileWidget
-                ref={turnstileRef}
-                action="career_application"
-                onVerify={(token) => setCaptchaToken(token)}
-                onExpire={() => setCaptchaToken("")}
-                onError={() => setCaptchaToken("")}
+              <GoogleRecaptchaWidget
+                onVerify={(token) => {
+                  setCaptchaToken(token);
+                  setErrorMessage(null);
+                }}
+                onExpire={() => {
+                  setCaptchaToken("");
+                  setErrorMessage("Human verification expired. Please tick the checkbox again.");
+                }}
+                onError={() => {
+                  setCaptchaToken("");
+                  setErrorMessage("Verification challenge error. Please try again.");
+                }}
+                resetTrigger={recaptchaResetCount}
               />
             </div>
 
@@ -663,11 +712,7 @@ export default function CareerApplication({
                 )}
               </button>
               <p className="text-[11px] text-[#7E8997] text-center mt-3 font-light">
-                By submitting, you agree to allow Axivon Technologies to process your application data in accordance with our{" "}
-                <a href="/careers-privacy" target="_blank" rel="noopener noreferrer" className="text-[#10B981] hover:underline font-medium">
-                  Applicant Privacy Notice
-                </a>{" "}
-                and the India DPDP Act 2023.
+                Your candidate data is protected under the Digital Personal Data Protection (DPDP) Act 2023 and retained strictly for talent evaluation.
               </p>
             </div>
           </form>

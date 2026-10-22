@@ -5,6 +5,8 @@ import { ChevronRight, ChevronLeft, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { trackPartnerApplication } from "@/lib/analytics";
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
+import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
+import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 
 export default function PartnerApplicationForm() {
   const [step, setStep] = useState(1);
@@ -12,6 +14,9 @@ export default function PartnerApplicationForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
+  const [policyAcknowledged, setPolicyAcknowledged] = useState(false);
+  const [policyError, setPolicyError] = useState<string | null>(null);
+  const [recaptchaResetCount, setRecaptchaResetCount] = useState<number>(0);
   const turnstileRef = useRef<TurnstileWidgetRef>(null);
 
   const [formData, setFormData] = useState({
@@ -84,6 +89,18 @@ export default function PartnerApplicationForm() {
 
   const handleSubmit = async () => {
     setError("");
+
+    if (!policyAcknowledged) {
+      setPolicyError("Please acknowledge the Privacy Policy before submitting.");
+      setError("Please acknowledge the Privacy Policy before submitting.");
+      return;
+    }
+
+    if (!captchaToken) {
+      setError("Please complete the human verification before submitting.");
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -121,6 +138,9 @@ export default function PartnerApplicationForm() {
         motivation: formData.motivation,
         contribution: formData.contribution,
         additionalInfo: formData.additionalInfo,
+        privacyPolicyAcknowledged: true,
+        policyVersion: "1.0.0",
+        recaptchaToken: captchaToken,
         captchaToken: captchaToken || undefined,
       };
 
@@ -353,30 +373,37 @@ export default function PartnerApplicationForm() {
                 {formData.eduUGDegree && <p className="text-gray-200">UG: {formData.eduUGDegree} at {formData.eduUGCollege}</p>}
               </div>
             </div>
-            <div className="bg-[#111] p-4 border-l-2 border-[#e8a064] text-xs text-gray-400">
-              <p className="mb-2">I confirm that the information provided is accurate.</p>
-              <p>I agree that AXIVON may use this information to review my Business Partner application as per the <Link href="/privacy-policy" className="text-[#e8a064] hover:underline">Privacy Policy</Link> and <Link href="/business-partner/policy" className="text-[#e8a064] hover:underline">Partner Policy</Link>.</p>
+            {/* Dual Mandatory Checks: 1. Privacy Policy Acknowledgement */}
+            <div className="pt-2">
+              <RequiredPolicyAcknowledgement
+                checked={policyAcknowledged}
+                onChange={(val) => {
+                  setPolicyAcknowledged(val);
+                  setPolicyError(null);
+                  setError("");
+                }}
+                error={policyError}
+                showVersionBadge={true}
+                policyVersion="1.0.0"
+              />
             </div>
 
-            {/* Honeypot field for bot deterrence */}
-            <input
-              type="text"
-              name="website_trap"
-              tabIndex={-1}
-              autoComplete="off"
-              className="hidden"
-              aria-hidden="true"
-              style={{ display: "none" }}
-            />
-
-            {/* Cloudflare Turnstile Verification */}
+            {/* Dual Mandatory Checks: 2. Google reCAPTCHA v2 Checkbox */}
             <div className="flex justify-center pt-2">
-              <TurnstileWidget
-                ref={turnstileRef}
-                action="partner_application"
-                onVerify={(token) => setCaptchaToken(token)}
-                onExpire={() => setCaptchaToken("")}
-                onError={() => setCaptchaToken("")}
+              <GoogleRecaptchaWidget
+                onVerify={(token) => {
+                  setCaptchaToken(token);
+                  setError("");
+                }}
+                onExpire={() => {
+                  setCaptchaToken("");
+                  setError("Human verification expired. Please tick the checkbox again.");
+                }}
+                onError={() => {
+                  setCaptchaToken("");
+                  setError("Verification error. Please retry.");
+                }}
+                resetTrigger={recaptchaResetCount}
               />
             </div>
           </div>

@@ -36,6 +36,29 @@ function fmtTime(dt: string | null) {
   return new Date(dt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
 }
 
+function formatDateStr(dateVal: string | Date | null | undefined): string {
+  if (!dateVal) return "—";
+  if (typeof dateVal === "string") {
+    const match = dateVal.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      const [year, month, day] = match[0].split("-").map(Number);
+      const d = new Date(year, month - 1, day);
+      return d.toLocaleDateString("en-IN", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+  }
+  return new Date(dateVal).toLocaleDateString("en-IN", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 const STATUS_COLORS: Record<string, string> = {
   COMPLETE: "bg-green-500/10 text-green-400 border-green-500/20",
   IN_PROGRESS: "bg-blue-500/10 text-blue-400 border-blue-500/20",
@@ -51,7 +74,7 @@ export default function AdminAttendancePage() {
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
 
-  const [activeTab, setActiveTab] = useState<"monitor" | "regularizations" | "policy">("monitor");
+  const [activeTab, setActiveTab] = useState<"monitor" | "history" | "regularizations" | "policy">("monitor");
   const [records, setRecords] = useState<any[]>([]);
   const [policy, setPolicy] = useState<any>(null);
   const [summary, setSummary] = useState<any>(null);
@@ -60,6 +83,21 @@ export default function AdminAttendancePage() {
   const [search, setSearch] = useState(initialSearch);
   const [deptFilter, setDeptFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+
+  // Company history state
+  const [historyRecords, setHistoryRecords] = useState<any[]>([]);
+  const [historyRange, setHistoryRange] = useState<"today" | "7d" | "30d" | "all" | "custom">("30d");
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 30);
+    return d.toISOString().split("T")[0];
+  });
+  const [endDate, setEndDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [historyDeptFilter, setHistoryDeptFilter] = useState("");
+  const [historyStatusFilter, setHistoryStatusFilter] = useState("");
+  const [historySearch, setHistorySearch] = useState("");
+  const [historyStatsAll, setHistoryStatsAll] = useState<any>(null);
+  const [historyTabLoading, setHistoryTabLoading] = useState(false);
 
   // History modal state
   const [selectedEmployee, setSelectedEmployee] = useState<any | null>(null);
@@ -132,6 +170,50 @@ export default function AdminAttendancePage() {
     load();
     loadRegularizations();
   }, [load]);
+
+  const loadCompanyHistory = useCallback(async () => {
+    setHistoryTabLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.set("view", "history");
+      if (historyRange === "custom") {
+        if (startDate) params.set("startDate", startDate);
+        if (endDate) params.set("endDate", endDate);
+      } else if (historyRange === "today") {
+        const todayStr = new Date().toISOString().split("T")[0];
+        params.set("startDate", todayStr);
+        params.set("endDate", todayStr);
+      } else if (historyRange === "7d") {
+        const start = new Date();
+        start.setDate(start.getDate() - 7);
+        params.set("startDate", start.toISOString().split("T")[0]);
+        params.set("endDate", new Date().toISOString().split("T")[0]);
+      } else if (historyRange === "30d") {
+        const start = new Date();
+        start.setDate(start.getDate() - 30);
+        params.set("startDate", start.toISOString().split("T")[0]);
+        params.set("endDate", new Date().toISOString().split("T")[0]);
+      }
+      if (historyDeptFilter) params.set("department", historyDeptFilter);
+      if (historyStatusFilter) params.set("status", historyStatusFilter);
+      if (historySearch) params.set("search", historySearch);
+
+      const res = await fetch(`/api/v1/admin/attendance?${params.toString()}`);
+      const data = await res.json();
+      setHistoryRecords(data.history || []);
+      setHistoryStatsAll(data.stats || null);
+    } catch {
+      setHistoryRecords([]);
+    } finally {
+      setHistoryTabLoading(false);
+    }
+  }, [historyRange, startDate, endDate, historyDeptFilter, historyStatusFilter, historySearch]);
+
+  useEffect(() => {
+    if (activeTab === "history") {
+      loadCompanyHistory();
+    }
+  }, [activeTab, loadCompanyHistory]);
 
   const viewEmployeeHistory = async (emp: any) => {
     setSelectedEmployee(emp);
@@ -215,6 +297,17 @@ export default function AdminAttendancePage() {
               }`}
             >
               Live Monitor
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab("history");
+                loadCompanyHistory();
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                activeTab === "history" ? "bg-green-600 text-white" : "text-gray-400 hover:text-white"
+              }`}
+            >
+              Attendance History
             </button>
             <button
               onClick={() => setActiveTab("regularizations")}
@@ -465,6 +558,267 @@ export default function AdminAttendancePage() {
                               <Eye className="w-3.5 h-3.5" />
                               <span>History</span>
                               <ChevronRight className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* TAB 1.5: COMPANY-WIDE ATTENDANCE HISTORY */}
+      {/* ============================================================ */}
+      {activeTab === "history" && (
+        <div className="space-y-6">
+          {/* History Stats Bar */}
+          {historyStatsAll && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-[#111111] border border-white/10 rounded-2xl p-4 flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-white/5 shrink-0">
+                  <Calendar className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-white">{historyStatsAll.totalRecords || 0}</p>
+                  <p className="text-[11px] text-gray-400">Total Logged Records</p>
+                </div>
+              </div>
+              <div className="bg-[#111111] border border-white/10 rounded-2xl p-4 flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-green-500/10 shrink-0">
+                  <Clock className="w-5 h-5 text-green-400" />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-green-400 font-mono">
+                    {fmt(historyStatsAll.totalWorkedMinutes || 0).replace(/^[+-]/, "")}
+                  </p>
+                  <p className="text-[11px] text-gray-400">Total Hours Worked</p>
+                </div>
+              </div>
+              <div className="bg-[#111111] border border-white/10 rounded-2xl p-4 flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-amber-500/10 shrink-0">
+                  <Coffee className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-amber-400 font-mono">
+                    {fmt(historyStatsAll.totalBreakMinutes || 0).replace(/^[+-]/, "")}
+                  </p>
+                  <p className="text-[11px] text-gray-400">Total Break Time</p>
+                </div>
+              </div>
+              <div className="bg-[#111111] border border-white/10 rounded-2xl p-4 flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-blue-500/10 shrink-0">
+                  <CheckCircle2 className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-blue-400">{historyStatsAll.totalCompletedDays || 0}</p>
+                  <p className="text-[11px] text-gray-400">Target Met Shifts</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* History Filter Toolbar */}
+          <div className="bg-[#111111] border border-white/10 rounded-2xl p-4 flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {/* Preset Range Buttons */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {[
+                  { label: "Today", value: "today" },
+                  { label: "Last 7 Days", value: "7d" },
+                  { label: "Last 30 Days", value: "30d" },
+                  { label: "All Records", value: "all" },
+                  { label: "Custom Range", value: "custom" },
+                ].map((item) => (
+                  <button
+                    key={item.value}
+                    onClick={() => setHistoryRange(item.value as any)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+                      historyRange === item.value
+                        ? "bg-green-600 text-white border-green-500"
+                        : "bg-[#18181b] text-gray-400 border-white/10 hover:text-white"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Custom Date Pickers */}
+              {historyRange === "custom" && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="bg-[#18181b] border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-green-500"
+                  />
+                  <span className="text-gray-500 text-xs">to</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="bg-[#18181b] border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-green-500"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Department, Status, and Search Filters */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2 border-t border-white/5">
+              <div className="relative">
+                <Search className="w-4 h-4 text-gray-500 absolute left-3 top-2.5" />
+                <input
+                  type="text"
+                  placeholder="Search name, email, employee ID..."
+                  value={historySearch}
+                  onChange={(e) => setHistorySearch(e.target.value)}
+                  className="w-full bg-[#18181b] border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-green-500"
+                />
+              </div>
+
+              <select
+                value={historyDeptFilter}
+                onChange={(e) => setHistoryDeptFilter(e.target.value)}
+                className="bg-[#18181b] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-green-500"
+              >
+                <option value="">All Departments</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Design">Design</option>
+                <option value="Operations">Operations</option>
+                <option value="Executive">Executive</option>
+                <option value="Management">Management</option>
+              </select>
+
+              <select
+                value={historyStatusFilter}
+                onChange={(e) => setHistoryStatusFilter(e.target.value)}
+                className="bg-[#18181b] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-green-500"
+              >
+                <option value="">All Statuses</option>
+                <option value="COMPLETE">Complete (Target Met)</option>
+                <option value="IN_PROGRESS">Working Live</option>
+                <option value="HALF_DAY">Half Day</option>
+                <option value="INCOMPLETE">Incomplete (Under Target)</option>
+              </select>
+
+              <button
+                onClick={loadCompanyHistory}
+                disabled={historyTabLoading}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white text-xs font-semibold transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${historyTabLoading ? "animate-spin text-green-500" : ""}`} />
+                <span>Apply & Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Company History Log Table */}
+          <div className="bg-[#111111] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="p-4 border-b border-white/10 flex items-center justify-between">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-green-500" />
+                <span>Company-Wide Attendance Records</span>
+              </h2>
+              <span className="text-xs text-gray-400">{historyRecords.length} records retrieved</span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-gray-300">
+                <thead className="bg-[#18181b] text-xs uppercase font-semibold text-gray-400 border-b border-white/10">
+                  <tr>
+                    <th className="py-3 px-4">Date</th>
+                    <th className="py-3 px-4">Employee</th>
+                    <th className="py-3 px-4">Punches</th>
+                    <th className="py-3 px-4">Gross</th>
+                    <th className="py-3 px-4">Breaks</th>
+                    <th className="py-3 px-4">Net Worked</th>
+                    <th className="py-3 px-4">Daily Target</th>
+                    <th className="py-3 px-4">Difference</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 text-right">Details</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {historyTabLoading ? (
+                    <tr>
+                      <td colSpan={10} className="p-12 text-center text-gray-400">
+                        <div className="flex items-center justify-center gap-2">
+                          <RefreshCw className="w-4 h-4 animate-spin text-green-500" />
+                          <span>Loading company attendance records...</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : historyRecords.length === 0 ? (
+                    <tr>
+                      <td colSpan={10} className="p-12 text-center text-gray-500">
+                        No historical attendance records found matching the selected filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    historyRecords.map((r, i) => {
+                      const worked = r.workedMinutes || 0;
+                      const req = r.requiredMinutes || 480;
+                      const diff = r.differenceMinutes !== undefined ? r.differenceMinutes : (worked - req);
+                      return (
+                        <tr key={r.id || i} className="hover:bg-white/[0.02] transition-colors">
+                          <td className="py-3.5 px-4 font-semibold text-white whitespace-nowrap">
+                            {formatDateStr(r.date)}
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <div className="text-white font-medium">{r.employeeName}</div>
+                            <div className="text-xs text-gray-500">
+                              {r.employeeCode ? `ID: ${r.employeeCode} • ` : ""}
+                              {r.department || "General"}
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-xs whitespace-nowrap">
+                            <span className="text-green-400 font-semibold">{fmtTime(r.checkInAt)}</span>
+                            <span className="text-gray-500"> → </span>
+                            {r.checkOutAt ? (
+                              <span className="text-blue-400 font-semibold">{fmtTime(r.checkOutAt)}</span>
+                            ) : (
+                              <span className="text-amber-400 font-semibold">Active</span>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-xs text-gray-400">
+                            {fmt(r.grossMinutes || worked).replace(/^[+-]/, "")}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-xs text-amber-400">
+                            {fmt(r.breakMinutes || 0).replace(/^[+-]/, "")}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-xs text-white font-bold">
+                            {fmt(worked).replace(/^[+-]/, "")}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-xs text-gray-400">
+                            {fmt(req).replace(/^[+-]/, "")}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-xs font-semibold whitespace-nowrap">
+                            <span className={diff >= 0 ? "text-green-400" : "text-red-400"}>
+                              {diff >= 0 ? "+" : ""}
+                              {fmt(diff)}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span
+                              className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                                STATUS_COLORS[r.status] || "bg-gray-500/10 text-gray-400 border-gray-500/20"
+                              }`}
+                            >
+                              {r.status}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-right">
+                            <button
+                              onClick={() => viewEmployeeHistory(r)}
+                              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                              title="View individual employee log"
+                            >
+                              <Eye className="w-4 h-4" />
                             </button>
                           </td>
                         </tr>

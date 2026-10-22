@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { CheckCircle2, ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
+import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 
 type FormState = {
   name: string;
@@ -35,6 +37,10 @@ export default function LeadFormPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [policyAcknowledged, setPolicyAcknowledged] = useState(false);
+  const [policyError, setPolicyError] = useState<string | null>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const [recaptchaResetCount, setRecaptchaResetCount] = useState(0);
 
   const [formData, setFormData] = useState<FormState>({
     name: "",
@@ -111,6 +117,17 @@ export default function LeadFormPage() {
       return;
     }
 
+    if (!policyAcknowledged) {
+      setPolicyError("Please acknowledge the Privacy Policy before submitting.");
+      setValidationError("Please acknowledge the Privacy Policy before submitting.");
+      return;
+    }
+
+    if (!recaptchaToken) {
+      setValidationError("Please complete the human verification before submitting.");
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
@@ -118,17 +135,27 @@ export default function LeadFormPage() {
       const res = await fetch("/api/v1/public/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, referralCode }),
+        body: JSON.stringify({
+          ...formData,
+          referralCode,
+          privacyPolicyAcknowledged: true,
+          policyVersion: "1.0.0",
+          recaptchaToken,
+          captchaToken: recaptchaToken,
+        }),
       });
 
       if (!res.ok) {
-        throw new Error("Failed to submit enquiry. Please try again.");
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || d.message || "Failed to submit enquiry. Please try again.");
       }
 
       setIsSuccess(true);
       window.scrollTo(0, 0);
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
+      setRecaptchaResetCount((c) => c + 1);
+      setRecaptchaToken("");
     } finally {
       setIsSubmitting(false);
     }
@@ -527,6 +554,31 @@ export default function LeadFormPage() {
                     </span>
                   </div>
                 )}
+
+                {/* Mandatory Privacy Acknowledgement & Google reCAPTCHA v2 */}
+                <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
+                  <RequiredPolicyAcknowledgement
+                    checked={policyAcknowledged}
+                    onChange={(checked) => {
+                      setPolicyAcknowledged(checked);
+                      if (checked) setPolicyError(null);
+                    }}
+                    policySlug="privacy-policy"
+                    errorMessage={policyError || undefined}
+                  />
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                      Human Verification <span className="text-red-400">*</span>
+                    </label>
+                    <GoogleRecaptchaWidget
+                      onVerify={(token) => setRecaptchaToken(token)}
+                      onExpired={() => setRecaptchaToken("")}
+                      onError={() => setRecaptchaToken("")}
+                      resetTrigger={recaptchaResetCount}
+                    />
+                  </div>
+                </div>
               </div>
             )}
           </div>

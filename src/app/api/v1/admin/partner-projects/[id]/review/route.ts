@@ -62,27 +62,29 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
       }
     });
 
-    // Notify Partner depending on status
-    if (status === "REVISION_REQUIRED" || status === "INFORMATION_REQUIRED") {
-      await db.notification.create({
-        data: {
-          userId: project.brokerProfile.userId,
-          type: "SYSTEM",
-          title: "Action Required: Project Onboarding",
-          message: `Your project ${project.projectCode} requires ${status === "REVISION_REQUIRED" ? "revisions" : "more information"}. Please review and update.`,
-          link: `/broker/projects/${project.id}/onboarding`,
-        }
-      });
-    } else if (status === "ACCEPTED") {
-      await db.notification.create({
-        data: {
-          userId: project.brokerProfile.userId,
-          type: "SYSTEM",
-          title: "Project Accepted",
-          message: `Your project ${project.projectCode} has been accepted. The final pricing is being prepared.`,
-          link: `/broker/projects/${project.id}`,
-        }
-      });
+    // Notify Partner depending on status if broker-referred
+    if (project.brokerProfile?.userId) {
+      if (status === "REVISION_REQUIRED" || status === "INFORMATION_REQUIRED") {
+        await db.notification.create({
+          data: {
+            userId: project.brokerProfile.userId,
+            type: "SYSTEM",
+            title: "Action Required: Project Onboarding",
+            message: `Your project ${project.projectCode} requires ${status === "REVISION_REQUIRED" ? "revisions" : "more information"}. Please review and update.`,
+            link: `/broker/projects/${project.id}/onboarding`,
+          }
+        });
+      } else if (status === "ACCEPTED") {
+        await db.notification.create({
+          data: {
+            userId: project.brokerProfile.userId,
+            type: "SYSTEM",
+            title: "Project Accepted",
+            message: `Your project ${project.projectCode} has been accepted. The final pricing is being prepared.`,
+            link: `/broker/projects/${project.id}`,
+          }
+        });
+      }
     }
 
     return NextResponse.json({ success: true, data: updated });

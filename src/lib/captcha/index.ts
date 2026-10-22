@@ -3,4 +3,5 @@
  */
 
 export * from "./turnstile";
+export * from "./recaptcha";
 export * from "./verify-request";

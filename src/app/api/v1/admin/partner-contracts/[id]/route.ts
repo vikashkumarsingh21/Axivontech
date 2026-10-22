@@ -51,7 +51,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
     if (!contract || contract.versions.length === 0) throw new ApiError(404, "Contract or version not found.");
 
     const targetVersion = contract.versions[0];
-    const brokerUserId = contract.partnerProject.brokerProfile.userId;
+    const brokerUserId = contract.partnerProject.brokerProfile?.userId;
     const projectId = contract.partnerProject.id;
     const projectCode = contract.partnerProject.projectCode;
 
@@ -61,7 +61,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
       }
 
       // Resolve project price from finalProjectValue (established in Phase 6)
-      const projectPrice = contract.partnerProject.finalProjectValue || parseFloat(contract.partnerProject.projectBudget.replace(/[^0-9.]/g, "")) || 0;
+      const projectPrice = contract.partnerProject.finalProjectValue || parseFloat(String(contract.partnerProject.projectBudget || "").replace(/[^0-9.]/g, "")) || 0;
       
       const advancePercentage = 40;
       const advanceAmount = Math.round((projectPrice * advancePercentage) / 100);
@@ -73,7 +73,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
         db.paymentSettings.findFirst({ where: { type: "UPI", isActive: true } }),
       ]);
 
-      await db.$transaction([
+      const verifyOps: any[] = [
         db.partnerContractVersion.update({
           where: { id: versionId },
           data: { status: "VERIFIED", verifiedAt: new Date(), verifiedById: userId },
@@ -100,16 +100,23 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
         db.auditLog.create({
           data: { userId, action: "CONTRACT_VERIFIED", resource: "PartnerContract", details: { contractId: params.id, versionId, projectCode } },
         }),
-        db.notification.create({
-          data: {
-            userId: brokerUserId,
-            type: "SYSTEM",
-            title: "Contract Verified",
-            message: `Your contract for project ${projectCode} has been verified. Please proceed with payment.`,
-            link: `/broker/projects/${projectId}`,
-          },
-        }),
-      ]);
+      ];
+
+      if (brokerUserId) {
+        verifyOps.push(
+          db.notification.create({
+            data: {
+              userId: brokerUserId,
+              type: "SYSTEM",
+              title: "Contract Verified",
+              message: `Your contract for project ${projectCode} has been verified. Please proceed with payment.`,
+              link: `/broker/projects/${projectId}`,
+            },
+          })
+        );
+      }
+
+      await db.$transaction(verifyOps);
 
       return NextResponse.json({ success: true, message: "Contract verified. Payment request created." });
     }
@@ -117,7 +124,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
     if (action === "reject") {
       if (!rejectionReason) throw new ApiError(400, "Rejection reason is required.");
 
-      await db.$transaction([
+      const rejectOps: any[] = [
         db.partnerContractVersion.update({
           where: { id: versionId },
           data: { status: "REJECTED", rejectionReason, rejectedAt: new Date() },
@@ -129,22 +136,29 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
         db.auditLog.create({
           data: { userId, action: "CONTRACT_REJECTED", resource: "PartnerContract", details: { contractId: params.id, versionId, projectCode, reason: rejectionReason } },
         }),
-        db.notification.create({
-          data: {
-            userId: brokerUserId,
-            type: "SYSTEM",
-            title: "Contract Rejected",
-            message: `Your contract for project ${projectCode} was rejected. Reason: ${rejectionReason}`,
-            link: `/broker/projects/${projectId}`,
-          },
-        }),
-      ]);
+      ];
+
+      if (brokerUserId) {
+        rejectOps.push(
+          db.notification.create({
+            data: {
+              userId: brokerUserId,
+              type: "SYSTEM",
+              title: "Contract Rejected",
+              message: `Your contract for project ${projectCode} was rejected. Reason: ${rejectionReason}`,
+              link: `/broker/projects/${projectId}`,
+            },
+          })
+        );
+      }
+
+      await db.$transaction(rejectOps);
 
       return NextResponse.json({ success: true, message: "Contract rejected." });
     }
 
     if (action === "request_reupload") {
-      await db.$transaction([
+      const reuploadOps: any[] = [
         db.partnerContractVersion.update({
           where: { id: versionId },
           data: { status: "REUPLOAD_REQUIRED", rejectionReason: "Re-upload requested", rejectedAt: new Date() },
@@ -172,16 +186,23 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
         db.auditLog.create({
           data: { userId, action: "CONTRACT_REUPLOAD_REQUESTED", resource: "PartnerContract", details: { contractId: params.id, versionId, projectCode } },
         }),
-        db.notification.create({
-          data: {
-            userId: brokerUserId,
-            type: "SYSTEM",
-            title: "Contract Re-upload Required",
-            message: `Please re-upload the signed contract for project ${projectCode}.`,
-            link: `/broker/projects/${projectId}`,
-          },
-        }),
-      ]);
+      ];
+
+      if (brokerUserId) {
+        reuploadOps.push(
+          db.notification.create({
+            data: {
+              userId: brokerUserId,
+              type: "SYSTEM",
+              title: "Contract Re-upload Required",
+              message: `Please re-upload the signed contract for project ${projectCode}.`,
+              link: `/broker/projects/${projectId}`,
+            },
+          })
+        );
+      }
+
+      await db.$transaction(reuploadOps);
 
       return NextResponse.json({ success: true, message: "Re-upload requested." });
     }

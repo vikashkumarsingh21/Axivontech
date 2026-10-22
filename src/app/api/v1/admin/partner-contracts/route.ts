@@ -75,7 +75,7 @@ export async function POST(req: Request) {
     if (!project) throw new ApiError(404, "Project not found.");
     if (project.contract) throw new ApiError(409, "A contract already exists for this project.");
 
-    const [contract] = await db.$transaction([
+    const txOps: any[] = [
       db.partnerContract.create({
         data: {
           partnerProjectId,
@@ -100,16 +100,23 @@ export async function POST(req: Request) {
       db.auditLog.create({
         data: { userId, action: "CONTRACT_SENT", resource: "PartnerContract", details: { projectId: partnerProjectId, contractName } },
       }),
-      db.notification.create({
-        data: {
-          userId: project.brokerProfile.userId,
-          type: "SYSTEM",
-          title: "Contract Sent",
-          message: `A contract "${contractName}" has been sent for project ${project.projectCode}. Please review and sign.`,
-          link: `/broker/projects/${partnerProjectId}`,
-        },
-      }),
-    ]);
+    ];
+
+    if (project.brokerProfile?.userId) {
+      txOps.push(
+        db.notification.create({
+          data: {
+            userId: project.brokerProfile.userId,
+            type: "SYSTEM",
+            title: "Contract Sent",
+            message: `A contract "${contractName}" has been sent for project ${project.projectCode}. Please review and sign.`,
+            link: `/broker/projects/${partnerProjectId}`,
+          },
+        })
+      );
+    }
+
+    const [contract] = await db.$transaction(txOps);
 
     return NextResponse.json({ data: contract }, { status: 201 });
   } catch (error) {

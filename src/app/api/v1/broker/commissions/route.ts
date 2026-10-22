@@ -26,6 +26,12 @@ export async function GET(req: Request) {
         approvedAt: true,
         paidAt: true,
         payoutReference: true,
+        payoutRequestedAt: true,
+        payoutDueAt: true,
+        payoutMethod: true,
+        payoutDetails: true,
+        payoutNotes: true,
+        rejectionReason: true,
         createdAt: true,
         updatedAt: true,
         partnerProject: { select: { projectCode: true, projectName: true } },
@@ -37,6 +43,9 @@ export async function GET(req: Request) {
     // Calculate stats
     const stats = {
       total: commissions.reduce((sum, c) => sum + c.commissionAmount, 0),
+      eligible: commissions.filter(c => c.status === "ELIGIBLE").reduce((sum, c) => sum + c.commissionAmount, 0),
+      requested: commissions.filter(c => c.status === "REQUESTED").reduce((sum, c) => sum + c.commissionAmount, 0),
+      processing: commissions.filter(c => c.status === "PROCESSING" || c.status === "APPROVED").reduce((sum, c) => sum + c.commissionAmount, 0),
       pending: commissions.filter(c => c.status === "PENDING" || c.status === "ELIGIBLE").reduce((sum, c) => sum + c.commissionAmount, 0),
       approved: commissions.filter(c => c.status === "APPROVED").reduce((sum, c) => sum + c.commissionAmount, 0),
       paid: commissions.filter(c => c.status === "PAID").reduce((sum, c) => sum + c.commissionAmount, 0),

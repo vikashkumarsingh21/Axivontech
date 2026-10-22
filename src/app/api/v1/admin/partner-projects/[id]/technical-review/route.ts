@@ -71,7 +71,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
       newTechnicalNotes = `${newTechnicalNotes ? newTechnicalNotes + "\n\n" : ""}--- [${timestamp}] ${actor.name || "Reviewer"} ---\n${notes}`;
     }
 
-    await db.$transaction([
+    const txOps: any[] = [
       db.partnerProject.update({
         where: { id },
         data: {
@@ -90,24 +90,31 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
           details: { projectId: id, projectCode: project.projectCode, technicalReviewStatus },
         },
       }),
-      db.notification.create({
-        data: {
-          userId: project.brokerProfile.userId,
-          type: "SYSTEM",
-          title: action === "approve"
-            ? "Technical Review Approved"
-            : action === "clarification"
-              ? "Technical Clarification Required"
-              : "Technical Review Started",
-          message: action === "approve"
-            ? `Technical review for project ${project.projectCode} has been approved.`
-            : action === "clarification"
-              ? `Clarification is needed for project ${project.projectCode}. Please check your project details.`
-              : `Technical review has started for project ${project.projectCode}.`,
-          link: `/broker/projects/${id}`,
-        },
-      }),
-    ]);
+    ];
+
+    if (project.brokerProfile?.userId) {
+      txOps.push(
+        db.notification.create({
+          data: {
+            userId: project.brokerProfile.userId,
+            type: "SYSTEM",
+            title: action === "approve"
+              ? "Technical Review Approved"
+              : action === "clarification"
+                ? "Technical Clarification Required"
+                : "Technical Review Started",
+            message: action === "approve"
+              ? `Technical review for project ${project.projectCode} has been approved.`
+              : action === "clarification"
+                ? `Clarification is needed for project ${project.projectCode}. Please check your project details.`
+                : `Technical review has started for project ${project.projectCode}.`,
+            link: `/broker/projects/${id}`,
+          },
+        })
+      );
+    }
+
+    await db.$transaction(txOps);
 
     return NextResponse.json({ success: true, message: `Technical review: ${technicalReviewStatus}` });
   } catch (error) {

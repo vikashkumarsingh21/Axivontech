@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ChangePasswordForm } from "@/components/employee/ChangePasswordForm";
@@ -23,7 +23,35 @@ export default function EmployeeSettingsPage() {
   const [announcementAlerts, setAnnouncementAlerts] = useState(true);
   const [savedSettings, setSavedSettings] = useState(false);
 
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("axivon_employee_prefs");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.emailDigest !== undefined) setEmailDigest(Boolean(parsed.emailDigest));
+        if (parsed.taskAlerts !== undefined) setTaskAlerts(Boolean(parsed.taskAlerts));
+        if (parsed.attendanceReminders !== undefined) setAttendanceReminders(Boolean(parsed.attendanceReminders));
+        if (parsed.announcementAlerts !== undefined) setAnnouncementAlerts(Boolean(parsed.announcementAlerts));
+      }
+    } catch {
+      // ignore localStorage parse issues
+    }
+  }, []);
+
   const handleSavePreferences = () => {
+    try {
+      localStorage.setItem(
+        "axivon_employee_prefs",
+        JSON.stringify({
+          emailDigest,
+          taskAlerts,
+          attendanceReminders,
+          announcementAlerts,
+        })
+      );
+    } catch {
+      // ignore
+    }
     setSavedSettings(true);
     setTimeout(() => setSavedSettings(false), 3000);
   };

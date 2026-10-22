@@ -4,6 +4,8 @@ import { useState, useRef, FormEvent, FocusEvent } from 'react';
 import { motion } from 'framer-motion';
 import { Star, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
+import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
+import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 
 interface ReviewFormProps {
   id?: string;
@@ -38,6 +40,9 @@ export default function ReviewForm({ id }: ReviewFormProps) {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [globalError, setGlobalError] = useState<string>('');
   const [captchaToken, setCaptchaToken] = useState<string>('');
+  const [policyAcknowledged, setPolicyAcknowledged] = useState(false);
+  const [policyError, setPolicyError] = useState<string | null>(null);
+  const [recaptchaResetCount, setRecaptchaResetCount] = useState<number>(0);
   const turnstileRef = useRef<TurnstileWidgetRef>(null);
 
   const errors: Record<string, string> = {};
@@ -82,6 +87,17 @@ export default function ReviewForm({ id }: ReviewFormProps) {
       return;
     }
 
+    if (!policyAcknowledged) {
+      setPolicyError("Please acknowledge the Privacy Policy before submitting your review.");
+      setGlobalError("Please acknowledge the Privacy Policy before submitting.");
+      return;
+    }
+
+    if (!captchaToken) {
+      setGlobalError("Please complete the human verification before submitting.");
+      return;
+    }
+
     setStatus('submitting');
     setGlobalError('');
 
@@ -101,6 +117,9 @@ export default function ReviewForm({ id }: ReviewFormProps) {
           service: formData.service || undefined,
           publicConsent: formData.consent,
           website: formData.website || undefined,
+          privacyPolicyAcknowledged: true,
+          policyVersion: "1.0.0",
+          recaptchaToken: captchaToken,
           captchaToken: captchaToken || undefined,
         })
       });
@@ -108,6 +127,7 @@ export default function ReviewForm({ id }: ReviewFormProps) {
       if (!response.ok) {
         turnstileRef.current?.reset();
         setCaptchaToken('');
+        setRecaptchaResetCount((prev) => prev + 1);
         throw new Error('Failed to submit review');
       }
 
@@ -322,14 +342,36 @@ export default function ReviewForm({ id }: ReviewFormProps) {
           {errors.consent && <p className="text-xs text-red-400 pl-8">{errors.consent}</p>}
         </div>
 
-        {/* Turnstile Anti-Bot Verification */}
+        {/* Dual Mandatory Checks: 1. Privacy Policy Acknowledgement */}
         <div className="pt-2">
-          <TurnstileWidget
-            ref={turnstileRef}
-            action="review_submission"
-            onVerify={(token) => setCaptchaToken(token)}
-            onExpire={() => setCaptchaToken('')}
-            onError={() => setCaptchaToken('')}
+          <RequiredPolicyAcknowledgement
+            checked={policyAcknowledged}
+            onChange={(val) => {
+              setPolicyAcknowledged(val);
+              setPolicyError(null);
+            }}
+            error={policyError}
+            showVersionBadge={true}
+            policyVersion="1.0.0"
+          />
+        </div>
+
+        {/* Dual Mandatory Checks: 2. Google reCAPTCHA v2 Checkbox */}
+        <div className="pt-2">
+          <GoogleRecaptchaWidget
+            onVerify={(token) => {
+              setCaptchaToken(token);
+              setGlobalError('');
+            }}
+            onExpire={() => {
+              setCaptchaToken('');
+              setGlobalError('Human verification expired. Please tick the checkbox again.');
+            }}
+            onError={() => {
+              setCaptchaToken('');
+              setGlobalError('Human verification error. Please retry.');
+            }}
+            resetTrigger={recaptchaResetCount}
           />
         </div>
 

@@ -269,7 +269,12 @@ describe("Complete Legal Pages & Compliance System Tests", () => {
       const req = new NextRequest("http://localhost/api/v1/public/privacy-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requesterName: "Dev User" }),
+        body: JSON.stringify({
+          requesterName: "Dev User",
+          privacyPolicyAcknowledged: true,
+          policyVersion: "1.0.0",
+          captchaToken: "XXXX.DUMMY.PASS.TOKEN.XXXX",
+        }),
       });
 
       const res = await PublicPrivacyRequestsRoute.POST(req);
@@ -288,6 +293,8 @@ describe("Complete Legal Pages & Compliance System Tests", () => {
           requesterEmail: "not-an-email",
           category: "ACCESS",
           requestDetails: "Summary of my details please",
+          privacyPolicyAcknowledged: true,
+          policyVersion: "1.0.0",
           captchaToken: "XXXX.DUMMY.PASS.TOKEN.XXXX",
         }),
       });
@@ -308,6 +315,8 @@ describe("Complete Legal Pages & Compliance System Tests", () => {
           requesterEmail: "ananya@example.com",
           category: "ACCESS",
           requestDetails: "Requesting summary of resume data submitted to careers.",
+          privacyPolicyAcknowledged: true,
+          policyVersion: "1.0.0",
           captchaToken: "XXXX.DUMMY.PASS.TOKEN.XXXX",
         }),
       });

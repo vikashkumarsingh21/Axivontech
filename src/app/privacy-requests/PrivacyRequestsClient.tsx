@@ -16,6 +16,8 @@ import {
   UserCheck,
 } from "lucide-react";
 import { TurnstileWidget, TurnstileWidgetHandle } from "@/components/ui/TurnstileWidget";
+import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
+import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 
 const CATEGORIES = [
   {
@@ -55,6 +57,9 @@ export default function PrivacyRequestsClient() {
   const [category, setCategory] = useState("ACCESS");
   const [details, setDetails] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
+  const [policyAcknowledged, setPolicyAcknowledged] = useState(false);
+  const [policyError, setPolicyError] = useState<string | null>(null);
+  const [recaptchaResetCount, setRecaptchaResetCount] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedResult, setSubmittedResult] = useState<{
@@ -86,8 +91,14 @@ export default function PrivacyRequestsClient() {
       return;
     }
 
+    if (!policyAcknowledged) {
+      setPolicyError("Please acknowledge the Privacy Policy before submitting.");
+      setSubmitError("Please acknowledge the Privacy Policy before submitting.");
+      return;
+    }
+
     if (!captchaToken) {
-      setSubmitError("Please complete the anti-bot security check before submitting.");
+      setSubmitError("Please complete the human verification before submitting.");
       return;
     }
 
@@ -102,6 +113,9 @@ export default function PrivacyRequestsClient() {
           requesterPhone: phone,
           category,
           requestDetails: details,
+          privacyPolicyAcknowledged: true,
+          policyVersion: "1.0.0",
+          recaptchaToken: captchaToken,
           captchaToken,
         }),
       });
@@ -121,9 +135,12 @@ export default function PrivacyRequestsClient() {
       setPhone("");
       setDetails("");
       setCaptchaToken("");
+      setPolicyAcknowledged(false);
+      setRecaptchaResetCount((c) => c + 1);
       turnstileRef.current?.reset();
     } catch (err: any) {
       setSubmitError(err.message || "Something went wrong.");
+      setRecaptchaResetCount((c) => c + 1);
       turnstileRef.current?.reset();
     } finally {
       setIsSubmitting(false);
@@ -336,14 +353,29 @@ export default function PrivacyRequestsClient() {
                 />
               </div>
 
-              {/* Turnstile CAPTCHA */}
-              <div className="p-4 rounded-xl bg-[#151A21]/50 border border-[#1E2530]">
-                <TurnstileWidget
-                  ref={turnstileRef}
-                  action="privacy_request"
-                  onVerify={(token) => setCaptchaToken(token)}
-                  onExpire={() => setCaptchaToken("")}
+              {/* Dual Checks: Privacy Policy Acknowledgement & Google reCAPTCHA v2 */}
+              <div className="space-y-4 pt-2 border-t border-[#1E2530]">
+                <RequiredPolicyAcknowledgement
+                  checked={policyAcknowledged}
+                  onChange={(checked) => {
+                    setPolicyAcknowledged(checked);
+                    if (checked) setPolicyError(null);
+                  }}
+                  policySlug="privacy-policy"
+                  errorMessage={policyError || undefined}
                 />
+
+                <div>
+                  <label className="block text-xs font-bold text-[#A7B0BC] uppercase tracking-wider mb-2">
+                    Human Verification <span className="text-red-400">*</span>
+                  </label>
+                  <GoogleRecaptchaWidget
+                    onVerify={(token) => setCaptchaToken(token)}
+                    onExpired={() => setCaptchaToken("")}
+                    onError={() => setCaptchaToken("")}
+                    resetTrigger={recaptchaResetCount}
+                  />
+                </div>
               </div>
 
               {/* Submit Button */}

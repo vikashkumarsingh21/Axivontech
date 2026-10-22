@@ -159,8 +159,8 @@ model PartnerProject {
   commission      Commission?
   id              String        @id @default(cuid())
   projectCode     String        @unique
-  brokerProfileId String
-  brokerProfile   BrokerProfile @relation(fields: [brokerProfileId], references: [id], onDelete: Cascade)
+  brokerProfileId String?
+  brokerProfile   BrokerProfile? @relation(fields: [brokerProfileId], references: [id], onDelete: SetNull)
 
   // Client details (collected from public form — never trust from browser)
   clientName        String
@@ -1535,7 +1535,13 @@ model Commission {
   paidBy   User?     @relation("CommissionPayer", fields: [paidById], references: [id], onDelete: SetNull)
 
   notes           String?
-  payoutReference String?
+  payoutReference   String?
+  payoutRequestedAt DateTime?
+  payoutDueAt       DateTime?
+  payoutMethod      String?
+  payoutDetails     Json?
+  payoutNotes       String?
+  rejectionReason   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

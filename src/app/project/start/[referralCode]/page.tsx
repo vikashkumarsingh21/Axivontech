@@ -4,7 +4,8 @@ import { useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { CheckCircle2, ChevronRight, ChevronLeft, Check, FileText } from "lucide-react";
-import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
+import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
+import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 
 export default function ProjectOnboardingForm() {
   const params = useParams();
@@ -16,7 +17,10 @@ export default function ProjectOnboardingForm() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [projectCode, setProjectCode] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
-  const turnstileRef = useRef<TurnstileWidgetRef>(null);
+  const [policyAcknowledged, setPolicyAcknowledged] = useState(false);
+  const [policyError, setPolicyError] = useState<string | null>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const [recaptchaResetCount, setRecaptchaResetCount] = useState(0);
 
   const [formData, setFormData] = useState({
     // Step 1: Client Information
@@ -111,13 +115,33 @@ export default function ProjectOnboardingForm() {
 
   const handleSubmit = async () => {
     setError("");
+
+    if (!policyAcknowledged) {
+      setPolicyError("Please acknowledge the Privacy Policy before submitting.");
+      setError("Please acknowledge the Privacy Policy before submitting.");
+      return;
+    }
+
+    if (!recaptchaToken && !captchaToken) {
+      setError("Please complete the human verification before submitting.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
+      const activeToken = recaptchaToken || captchaToken;
       const response = await fetch("/api/v1/public/project-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, referralCode, captchaToken }),
+        body: JSON.stringify({
+          ...formData,
+          referralCode,
+          privacyPolicyAcknowledged: true,
+          policyVersion: "1.0.0",
+          recaptchaToken: activeToken,
+          captchaToken: activeToken,
+        }),
       });
 
       const data = await response.json();
@@ -127,14 +151,16 @@ export default function ProjectOnboardingForm() {
         setIsSuccess(true);
         window.scrollTo(0, 0);
       } else {
-        turnstileRef.current?.reset();
+        setRecaptchaResetCount((c) => c + 1);
+        setRecaptchaToken("");
         setCaptchaToken("");
         setError(data.message || data.error || "Failed to submit request. Please try again.");
       }
-    } catch (err) {
-      turnstileRef.current?.reset();
+    } catch (err: any) {
+      setRecaptchaResetCount((c) => c + 1);
+      setRecaptchaToken("");
       setCaptchaToken("");
-      setError("An unexpected error occurred. Please check your connection and try again.");
+      setError(err?.message || "An unexpected error occurred. Please check your connection and try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -653,15 +679,29 @@ export default function ProjectOnboardingForm() {
                   style={{ display: "none" }}
                 />
 
-                {/* Cloudflare Turnstile Verification */}
-                <div className="flex justify-center pt-4">
-                  <TurnstileWidget
-                    ref={turnstileRef}
-                    action="project_request"
-                    onVerify={(token) => setCaptchaToken(token)}
-                    onExpire={() => setCaptchaToken("")}
-                    onError={() => setCaptchaToken("")}
+                {/* Mandatory Privacy Acknowledgement & Google reCAPTCHA v2 */}
+                <div className="pt-6 border-t border-white/10 space-y-4">
+                  <RequiredPolicyAcknowledgement
+                    checked={policyAcknowledged}
+                    onChange={(checked) => {
+                      setPolicyAcknowledged(checked);
+                      if (checked) setPolicyError(null);
+                    }}
+                    policySlug="privacy-policy"
+                    errorMessage={policyError || undefined}
                   />
+
+                  <div className="flex flex-col items-center">
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 self-start sm:self-center">
+                      Human Verification <span className="text-red-400">*</span>
+                    </label>
+                    <GoogleRecaptchaWidget
+                      onVerify={(token) => setRecaptchaToken(token)}
+                      onExpired={() => setRecaptchaToken("")}
+                      onError={() => setRecaptchaToken("")}
+                      resetTrigger={recaptchaResetCount}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

@@ -25,12 +25,14 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => ({}));
 
-    // Server-verified CAPTCHA and anti-bot check
+    // Server-side dual protection: Privacy Policy acknowledgement + Google reCAPTCHA v2 / Turnstile
     const protectionResult = await verifyFormProtection(req, body, {
       action: "project_request",
+      requirePolicyAcknowledgement: true,
+      policySlug: "privacy-policy",
     });
     if (!protectionResult.success) {
-      return protectionResult.response!;
+      return (protectionResult.errorResponse || protectionResult.response)!;
     }
     const {
       clientName, clientEmail, clientPhone, clientWhatsapp, clientDesignation,

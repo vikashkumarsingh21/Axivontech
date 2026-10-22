@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { getExecutiveScope, isDepartmentAllowed } from "@/lib/auth/executive-scope";
 import { handleApiError } from "@/lib/api-error";
+import { getUtcCalendarDate, getUtcDayRange } from "@/lib/date-utils";
 
 export async function GET(req: Request) {
   try {
@@ -14,11 +15,8 @@ export async function GET(req: Request) {
     const dateFilterStr = searchParams.get("date") || undefined;
     const departmentFilter = searchParams.get("department") || undefined;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const targetDate = dateFilterStr ? new Date(dateFilterStr) : today;
-    targetDate.setHours(0, 0, 0, 0);
+    const targetDate = getUtcCalendarDate(dateFilterStr || new Date());
+    const { startOfDay, endOfDay } = getUtcDayRange(targetDate);
 
     const employeeWhere: any = {
       userRoles: { none: { role: { name: { in: ["FOUNDER", "CO_FOUNDER"] } } } },
@@ -57,11 +55,20 @@ export async function GET(req: Request) {
     const attendances = await db.attendance.findMany({
       where: {
         userId: { in: empIds },
-        date: targetDate,
+        OR: [
+          { date: { gte: startOfDay, lte: endOfDay } },
+          { checkInAt: { gte: startOfDay, lte: endOfDay } },
+        ],
       },
+      orderBy: { checkInAt: "desc" },
     });
 
-    const attendanceMap = new Map(attendances.map((a) => [a.userId, a]));
+    const attendanceMap = new Map<string, (typeof attendances)[0]>();
+    for (const a of attendances) {
+      if (!attendanceMap.has(a.userId)) {
+        attendanceMap.set(a.userId, a);
+      }
+    }
 
     let currentlyWorking = 0;
     let completedToday = 0;

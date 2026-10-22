@@ -26,7 +26,40 @@ export async function GET(req: Request) {
       orderBy: { createdAt: "desc" }
     });
 
-    return NextResponse.json({ data: commissions });
+    const now = Date.now();
+    const enriched = commissions.map((c) => {
+      let slaStatus: "HEALTHY" | "WARNING" | "BREACHED" | "SETTLED" | "N_A" = "N_A";
+      let hoursRemaining: number | null = null;
+      let hoursElapsed: number | null = null;
+
+      if (c.status === "PAID") {
+        slaStatus = "SETTLED";
+      } else if (c.status === "REQUESTED" || c.status === "PROCESSING" || c.status === "APPROVED") {
+        if (c.payoutRequestedAt) {
+          hoursElapsed = Math.max(0, Math.round((now - new Date(c.payoutRequestedAt).getTime()) / (1000 * 60 * 60)));
+        }
+        if (c.payoutDueAt) {
+          const diffMs = new Date(c.payoutDueAt).getTime() - now;
+          hoursRemaining = Math.round(diffMs / (1000 * 60 * 60));
+          if (diffMs < 0) {
+            slaStatus = "BREACHED";
+          } else if (diffMs <= 24 * 60 * 60 * 1000) {
+            slaStatus = "WARNING";
+          } else {
+            slaStatus = "HEALTHY";
+          }
+        }
+      }
+
+      return {
+        ...c,
+        slaStatus,
+        hoursRemaining,
+        hoursElapsed,
+      };
+    });
+
+    return NextResponse.json({ data: enriched });
   } catch (error) {
     return handleApiError(error);
   }

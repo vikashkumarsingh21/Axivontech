@@ -164,8 +164,31 @@ export class AttendanceService {
       };
     }
 
-    const effectiveEnd = checkOutAt ? new Date(checkOutAt) : referenceTime;
-    const grossMs = Math.max(0, effectiveEnd.getTime() - new Date(checkInAt).getTime());
+    const checkInDateObj = new Date(checkInAt);
+    const now = referenceTime || new Date();
+
+    // Determine effective end time
+    let effectiveEnd: Date;
+    let isHistoricalUnclosed = false;
+
+    if (checkOutAt) {
+      effectiveEnd = new Date(checkOutAt);
+    } else {
+      // Check if this attendance record is from a past calendar day (> 24 hours elapsed)
+      const elapsedSinceCheckInMs = now.getTime() - checkInDateObj.getTime();
+      if (elapsedSinceCheckInMs > 24 * 60 * 60 * 1000) {
+        isHistoricalUnclosed = true;
+        // Cap historical unclosed session at policy cutoff or end of window on that day
+        const [cutoffH = 23, cutoffM = 0] = (policy?.cutoffTime || DEFAULT_ATTENDANCE_POLICY.cutoffTime).split(":").map(Number);
+        const cappedDate = new Date(checkInDateObj);
+        cappedDate.setUTCHours(cutoffH, cutoffM, 0, 0);
+        effectiveEnd = cappedDate > checkInDateObj ? cappedDate : new Date(checkInDateObj.getTime() + requiredDailyMinutes * 60000);
+      } else {
+        effectiveEnd = now;
+      }
+    }
+
+    const grossMs = Math.max(0, effectiveEnd.getTime() - checkInDateObj.getTime());
     const grossMinutes = Math.floor(grossMs / 60000);
 
     let breakMinutes = 0;
@@ -180,7 +203,7 @@ export class AttendanceService {
         breakMinutes += bDuration;
       } else {
         // Active ongoing break
-        isOnBreak = true;
+        isOnBreak = !checkOutAt && !isHistoricalUnclosed;
         activeBreakStartTime = bStart;
         const bDuration = Math.max(0, Math.floor((effectiveEnd.getTime() - bStart.getTime()) / 60000));
         breakMinutes += bDuration;
@@ -194,14 +217,13 @@ export class AttendanceService {
     let lateMinutes = 0;
     let isLate = false;
 
-    const [startH, startM] = policy.workWindowStart.split(":").map(Number);
-    const checkInDateObj = new Date(checkInAt);
+    const [startH = 6, startM = 0] = (policy?.workWindowStart || DEFAULT_ATTENDANCE_POLICY.workWindowStart).split(":").map(Number);
     
     // Set UTC hours if checkInAt is given in UTC, else local hours
     const windowStartTime = new Date(checkInDateObj);
     windowStartTime.setUTCHours(startH, startM, 0, 0);
 
-    const graceStartTime = new Date(windowStartTime.getTime() + (policy.graceMinutes || 0) * 60000);
+    const graceStartTime = new Date(windowStartTime.getTime() + (policy?.graceMinutes ?? DEFAULT_ATTENDANCE_POLICY.graceMinutes) * 60000);
     if (checkInDateObj.getTime() > graceStartTime.getTime()) {
       lateMinutes = Math.floor((checkInDateObj.getTime() - windowStartTime.getTime()) / 60000);
       isLate = true;
@@ -235,41 +257,38 @@ export class AttendanceService {
       isLate,
       isEarlyExit,
       completionStatus,
-      isWorking: !checkOutAt && !isOnBreak,
+      isWorking: !checkOutAt && !isOnBreak && !isHistoricalUnclosed,
       isOnBreak,
       activeBreakStartTime,
     };
   }
 
   /**
-   * Run the end-of-day cutoff check (11:00 PM cutoff) to identify incomplete hours and dispatch alerts
+   * Process daily attendance compliance for all employees (Nightly Cron Job)
+   * Calculates actual net minutes vs. each employee's configured target,
+   * updates status, and sends alert emails + notifications if targets are not met.
    */
-  static async processCutoffAlerts(targetDate?: Date): Promise<{
-    date: string;
-    totalEmployees: number;
-    alertsSent: number;
-    completed: number;
-    incomplete: number;
-    exempted: number;
-  }> {
+  static async processDailyCompliance(targetDate?: Date) {
     const policy = await this.getPolicy();
-    if (!policy.enableIncompleteAlerts) {
-      return { date: (targetDate || new Date()).toISOString(), totalEmployees: 0, alertsSent: 0, completed: 0, incomplete: 0, exempted: 0 };
-    }
-
-    const dateToProcess = targetDate ? new Date(targetDate) : new Date();
-    dateToProcess.setHours(0, 0, 0, 0);
+    const dateToProcess = targetDate || new Date();
+    dateToProcess.setUTCHours(0, 0, 0, 0);
 
     const dateStr = dateToProcess.toISOString().split("T")[0];
     const dayOfWeek = dateToProcess.getDay();
 
     // Check if whole day is weekly off
-    const isWeeklyOffDay = policy.weeklyOffDays.includes(dayOfWeek);
+    const isWeeklyOffDay = Array.isArray(policy?.weeklyOffDays) && policy.weeklyOffDays.includes(dayOfWeek);
 
-    // Check if whole day is company holiday
-    const holiday = await db.holiday.findFirst({
-      where: { date: dateToProcess },
-    });
+    // Check if whole day is company holiday (defensive query against missing columns)
+    let holiday = null;
+    try {
+      holiday = await db.holiday.findFirst({
+        where: { date: dateToProcess },
+        select: { id: true, name: true, date: true },
+      });
+    } catch {
+      holiday = null;
+    }
 
     const employees = await db.user.findMany({
       where: { status: "ACTIVE" },
@@ -290,14 +309,20 @@ export class AttendanceService {
 
     for (const emp of employees) {
       // 1. Check approved leave
-      const leave = await db.leaveRequest.findFirst({
-        where: {
-          userId: emp.id,
-          status: "APPROVED",
-          startDate: { lte: dateToProcess },
-          endDate: { gte: dateToProcess },
-        },
-      });
+      let leave = null;
+      try {
+        leave = await db.leaveRequest.findFirst({
+          where: {
+            userId: emp.id,
+            status: "APPROVED",
+            startDate: { lte: dateToProcess },
+            endDate: { gte: dateToProcess },
+          },
+          select: { id: true, leaveType: true },
+        });
+      } catch {
+        leave = null;
+      }
 
       if (leave || holiday || (isWeeklyOffDay && !leave)) {
         exempted++;
@@ -424,5 +449,12 @@ export class AttendanceService {
       incomplete,
       exempted,
     };
+  }
+
+  /**
+   * Alias for processDailyCompliance (used by scheduled background cutoff runner)
+   */
+  static async processCutoffAlerts(targetDate?: Date) {
+    return this.processDailyCompliance(targetDate);
   }
 }

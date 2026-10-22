@@ -24,31 +24,70 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
        throw new ApiError(400, "Paid commissions cannot be modified.");
     }
 
-    if (action === "approve") {
-      // Transition rule: PENDING/ELIGIBLE -> APPROVED
-      if (commission.status !== "PENDING" && commission.status !== "ELIGIBLE") {
-        throw new ApiError(400, "Only PENDING or ELIGIBLE commissions can be approved.");
+    if (action === "approve" || action === "process") {
+      // Transition rule: REQUESTED, PENDING, or ELIGIBLE -> PROCESSING / APPROVED
+      if (commission.status !== "REQUESTED" && commission.status !== "PENDING" && commission.status !== "ELIGIBLE") {
+        throw new ApiError(400, "Only REQUESTED, PENDING, or ELIGIBLE commissions can be approved for payout.");
       }
       
+      const newStatus = action === "process" ? "PROCESSING" : "APPROVED";
+
       await db.$transaction([
         db.commission.update({
           where: { id: params.id },
-          data: { status: "APPROVED", approvedAt: new Date(), approvedById: userId, notes: notes || commission.notes },
+          data: { 
+            status: newStatus, 
+            approvedAt: new Date(), 
+            approvedById: userId, 
+            payoutNotes: notes || commission.payoutNotes,
+            notes: notes || commission.notes 
+          },
         }),
         db.auditLog.create({
-          data: { userId, action: "COMMISSION_APPROVED", resource: "Commission", details: { commissionId: params.id } }
+          data: { 
+            userId, 
+            action: `COMMISSION_${newStatus}`, 
+            resource: "Commission", 
+            details: { commissionId: params.id, amount: commission.commissionAmount, status: newStatus } 
+          }
         }),
         db.notification.create({
-          data: { userId: commission.brokerProfile.userId, type: "SYSTEM", title: "Commission Approved", message: `Your commission of ₹${commission.commissionAmount} has been approved.`, link: "/broker/commissions" }
+          data: { 
+            userId: commission.brokerProfile.userId, 
+            type: "SYSTEM", 
+            title: "Payout Request Processing", 
+            message: `Your payout request for ₹${commission.commissionAmount.toLocaleString()} has been approved and is being processed by Finance.`, 
+            link: "/broker/commissions" 
+          }
         })
       ]);
-      return NextResponse.json({ success: true, message: "Commission approved." });
+      return NextResponse.json({ success: true, message: `Commission marked as ${newStatus}.` });
     }
 
     if (action === "pay") {
-      // Transition rule: APPROVED -> PAID
-      if (commission.status !== "APPROVED") {
-        throw new ApiError(400, "Commission must be APPROVED before payout.");
+      // Business Rule: Payout is marked PAID only upon verified settlement confirmation with UTR
+      if (!payoutReference || !payoutReference.trim()) {
+        throw new ApiError(400, "Bank transaction reference (UTR) is strictly required to mark commission as PAID.");
+      }
+
+      if (commission.status !== "APPROVED" && commission.status !== "PROCESSING" && commission.status !== "REQUESTED") {
+        throw new ApiError(400, "Commission must be in REQUESTED, PROCESSING, or APPROVED status before final payout settlement.");
+      }
+
+      const cleanUtr = payoutReference.trim();
+
+      // Financial Safeguard: Ensure UTR is unique and not already recorded for another settled payout
+      const duplicateUtr = db.commission.findFirst
+        ? await db.commission.findFirst({
+            where: {
+              payoutReference: cleanUtr,
+              id: { not: params.id },
+              status: "PAID",
+            },
+          })
+        : null;
+      if (duplicateUtr) {
+        throw new ApiError(400, `Bank transaction reference (UTR) '${cleanUtr}' has already been recorded for another settled commission.`);
       }
 
       await db.$transaction([
@@ -59,33 +98,60 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
             paidAt: new Date(), 
             paidById: userId, 
             notes: notes || commission.notes,
-            payoutReference: payoutReference || null
+            payoutReference: cleanUtr,
           },
         }),
         db.auditLog.create({
-          data: { userId, action: "COMMISSION_PAID", resource: "Commission", details: { commissionId: params.id, payoutReference } }
+          data: { 
+            userId, 
+            action: "COMMISSION_PAID", 
+            resource: "Commission", 
+            details: { commissionId: params.id, payoutReference: cleanUtr, amount: commission.commissionAmount } 
+          }
         }),
         db.notification.create({
-          data: { userId: commission.brokerProfile.userId, type: "SYSTEM", title: "Commission Paid", message: `Your commission of ₹${commission.commissionAmount} has been paid. Ref: ${payoutReference || 'N/A'}`, link: "/broker/commissions" }
+          data: { 
+            userId: commission.brokerProfile.userId, 
+            type: "SYSTEM", 
+            title: "Payout Settled", 
+            message: `Your commission of ₹${commission.commissionAmount.toLocaleString()} has been settled. UTR / Ref: ${cleanUtr}`, 
+            link: "/broker/commissions" 
+          }
         })
       ]);
-      return NextResponse.json({ success: true, message: "Commission marked as paid." });
+      return NextResponse.json({ success: true, message: "Commission marked as paid and settled.", payoutReference: cleanUtr });
     }
     
     if (action === "reject") {
+      const reason = body.rejectionReason?.trim() || notes?.trim();
+      if (!reason) {
+        throw new ApiError(400, "A rejection reason is required to reject a payout request.");
+      }
+
       await db.$transaction([
         db.commission.update({
           where: { id: params.id },
-          data: { status: "REJECTED", notes: notes || commission.notes },
+          data: { 
+            status: "REJECTED", 
+            rejectionReason: reason,
+            payoutNotes: reason,
+            notes: reason 
+          },
         }),
         db.auditLog.create({
-          data: { userId, action: "COMMISSION_REJECTED", resource: "Commission", details: { commissionId: params.id, reason: notes } }
+          data: { userId, action: "COMMISSION_REJECTED", resource: "Commission", details: { commissionId: params.id, reason } }
         }),
         db.notification.create({
-          data: { userId: commission.brokerProfile.userId, type: "SYSTEM", title: "Commission Rejected", message: `Your commission was rejected.`, link: "/broker/commissions" }
+          data: { 
+            userId: commission.brokerProfile.userId, 
+            type: "SYSTEM", 
+            title: "Payout Request Rejected", 
+            message: `Your payout request was rejected. Reason: ${reason}. You may correct your account details and re-request.`, 
+            link: "/broker/commissions" 
+          }
         })
       ]);
-      return NextResponse.json({ success: true, message: "Commission rejected." });
+      return NextResponse.json({ success: true, message: "Commission payout request rejected." });
     }
 
     throw new ApiError(400, "Invalid action.");

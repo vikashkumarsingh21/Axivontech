@@ -297,6 +297,17 @@ img {
   line-height: 1.72;
 }
 
+/* ── Browser Autofill Dark Mode Styling ──────────────────────── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #10151B inset !important;
+  -webkit-text-fill-color: #F3F5F7 !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #F3F5F7 !important;
+}
+
 /* ── Demo project light-theme isolation ──────────────────────── */
 /* Applied to the wrapper div of light-themed demo project pages.
    Overrides the global dark color-scheme so native form controls,

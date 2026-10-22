@@ -101,6 +101,7 @@ export default function ClientDocumentsPage() {
           className="h-10 px-3 rounded-lg border border-[#29313B] bg-[#151A21] text-xs font-medium text-[#A7B0BC] focus:outline-none focus:border-emerald-500 shadow-2xs w-full sm:w-auto"
         >
           <option value="ALL">All Classifications</option>
+          <option value="CLIENT_REPORT">Official Delivery Reports</option>
           <option value="CLIENT_DELIVERABLE">Deliverables</option>
           <option value="PROJECT_DOCS">Technical Documentation</option>
           <option value="CONTRACT">Legal & Contracts</option>

@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ChevronLeft, FileText, CheckCircle, XCircle, CreditCard, Send, Upload, RefreshCw, Briefcase, Download, Star } from "lucide-react";
+import { 
+  ChevronLeft, FileText, CheckCircle, XCircle, CreditCard, Send, 
+  Upload, RefreshCw, Briefcase, Download, Star, ShieldCheck, 
+  Award, AlertTriangle, ExternalLink, Clock, Sparkles 
+} from "lucide-react";
 
 export default function AdminPartnerProjectDetailPage() {
   const params = useParams();
@@ -21,6 +25,10 @@ export default function AdminPartnerProjectDetailPage() {
   const [rejectContractModal, setRejectContractModal] = useState(false);
   const [rejectPaymentModal, setRejectPaymentModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+
+  // Delivery, Report & QA action states
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const fetchProject = async () => {
     try {
@@ -106,6 +114,80 @@ export default function AdminPartnerProjectDetailPage() {
     }
   };
 
+  const handleDelivery = async () => {
+    setActionLoading("delivery");
+    setActionMessage(null);
+    try {
+      const res = await fetch(`/api/v1/admin/partner-projects/${project.id}/delivery`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Delivery failed");
+      setActionMessage({ type: "success", text: "Project delivered successfully and official delivery report generated." });
+      fetchProject();
+    } catch (err: any) {
+      setActionMessage({ type: "error", text: err.message });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleCompletion = async () => {
+    setActionLoading("completion");
+    setActionMessage(null);
+    try {
+      const res = await fetch(`/api/v1/admin/partner-projects/${project.id}/completion`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Completion failed");
+      setActionMessage({ type: "success", text: "Project marked as COMPLETED successfully." });
+      fetchProject();
+    } catch (err: any) {
+      setActionMessage({ type: "error", text: err.message });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleGenerateReport = async () => {
+    setActionLoading("report");
+    setActionMessage(null);
+    try {
+      const res = await fetch(`/api/v1/admin/partner-projects/${project.id}/report`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to generate delivery report");
+      setActionMessage({ type: "success", text: "Verified delivery report compiled and published." });
+      fetchProject();
+    } catch (err: any) {
+      setActionMessage({ type: "error", text: err.message });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleQaStatusChange = async (newStatus: string) => {
+    setActionLoading("qa_" + newStatus);
+    setActionMessage(null);
+    try {
+      const res = await fetch(`/api/v1/admin/partner-projects/${project.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ qaStatus: newStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update QA status");
+      setActionMessage({ type: "success", text: `QA status successfully updated to ${newStatus}.` });
+      fetchProject();
+    } catch (err: any) {
+      setActionMessage({ type: "error", text: err.message });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   if (loading) return <div className="p-8 text-center text-gray-500">Loading project...</div>;
   if (error || !project) return <div className="p-6 text-red-500">{error || "Project not found"}</div>;
 
@@ -113,6 +195,7 @@ export default function AdminPartnerProjectDetailPage() {
     { id: "overview", label: "Overview" },
     { id: "contract", label: "Contract" },
     { id: "payment", label: "Payment" },
+    { id: "delivery", label: "Delivery & Reports" },
     { id: "timeline", label: "Timeline" },
   ];
 
@@ -191,11 +274,18 @@ export default function AdminPartnerProjectDetailPage() {
                 </dl>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-white/10 pb-2">Broker Information</h3>
-                <dl className="grid grid-cols-3 gap-y-4 text-sm">
-                  <dt className="text-gray-500">Name</dt><dd className="col-span-2 text-white">{project.brokerProfile.user.name}</dd>
-                  <dt className="text-gray-500">Email</dt><dd className="col-span-2 text-white">{project.brokerProfile.user.email}</dd>
-                </dl>
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-white/10 pb-2">Attribution & Origin</h3>
+                {project.brokerProfile?.user ? (
+                  <dl className="grid grid-cols-3 gap-y-4 text-sm">
+                    <dt className="text-gray-500">Channel</dt><dd className="col-span-2 text-amber-400 font-semibold">Broker Referral</dd>
+                    <dt className="text-gray-500">Broker</dt><dd className="col-span-2 text-white">{project.brokerProfile.user.name}</dd>
+                    <dt className="text-gray-500">Email</dt><dd className="col-span-2 text-white">{project.brokerProfile.user.email}</dd>
+                  </dl>
+                ) : (
+                  <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-400">
+                    <span className="font-bold">Direct Client Engagement:</span> Acquired directly through website without broker intermediary. Direct contractual agreement applies with zero broker commission.
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -441,6 +531,278 @@ export default function AdminPartnerProjectDetailPage() {
           </div>
         )}
 
+        {activeTab === "delivery" && (
+          <div className="p-6 space-y-6">
+            {actionMessage && (
+              <div
+                className={`p-4 rounded-xl border flex items-center justify-between text-sm ${
+                  actionMessage.type === "success"
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    : "bg-red-500/10 border-red-500/30 text-red-400"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  {actionMessage.type === "success" ? (
+                    <CheckCircle className="w-5 h-5 shrink-0" />
+                  ) : (
+                    <AlertTriangle className="w-5 h-5 shrink-0" />
+                  )}
+                  <span>{actionMessage.text}</span>
+                </div>
+                <button
+                  onClick={() => setActionMessage(null)}
+                  className="text-xs uppercase tracking-wider underline hover:opacity-80"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+
+            {/* Status & Gates Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-5 bg-[#1a1a1a] rounded-xl border border-white/10 space-y-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">Lifecycle Status</span>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-3 py-1 text-sm font-bold rounded-md ${
+                      project.status === "COMPLETED"
+                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                        : project.status === "DELIVERED"
+                        ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                        : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                    }`}
+                  >
+                    {project.status}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-400 pt-1">
+                  {project.status === "COMPLETED"
+                    ? "Project execution closed and delivered."
+                    : project.status === "DELIVERED"
+                    ? "Deliverables handed over. Pending final completion."
+                    : "Project active in execution stage."}
+                </p>
+              </div>
+
+              <div className="p-5 bg-[#1a1a1a] rounded-xl border border-white/10 space-y-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">QA & UAT Quality Gate</span>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-3 py-1 text-sm font-bold rounded-md flex items-center gap-1.5 ${
+                      project.qaStatus === "UAT_APPROVED"
+                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                        : project.qaStatus === "UAT_READY"
+                        ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                        : "bg-gray-500/20 text-gray-400 border border-gray-500/30"
+                    }`}
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    {project.qaStatus || "INTERNAL_QA"}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-400 pt-1">
+                  {project.qaStatus === "UAT_APPROVED"
+                    ? "Quality gate cleared: Client accepted deliverables."
+                    : project.qaStatus === "UAT_READY"
+                    ? "Awaiting client review & formal sign-off in Client Portal."
+                    : "Internal QA verification in progress."}
+                </p>
+              </div>
+
+              <div className="p-5 bg-[#1a1a1a] rounded-xl border border-white/10 space-y-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">Official Report Status</span>
+                {(() => {
+                  const reportDoc = project.documents?.find((d: any) => d.category === "CLIENT_REPORT");
+                  return reportDoc ? (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1 text-sm font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                          <Award className="w-4 h-4" />
+                          PUBLISHED
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 pt-1">
+                        Compiled on {new Date(reportDoc.createdAt).toLocaleDateString()}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1 text-sm font-bold rounded-md bg-gray-500/20 text-gray-400 border border-gray-500/30">
+                          PENDING DELIVERY
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 pt-1">Auto-generated upon UAT delivery acceptance.</p>
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* QA & Delivery Workflow Actions */}
+            <div className="p-6 bg-[#161a22] rounded-xl border border-white/10 space-y-6">
+              <div className="border-b border-white/10 pb-4">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-red-500" />
+                  Stage Progression & Quality Gate Actions
+                </h3>
+                <p className="text-xs text-gray-400 mt-1">
+                  Execution progression enforces client UAT approval before official delivery, protecting contract integrity.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Gate 1: QA & UAT Staging */}
+                <div className="p-4 bg-black/40 rounded-lg border border-white/5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-semibold text-white">1. QA & UAT Staging</h4>
+                    <span className="text-[11px] font-mono text-gray-400">{project.qaStatus || "INTERNAL_QA"}</span>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    Advance to UAT Ready when staging is ready for client review. Client can sign off directly in their portal.
+                  </p>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {project.qaStatus !== "UAT_READY" && project.qaStatus !== "UAT_APPROVED" && (
+                      <button
+                        onClick={() => handleQaStatusChange("UAT_READY")}
+                        disabled={actionLoading !== null}
+                        className="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 rounded-md text-xs font-medium disabled:opacity-50"
+                      >
+                        {actionLoading === "qa_UAT_READY" ? "Updating..." : "Mark as UAT Ready"}
+                      </button>
+                    )}
+                    {project.qaStatus !== "UAT_APPROVED" && (
+                      <button
+                        onClick={() => handleQaStatusChange("UAT_APPROVED")}
+                        disabled={actionLoading !== null}
+                        className="px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-md text-xs font-medium disabled:opacity-50"
+                      >
+                        {actionLoading === "qa_UAT_APPROVED" ? "Updating..." : "Admin Override: Approve UAT"}
+                      </button>
+                    )}
+                    {project.qaStatus === "UAT_APPROVED" && (
+                      <div className="text-xs text-emerald-400 flex items-center gap-1.5 font-medium">
+                        <CheckCircle className="w-4 h-4" /> UAT Approved & Ready for Delivery Handover
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Gate 2: Official Delivery & Handover */}
+                <div className="p-4 bg-black/40 rounded-lg border border-white/5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-semibold text-white">2. Delivery & Handover</h4>
+                    <span className="text-[11px] font-mono text-gray-400">{project.status}</span>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    Delivering compiles the immutable Delivery Report, notifies the client, and places artifacts into the Client Document Vault.
+                  </p>
+                  <div className="pt-2">
+                    {project.status !== "DELIVERED" && project.status !== "COMPLETED" ? (
+                      <button
+                        onClick={handleDelivery}
+                        disabled={actionLoading !== null || project.qaStatus !== "UAT_APPROVED"}
+                        className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-800 disabled:text-gray-500 text-white rounded-md text-xs font-bold transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Send className="w-4 h-4" />
+                        {actionLoading === "delivery"
+                          ? "Delivering & Generating Report..."
+                          : "Mark as DELIVERED & Compile Report"}
+                      </button>
+                    ) : project.status === "DELIVERED" ? (
+                      <button
+                        onClick={handleCompletion}
+                        disabled={actionLoading !== null}
+                        className="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-md text-xs font-bold transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Award className="w-4 h-4" />
+                        {actionLoading === "completion" ? "Finalizing..." : "Mark Project as COMPLETED"}
+                      </button>
+                    ) : (
+                      <div className="text-xs text-emerald-400 flex items-center gap-1.5 font-medium">
+                        <CheckCircle className="w-4 h-4" /> Project Successfully Completed
+                      </div>
+                    )}
+
+                    {project.status !== "DELIVERED" && project.status !== "COMPLETED" && project.qaStatus !== "UAT_APPROVED" && (
+                      <p className="text-[11px] text-amber-400/80 mt-2 flex items-center gap-1">
+                        <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                        Requires UAT Approval before delivery transition.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Official Delivery Report Card */}
+            <div className="p-6 bg-[#1a1a1a] rounded-xl border border-white/10 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <Award className="w-4 h-4 text-emerald-400" />
+                    Verified Project Delivery Report (Client Document Vault)
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Truth-grounded handover certificate containing milestone ledger, QA audit, and direct Axivon guarantee.
+                  </p>
+                </div>
+                <button
+                  onClick={handleGenerateReport}
+                  disabled={actionLoading !== null}
+                  className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  {actionLoading === "report" ? "Compiling..." : "Generate / Refresh Report"}
+                </button>
+              </div>
+
+              {(() => {
+                const reportDoc = project.documents?.find((d: any) => d.category === "CLIENT_REPORT");
+                if (!reportDoc) {
+                  return (
+                    <div className="p-8 border border-dashed border-white/10 rounded-xl text-center space-y-3">
+                      <FileText className="w-10 h-10 text-gray-600 mx-auto" />
+                      <p className="text-sm text-gray-400 font-medium">No Delivery Report Generated Yet</p>
+                      <p className="text-xs text-gray-500 max-w-md mx-auto">
+                        A verified project delivery report will be created automatically when you deliver the project, or you can generate one now for preview.
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="p-5 bg-black/40 border border-emerald-500/20 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-emerald-400" />
+                        <h4 className="text-sm font-bold text-white">{reportDoc.title}</h4>
+                        <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded text-[10px] font-mono">
+                          {reportDoc.category}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400">
+                        Published on {new Date(reportDoc.createdAt).toLocaleString()} • Secure HTML Vault Artifact
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`/api/v1/client/projects/${project.id}/documents/${reportDoc.id}/download`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-md text-xs font-medium transition-colors flex items-center gap-2 shadow-sm"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        View / Download Report
+                      </a>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+
         {activeTab === "timeline" && (
           <div className="p-6 max-w-2xl mx-auto py-10">
             <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/20 before:to-transparent">
@@ -528,6 +890,51 @@ export default function AdminPartnerProjectDetailPage() {
                       <span className="text-xs text-gray-500">{new Date(project.payment.verifiedAt).toLocaleDateString()}</span>
                     </div>
                     <p className="text-sm text-gray-400">Payment verified. Project execution begins.</p>
+                  </div>
+                </div>
+              )}
+
+              {project.qaStatus === "UAT_APPROVED" && (
+                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-purple-500 bg-purple-500/20 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
+                    <ShieldCheck className="text-purple-400 w-5 h-5" />
+                  </div>
+                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl bg-white/5 border border-white/10 shadow">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-bold text-white text-sm">UAT Approved</h3>
+                      <span className="text-xs text-emerald-400 font-semibold">Cleared</span>
+                    </div>
+                    <p className="text-sm text-gray-400">Deliverables inspected and accepted for delivery handover.</p>
+                  </div>
+                </div>
+              )}
+
+              {(project.deliveredAt || project.status === "DELIVERED" || project.status === "COMPLETED") && (
+                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-blue-500 bg-blue-500/20 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
+                    <Award className="text-blue-400 w-5 h-5" />
+                  </div>
+                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl bg-white/5 border border-white/10 shadow">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-bold text-white text-sm">Project Delivered</h3>
+                      <span className="text-xs text-gray-500">{project.deliveredAt ? new Date(project.deliveredAt).toLocaleDateString() : "Handed Over"}</span>
+                    </div>
+                    <p className="text-sm text-gray-400">Official Delivery Report published to Client Vault.</p>
+                  </div>
+                </div>
+              )}
+
+              {(project.completedAt || project.status === "COMPLETED") && (
+                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-emerald-500 bg-emerald-600 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow shadow-emerald-500/50">
+                    <CheckCircle className="text-white w-5 h-5" />
+                  </div>
+                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/30 shadow">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-bold text-white text-sm">Project Completed</h3>
+                      <span className="text-xs text-gray-500">{project.completedAt ? new Date(project.completedAt).toLocaleDateString() : "Finalized"}</span>
+                    </div>
+                    <p className="text-sm text-gray-400">All deliverables and warranties completed.</p>
                   </div>
                 </div>
               )}

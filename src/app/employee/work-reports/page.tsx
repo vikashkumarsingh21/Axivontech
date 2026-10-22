@@ -38,6 +38,7 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [todayReport, setTodayReport] = useState<WorkReportItem | null>(null);
+  const [userTargetHours, setUserTargetHours] = useState<number>(8);
 
   // Form State
   const [summary, setSummary] = useState("");
@@ -55,8 +56,18 @@ export default function ReportsPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/v1/employee/work-reports");
+      const [res, meRes] = await Promise.all([
+        fetch("/api/v1/employee/work-reports"),
+        fetch("/api/v1/employee/me"),
+      ]);
       const data = await res.json();
+      const meData = await meRes.json().catch(() => null);
+
+      const targetHours = meData?.user?.requiredDailyMinutes
+        ? Math.round(meData.user.requiredDailyMinutes / 60)
+        : 8;
+      setUserTargetHours(targetHours);
+
       if (data.success && Array.isArray(data.reports)) {
         setReports(data.reports);
 
@@ -73,9 +84,10 @@ export default function ReportsPage() {
           setTasksCompleted(existingToday.tasksCompleted || "");
           setChallenges(existingToday.challenges || "");
           setNextSteps(existingToday.nextSteps || "");
-          setHoursWorked(existingToday.hoursWorked || 8);
+          setHoursWorked(existingToday.hoursWorked ?? targetHours);
         } else {
           setTodayReport(null);
+          setHoursWorked(targetHours);
         }
       }
     } catch {
@@ -109,7 +121,7 @@ export default function ReportsPage() {
           tasksCompleted: tasksCompleted.trim() || null,
           challenges: challenges.trim() || null,
           nextSteps: nextSteps.trim() || null,
-          hoursWorked: Number(hoursWorked) || 8,
+          hoursWorked: Number(hoursWorked) || userTargetHours,
         }),
       });
 

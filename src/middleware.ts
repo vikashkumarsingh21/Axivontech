@@ -95,39 +95,55 @@ export async function middleware(req: NextRequest) {
       // Role based basic checks
       const role = payload.role as string;
       
+      const getRoleRedirectUrl = (userRole: string) => {
+        if (userRole === "BROKER" || userRole === "BUSINESS_PARTNER") {
+          return new URL("/broker/dashboard", req.url);
+        }
+        if (userRole === "CLIENT") {
+          return new URL("/client/dashboard", req.url);
+        }
+        if (userRole === "FOUNDER" || userRole === "CO_FOUNDER") {
+          return new URL("/executive/dashboard", req.url);
+        }
+        if (userRole === "ADMIN") {
+          return new URL("/admin/dashboard", req.url);
+        }
+        return new URL("/employee/dashboard", req.url);
+      };
+
       if ((isAdminRoute || isAdminApiRoute || isAnalyticsApiRoute) && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
         if (isAdminApiRoute || isAnalyticsApiRoute) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
-        return NextResponse.redirect(role === "BROKER" ? new URL("/broker/dashboard", req.url) : new URL("/employee/dashboard", req.url));
+        return NextResponse.redirect(getRoleRedirectUrl(role));
       }
 
       if ((isExecutiveRoute || isExecutiveApiRoute) && role !== "FOUNDER" && role !== "CO_FOUNDER") {
         if (isExecutiveApiRoute) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
-        return NextResponse.redirect(role === "BROKER" ? new URL("/broker/dashboard", req.url) : new URL("/employee/dashboard", req.url));
+        return NextResponse.redirect(getRoleRedirectUrl(role));
       }
 
-      if ((isEmployeeRoute || isEmployeeApiRoute) && role === "BROKER") {
+      if ((isEmployeeRoute || isEmployeeApiRoute) && (role === "BROKER" || role === "BUSINESS_PARTNER" || role === "CLIENT")) {
         if (isEmployeeApiRoute) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
-        return NextResponse.redirect(new URL("/broker/dashboard", req.url));
+        return NextResponse.redirect(getRoleRedirectUrl(role));
       }
 
-      if ((isBrokerRoute || isBrokerApiRoute) && role !== "BROKER" && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
+      if ((isBrokerRoute || isBrokerApiRoute) && role !== "BROKER" && role !== "BUSINESS_PARTNER" && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
         if (isBrokerApiRoute) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
-        return NextResponse.redirect(new URL("/employee/dashboard", req.url));
+        return NextResponse.redirect(getRoleRedirectUrl(role));
       }
 
-      if ((isClientRoute || isClientApiRoute) && role !== "CLIENT") {
+      if ((isClientRoute || isClientApiRoute) && role !== "CLIENT" && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
         if (isClientApiRoute) {
            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
-        return NextResponse.redirect(new URL("/login", req.url));
+        return NextResponse.redirect(getRoleRedirectUrl(role));
       }
 
       // Add user info to headers for downstream consumption securely

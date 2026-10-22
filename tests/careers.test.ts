@@ -147,6 +147,8 @@ describe("Careers API Validations When Recruitment is Active (ON)", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         fullName: "Test Candidate",
+        privacyPolicyAcknowledged: true,
+        policyVersion: "1.0.0",
         captchaToken: "1x00000000000000000000AA",
         // missing email, position, location, resumeUrl
       }),
@@ -171,6 +173,8 @@ describe("Careers API Validations When Recruitment is Active (ON)", () => {
         position: "Frontend Developer Intern",
         location: "Patna, Bihar",
         resumeUrl: "https://drive.google.com/test-resume",
+        privacyPolicyAcknowledged: true,
+        policyVersion: "1.0.0",
         captchaToken: "1x00000000000000000000AA",
       }),
     });
@@ -204,6 +208,8 @@ describe("Careers API Validations When Recruitment is Active (ON)", () => {
         github: "https://github.com/ananya-dev",
         portfolio: "https://ananya.dev",
         coverLetter: "Excited about modern Next.js and Tailwind development at Axivon.",
+        privacyPolicyAcknowledged: true,
+        policyVersion: "1.0.0",
         captchaToken: "1x00000000000000000000AA",
       }),
     });

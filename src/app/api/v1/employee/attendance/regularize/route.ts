@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { validateActiveUser } from "@/lib/auth/permissions";
+import { getUtcCalendarDate } from "@/lib/date-utils";
 
 export async function GET(req: NextRequest) {
   try {
@@ -40,8 +41,7 @@ export async function POST(req: NextRequest) {
       throw new ApiError(400, "Date, requested check-in time, check-out time, and reason are required");
     }
 
-    const targetDate = new Date(date);
-    targetDate.setHours(0, 0, 0, 0);
+    const targetDate = getUtcCalendarDate(date);
 
     const checkInDate = new Date(requestedCheckIn);
     const checkOutDate = new Date(requestedCheckOut);

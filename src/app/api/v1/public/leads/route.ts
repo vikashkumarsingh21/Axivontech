@@ -8,10 +8,12 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
 
-    // Server-side anti-bot, rate limiting, and Turnstile CAPTCHA verification
+    // Server-side dual protection: Privacy Policy acknowledgement + Google reCAPTCHA v2 / Turnstile
     const protection = await verifyFormProtection(req, body, {
       action: ["lead_inbound", "contact_form", "contact_inquiry", "chatbot_lead", "referral_lead"],
       rateLimitPreset: RATE_LIMIT_PRESETS.PUBLIC_LEADS,
+      requirePolicyAcknowledgement: true,
+      policySlug: "privacy-policy",
     });
     if (!protection.success && protection.errorResponse) {
       return protection.errorResponse;

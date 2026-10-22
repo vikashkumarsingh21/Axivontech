@@ -31,9 +31,11 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    // Verify Turnstile CAPTCHA & honeypot anti-bot protection
+    // Verify anti-bot protection (Google reCAPTCHA v2 / Turnstile) & honeypot traps
     const protectionResult = await verifyFormProtection(req, body, {
       action: "auth_login",
+      requirePolicyAcknowledgement: false,
+      requireCaptcha: true,
     });
     if (!protectionResult.success) {
       return protectionResult.response!;
@@ -70,7 +72,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Identify primary role for session based on role hierarchy
-    const roleHierarchy = ["FOUNDER", "CO_FOUNDER", "ADMIN", "EMPLOYEE", "BROKER"];
+    const roleHierarchy = [
+      "FOUNDER",
+      "CO_FOUNDER",
+      "ADMIN",
+      "EXECUTIVE",
+      "BROKER",
+      "BUSINESS_PARTNER",
+      "CLIENT",
+      "HR",
+      "FINANCE",
+      "LEAD_DEVELOPER",
+      "EMPLOYEE",
+    ];
     const userRoleNames = user.userRoles.map((ur) => ur.role.name);
     const role = roleHierarchy.find((r) => userRoleNames.includes(r)) || userRoleNames[0] || "EMPLOYEE";
 

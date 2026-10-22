@@ -22,6 +22,14 @@ interface PortalAIAssistantProps {
   initialOpen?: boolean;
 }
 
+function generateMessageId(prefix: "usr" | "bot"): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function getFormattedTime(): string {
+  return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
 export function PortalAIAssistant({ portalRole, initialOpen = false }: PortalAIAssistantProps) {
   const [isOpen, setIsOpen] = useState(initialOpen);
   const [config, setConfig] = useState<PortalAssistantConfig | null>(null);
@@ -84,10 +92,10 @@ export function PortalAIAssistant({ portalRole, initialOpen = false }: PortalAIA
 
     setError(null);
     const userMsg: PortalAIMessage = {
-      id: `usr-${Date.now()}`,
+      id: generateMessageId("usr"),
       role: "user",
       content: textToSend,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      timestamp: getFormattedTime(),
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -115,10 +123,10 @@ export function PortalAIAssistant({ portalRole, initialOpen = false }: PortalAIA
       const aiData = json.data;
 
       const botMsg: PortalAIMessage = {
-        id: `bot-${Date.now()}`,
+        id: generateMessageId("bot"),
         role: "assistant",
         content: aiData.reply || "I have retrieved your requested records.",
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        timestamp: getFormattedTime(),
         toolsExecuted: aiData.toolsExecuted,
         suggestedActions: aiData.suggestedActions,
         isDraft: Boolean(aiData.draftData),

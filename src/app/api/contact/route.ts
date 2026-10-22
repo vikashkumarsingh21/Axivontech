@@ -7,10 +7,12 @@ export async function POST(req: Request) {
   try {
     const data = await req.json().catch(() => ({}));
 
-    // Server-side anti-bot & CAPTCHA protection
+    // Server-side dual protection: Privacy Policy acknowledgement + Google reCAPTCHA v2 / Turnstile
     const protection = await verifyFormProtection(req, data, {
       action: ["contact_inquiry", "contact_form", "lead_inbound"],
       rateLimitPreset: RATE_LIMIT_PRESETS.PUBLIC_LEADS,
+      requirePolicyAcknowledgement: true,
+      policySlug: "privacy-policy",
     });
     if (!protection.success && protection.errorResponse) {
       return protection.errorResponse;

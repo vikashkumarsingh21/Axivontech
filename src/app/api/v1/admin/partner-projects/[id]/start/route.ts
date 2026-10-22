@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
+import { EmailService } from "@/lib/email/service";
 import crypto from "crypto";
 
 // BP-0904: Project Start and Client Account Creation
@@ -55,6 +56,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
       // Only create if there's no clientUserId linked and no existing user with that email
       const clientUserId = project.clientUserId;
       let isNewClient = false;
+      let clientActivationToken: string | null = null;
       
       if (!clientUserId) {
         // Check if a user with this email already exists
@@ -66,6 +68,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
           // BP-0905: Temporary credential logic
           // Generate a secure random token that will be sent via email
           const token = crypto.randomBytes(32).toString('hex');
+          clientActivationToken = token;
           
           clientUser = await tx.user.create({
             data: {
@@ -114,8 +117,6 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
               details: { clientId: clientUser.id, projectId: id, projectCode: project.projectCode },
             },
           });
-          
-          // In real implementation, send email here with activationToken link
         }
         
         // Link client to project safely
@@ -125,18 +126,49 @@ export async function POST(req: NextRequest, props: { params: Promise<{ [key: st
         });
       }
 
-      await tx.notification.create({
-        data: {
-          userId: project.brokerProfile.userId,
-          type: "SYSTEM",
-          title: "Project Started",
-          message: `Your project ${project.projectCode} has officially started! The client account has been prepared.`,
-          link: `/broker/projects/${id}`,
-        },
-      });
+      if (project.brokerProfile?.userId) {
+        await tx.notification.create({
+          data: {
+            userId: project.brokerProfile.userId,
+            type: "SYSTEM",
+            title: "Project Started",
+            message: `Your project ${project.projectCode} has officially started! The client account has been prepared.`,
+            link: `/broker/projects/${id}`,
+          },
+        });
+      }
 
-      return { project: startedProject, isNewClient };
+      return {
+        project: startedProject,
+        isNewClient,
+        activationToken: clientActivationToken,
+        clientEmail: project.clientEmail,
+        clientName: project.clientName,
+        companyName: project.companyName,
+        projectName: project.projectName,
+        projectCode: project.projectCode,
+      };
     });
+
+    // Send client onboarding activation email asynchronously if account was newly created
+    if (result.isNewClient && result.activationToken) {
+      const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in";
+      const activationLink = `${baseUrl}/client/activate?token=${result.activationToken}`;
+
+      EmailService.send({
+        to: result.clientEmail,
+        templateKey: "CLIENT_ACCOUNT_ACTIVATION",
+        variables: {
+          name: result.clientName,
+          companyName: result.companyName,
+          projectName: result.projectName,
+          projectCode: result.projectCode,
+          activationLink,
+          title: `Activate Your Axivon Client Portal — ${result.projectName}`,
+          message: `Your project ${result.projectCode} (${result.projectName}) has officially commenced! Please activate your AXIVON ONE Client Portal account using the secure link below to review project deliverables, milestones, and sign-offs:\n\n${activationLink}`,
+        },
+      }).catch((err) => console.error("[StartProject] Client activation email dispatch error:", err));
+    }
 
     return NextResponse.json({ success: true, data: result });
   } catch (error) {

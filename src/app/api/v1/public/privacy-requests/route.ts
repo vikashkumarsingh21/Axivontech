@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { verifyTurnstileToken } from "@/lib/captcha/turnstile";
+import { verifyFormProtection } from "@/lib/captcha";
 import { randomBytes } from "crypto";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { requesterName, requesterEmail, requesterPhone, category, requestDetails, captchaToken } = body;
+
+    // Server-side dual protection: Privacy Policy acknowledgement + Google reCAPTCHA v2 / Turnstile
+    const protection = await verifyFormProtection(req, body, {
+      action: "privacy_request",
+      requirePolicyAcknowledgement: true,
+      policySlug: "privacy-policy",
+    });
+    if (!protection.success && protection.errorResponse) {
+      return protection.errorResponse;
+    }
 
     if (!requesterName?.trim() || !requesterEmail?.trim() || !category?.trim() || !requestDetails?.trim()) {
       return NextResponse.json(
@@ -23,20 +33,6 @@ export async function POST(req: NextRequest) {
     const validCategories = ["ACCESS", "CORRECTION", "ERASURE", "WITHDRAW_CONSENT", "GRIEVANCE"];
     if (!validCategories.includes(category)) {
       return NextResponse.json({ error: "Invalid privacy request category." }, { status: 400 });
-    }
-
-    // CAPTCHA verification
-    const captchaResult = await verifyTurnstileToken({
-      token: captchaToken,
-      remoteIp: req.headers.get("x-forwarded-for"),
-      expectedAction: "privacy_request",
-    });
-
-    if (!captchaResult.success) {
-      return NextResponse.json(
-        { error: captchaResult.message || "CAPTCHA verification failed." },
-        { status: 400 }
-      );
     }
 
     const referenceId = `PR-2026-${randomBytes(3).toString("hex").toUpperCase()}`;

@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { validateActiveUser, hasPermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { AttendanceService } from "@/lib/services/attendance.service";
+import { getUtcCalendarDate, getUtcDayRange } from "@/lib/date-utils";
 
 export async function GET(req: NextRequest) {
   try {
@@ -29,7 +30,10 @@ export async function GET(req: NextRequest) {
     const statusFilter = searchParams.get("status") || undefined;
     const search = searchParams.get("search") || undefined;
     const dateFilterStr = searchParams.get("date") || undefined;
+    const startDateParam = searchParams.get("startDate") || undefined;
+    const endDateParam = searchParams.get("endDate") || undefined;
     const isHistoryView = searchParams.get("history") === "true";
+    const isCompanyHistoryView = (isHistoryView && !employeeIdFilter) || searchParams.get("view") === "history" || (!!startDateParam && !!endDateParam);
 
     // ─── 1. INDIVIDUAL EMPLOYEE DETAILED HISTORY ──────────────────────────────
     if (employeeIdFilter && isHistoryView) {
@@ -99,7 +103,7 @@ export async function GET(req: NextRequest) {
           isLate: calc.isLate,
           lateMinutes: calc.lateMinutes,
           isEarlyExit: calc.isEarlyExit,
-          status: calc.completionStatus,
+          status: !att.checkOutAt && !!att.checkInAt ? "IN_PROGRESS" : calc.completionStatus,
           completionStatus: calc.completionStatus,
           emailAlertSent: att.emailAlertSent,
           breaks: att.breaks,
@@ -125,17 +129,7 @@ export async function GET(req: NextRequest) {
     }
 
     // ─── 2. DAILY OR FILTERED COMPANY-WIDE VIEW ──────────────────────────────
-    let startOfDay: Date;
-    let endOfDay: Date;
-
-    if (dateFilterStr) {
-      startOfDay = new Date(`${dateFilterStr}T00:00:00.000Z`);
-      endOfDay = new Date(`${dateFilterStr}T23:59:59.999Z`);
-    } else {
-      const now = new Date();
-      startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
-      endOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
-    }
+    const { startOfDay, endOfDay } = getUtcDayRange(dateFilterStr || new Date());
 
     const employeeWhere: any = {};
 
@@ -176,13 +170,128 @@ export async function GET(req: NextRequest) {
 
     const empIds = employees.map((e) => e.id);
 
-    // Fetch attendance records and active breaks
+    // ─── 2. COMPANY-WIDE DETAILED ATTENDANCE HISTORY VIEW ────────────────────
+    if (isCompanyHistoryView) {
+      const attWhere: any = {};
+      if (empIds.length > 0) {
+        attWhere.userId = { in: empIds };
+      }
+      if (startDateParam && endDateParam) {
+        const { startOfDay } = getUtcDayRange(startDateParam);
+        const { endOfDay } = getUtcDayRange(endDateParam);
+        attWhere.OR = [
+          { date: { gte: startOfDay, lte: endOfDay } },
+          { checkInAt: { gte: startOfDay, lte: endOfDay } },
+        ];
+      }
+
+      const historyAttendances = await db.attendance.findMany({
+        where: attWhere,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              employeeId: true,
+              department: true,
+              designation: true,
+              requiredDailyMinutes: true,
+            },
+          },
+          breaks: {
+            orderBy: { startTime: "asc" },
+          },
+          regularization: true,
+        },
+        orderBy: [{ date: "desc" }, { checkInAt: "desc" }],
+        take: 300,
+      });
+
+      let totalWorkedMinutes = 0;
+      let totalBreakMinutes = 0;
+      let totalCompletedDays = 0;
+
+      const formattedHistory = historyAttendances.map((att) => {
+        const reqMins = att.requiredDailyMinutes || att.user?.requiredDailyMinutes || policy.defaultRequiredMinutes || 480;
+        const isActive = !att.checkOutAt && !!att.checkInAt;
+
+        const calc = AttendanceService.calculateDay({
+          checkInAt: att.checkInAt,
+          checkOutAt: att.checkOutAt,
+          breaks: att.breaks,
+          requiredDailyMinutes: reqMins,
+          policy,
+          referenceTime: new Date(),
+        });
+
+        if (calc.completionStatus === "COMPLETE") {
+          totalCompletedDays++;
+        }
+        totalWorkedMinutes += calc.netMinutes;
+        totalBreakMinutes += calc.breakMinutes;
+
+        return {
+          id: att.id,
+          userId: att.userId,
+          employeeName: att.user?.name || "Unknown",
+          employeeEmail: att.user?.email || "",
+          employeeCode: att.user?.employeeId || null,
+          department: att.user?.department || null,
+          designation: att.user?.designation || null,
+          date: att.date,
+          checkInAt: att.checkInAt,
+          checkOutAt: att.checkOutAt,
+          grossMinutes: calc.grossMinutes,
+          breakMinutes: calc.breakMinutes,
+          workedMinutes: calc.netMinutes,
+          netMinutes: calc.netMinutes,
+          requiredMinutes: reqMins,
+          remainingMinutes: calc.remainingMinutes,
+          differenceMinutes: calc.netMinutes - reqMins,
+          isLate: calc.isLate,
+          lateMinutes: calc.lateMinutes,
+          isEarlyExit: calc.isEarlyExit,
+          status: isActive ? "IN_PROGRESS" : calc.completionStatus,
+          completionStatus: calc.completionStatus,
+          emailAlertSent: att.emailAlertSent,
+          breaks: att.breaks,
+          regularization: att.regularization,
+          currentState: calc.isOnBreak ? "ON_BREAK" : isActive ? "WORKING" : "IDLE",
+          notes: att.notes,
+        };
+      });
+
+      let finalHistory = formattedHistory;
+      if (statusFilter) {
+        finalHistory = formattedHistory.filter(
+          (r) => r.status.toUpperCase() === statusFilter.toUpperCase()
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        policy,
+        history: finalHistory,
+        stats: {
+          totalRecords: finalHistory.length,
+          totalWorkedMinutes,
+          totalBreakMinutes,
+          totalCompletedDays,
+          averageWorkedMinutes: finalHistory.length ? Math.round(totalWorkedMinutes / finalHistory.length) : 0,
+        },
+      });
+    }
+
+    // ─── 3. DAILY COMPANY-WIDE LIVE MONITOR ──────────────────────────────────
+    // Fetch attendance records, today's punches, and active unclosed punches
     const attendances = await db.attendance.findMany({
       where: {
         userId: { in: empIds },
         OR: [
           { date: { gte: startOfDay, lte: endOfDay } },
           { checkInAt: { gte: startOfDay, lte: endOfDay } },
+          { checkOutAt: null },
         ],
       },
       include: {
@@ -205,13 +314,31 @@ export async function GET(req: NextRequest) {
     });
     const leaveMap = new Map(leaves.map((l) => [l.userId, l]));
 
-    // Check holiday
-    const holiday = await db.holiday.findFirst({
-      where: { date: startOfDay },
-    });
+    // Check holiday (safely handled with try/catch to prevent schema drift crashes)
+    let holiday = null;
+    try {
+      holiday = await db.holiday.findFirst({
+        where: { date: startOfDay },
+        select: { id: true, name: true, date: true },
+      });
+    } catch {
+      holiday = null;
+    }
 
-    const isWeeklyOff = policy.weeklyOffDays.includes(startOfDay.getUTCDay());
-    const attendanceMap = new Map(attendances.map((a) => [a.userId, a]));
+    const isWeeklyOff = Array.isArray(policy?.weeklyOffDays)
+      ? policy.weeklyOffDays.includes(startOfDay.getUTCDay())
+      : false;
+    const attendanceMap = new Map<string, any>();
+    for (const a of attendances) {
+      if (!attendanceMap.has(a.userId)) {
+        attendanceMap.set(a.userId, a);
+      } else {
+        const prev = attendanceMap.get(a.userId);
+        if (prev.checkOutAt && !a.checkOutAt) {
+          attendanceMap.set(a.userId, a);
+        }
+      }
+    }
 
     let currentlyWorking = 0;
     let currentlyOnBreak = 0;
@@ -393,7 +520,7 @@ export async function GET(req: NextRequest) {
         lateMinutes: calc.lateMinutes,
         isEarlyExit: calc.isEarlyExit,
         earlyExitMinutes: calc.earlyExitMinutes,
-        status: calc.completionStatus,
+        status: !att.checkOutAt && !!att.checkInAt ? "IN_PROGRESS" : calc.completionStatus,
         completionStatus: calc.completionStatus,
         emailAlertSent: att.emailAlertSent,
         currentState: calc.isOnBreak ? "ON_BREAK" : calc.isWorking ? "WORKING" : "IDLE",
@@ -450,8 +577,7 @@ export async function POST(req: NextRequest) {
       throw new ApiError(400, "userId, date, and checkInAt are required");
     }
 
-    const targetDate = new Date(date);
-    targetDate.setHours(0, 0, 0, 0);
+    const targetDate = getUtcCalendarDate(date);
 
     const targetUser = await db.user.findUnique({ where: { id: userId } });
     if (!targetUser) throw new ApiError(404, "Target employee not found");
@@ -481,7 +607,7 @@ export async function POST(req: NextRequest) {
         earlyExitMinutes: calc.earlyExitMinutes,
         isLate: calc.isLate,
         isEarlyExit: calc.isEarlyExit,
-        status: calc.completionStatus,
+        status: checkOutAt ? calc.completionStatus : "IN_PROGRESS",
         completionStatus: calc.completionStatus,
         notes: notes || "Admin manual punch",
       },
@@ -500,7 +626,7 @@ export async function POST(req: NextRequest) {
         earlyExitMinutes: calc.earlyExitMinutes,
         isLate: calc.isLate,
         isEarlyExit: calc.isEarlyExit,
-        status: calc.completionStatus,
+        status: checkOutAt ? calc.completionStatus : "IN_PROGRESS",
         completionStatus: calc.completionStatus,
         notes: notes || "Admin manual punch",
       },

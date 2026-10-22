@@ -135,7 +135,7 @@ describe("STEP 1: Website Reliability & Credibility Tests", () => {
       const req = new Request("http://localhost:3000/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "test@example.com", message: "Hello", captchaToken: "1x00000000000000000000AA" }),
+        body: JSON.stringify({ email: "test@example.com", message: "Hello", privacyPolicyAcknowledged: true, policyVersion: "1.0.0", captchaToken: "1x00000000000000000000AA" }),
       });
 
       const res = await POST(req);
@@ -150,7 +150,7 @@ describe("STEP 1: Website Reliability & Credibility Tests", () => {
       const req = new Request("http://localhost:3000/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: "Alice", email: "not-an-email", message: "Hello", captchaToken: "1x00000000000000000000AA" }),
+        body: JSON.stringify({ name: "Alice", email: "not-an-email", message: "Hello", privacyPolicyAcknowledged: true, policyVersion: "1.0.0", captchaToken: "1x00000000000000000000AA" }),
       });
 
       const res = await POST(req);
@@ -171,6 +171,8 @@ describe("STEP 1: Website Reliability & Credibility Tests", () => {
           phone: "+91 9876543210",
           service: "Website Development",
           message: "Looking for an enterprise web platform",
+          privacyPolicyAcknowledged: true,
+          policyVersion: "1.0.0",
           captchaToken: "1x00000000000000000000AA",
         }),
       });

@@ -227,6 +227,7 @@ describe("Step 6: Performance, Security & Production Optimization", () => {
       expect(getHeader("Referrer-Policy")).toBe("strict-origin-when-cross-origin");
       expect(getHeader("Strict-Transport-Security")).toContain("max-age=31536000");
       expect(getHeader("Content-Security-Policy")).toContain("default-src 'self'");
+      expect(getHeader("Content-Security-Policy")).toContain("frame-src 'self' https://www.google.com/recaptcha/");
       expect(getHeader("Permissions-Policy")).toContain("camera=()");
     });
 

@@ -42,10 +42,10 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
     });
     if (!payment) throw new ApiError(404, "Payment not found.");
 
-    const brokerUserId = payment.partnerProject.brokerProfile.userId;
+    const brokerUserId = payment.partnerProject.brokerProfile?.userId;
     const projectId = payment.partnerProject.id;
     const projectCode = payment.partnerProject.projectCode;
-    const brokerProfileId = payment.partnerProject.brokerProfile.id;
+    const brokerProfileId = payment.partnerProject.brokerProfile?.id;
 
     if (action === "verify") {
       if (payment.status !== "SUBMITTED" && payment.status !== "UNDER_REVIEW") {
@@ -60,10 +60,10 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
         throw new ApiError(400, "Project contract must be VERIFIED before payment can be verified.");
       }
 
-      // COMMISSION CALCULATION
+      // COMMISSION CALCULATION (only for broker-referred projects)
       const activeRule = await db.commissionRule.findFirst({ where: { isActive: true } });
       let commAmount = 0;
-      if (activeRule) {
+      if (activeRule && brokerProfileId) {
         if (activeRule.type === "PERCENTAGE") {
           commAmount = (payment.projectPrice * activeRule.value) / 100;
         } else {
@@ -83,52 +83,75 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
         db.auditLog.create({
           data: { userId, action: "PAYMENT_VERIFIED", resource: "PartnerPayment", details: { paymentId: params.id, projectCode, amount: payment.amountPaid } },
         }),
-        db.notification.create({
-          data: {
-            userId: brokerUserId, type: "SYSTEM", title: "Payment Verified",
-            message: `Payment for project ${projectCode} has been verified. Your project is now confirmed!`,
-            link: `/broker/projects/${projectId}`,
-          },
-        }),
       ];
 
-      if (activeRule) {
+      if (brokerUserId) {
         transactionOps.push(
-          db.commission.create({
-            data: {
-              partnerProjectId: projectId,
-              brokerProfileId: brokerProfileId,
-              commissionRuleId: activeRule.id,
-              projectValue: payment.projectPrice,
-              commissionType: activeRule.type,
-              commissionRate: activeRule.type === "PERCENTAGE" ? activeRule.value : null,
-              commissionAmount: commAmount,
-              status: "ELIGIBLE",
-              eligibleAt: new Date(),
-            }
-          }),
-          db.auditLog.create({
-            data: { userId, action: "COMMISSION_ELIGIBLE", resource: "Commission", details: { projectId, projectCode, amount: commAmount } }
-          }),
           db.notification.create({
             data: {
-              userId: brokerUserId, type: "SYSTEM", title: "Commission Eligible",
-              message: `Your commission for project ${projectCode} is now eligible.`,
-              link: `/broker/commissions`,
-            }
+              userId: brokerUserId, type: "SYSTEM", title: "Payment Verified",
+              message: `Payment for project ${projectCode} has been verified. Your project is now confirmed!`,
+              link: `/broker/projects/${projectId}`,
+            },
           })
         );
       }
 
+      // Direct projects without valid broker attribution do not generate broker commissions
+      if (activeRule && brokerProfileId) {
+        // Idempotency guard: prevent duplicate commission creation if retried
+        const existingCommission = await db.commission.findUnique({
+          where: { partnerProjectId: projectId },
+        });
+
+        if (!existingCommission) {
+          transactionOps.push(
+            db.commission.create({
+              data: {
+                partnerProjectId: projectId,
+                brokerProfileId: brokerProfileId,
+                commissionRuleId: activeRule.id,
+                projectValue: payment.projectPrice,
+                commissionType: activeRule.type,
+                commissionRate: activeRule.type === "PERCENTAGE" ? activeRule.value : null,
+                commissionAmount: commAmount,
+                status: "ELIGIBLE",
+                eligibleAt: new Date(),
+              }
+            }),
+            db.auditLog.create({
+              data: { userId, action: "COMMISSION_ELIGIBLE", resource: "Commission", details: { projectId, projectCode, amount: commAmount } }
+            })
+          );
+
+          if (brokerUserId) {
+            transactionOps.push(
+              db.notification.create({
+                data: {
+                  userId: brokerUserId, type: "SYSTEM", title: "Commission Eligible",
+                  message: `Your commission for project ${projectCode} is now eligible.`,
+                  link: `/broker/commissions`,
+                }
+              })
+            );
+          }
+        }
+      }
+
       await db.$transaction(transactionOps);
 
-      return NextResponse.json({ success: true, message: "Payment verified. Project confirmed. Commission created." });
+      return NextResponse.json({ 
+        success: true, 
+        message: brokerProfileId 
+          ? "Payment verified. Project confirmed. Commission created." 
+          : "Payment verified. Direct project confirmed." 
+      });
     }
 
     if (action === "reject") {
       if (!rejectionReason) throw new ApiError(400, "Rejection reason is required.");
 
-      await db.$transaction([
+      const rejectOps: any[] = [
         db.partnerPayment.update({
           where: { id: params.id },
           data: { status: "REJECTED", rejectionReason, rejectedAt: new Date() },
@@ -140,14 +163,21 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
         db.auditLog.create({
           data: { userId, action: "PAYMENT_REJECTED", resource: "PartnerPayment", details: { paymentId: params.id, projectCode, reason: rejectionReason } },
         }),
-        db.notification.create({
-          data: {
-            userId: brokerUserId, type: "SYSTEM", title: "Payment Rejected",
-            message: `Payment for project ${projectCode} was rejected. Reason: ${rejectionReason}`,
-            link: `/broker/projects/${projectId}`,
-          },
-        }),
-      ]);
+      ];
+
+      if (brokerUserId) {
+        rejectOps.push(
+          db.notification.create({
+            data: {
+              userId: brokerUserId, type: "SYSTEM", title: "Payment Rejected",
+              message: `Payment for project ${projectCode} was rejected. Reason: ${rejectionReason}`,
+              link: `/broker/projects/${projectId}`,
+            },
+          })
+        );
+      }
+
+      await db.$transaction(rejectOps);
 
       return NextResponse.json({ success: true, message: "Payment rejected." });
     }
@@ -155,7 +185,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
     if (action === "request_info") {
       if (!rejectionReason) throw new ApiError(400, "Reason for requesting more information is required.");
 
-      await db.$transaction([
+      const infoOps: any[] = [
         db.partnerPayment.update({
           where: { id: params.id },
           data: { 
@@ -167,16 +197,23 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
         db.auditLog.create({
           data: { userId, action: "PAYMENT_MORE_INFO_REQUESTED", resource: "PartnerPayment", details: { paymentId: params.id, projectCode, reason: rejectionReason } },
         }),
-        db.notification.create({
-          data: {
-            userId: brokerUserId, type: "SYSTEM", title: "Payment: More Information Required",
-            message: `More information is needed for your payment on project ${projectCode}. Please update and resubmit.`,
-            link: `/broker/projects/${projectId}`,
-          },
-        }),
-      ]);
+      ];
 
-      return NextResponse.json({ success: true, message: "More information requested from partner." });
+      if (brokerUserId) {
+        infoOps.push(
+          db.notification.create({
+            data: {
+              userId: brokerUserId, type: "SYSTEM", title: "Payment: More Information Required",
+              message: `More information is needed for your payment on project ${projectCode}. Please update and resubmit.`,
+              link: `/broker/projects/${projectId}`,
+            },
+          })
+        );
+      }
+
+      await db.$transaction(infoOps);
+
+      return NextResponse.json({ success: true, message: "More information requested." });
     }
 
     throw new ApiError(400, "Invalid action. Use 'verify', 'reject', or 'request_info'.");

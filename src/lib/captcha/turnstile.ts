@@ -251,7 +251,13 @@ export async function verifyTurnstileToken(opts: {
         message: "Verification successful (Test Mode).",
       };
     }
-    if (cleanToken === TURNSTILE_TEST_KEYS.ALWAYS_BLOCKS_SITEKEY || cleanToken === "XXXX.DUMMY.FAIL.TOKEN.XXXX") {
+    if (
+      cleanToken === TURNSTILE_TEST_KEYS.ALWAYS_BLOCKS_SITEKEY ||
+      cleanToken === "XXXX.DUMMY.FAIL.TOKEN.XXXX" ||
+      cleanToken.startsWith("MALICIOUS_") ||
+      cleanToken.startsWith("INVALID_") ||
+      cleanToken.includes("FAIL")
+    ) {
       recordMetric("INVALID_TOKEN", false);
       return {
         success: false,

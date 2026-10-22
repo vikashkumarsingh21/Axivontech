@@ -3,6 +3,8 @@
 import React, { useState, useRef } from "react";
 import { Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
+import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
+import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 
 interface LeadCaptureProps {
   onComplete: (name: string) => void;
@@ -21,6 +23,9 @@ export function LeadCapture({ onComplete, onCancel }: LeadCaptureProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string>("");
+  const [policyAcknowledged, setPolicyAcknowledged] = useState(false);
+  const [policyError, setPolicyError] = useState<string | null>(null);
+  const [recaptchaResetCount, setRecaptchaResetCount] = useState<number>(0);
   const turnstileRef = useRef<TurnstileWidgetRef>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,6 +43,17 @@ export function LeadCapture({ onComplete, onCancel }: LeadCaptureProps) {
       return;
     }
 
+    if (!policyAcknowledged) {
+      setError("Please acknowledge the Privacy Policy before submitting.");
+      setPolicyError("Please acknowledge the Privacy Policy.");
+      return;
+    }
+
+    if (!captchaToken) {
+      setError("Please complete the human verification before submitting.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -52,7 +68,10 @@ export function LeadCapture({ onComplete, onCancel }: LeadCaptureProps) {
           serviceInterest: formData.serviceInterest.trim() || undefined,
           message: formData.message.trim() || undefined,
           source: "WEBSITE_CHATBOT",
-          captchaToken: captchaToken || undefined,
+          privacyPolicyAcknowledged: true,
+          policyVersion: "1.0.0",
+          recaptchaToken: captchaToken,
+          captchaToken: captchaToken,
         }),
       });
 
@@ -65,11 +84,13 @@ export function LeadCapture({ onComplete, onCancel }: LeadCaptureProps) {
       } else {
         turnstileRef.current?.reset();
         setCaptchaToken("");
+        setRecaptchaResetCount((prev) => prev + 1);
         setError(data.error || "Failed to submit request. Please try again.");
       }
     } catch {
       turnstileRef.current?.reset();
       setCaptchaToken("");
+      setRecaptchaResetCount((prev) => prev + 1);
       setError("Network connection issue. Please check your connection and retry.");
     } finally {
       setLoading(false);
@@ -180,25 +201,38 @@ export function LeadCapture({ onComplete, onCancel }: LeadCaptureProps) {
           style={{ display: "none" }}
         />
 
-        {/* Cloudflare Turnstile Verification */}
-        <div className="flex justify-center pt-1 overflow-hidden">
-          <TurnstileWidget
-            ref={turnstileRef}
-            action="chatbot_lead"
-            size="compact"
-            onVerify={(token) => setCaptchaToken(token)}
-            onExpire={() => setCaptchaToken("")}
-            onError={() => setCaptchaToken("")}
+        {/* Dual Mandatory Checks: 1. Privacy Policy Acknowledgement */}
+        <div className="pt-1">
+          <RequiredPolicyAcknowledgement
+            checked={policyAcknowledged}
+            onChange={(val) => {
+              setPolicyAcknowledged(val);
+              setPolicyError(null);
+              setError(null);
+            }}
+            error={policyError}
           />
         </div>
 
-        <p className="text-[10px] text-[#7E8997] text-center leading-tight">
-          By submitting, you agree to our{" "}
-          <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-[#10B981] hover:underline">
-            Privacy Policy
-          </a>{" "}
-          under the DPDP Act 2023.
-        </p>
+        {/* Dual Mandatory Checks: 2. Real Google reCAPTCHA v2 Checkbox */}
+        <div className="flex justify-center pt-1 overflow-hidden">
+          <GoogleRecaptchaWidget
+            size="compact"
+            onVerify={(token) => {
+              setCaptchaToken(token);
+              setError(null);
+            }}
+            onExpire={() => {
+              setCaptchaToken("");
+              setError("Verification expired. Please tick the checkbox again.");
+            }}
+            onError={() => {
+              setCaptchaToken("");
+              setError("Verification error. Please retry.");
+            }}
+            resetTrigger={recaptchaResetCount}
+          />
+        </div>
 
         <div className="flex items-center gap-2 pt-1">
           <button

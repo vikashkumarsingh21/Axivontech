@@ -30,13 +30,15 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") || "";
     const statusFilter = searchParams.get("status") || "";
+    const includeAdmins = searchParams.get("includeAdmins") === "true";
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.max(1, parseInt(searchParams.get("limit") || "10"));
     const skip = (page - 1) * limit;
 
-    const where: any = {
-      userRoles: { none: { role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] } } } },
-    };
+    const where: any = {};
+    if (!includeAdmins) {
+      where.userRoles = { none: { role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] } } } };
+    }
 
     if (statusFilter) {
       where.status = statusFilter;
