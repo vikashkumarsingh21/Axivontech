@@ -1,20 +1,25 @@
+import React from "react";
+
 const variants = {
-  success: "bg-[#34D399]/10 text-[#34D399] border-[#34D399]/20",
-  error: "bg-[#F87171]/10 text-[#F87171] border-[#F87171]/20",
-  warning: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  info: "bg-[#5FA8A0]/10 text-[#5FA8A0] border-[#5FA8A0]/20",
-  neutral: "bg-[#171A1F] text-[#8B94A1] border-[#22262D]",
-  purple: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  success: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25 shadow-xs",
+  error: "bg-rose-500/10 text-rose-400 border-rose-500/25 shadow-xs",
+  warning: "bg-amber-500/10 text-amber-400 border-amber-500/25 shadow-xs",
+  info: "bg-indigo-500/10 text-indigo-400 border-indigo-500/25 shadow-xs",
+  cyan: "bg-cyan-500/10 text-cyan-400 border-cyan-500/25 shadow-xs",
+  neutral: "bg-slate-800/80 text-slate-300 border-slate-700/80",
+  purple: "bg-violet-500/10 text-violet-400 border-violet-500/25 shadow-xs",
 };
 
-export function StatusBadge({ 
-  children, 
+export function StatusBadge({
+  children,
   variant,
   status,
-}: { 
-  children?: React.ReactNode; 
+  className = "",
+}: {
+  children?: React.ReactNode;
   variant?: keyof typeof variants;
   status?: string;
+  className?: string;
 }) {
   let computedVariant: keyof typeof variants = variant || "neutral";
   if (status && !variant) {
@@ -33,7 +38,9 @@ export function StatusBadge({
   const content = children || status?.replace(/_/g, " ") || "";
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${variants[computedVariant]}`}>
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all ${variants[computedVariant]} ${className}`}
+    >
       {content}
     </span>
   );

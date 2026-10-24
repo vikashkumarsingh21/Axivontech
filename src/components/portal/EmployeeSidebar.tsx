@@ -87,9 +87,9 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
     pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <div className="flex flex-col h-full bg-[#0E1116] border-r border-[#1E2530] w-64 pt-5 select-none shadow-xs">
+    <div className="flex flex-col h-full bg-[#090D16] border-r border-[#1E293B] w-64 pt-5 select-none shadow-xl">
       {/* Brand Header */}
-      <div className="px-5 pb-5 border-b border-[#1E2530] flex items-center justify-between">
+      <div className="px-5 pb-5 border-b border-[#1E293B] flex items-center justify-between">
         <div>
           <Link href="/employee/dashboard" className="block transition-opacity hover:opacity-90">
             <Image
@@ -101,14 +101,14 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
               priority
             />
           </Link>
-          <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[var(--ep-accent-soft)] text-[#5FA8A0] border border-[var(--ep-accent-border)]">
-            <Shield className="w-3 h-3 text-[#5FA8A0]" />
+          <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/25 shadow-xs">
+            <Shield className="w-3 h-3 text-indigo-400" />
             <span>Employee Portal</span>
           </div>
         </div>
         <button
           onClick={onClose}
-          className="lg:hidden p-1.5 rounded-lg text-[#566171] hover:text-[#F3F5F7] hover:bg-[#202833] transition-colors"
+          className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           aria-label="Close navigation sidebar"
         >
           <X className="w-5 h-5" />
@@ -119,7 +119,7 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
         {navGroups.map((group) => (
           <div key={group.label} className="space-y-1">
-            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#566171]">
+            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
               {group.label}
             </div>
             {group.items.map((item) => {
@@ -130,25 +130,25 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
                   key={item.name}
                   href={item.href}
                   onClick={onClose}
-                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all group ${
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 group ${
                     active
-                      ? "bg-[var(--ep-accent-soft)] text-[#5FA8A0] border border-[var(--ep-accent-border)]"
-                      : "text-[#A7B0BC] hover:text-[#F3F5F7] hover:bg-[#202833] border border-transparent"
+                      ? "bg-gradient-to-r from-indigo-500/15 via-indigo-500/10 to-transparent text-indigo-300 border border-indigo-500/30 shadow-xs"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <Icon
                       className={`w-4 h-4 shrink-0 transition-colors ${
                         active
-                          ? "text-[#5FA8A0]"
-                          : "text-[#566171] group-hover:text-[#A7B0BC]"
+                          ? "text-indigo-400"
+                          : "text-slate-500 group-hover:text-slate-300"
                       }`}
                       strokeWidth={active ? 2.2 : 1.8}
                     />
                     <span>{item.name}</span>
                   </div>
                   {active && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#5FA8A0]" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-sm shadow-indigo-400/50" />
                   )}
                 </Link>
               );
@@ -158,13 +158,13 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
       </nav>
 
       {/* Logout Footer */}
-      <div className="p-3.5 border-t border-[#1E2530] bg-[#0B0D10]/50">
+      <div className="p-3.5 border-t border-[#1E293B] bg-[#090D16]">
         <form action="/api/v1/auth/logout" method="POST">
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-[#7E8997] hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 border border-transparent transition-all text-xs font-semibold"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 border border-transparent transition-all text-xs font-semibold cursor-pointer"
           >
-            <LogOut className="w-4 h-4 text-[#566171] group-hover:text-red-400" />
+            <LogOut className="w-4 h-4 text-slate-500 group-hover:text-red-400" />
             <span>Sign Out</span>
           </button>
         </form>

@@ -12,11 +12,16 @@ interface EpButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses = {
-  primary: "bg-[#5FA8A0] hover:bg-[#6DB8B0] text-[#071918] font-bold shadow-sm",
-  secondary: "bg-[#171A1F] hover:bg-[#1E2530] border border-[#22262D] text-[#E6E8EB] font-semibold",
-  outline: "bg-transparent hover:bg-[#171A1F] border border-[#1E2530] hover:border-[#22262D] text-[#8B94A1] hover:text-[#E6E8EB] font-medium",
-  ghost: "text-[#8B94A1] hover:text-[#E6E8EB] hover:bg-[#171A1F]",
-  danger: "bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-semibold",
+  primary:
+    "bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white font-semibold shadow-md shadow-indigo-500/25 active:scale-[0.98] border border-indigo-400/20",
+  secondary:
+    "bg-[#1E293B] hover:bg-[#283548] border border-[#334155] hover:border-indigo-500/40 text-[#F8FAFC] font-semibold shadow-sm active:scale-[0.98]",
+  outline:
+    "bg-transparent hover:bg-indigo-500/10 border border-slate-700/80 hover:border-indigo-500/50 text-slate-300 hover:text-indigo-300 font-medium active:scale-[0.98]",
+  ghost:
+    "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 font-medium active:scale-[0.98]",
+  danger:
+    "bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/25 font-semibold active:scale-[0.98]",
 };
 
 const sizeClasses = {
@@ -40,7 +45,7 @@ export function EpButton({
   return (
     <button
       disabled={disabled || isSpinning}
-      className={`inline-flex items-center justify-center transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       {...props}
     >
       {isSpinning ? <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" /> : icon && <span className="shrink-0">{icon}</span>}
