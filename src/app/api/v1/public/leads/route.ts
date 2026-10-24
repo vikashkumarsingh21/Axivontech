@@ -237,6 +237,19 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Real-time Notification for referring Partner/Broker
+    if (finalOwnerId) {
+      await db.notification.create({
+        data: {
+          userId: finalOwnerId,
+          type: "SYSTEM",
+          title: `New Referral Lead: ${lead.name}`,
+          message: `A client submitted an inquiry using your referral link (${lead.leadCode}): ${lead.serviceInterest || "General Inquiry"}.`,
+          link: `/broker/leads`,
+        },
+      }).catch((err) => console.error("[Notification] Failed to notify partner of new lead:", err));
+    }
+
     // Emit platform event to trigger automations & activity logging
     try {
       const { EventBus } = await import("@/lib/events/bus");

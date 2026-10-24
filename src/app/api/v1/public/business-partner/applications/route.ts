@@ -96,10 +96,13 @@ export async function POST(req: Request) {
 
     const data = applicationSchema.parse(body);
 
-    // Duplicate application check
+    // Duplicate application check (email or phone)
     const existingApp = await db.businessPartnerApplication.findFirst({
       where: {
-        email: data.email,
+        OR: [
+          { email: data.email },
+          { phone: data.phone },
+        ],
         status: {
           notIn: ["REJECTED"],
         },
@@ -109,8 +112,13 @@ export async function POST(req: Request) {
     if (existingApp) {
       return NextResponse.json(
         {
+          success: false,
+          error: {
+            code: "DUPLICATE_APPLICATION",
+            message: "An application associated with this email or phone number is already under review. Please contact AXIVON if you have questions.",
+          },
           message:
-            "An application associated with this email is already under review. Please contact AXIVON if you have questions.",
+            "An application associated with this email or phone number is already under review. Please contact AXIVON if you have questions.",
         },
         { status: 409 }
       );
@@ -180,6 +188,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       {
+        success: true,
         message: "Application submitted successfully.",
         applicationId: application.applicationId,
       },
@@ -189,3 +198,60 @@ export async function POST(req: Request) {
     return handleApiError(err);
   }
 }
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const applicationId = searchParams.get("applicationId") || searchParams.get("id");
+    const token = searchParams.get("token");
+
+    if (!applicationId && !token) {
+      throw new ApiError(400, "Application ID or verification token is required.");
+    }
+
+    const application = await db.businessPartnerApplication.findFirst({
+      where: applicationId
+        ? { applicationId }
+        : { verificationToken: token! },
+      select: {
+        applicationId: true,
+        fullName: true,
+        email: true,
+        status: true,
+        emailVerifiedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        statusHistory: {
+          select: {
+            newStatus: true,
+            createdAt: true,
+            reason: true,
+          },
+          orderBy: { createdAt: "asc" },
+        },
+        meetings: {
+          select: {
+            id: true,
+            title: true,
+            meetingUrl: true,
+            scheduledAt: true,
+            status: true,
+          },
+          orderBy: { scheduledAt: "desc" },
+        },
+      },
+    });
+
+    if (!application) {
+      throw new ApiError(404, "Application not found.", undefined, "APPLICATION_NOT_FOUND");
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: application,
+    });
+  } catch (err) {
+    return handleApiError(err);
+  }
+}
+

@@ -1,41 +1,55 @@
-import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { handleApiError, ApiError } from "@/lib/api-error";
-import { getAuthenticatedSession } from "@/lib/auth/session";
-import { normalizeRole, canAccessPartnerPortal } from "@/lib/auth/roles";
+import { handleApiError } from "@/lib/api-error";
+import {
+  requireBroker,
+  apiSuccess,
+  checkRateLimit,
+  logBrokerAudit,
+} from "@/lib/api/broker";
 import crypto from "crypto";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const session = await getAuthenticatedSession(req);
-    const role = normalizeRole(session.role);
+    const { brokerProfile, brokerId, user } = await requireBroker(req);
 
-    if (!canAccessPartnerPortal(role)) {
-      throw new ApiError(403, "Forbidden. Only Partners can generate a referral code.");
-    }
+    checkRateLimit(`broker_referral_gen:${brokerId}`, 10, 60);
 
-    const brokerId = session.userId;
+    const baseUrl =
+      process.env.NEXTAUTH_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      "https://axivontech.in";
 
-    const brokerProfile = await db.brokerProfile.findUnique({
-      where: { userId: brokerId },
-    });
-
-    if (!brokerProfile) {
-      throw new ApiError(404, "Broker profile not found.");
-    }
-
+    // 1. Idempotency Check: If referral code already exists, return cleanly (200 OK)
     if (brokerProfile.referralCode) {
-      throw new ApiError(400, "Referral code already exists. It cannot be regenerated.");
+      const referralCode = brokerProfile.referralCode;
+      return apiSuccess({
+        referralCode,
+        generated: false,
+        leadUrl: `${baseUrl}/lead/${referralCode}`,
+        projectUrl: `${baseUrl}/project/start/${referralCode}`,
+        shareTemplates: {
+          whatsapp: `Hi! Submit your project requirement or software consultation directly to Axivon Technologies via my verified Partner Link: ${baseUrl}/lead/${referralCode}`,
+          emailSubject: "Invitation: Start Your Tech Project with Axivon Technologies",
+          emailBody: `Hello,\n\nI invite you to submit your software engineering requirements directly to Axivon Technologies using my official partner referral link:\n\n${baseUrl}/project/start/${referralCode}\n\nOur executive team will review your proposal promptly.\n\nBest regards,\n${user.name}`,
+        },
+      });
     }
 
-    // Generate unique referral code
+    // 2. Generate unique referral code
+    const safeName =
+      (user.name || "BRK")
+        .split(" ")[0]
+        .replace(/[^A-Za-z0-9]/g, "")
+        .substring(0, 5)
+        .toUpperCase() || "BRK";
+
     let isUnique = false;
     let newCode = "";
-    
-    // Loop to ensure uniqueness, though collision is highly unlikely
+
     while (!isUnique) {
-      const randomPart = crypto.randomBytes(3).toString("hex").toUpperCase(); // 6 chars
-      newCode = `AXV-BRK-${randomPart}`;
+      const randomPart = crypto.randomBytes(3).toString("hex").toUpperCase();
+      newCode = `AXP-${safeName}-${randomPart}`;
 
       const existing = await db.brokerProfile.findUnique({
         where: { referralCode: newCode },
@@ -48,29 +62,32 @@ export async function POST(req: Request) {
 
     const updatedProfile = await db.$transaction(async (tx) => {
       const profile = await tx.brokerProfile.update({
-        where: { userId: brokerId },
+        where: { id: brokerProfile.id },
         data: { referralCode: newCode },
-      });
-
-      await tx.auditLog.create({
-        data: {
-          userId: brokerId,
-          action: "REFERRAL_CODE_GENERATED",
-          resource: "BrokerProfile",
-          details: {
-            referralCode: newCode,
-          },
-        },
       });
 
       return profile;
     });
 
-    return NextResponse.json(
-      { data: { referralCode: updatedProfile.referralCode } },
-      { status: 200 }
-    );
-  } catch (error: any) {
+    await logBrokerAudit({
+      userId: brokerId,
+      action: "REFERRAL_CODE_GENERATED",
+      resource: "BrokerProfile",
+      details: { referralCode: newCode },
+    });
+
+    return apiSuccess({
+      referralCode: updatedProfile.referralCode,
+      generated: true,
+      leadUrl: `${baseUrl}/lead/${updatedProfile.referralCode}`,
+      projectUrl: `${baseUrl}/project/start/${updatedProfile.referralCode}`,
+      shareTemplates: {
+        whatsapp: `Hi! Submit your project requirement or software consultation directly to Axivon Technologies via my verified Partner Link: ${baseUrl}/lead/${updatedProfile.referralCode}`,
+        emailSubject: "Invitation: Start Your Tech Project with Axivon Technologies",
+        emailBody: `Hello,\n\nI invite you to submit your software engineering requirements directly to Axivon Technologies using my official partner referral link:\n\n${baseUrl}/project/start/${updatedProfile.referralCode}\n\nOur executive team will review your proposal promptly.\n\nBest regards,\n${user.name}`,
+      },
+    });
+  } catch (error) {
     return handleApiError(error);
   }
 }

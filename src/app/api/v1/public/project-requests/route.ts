@@ -68,6 +68,25 @@ export async function POST(req: NextRequest) {
     if (!brokerProfile) throw new ApiError(400, "Invalid referral code.");
     if (brokerProfile.user.status !== "ACTIVE") throw new ApiError(400, "This referral link is no longer active.");
 
+    // Duplicate project request check (past 24 hours with same client email & project name)
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const existingReq = await db.partnerProject.findFirst({
+      where: {
+        brokerProfileId: brokerProfile.id,
+        clientEmail: clientEmail.trim().toLowerCase(),
+        projectName: projectName.trim(),
+        createdAt: { gte: oneDayAgo },
+      },
+    });
+
+    if (existingReq) {
+      return NextResponse.json({
+        success: true,
+        message: "Your project request has already been recorded and is currently under review.",
+        projectCode: existingReq.projectCode,
+      }, { status: 200 });
+    }
+
     // Generate project code
     const today = new Date().toISOString().replace(/-/g, "").slice(0, 8);
     const count = await db.partnerProject.count({ where: { projectCode: { startsWith: `PRJ-${today}` } } });
@@ -122,6 +141,19 @@ export async function POST(req: NextRequest) {
             message: `Submitted by ${clientName} via partner ${brokerProfile.user.name} (${referralCode})`,
             link: `/admin/crm/partner-projects/${newProject.id}`,
           })),
+        });
+      }
+
+      // Real-time Notification for referring Partner/Broker
+      if (brokerProfile.user?.id) {
+        await tx.notification.create({
+          data: {
+            userId: brokerProfile.user.id,
+            type: "SYSTEM",
+            title: `New Referral Project: ${projectName}`,
+            message: `A client (${clientName}) submitted project request ${projectCode} using your referral link.`,
+            link: `/broker/projects/${newProject.id}`,
+          },
         });
       }
 

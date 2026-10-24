@@ -3,7 +3,8 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { z } from "zod";
-import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import { hashPassword } from "@/lib/auth/password";
 
 const createBrokerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -123,7 +124,10 @@ export async function POST(req: Request) {
       });
     }
 
-    const passwordHash = await bcrypt.hash(validatedData.password, 10);
+    const safeName = validatedData.name.split(" ")[0].replace(/[^A-Za-z0-9]/g, "").substring(0, 5).toUpperCase() || "BRK";
+    const referralCode = `AXP-${safeName}-${crypto.randomBytes(2).toString("hex").toUpperCase()}`;
+    const partnerId = `AXP-${new Date().getFullYear()}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+    const passwordHash = await hashPassword(validatedData.password);
     const status = validatedData.status || "ACTIVE";
 
     // Create the User and the associated BrokerProfile
@@ -143,6 +147,8 @@ export async function POST(req: Request) {
           },
           brokerProfile: {
             create: {
+              referralCode,
+              partnerId,
               companyName: validatedData.companyName || null,
               designation: validatedData.designation || null,
               whatsapp: validatedData.whatsapp || null,
@@ -150,7 +156,6 @@ export async function POST(req: Request) {
               state: validatedData.state || null,
               country: validatedData.country || null,
               website: validatedData.website || null,
-              // referralCode is strictly null until first login
             },
           },
         },
