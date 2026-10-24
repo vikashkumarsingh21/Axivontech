@@ -1,22 +1,21 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Coffee,
   Calendar,
-  Loader2,
-  Send,
   AlertCircle,
   CheckCircle2,
-  XCircle,
   Clock,
   Ban,
-  ArrowRight,
   Info,
+  Send,
 } from "lucide-react";
+import { PageHeader } from "@/components/employee/PageHeader";
+import { SkeletonCard } from "@/components/employee/SkeletonCard";
+import { StatusBadge } from "@/components/employee/StatusBadge";
+import { EpButton } from "@/components/employee/EpButton";
 
 interface LeaveRequestItem {
   id: string;
@@ -179,94 +178,131 @@ export default function LeavePage() {
     return requests.filter((r) => r.status === selectedStatus);
   }, [requests, selectedStatus]);
 
-  const getStatusBadge = (status: string) => {
+  const getStatusVariant = (status: string): "success" | "error" | "warning" | "neutral" => {
     switch (status) {
       case "APPROVED":
-        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+        return "success";
       case "REJECTED":
-        return "bg-rose-500/10 text-rose-400 border-rose-500/30";
+        return "error";
       case "CANCELLED":
-        return "bg-slate-500/10 text-slate-400 border-slate-500/30";
+        return "neutral";
       default:
-        return "bg-amber-500/10 text-amber-400 border-amber-500/30";
+        return "warning";
     }
   };
 
   return (
-    <div className="space-y-6 max-w-7xl">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="space-y-6 max-w-7xl"
+    >
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#F3F5F7] tracking-tight">
-          Leave Management
-        </h1>
-        <p className="text-sm text-[#A7B0BC] mt-1">
-          Apply for leaves, track annual quota allowances, and manage existing approvals.
-        </p>
-      </div>
+      <PageHeader
+        title="Leave Management"
+        subtitle="Apply for leaves, track annual quota allowances, and manage existing approvals."
+      />
 
       {/* Action Messages */}
       {actionSuccess && (
-        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm flex items-center gap-2">
+        <div className="p-3 bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] rounded-xl text-[#5FA8A0] text-xs font-semibold flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{actionSuccess}</span>
         </div>
       )}
 
       {actionError && (
-        <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-sm flex items-center gap-2">
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-semibold flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{actionError}</span>
         </div>
       )}
 
-      {/* Leave Quota Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-4 bg-[#151A21] border border-[#29313B] rounded-xl space-y-1">
-          <div className="text-xs text-[#7E8997] font-medium">Sick Leave Quota</div>
-          <div className="text-2xl font-bold text-[#F3F5F7]">
-            {balances.sick.balance}{" "}
-            <span className="text-xs font-normal text-[#7E8997]">/ {balances.sick.total} days</span>
+      {/* Leave Quota Cards with Progress Bars */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Sick Leave */}
+        <div className="p-4 bg-[#111317] border border-[#1E2530] rounded-xl space-y-2.5">
+          <div className="flex items-center justify-between text-xs text-[#566171] font-medium">
+            <span>Sick Leave</span>
+            <span className="text-[#8B94A1]">{balances.sick.used} used</span>
           </div>
-          <div className="text-[11px] text-[#A7B0BC] pt-1">Used: {balances.sick.used} days</div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-2xl font-bold text-[#E6E8EB]">{balances.sick.balance}</span>
+            <span className="text-xs text-[#566171]">/ {balances.sick.total} days</span>
+          </div>
+          <div className="h-1.5 w-full bg-[#0F1215] rounded-full overflow-hidden border border-[#1E2530]">
+            <div
+              className="h-full bg-[#5FA8A0] rounded-full transition-all"
+              style={{ width: `${Math.min(100, (balances.sick.used / balances.sick.total) * 100)}%` }}
+            />
+          </div>
         </div>
 
-        <div className="p-4 bg-[#151A21] border border-[#29313B] rounded-xl space-y-1">
-          <div className="text-xs text-[#7E8997] font-medium">Casual Leave Quota</div>
-          <div className="text-2xl font-bold text-[#F3F5F7]">
-            {balances.casual.balance}{" "}
-            <span className="text-xs font-normal text-[#7E8997]">/ {balances.casual.total} days</span>
+        {/* Casual Leave */}
+        <div className="p-4 bg-[#111317] border border-[#1E2530] rounded-xl space-y-2.5">
+          <div className="flex items-center justify-between text-xs text-[#566171] font-medium">
+            <span>Casual Leave</span>
+            <span className="text-[#8B94A1]">{balances.casual.used} used</span>
           </div>
-          <div className="text-[11px] text-[#A7B0BC] pt-1">Used: {balances.casual.used} days</div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-2xl font-bold text-[#E6E8EB]">{balances.casual.balance}</span>
+            <span className="text-xs text-[#566171]">/ {balances.casual.total} days</span>
+          </div>
+          <div className="h-1.5 w-full bg-[#0F1215] rounded-full overflow-hidden border border-[#1E2530]">
+            <div
+              className="h-full bg-[#67C5D8] rounded-full transition-all"
+              style={{ width: `${Math.min(100, (balances.casual.used / balances.casual.total) * 100)}%` }}
+            />
+          </div>
         </div>
 
-        <div className="p-4 bg-[#151A21] border border-[#29313B] rounded-xl space-y-1">
-          <div className="text-xs text-[#7E8997] font-medium">Paid Time Off (PTO)</div>
-          <div className="text-2xl font-bold text-[#D6B779]">
-            {balances.paid.balance}{" "}
-            <span className="text-xs font-normal text-[#7E8997]">/ {balances.paid.total} days</span>
+        {/* Paid Time Off */}
+        <div className="p-4 bg-[#111317] border border-[#1E2530] rounded-xl space-y-2.5">
+          <div className="flex items-center justify-between text-xs text-[#566171] font-medium">
+            <span>Paid Time Off (PTO)</span>
+            <span className="text-[#8B94A1]">{balances.paid.used} used</span>
           </div>
-          <div className="text-[11px] text-[#A7B0BC] pt-1">Used: {balances.paid.used} days</div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-2xl font-bold text-[#D6B779]">{balances.paid.balance}</span>
+            <span className="text-xs text-[#566171]">/ {balances.paid.total} days</span>
+          </div>
+          <div className="h-1.5 w-full bg-[#0F1215] rounded-full overflow-hidden border border-[#1E2530]">
+            <div
+              className="h-full bg-[#D6B779] rounded-full transition-all"
+              style={{ width: `${Math.min(100, (balances.paid.used / balances.paid.total) * 100)}%` }}
+            />
+          </div>
         </div>
 
-        <div className="p-4 bg-[#151A21] border border-[#29313B] rounded-xl space-y-1">
-          <div className="text-xs text-[#7E8997] font-medium">Unpaid Leave Logged</div>
-          <div className="text-2xl font-bold text-[#F3F5F7]">
-            {balances.unpaid.used}{" "}
-            <span className="text-xs font-normal text-[#7E8997]">days</span>
+        {/* Unpaid Leave */}
+        <div className="p-4 bg-[#111317] border border-[#1E2530] rounded-xl space-y-2.5">
+          <div className="flex items-center justify-between text-xs text-[#566171] font-medium">
+            <span>Unpaid Leave</span>
+            <span className="text-[#566171]">Manager review</span>
           </div>
-          <div className="text-[11px] text-[#A7B0BC] pt-1">Subject to manager approval</div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-2xl font-bold text-[#E6E8EB]">{balances.unpaid.used}</span>
+            <span className="text-xs text-[#566171]">days taken</span>
+          </div>
+          <div className="h-1.5 w-full bg-[#0F1215] rounded-full overflow-hidden border border-[#1E2530]">
+            <div
+              className="h-full bg-amber-400 rounded-full transition-all"
+              style={{ width: `${balances.unpaid.used > 0 ? 100 : 0}%` }}
+            />
+          </div>
         </div>
       </div>
 
       {/* New Leave Application Card */}
-      <Card className="p-5 sm:p-6 bg-[#151A21] border-[#29313B] rounded-2xl space-y-5">
+      <div className="p-5 sm:p-6 bg-[#111317] border border-[#1E2530] rounded-xl space-y-5">
         <div className="flex items-center gap-3 pb-3 border-b border-[#1E2530]">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <div className="w-10 h-10 rounded-xl bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] flex items-center justify-center text-[#5FA8A0]">
             <Coffee className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-[#F3F5F7]">Apply for Leave</h2>
-            <p className="text-xs text-[#7E8997]">
+            <h2 className="text-base sm:text-lg font-bold text-[#E6E8EB]">Apply for Leave</h2>
+            <p className="text-xs text-[#566171]">
               Requests are routed directly to your reporting manager and HR desk.
             </p>
           </div>
@@ -275,13 +311,13 @@ export default function LeavePage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-                Leave Category <span className="text-rose-400">*</span>
+              <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
+                Leave Category <span className="text-red-400">*</span>
               </label>
               <select
                 value={form.type}
                 onChange={(e) => setForm({ ...form, type: e.target.value })}
-                className="w-full h-10 px-3 bg-[#10151B] border border-[#29313B] rounded-lg text-xs sm:text-sm text-[#F3F5F7] focus:outline-none focus:border-emerald-500"
+                className="w-full h-10 px-3 bg-[#0F1215] border border-[#1E2530] rounded-xl text-xs sm:text-sm text-[#E6E8EB] focus:outline-hidden focus:border-[#5FA8A0] cursor-pointer"
               >
                 <option value="SICK">Sick Leave</option>
                 <option value="CASUAL">Casual Leave</option>
@@ -291,35 +327,35 @@ export default function LeavePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-                Start Date <span className="text-rose-400">*</span>
+              <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
+                Start Date <span className="text-red-400">*</span>
               </label>
-              <Input
+              <input
                 type="date"
                 value={form.start}
                 onChange={(e) => setForm({ ...form, start: e.target.value })}
                 required
-                className="bg-[#10151B] border-[#29313B] text-[#F3F5F7] focus-visible:border-emerald-500"
+                className="w-full h-10 px-3 bg-[#0F1215] border border-[#1E2530] rounded-xl text-xs sm:text-sm text-[#E6E8EB] focus:outline-hidden focus:border-[#5FA8A0]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-                End Date <span className="text-rose-400">*</span>
+              <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
+                End Date <span className="text-red-400">*</span>
               </label>
-              <Input
+              <input
                 type="date"
                 value={form.end}
                 min={form.start}
                 onChange={(e) => setForm({ ...form, end: e.target.value })}
                 required
-                className="bg-[#10151B] border-[#29313B] text-[#F3F5F7] focus-visible:border-emerald-500"
+                className="w-full h-10 px-3 bg-[#0F1215] border border-[#1E2530] rounded-xl text-xs sm:text-sm text-[#E6E8EB] focus:outline-hidden focus:border-[#5FA8A0]"
               />
             </div>
           </div>
 
           {calculatedDays > 0 && (
-            <div className="p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center gap-2">
+            <div className="p-3 bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] rounded-xl text-xs text-[#5FA8A0] flex items-center gap-2">
               <Info className="w-4 h-4 shrink-0" />
               <span>
                 Calculated duration: <strong>{calculatedDays} day{calculatedDays > 1 ? "s" : ""}</strong>
@@ -328,41 +364,40 @@ export default function LeavePage() {
           )}
 
           <div>
-            <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-              Reason for Absence <span className="text-rose-400">*</span>
+            <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
+              Reason for Absence <span className="text-red-400">*</span>
             </label>
-            <Input
+            <input
+              type="text"
               placeholder="e.g. Attending family function / Medical appointment / Personal emergency"
               value={form.reason}
               onChange={(e) => setForm({ ...form, reason: e.target.value })}
               required
-              className="bg-[#10151B] border-[#29313B] text-[#F3F5F7] placeholder:text-[#566171] focus-visible:border-emerald-500"
+              className="w-full h-10 px-3 bg-[#0F1215] border border-[#1E2530] rounded-xl text-xs sm:text-sm text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0]"
             />
           </div>
 
           <div className="pt-2 flex justify-end">
-            <Button
+            <EpButton
               type="submit"
-              disabled={submitting}
-              className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-[#04130E] font-semibold flex items-center justify-center gap-2"
+              variant="primary"
+              size="md"
+              loading={submitting}
+              icon={<Send className="w-3.5 h-3.5" />}
+              className="w-full sm:w-auto"
             >
-              {submitting ? (
-                <Loader2 className="animate-spin w-4 h-4" />
-              ) : (
-                <Send className="w-4 h-4" />
-              )}
-              <span>Submit Leave Request</span>
-            </Button>
+              Submit Leave Request
+            </EpButton>
           </div>
         </form>
-      </Card>
+      </div>
 
       {/* Leave History Card */}
-      <Card className="p-5 sm:p-6 bg-[#151A21] border-[#29313B] rounded-2xl space-y-4">
+      <div className="p-5 sm:p-6 bg-[#111317] border border-[#1E2530] rounded-xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1E2530]">
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-[#F3F5F7]">Leave Requests History</h2>
-            <p className="text-xs text-[#7E8997]">All submitted leave applications and their status</p>
+            <h2 className="text-base sm:text-lg font-bold text-[#E6E8EB]">Leave Requests History</h2>
+            <p className="text-xs text-[#566171]">All submitted leave applications and their status</p>
           </div>
 
           {/* Filter Pills */}
@@ -371,10 +406,10 @@ export default function LeavePage() {
               <button
                 key={st}
                 onClick={() => setSelectedStatus(st)}
-                className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors cursor-pointer text-xs ${
                   selectedStatus === st
-                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-                    : "bg-[#10151B] text-[#7E8997] hover:text-[#F3F5F7] border border-[#1E2530]"
+                    ? "bg-[var(--ep-accent-soft)] text-[#5FA8A0] border border-[var(--ep-accent-border)] font-semibold"
+                    : "bg-[#0F1215] text-[#8B94A1] hover:text-[#E6E8EB] border border-[#1E2530]"
                 }`}
               >
                 {st}
@@ -384,12 +419,13 @@ export default function LeavePage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center p-12 text-[#7E8997] gap-2">
-            <Loader2 className="animate-spin w-4 h-4 text-emerald-500" />
-            <span className="text-xs">Loading leave requests...</span>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
         ) : filteredRequests.length === 0 ? (
-          <div className="text-center py-12 text-[#7E8997] text-xs">
+          <div className="text-center py-12 text-[#566171] text-xs">
             No leave requests found for this filter.
           </div>
         ) : (
@@ -406,26 +442,26 @@ export default function LeavePage() {
               return (
                 <div
                   key={r.id}
-                  className="p-4 border border-[#29313B] rounded-xl bg-[#10151B] flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#364152] transition-all"
+                  className="p-4 border border-[#1E2530] rounded-xl bg-[#0F1215] flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#22262D] transition-all"
                 >
                   <div className="space-y-1.5 min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs font-bold text-[#F3F5F7] bg-[#151A21] border border-[#29313B] px-2.5 py-0.5 rounded">
+                      <span className="text-xs font-bold text-[#E6E8EB] bg-[#171A1F] border border-[#1E2530] px-2.5 py-0.5 rounded">
                         {r.leaveType} LEAVE
                       </span>
-                      <span className="text-xs text-[#D6B779] bg-[#D6B779]/10 border border-[#D6B779]/20 px-2 py-0.5 rounded">
+                      <span className="text-xs text-[#5FA8A0] bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] px-2 py-0.5 rounded font-semibold">
                         {days} day{days > 1 ? "s" : ""}
                       </span>
                     </div>
 
-                    <div className="text-xs text-[#A7B0BC] flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-[#7E8997]" />
+                    <div className="text-xs text-[#8B94A1] flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-[#566171]" />
                       <span>
                         {start.toLocaleDateString()} to {end.toLocaleDateString()}
                       </span>
                     </div>
 
-                    <p className="text-xs text-[#7E8997]">{r.reason}</p>
+                    <p className="text-xs text-[#566171]">{r.reason}</p>
 
                     {r.reviewNote && (
                       <p className="text-xs text-amber-400/90 bg-amber-500/5 p-2 rounded-lg border border-amber-500/10">
@@ -435,29 +471,21 @@ export default function LeavePage() {
                   </div>
 
                   <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                    <span
-                      className={`text-xs px-3 py-1 rounded-full font-semibold border ${getStatusBadge(
-                        r.status
-                      )}`}
-                    >
+                    <StatusBadge variant={getStatusVariant(r.status)}>
                       {r.status}
-                    </span>
+                    </StatusBadge>
 
                     {r.status === "PENDING" && (
-                      <Button
+                      <EpButton
                         size="sm"
-                        variant="outline"
+                        variant="danger"
                         disabled={isCancelling}
+                        loading={isCancelling}
                         onClick={() => handleCancel(r.id)}
-                        className="text-xs border-rose-500/30 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
+                        icon={<Ban className="w-3.5 h-3.5" />}
                       >
-                        {isCancelling ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <Ban className="w-3.5 h-3.5 mr-1" />
-                        )}
                         Cancel
-                      </Button>
+                      </EpButton>
                     )}
                   </div>
                 </div>
@@ -465,7 +493,7 @@ export default function LeavePage() {
             })}
           </div>
         )}
-      </Card>
-    </div>
+      </div>
+    </motion.div>
   );
 }
