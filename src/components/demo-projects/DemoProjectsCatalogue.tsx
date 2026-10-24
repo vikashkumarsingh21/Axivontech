@@ -42,6 +42,7 @@ import {
 import {
   DEMO_PROJECTS,
   DEMO_CATEGORIES,
+  SHOW_COMING_SOON_DEMOS,
   getDemoProjectImage,
   getDemoProjectSlug,
   type DemoProject,
@@ -82,20 +83,44 @@ export default function DemoProjectsCatalogue() {
   const [statusFilter, setStatusFilter] = useState<"ALL" | "LIVE_ONLY" | "COMING_SOON">("ALL");
   const [sortBy, setSortBy] = useState<"recommended" | "az">("recommended");
 
-  // Dynamic counts for each category
+  // Task 1: Visible base dataset respecting SHOW_COMING_SOON_DEMOS flag
+  const baseProjects = useMemo(() => {
+    if (SHOW_COMING_SOON_DEMOS) {
+      return DEMO_PROJECTS;
+    }
+    return DEMO_PROJECTS.filter((p) => p.status === "Live Demo");
+  }, []);
+
+  // Task 2: Dynamic stats
+  const liveCount = useMemo(() => {
+    return DEMO_PROJECTS.filter((p) => p.status === "Live Demo").length;
+  }, []);
+
+  const visibleIndustriesCount = useMemo(() => {
+    const cats = new Set(baseProjects.map((p) => p.category));
+    return cats.size;
+  }, [baseProjects]);
+
+  // Task 3: Visible categories (only industries that have at least one visible demo, plus "All Projects")
+  const visibleCategories = useMemo(() => {
+    const activeCats = new Set(baseProjects.map((p) => p.category));
+    return DEMO_CATEGORIES.filter((cat) => cat === "All Projects" || activeCats.has(cat));
+  }, [baseProjects]);
+
+  // Dynamic counts for each visible category
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { "All Projects": DEMO_PROJECTS.length };
-    for (const cat of DEMO_CATEGORIES) {
+    const counts: Record<string, number> = { "All Projects": baseProjects.length };
+    for (const cat of visibleCategories) {
       if (cat !== "All Projects") {
-        counts[cat] = DEMO_PROJECTS.filter((p) => p.category === cat).length;
+        counts[cat] = baseProjects.filter((p) => p.category === cat).length;
       }
     }
     return counts;
-  }, []);
+  }, [baseProjects, visibleCategories]);
 
   // Filtering and sorting logic
   const filteredProjects = useMemo(() => {
-    let result = [...DEMO_PROJECTS];
+    let result = [...baseProjects];
 
     // Category filter
     if (selectedCategory !== "All Projects") {
@@ -126,19 +151,22 @@ export default function DemoProjectsCatalogue() {
     if (sortBy === "az") {
       result.sort((a, b) => a.name.localeCompare(b.name));
     } else {
-      // "recommended" -> Live Demos first, then featured, then priority P1/P2/P3
-      const priorityWeights: Record<string, number> = { P1: 1, P2: 2, P3: 3 };
+      // "recommended" -> displayOrder if set, otherwise live Demos first, then featured, then priority
       result.sort((a, b) => {
+        if (a.displayOrder && b.displayOrder) {
+          return a.displayOrder - b.displayOrder;
+        }
         const liveDiff = (b.status === "Live Demo" ? 1 : 0) - (a.status === "Live Demo" ? 1 : 0);
         if (liveDiff !== 0) return liveDiff;
         const featDiff = (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
         if (featDiff !== 0) return featDiff;
+        const priorityWeights: Record<string, number> = { P1: 1, P2: 2, P3: 3 };
         return (priorityWeights[a.priority] || 99) - (priorityWeights[b.priority] || 99);
       });
     }
 
     return result;
-  }, [searchQuery, selectedCategory, statusFilter, sortBy]);
+  }, [baseProjects, searchQuery, selectedCategory, statusFilter, sortBy]);
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -150,7 +178,7 @@ export default function DemoProjectsCatalogue() {
   const isFiltered =
     searchQuery.trim().length > 0 ||
     selectedCategory !== "All Projects" ||
-    statusFilter !== "ALL";
+    (SHOW_COMING_SOON_DEMOS && statusFilter !== "ALL");
 
   // Flagship spotlight project (EstateVista)
   const spotlightProject = useMemo(() => {
@@ -220,18 +248,18 @@ export default function DemoProjectsCatalogue() {
             </Link>
           </div>
 
-          {/* Credible Statistics Row */}
+          {/* Dynamic Credible Statistics Row */}
           <div className="mt-14 pt-8 border-t border-[#1f1f1f] flex flex-wrap items-center justify-center gap-8 text-xs text-[#71717a]">
             <div>
-              <span className="font-semibold text-emerald-400 text-sm sm:text-base">8</span> Live Interactive Demos
+              <span className="font-semibold text-emerald-400 text-sm sm:text-base">{liveCount}</span> Live Interactive Demos
             </div>
             <div className="hidden sm:block h-3 w-px bg-[#262626]" />
             <div>
-              <span className="font-semibold text-[#f4f4f5] text-sm sm:text-base">22</span> Industry Domains Covered
+              <span className="font-semibold text-[#f4f4f5] text-sm sm:text-base">{visibleIndustriesCount}</span> Industry Domains Covered
             </div>
             <div className="hidden sm:block h-3 w-px bg-[#262626]" />
             <div>
-              <span className="font-semibold text-[#e8a064] text-sm sm:text-base">Modern</span> Full-Stack Architecture
+              <span className="font-semibold text-[#e8a064] text-sm sm:text-base">100%</span> Live, Clickable Demos
             </div>
           </div>
         </div>
@@ -374,40 +402,47 @@ export default function DemoProjectsCatalogue() {
 
               {/* Status Filter & Sort Dropdown */}
               <div className="flex flex-wrap items-center gap-3">
-                {/* Status Toggle Buttons */}
-                <div className="inline-flex rounded-full border border-[#262626] bg-[#141414] p-1 text-xs">
-                  <button
-                    onClick={() => setStatusFilter("ALL")}
-                    className={`rounded-full px-3 py-1.5 transition-colors ${
-                      statusFilter === "ALL"
-                        ? "bg-[#262626] text-[#f4f4f5] font-semibold"
-                        : "text-[#71717a] hover:text-[#a1a1aa]"
-                    }`}
-                  >
-                    All Statuses
-                  </button>
-                  <button
-                    onClick={() => setStatusFilter("LIVE_ONLY")}
-                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors ${
-                      statusFilter === "LIVE_ONLY"
-                        ? "bg-emerald-500/20 text-emerald-400 font-semibold"
-                        : "text-[#71717a] hover:text-emerald-400"
-                    }`}
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                    Live Demos (8)
-                  </button>
-                  <button
-                    onClick={() => setStatusFilter("COMING_SOON")}
-                    className={`rounded-full px-3 py-1.5 transition-colors ${
-                      statusFilter === "COMING_SOON"
-                        ? "bg-[#262626] text-[#f4f4f5] font-semibold"
-                        : "text-[#71717a] hover:text-[#a1a1aa]"
-                    }`}
-                  >
-                    Coming Soon
-                  </button>
-                </div>
+                {/* Status Toggle Buttons (active when SHOW_COMING_SOON_DEMOS is true) */}
+                {SHOW_COMING_SOON_DEMOS ? (
+                  <div className="inline-flex rounded-full border border-[#262626] bg-[#141414] p-1 text-xs">
+                    <button
+                      onClick={() => setStatusFilter("ALL")}
+                      className={`rounded-full px-3 py-1.5 transition-colors ${
+                        statusFilter === "ALL"
+                          ? "bg-[#262626] text-[#f4f4f5] font-semibold"
+                          : "text-[#71717a] hover:text-[#a1a1aa]"
+                      }`}
+                    >
+                      All Statuses
+                    </button>
+                    <button
+                      onClick={() => setStatusFilter("LIVE_ONLY")}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors ${
+                        statusFilter === "LIVE_ONLY"
+                          ? "bg-emerald-500/20 text-emerald-400 font-semibold"
+                          : "text-[#71717a] hover:text-emerald-400"
+                      }`}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      Live Demos ({liveCount})
+                    </button>
+                    <button
+                      onClick={() => setStatusFilter("COMING_SOON")}
+                      className={`rounded-full px-3 py-1.5 transition-colors ${
+                        statusFilter === "COMING_SOON"
+                          ? "bg-[#262626] text-[#f4f4f5] font-semibold"
+                          : "text-[#71717a] hover:text-[#a1a1aa]"
+                      }`}
+                    >
+                      Coming Soon
+                    </button>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-semibold text-emerald-400">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>{liveCount} Live Interactive Demos</span>
+                  </div>
+                )}
 
                 {/* Sort by dropdown */}
                 <div className="flex items-center gap-2">
@@ -429,7 +464,7 @@ export default function DemoProjectsCatalogue() {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-semibold uppercase tracking-wider text-[#71717a]">
-                  Browse by Industry ({DEMO_CATEGORIES.length - 1} sectors)
+                  Browse by Industry ({visibleCategories.length - 1} domains)
                 </span>
                 {isFiltered && (
                   <button
@@ -447,7 +482,7 @@ export default function DemoProjectsCatalogue() {
                 aria-label="Filter demo projects by category"
                 className="flex gap-2 overflow-x-auto pb-3 pt-1 scrollbar-thin scrollbar-thumb-[#262626] scrollbar-track-transparent"
               >
-                {DEMO_CATEGORIES.map((cat) => {
+                {visibleCategories.map((cat) => {
                   const isSelected = selectedCategory === cat;
                   const Icon = CATEGORY_ICONS[cat] || Layers;
                   const count = categoryCounts[cat] || 0;
@@ -489,8 +524,8 @@ export default function DemoProjectsCatalogue() {
                 {selectedCategory !== "All Projects" && (
                   <> in <span className="text-[#e8a064] font-medium">{selectedCategory}</span></>
                 )}
-                {statusFilter === "LIVE_ONLY" && <> (Live Demos only)</>}
-                {statusFilter === "COMING_SOON" && <> (Coming Soon concepts only)</>}
+                {statusFilter === "LIVE_ONLY" && SHOW_COMING_SOON_DEMOS && <> (Live Demos only)</>}
+                {statusFilter === "COMING_SOON" && SHOW_COMING_SOON_DEMOS && <> (Coming Soon concepts only)</>}
                 {searchQuery.trim() && (
                   <> matching &ldquo;<span className="text-[#f4f4f5]">{searchQuery.trim()}</span>&rdquo;</>
                 )}

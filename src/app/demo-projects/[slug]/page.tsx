@@ -49,6 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const description = `${project.shortDescription} Explore interactive frontend architecture created by Axivon Technologies.`;
   const canonicalUrl = `https://axivontech.in/demo-projects/${project.slug || project.id}`;
   const imageUrl = getDemoProjectImage(project);
+  const isLive = project.status === "Live Demo";
 
   return {
     title,
@@ -86,6 +87,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       "Custom Software",
       ...project.features,
     ],
+    ...(!isLive && {
+      robots: {
+        index: false,
+        follow: true,
+      },
+    }),
   };
 }
 

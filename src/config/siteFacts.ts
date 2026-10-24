@@ -4,7 +4,7 @@
 
 import { portfolioProjects } from "@/data/portfolio";
 import { servicesData } from "@/data/services";
-import { DEFAULT_INDUSTRIES } from "@/lib/content/content-db";
+// import { DEFAULT_INDUSTRIES } from "@/lib/content/content-db";
 
 /**
  * Centrally verified facts and metrics.
@@ -23,7 +23,8 @@ export const SERVICES_DISPLAY = `${SERVICES_COUNT}`;
 
 // TODO: Founder to confirm whether industry count display should follow the 8 primary CMS domain
 // categories or the 12 specific sub-verticals defined in the showcase.
-export const INDUSTRIES_COUNT = DEFAULT_INDUSTRIES.length; // 8
+// export const INDUSTRIES_COUNT = DEFAULT_INDUSTRIES.length; // 8
+export const INDUSTRIES_COUNT = 8;
 export const INDUSTRIES_LABEL = "Industry Domains";
 export const INDUSTRIES_DISPLAY = `${INDUSTRIES_COUNT}`;
 

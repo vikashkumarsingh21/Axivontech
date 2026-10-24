@@ -49,35 +49,16 @@ export const DEMO_CATEGORIES = [
 
 export type DemoCategory = (typeof DEMO_CATEGORIES)[number];
 
+/**
+ * Global configuration flag to control whether unlaunched concepts ("Coming Soon")
+ * are displayed in the main public catalogue.
+ * By default (false), only fully interactive "Live Demo" projects are displayed.
+ * Setting this to true instantly displays all 47 demo concepts.
+ */
+export const SHOW_COMING_SOON_DEMOS = false;
+
 export const DEMO_PROJECTS: DemoProject[] = [
-  // ── PRIORITY P1 — INITIAL SHOWCASE ───────────────────────────
-  {
-    id: "corporate-pro",
-    name: "CorporatePro",
-    slug: "corporatepro",
-    category: "Business & Corporate",
-    shortDescription: "High-performance enterprise website showcasing organizational credibility, service pillars, leadership, and investor relations.",
-    targetAudience: "Corporations, B2B enterprises, consulting firms, holding companies",
-    features: ["Executive Leadership Profile", "Interactive Service Matrix", "Investor Relations Portal", "Multi-office Locator"],
-    priority: "P1",
-    isFeatured: true,
-    status: "Live Demo",
-    demoUrl: "/demo-projects/business/corporatepro",
-    enquiryType: "View Demo",
-    accentColor: "#29483b",
-    image: "/images/demo-projects/corporatepro/hero-advisory.jpg",
-    gallery: [
-      "/images/demo-projects/corporatepro/hero-advisory.jpg",
-      "/images/demo-projects/corporatepro/about-philosophy.jpg",
-      "/images/demo-projects/corporatepro/digital-transformation.jpg",
-      "/images/demo-projects/corporatepro/operations-case-study.jpg",
-    ],
-    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Framer Motion", "Lucide React"],
-    problemStatement: "Multi-practice consulting firms and large B2B enterprises need to project institutional credibility, executive depth, and global service capabilities without suffering from slow legacy CMS architectures.",
-    solutionOverview: "CorporatePro delivers an ultra-fast corporate digital flagship featuring interactive service matrices, leadership dossiers, investor governance repositories, and multi-office locator routing.",
-    relatedServiceSlug: "web-development",
-    displayOrder: 1,
-  },
+  // ── LIVE DEMO 1 ──
   {
     id: "medicare",
     name: "MediCare",
@@ -103,8 +84,39 @@ export const DEMO_PROJECTS: DemoProject[] = [
     problemStatement: "Patients seeking clinical care frequently encounter difficult-to-navigate hospital portals that obscure doctor credentials, OPD schedules, and direct consultation request options.",
     solutionOverview: "MediCare provides a calming, accessible healthcare portal with real-time doctor specialty filtering, department service hubs, OPD timetable showcases, and streamlined appointment request funnels.",
     relatedServiceSlug: "web-development",
+    displayOrder: 1,
+  },
+
+  // ── LIVE DEMO 2 ──
+  {
+    id: "edusmart",
+    name: "EduSmart",
+    slug: "edusmart",
+    category: "Education",
+    shortDescription: "Comprehensive academic institution portal covering admissions, academic curriculums, campus tours, and student notices.",
+    targetAudience: "Schools, colleges, universities, coaching academies, ed-tech brands",
+    features: ["Admissions Workflow", "Course & Program Finder", "Faculty Directory", "Digital Notice Board"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Live Demo",
+    enquiryType: "View Demo",
+    demoUrl: "/demo-projects/education/edusmart",
+    accentColor: "#33243B",
+    image: "/images/demo-projects/edusmart/hero-campus.jpg",
+    gallery: [
+      "/images/demo-projects/edusmart/hero-campus.jpg",
+      "/images/demo-projects/edusmart/campus-library.jpg",
+      "/images/demo-projects/edusmart/academic-seminar.jpg",
+      "/images/demo-projects/edusmart/about-learning.jpg",
+    ],
+    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Lucide React"],
+    problemStatement: "Educational academies and universities need to present multi-tier degree curricula, campus facilities, and admissions deadlines clearly to prospective students and parents.",
+    solutionOverview: "EduSmart (Aurevia Academy) provides an academic digital portal featuring program filtering, curriculum modal views, admissions inquiry forms, faculty directories, and campus life photo galleries.",
+    relatedServiceSlug: "web-development",
     displayOrder: 2,
   },
+
+  // ── LIVE DEMO 3 ──
   {
     id: "foodiehub",
     name: "FoodieHub",
@@ -132,145 +144,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     relatedServiceSlug: "web-development",
     displayOrder: 3,
   },
-  {
-    id: "edusmart",
-    name: "EduSmart",
-    slug: "edusmart",
-    category: "Education",
-    shortDescription: "Comprehensive academic institution portal covering admissions, academic curriculums, campus tours, and student notices.",
-    targetAudience: "Schools, colleges, universities, coaching academies, ed-tech brands",
-    features: ["Admissions Workflow", "Course & Program Finder", "Faculty Directory", "Digital Notice Board"],
-    priority: "P1",
-    isFeatured: true,
-    status: "Live Demo",
-    enquiryType: "View Demo",
-    demoUrl: "/demo-projects/education/edusmart",
-    accentColor: "#33243B",
-    image: "/images/demo-projects/edusmart/hero-campus.jpg",
-    gallery: [
-      "/images/demo-projects/edusmart/hero-campus.jpg",
-      "/images/demo-projects/edusmart/campus-library.jpg",
-      "/images/demo-projects/edusmart/academic-seminar.jpg",
-      "/images/demo-projects/edusmart/about-learning.jpg",
-    ],
-    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Lucide React"],
-    problemStatement: "Educational academies and universities need to present multi-tier degree curricula, campus facilities, and admissions deadlines clearly to prospective students and parents.",
-    solutionOverview: "EduSmart (Aurevia Academy) provides an academic digital portal featuring program filtering, curriculum modal views, admissions inquiry forms, faculty directories, and campus life photo galleries.",
-    relatedServiceSlug: "web-development",
-    displayOrder: 4,
-  },
-  {
-    id: "novacart",
-    name: "NovaCart",
-    slug: "novacart",
-    category: "E-commerce",
-    shortDescription: "Thoughtfully selected everyday lifestyle products with dynamic filtering, live cart persistence, and checkout demonstration.",
-    targetAudience: "D2C brands, online retailers, lifestyle boutique stores, consumer products",
-    features: ["Dynamic Cart & Wishlist", "Category & Price Filters", "Live Product Search", "Simulated Checkout Flow"],
-    priority: "P1",
-    isFeatured: true,
-    status: "Live Demo",
-    enquiryType: "View Demo",
-    demoUrl: "/demo-projects/ecommerce/novacart",
-    accentColor: "#D8F16A",
-    image: "/images/demo-projects/novacart/hero-lifestyle.jpg",
-    gallery: [
-      "/images/demo-projects/novacart/hero-lifestyle.jpg",
-      "/images/demo-projects/novacart/watch-matte-chrono.jpg",
-      "/images/demo-projects/novacart/backpack-commuter.jpg",
-      "/images/demo-projects/novacart/mechanical-keyboard.jpg",
-    ],
-    techStack: ["Next.js 15", "React Context API", "LocalStorage Persistence", "Tailwind CSS", "Framer Motion"],
-    problemStatement: "D2C lifestyle retailers require sub-second catalog responsiveness, dynamic multi-attribute filtering, persistent cart state across sessions, and simulated checkout flows to maximize conversion.",
-    solutionOverview: "NovaCart is an ultra-fast lifestyle e-commerce demonstration featuring live search, faceted category and price filtering, reactive cart and wishlist drawers, discount coupon logic, and interactive checkout simulation.",
-    relatedServiceSlug: "web-development",
-    displayOrder: 5,
-  },
-  {
-    id: "estatevista",
-    name: "EstateVista",
-    slug: "estatevista",
-    category: "Real Estate",
-    shortDescription: "Curated architectural real estate platform featuring verified listings, CAD floor plans, enclave guides, mortgage calculators, and private viewing workflows.",
-    targetAudience: "Luxury brokerages, property developers, private family offices, institutional investors",
-    features: ["Interactive Multi-Facet Search", "CAD Floor Plan Room Dimensions", "Side-by-Side Comparison", "Dynamic Mortgage Modeler"],
-    priority: "P1",
-    isFeatured: true,
-    status: "Live Demo",
-    enquiryType: "View Demo",
-    demoUrl: "/demo-projects/real-estate/estatevista",
-    accentColor: "#123C32",
-    image: "/images/demo-projects/estatevista/estatevista-hero.jpg",
-    gallery: [
-      "/images/demo-projects/estatevista/estatevista-hero.jpg",
-      "/images/demo-projects/estatevista/estatevista-1.jpg",
-      "/images/demo-projects/estatevista/estatevista-2.jpg",
-      "/images/demo-projects/estatevista/estatevista-3.jpg",
-    ],
-    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Framer Motion", "Vector CAD Blueprints"],
-    problemStatement: "Ultra-luxury real estate brokerages struggle to convey architectural grandeur through generic real estate templates that lack CAD floor plans, enclave context, or dynamic mortgage telemetry.",
-    solutionOverview: "EstateVista delivers an architectural-grade real estate experience featuring verified high-value property dossiers, vector CAD floor plans with room measurements, enclave guides, interactive mortgage calculators, and private VIP tour booking.",
-    relatedServiceSlug: "web-development",
-    displayOrder: 6,
-  },
-  {
-    id: "staysphere",
-    name: "StaySphere",
-    slug: "staysphere",
-    category: "Hotels & Travel",
-    shortDescription: "Luxury boutique resort & hotel website highlighting room categories, amenities, local experiences, and direct reservation inquiries.",
-    targetAudience: "Boutique hotels, luxury resorts, homestays, vacation rentals",
-    features: ["Room Suite Previews", "Amenities Grid", "Seasonal Offer Banners", "Direct Booking Inquiries"],
-    priority: "P1",
-    isFeatured: true,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-    accentColor: "#f59e0b",
-  },
-  {
-    id: "creativefolio",
-    name: "CreativeFolio",
-    slug: "creativefolio",
-    category: "Creative & Marketing",
-    shortDescription: "Immersive agency portfolio designed to present case studies, brand identity transformations, motion showcases, and client impact.",
-    targetAudience: "Design studios, branding agencies, creative directors, production houses",
-    features: ["Case Study Deep-dives", "Interactive Client Grid", "Awards & Recognition", "Project Inquiry Builder"],
-    priority: "P1",
-    isFeatured: true,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-    accentColor: "#6366f1",
-  },
-  {
-    id: "locallift",
-    name: "LocalLift",
-    slug: "locallift",
-    category: "Local Businesses",
-    shortDescription: "High-conversion local service business website built to capture local search leads, emergency booking, and customer trust.",
-    targetAudience: "Plumbing, electrical, home repairs, cleaning, local workshops",
-    features: ["Click-to-Call Floating CTA", "Service Radius Map", "Transparent Pricing Tiers", "Verified Customer Testimonials"],
-    priority: "P1",
-    isFeatured: true,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-    accentColor: "#eab308",
-  },
-  {
-    id: "saaslaunch",
-    name: "SaaSLaunch",
-    slug: "saaslaunch",
-    category: "SaaS & Software",
-    shortDescription: "High-converting SaaS product landing page with interactive feature breakdowns, live interactive demo previews, and tiered pricing tables.",
-    targetAudience: "Tech startups, B2B software vendors, product teams, micro-SaaS",
-    features: ["Interactive Feature Showcase", "Interactive Pricing Calculator", "Customer Social Proof", "Free Trial Onboarding Funnel"],
-    priority: "P1",
-    isFeatured: true,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-    accentColor: "#3b82f6",
-  },
 
-  // ── PRIORITY P2 — INDUSTRY EXPANSION ──────────────────────────
+  // ── LIVE DEMO 4 ──
   {
     id: "fitzone",
     name: "FitZone",
@@ -301,226 +176,97 @@ export const DEMO_PROJECTS: DemoProject[] = [
     problemStatement: "Athletic clubs and boutique gyms fail to convert online visitors when websites present static schedule PDFs and generic trainer lists without immersive kinetic energy.",
     solutionOverview: "FitZone delivers an energetic 3D gym experience featuring dynamic class telemetry, coach biography modals, interactive workout split planning, and VIP free trial lead capture.",
     relatedServiceSlug: "web-development",
-    displayOrder: 7,
-  },
-  {
-    id: "eventora",
-    name: "Eventora",
-    category: "Events",
-    shortDescription: "Conference & summit landing page with keynote speaker lineups, agenda tracks, venue guidance, and ticket tier registration.",
-    targetAudience: "Conference organizers, trade shows, event agencies, tech summits",
-    features: ["Multi-Track Agenda Timeline", "Speaker Spotlight Grid", "Sponsor Tiers Showcase", "Early Bird Pass Lead Flow"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "autocare-pro",
-    name: "AutoCare Pro",
-    category: "Local Businesses",
-    shortDescription: "Automotive repair & service workshop website with service packages, quote estimators, and vehicle diagnostic appointments.",
-    targetAudience: "Auto repair shops, detailing centers, car dealerships, mechanics",
-    features: ["Service Package Selector", "Instant Quote Form", "Customer Diagnostic Guide", "Location & Directions"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "consultedge",
-    name: "ConsultEdge",
-    category: "Professional Services",
-    shortDescription: "B2B management & strategic advisory consulting website highlighting industry practice areas, thought leadership, and partner bios.",
-    targetAudience: "Management consultants, strategy advisors, accounting firms, law practices",
-    features: ["Practice Area Deep-dives", "Whitepaper Downloads", "Partner Bios", "Confidential Consultation Request"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "impactnow",
-    name: "ImpactNow",
-    category: "Nonprofit",
-    shortDescription: "Non-profit & NGO website dedicated to community initiatives, transparent fund utilization reports, and volunteer sign-ups.",
-    targetAudience: "Charitable trusts, non-profits, international NGOs, community foundations",
-    features: ["Cause Impact Metrics", "Volunteer Application Portal", "Annual Reports Archive", "Transparent Fund Utilization"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "krishi-drishti-demo",
-    name: "Krishi Drishti",
-    category: "Agriculture & IoT",
-    shortDescription: "Smart agriculture & precision irrigation platform demo showcasing IoT sensor data, weather analytics, and crop advisory systems.",
-    targetAudience: "Agri-tech startups, farm cooperatives, government agro missions",
-    features: ["IoT Sensor Telemetry", "Automated Irrigation Controls", "Weather Advisory Forecast", "Crop Health Diagnostics"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "glowstudio",
-    name: "GlowStudio",
-    category: "Beauty & Lifestyle",
-    shortDescription: "Luxury salon, spa, and beauty studio website with service menus, aesthetic galleries, package bookings, and stylist profiles.",
-    targetAudience: "Spas, premium salons, aesthetic clinics, beauty practitioners",
-    features: ["Treatment Menu with Pricing", "Stylist Lookbook Gallery", "Online Appointment Request", "Gift Voucher Inquiries"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "cargoflow",
-    name: "CargoFlow",
-    category: "Logistics",
-    shortDescription: "Commercial logistics & freight forwarding website with shipment tracking previews, route coverage, and instant freight quote calculators.",
-    targetAudience: "Freight forwarders, 3PL providers, courier companies, warehousing firms",
-    features: ["Consignment Tracking Mockup", "Freight Rate Estimator", "Global Fleet Overview", "Port & Terminal Directory"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "talentbridge",
-    name: "TalentBridge",
-    category: "Recruitment",
-    shortDescription: "Executive search and staffing firm website showcasing candidate placements, employer hiring services, and active job listings.",
-    targetAudience: "Staffing agencies, executive search firms, HR consultancies",
-    features: ["Live Job Board", "Resume Drop Box", "Employer Talent Request", "Sector Specialization Matrix"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "finedge",
-    name: "FinEdge",
-    category: "Finance & Accounting",
-    shortDescription: "Corporate finance, tax advisory, and wealth management firm website built with security-first credibility and client portal gateways.",
-    targetAudience: "Chartered accountants, wealth managers, tax advisors, investment firms",
-    features: ["Financial Calculator Tools", "Tax Compliance Calendar", "Secure Client Portal Gateway", "Service Package Comparison"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "spacecraft",
-    name: "SpaceCraft",
-    category: "Professional Services",
-    shortDescription: "Architectural & interior design studio portfolio presenting 3D rendering case studies, material palettes, and consultation estimators.",
-    targetAudience: "Interior designers, architects, decor studios, turnkey builders",
-    features: ["Before/After Sliders", "Room Transformation Portfolio", "Material & Style Guide", "Design Consultation Form"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "stylestreet",
-    name: "StyleStreet",
-    category: "E-commerce",
-    shortDescription: "Trend-driven fashion apparel eCommerce demo highlighting lookbooks, size guide assistants, and seasonal collection curation.",
-    targetAudience: "Fashion labels, streetwear brands, apparel manufacturers",
-    features: ["Lookbook Interactive Hotspots", "Size Recommendation Guide", "Wishlist & Quick View", "Instagram Feed Integration"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "appnova",
-    name: "AppNova",
-    category: "SaaS & Software",
-    shortDescription: "Mobile app showcase landing page designed to drive App Store / Google Play downloads with interactive phone mockups and reviews.",
-    targetAudience: "Mobile app developers, consumer tech startups, app publishers",
-    features: ["Interactive Device Mockup", "Feature Walkthrough Carousel", "App Store Smart Badges", "Press & Media Kit"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "securestack",
-    name: "SecureStack",
-    category: "SaaS & Software",
-    shortDescription: "Cybersecurity & managed IT services provider website showcasing threat protection suites, compliance certifications, and audits.",
-    targetAudience: "Managed service providers (MSP), SOC teams, cybersecurity firms",
-    features: ["Security Audit Questionnaire", "Compliance Checklist (SOC2, ISO)", "24/7 Incident Response CTA", "Threat Intelligence Highlights"],
-    priority: "P2",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
+    displayOrder: 4,
   },
 
-  // ── PRIORITY P3 — ADVANCED APPLICATIONS & DASHBOARDS ──────────
+  // ── LIVE DEMO 5 ──
   {
-    id: "learnsphere",
-    name: "LearnSphere",
-    category: "Education",
-    shortDescription: "Online learning platform demonstration with course video player, quiz engine, instructor management, and progress tracker.",
-    targetAudience: "EdTech platforms, online course creators, corporate training firms",
-    features: ["Curriculum & Module Viewer", "Video Lessons Interface", "Student Quiz & Certificate Mockup", "Instructor Analytics"],
-    priority: "P3",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
+    id: "novacart",
+    name: "NovaCart",
+    slug: "novacart",
+    category: "E-commerce",
+    shortDescription: "Thoughtfully selected everyday lifestyle products with dynamic filtering, live cart persistence, and checkout demonstration.",
+    targetAudience: "D2C brands, online retailers, lifestyle boutique stores, consumer products",
+    features: ["Dynamic Cart & Wishlist", "Category & Price Filters", "Live Product Search", "Simulated Checkout Flow"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Live Demo",
+    enquiryType: "View Demo",
+    demoUrl: "/demo-projects/ecommerce/novacart",
+    accentColor: "#D8F16A",
+    image: "/images/demo-projects/novacart/hero-lifestyle.jpg",
+    gallery: [
+      "/images/demo-projects/novacart/hero-lifestyle.jpg",
+      "/images/demo-projects/novacart/watch-matte-chrono.jpg",
+      "/images/demo-projects/novacart/backpack-commuter.jpg",
+      "/images/demo-projects/novacart/mechanical-keyboard.jpg",
+    ],
+    techStack: ["Next.js 15", "React Context API", "LocalStorage Persistence", "Tailwind CSS", "Framer Motion"],
+    problemStatement: "D2C lifestyle retailers require sub-second catalog responsiveness, dynamic multi-attribute filtering, persistent cart state across sessions, and simulated checkout flows to maximize conversion.",
+    solutionOverview: "NovaCart is an ultra-fast lifestyle e-commerce demonstration featuring live search, faceted category and price filtering, reactive cart and wishlist drawers, discount coupon logic, and interactive checkout simulation.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 5,
   },
+
+  // ── LIVE DEMO 6 ──
   {
-    id: "careernest",
-    name: "CareerNest",
-    category: "Recruitment",
-    shortDescription: "Full-scale job portal experience featuring applicant filtering, employer job posting workflows, and instant candidate matching.",
-    targetAudience: "Niche job boards, industry associations, university alumni networks",
-    features: ["Advanced Filter by Salary/Skill", "Candidate Application Funnel", "Employer Posting Wizard", "Email Job Alerts"],
-    priority: "P3",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "bookease",
-    name: "BookEase",
-    category: "Local Businesses",
-    shortDescription: "Universal appointment booking marketplace for local service providers, doctors, tutors, and consultants with calendar sync.",
-    targetAudience: "Service marketplaces, multi-vendor booking platforms, appointment aggregators",
-    features: ["Multi-provider Calendar Sync", "Time Slot Real-time Selector", "Automated SMS/Email Reminders", "Payment Milestone Preview"],
-    priority: "P3",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
-  },
-  {
-    id: "rentpilot",
-    name: "RentPilot",
+    id: "estatevista",
+    name: "EstateVista",
+    slug: "estatevista",
     category: "Real Estate",
-    shortDescription: "Property management dashboard enabling landlords and tenants to monitor rent payments, maintenance tickets, and leases.",
-    targetAudience: "Property managers, real estate investment trusts, co-living operators",
-    features: ["Tenant Rent Collection Tracking", "Maintenance Ticket Workflow", "Lease Expiry Calendar", "Financial Inflow Breakdown"],
-    priority: "P3",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
+    shortDescription: "Curated architectural real estate platform featuring verified listings, CAD floor plans, enclave guides, mortgage calculators, and private viewing workflows.",
+    targetAudience: "Luxury brokerages, property developers, private family offices, institutional investors",
+    features: ["Interactive Multi-Facet Search", "CAD Floor Plan Room Dimensions", "Side-by-Side Comparison", "Dynamic Mortgage Modeler"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Live Demo",
+    enquiryType: "View Demo",
+    demoUrl: "/demo-projects/real-estate/estatevista",
+    accentColor: "#123C32",
+    image: "/images/demo-projects/estatevista/estatevista-hero.jpg",
+    gallery: [
+      "/images/demo-projects/estatevista/estatevista-hero.jpg",
+      "/images/demo-projects/estatevista/estatevista-1.jpg",
+      "/images/demo-projects/estatevista/estatevista-2.jpg",
+      "/images/demo-projects/estatevista/estatevista-3.jpg",
+    ],
+    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Framer Motion", "Vector CAD Blueprints"],
+    problemStatement: "Ultra-luxury real estate brokerages struggle to convey architectural grandeur through generic real estate templates that lack CAD floor plans, enclave context, or dynamic mortgage telemetry.",
+    solutionOverview: "EstateVista delivers an architectural-grade real estate experience featuring verified high-value property dossiers, vector CAD floor plans with room measurements, enclave guides, interactive mortgage calculators, and private VIP tour booking.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 6,
   },
+
+  // ── LIVE DEMO 7 ──
   {
-    id: "stockwise",
-    name: "StockWise",
-    category: "Dashboards & Portals",
-    shortDescription: "Point-of-Sale and multi-store inventory dashboard showcasing low-stock alerts, barcode scanner integration, and daily revenue reports.",
-    targetAudience: "Retail chains, FMCG distributors, electronics stores, boutiques",
-    features: ["Real-time Inventory Ledger", "Low Stock Automated Alerts", "Multi-branch Reconciliation", "Sales Analytics Graphing"],
-    priority: "P3",
-    isFeatured: false,
-    status: "Coming Soon",
-    enquiryType: "Request a Similar Project",
+    id: "corporate-pro",
+    name: "CorporatePro",
+    slug: "corporatepro",
+    category: "Business & Corporate",
+    shortDescription: "High-performance enterprise website showcasing organizational credibility, service pillars, leadership, and investor relations.",
+    targetAudience: "Corporations, B2B enterprises, consulting firms, holding companies",
+    features: ["Executive Leadership Profile", "Interactive Service Matrix", "Investor Relations Portal", "Multi-office Locator"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Live Demo",
+    demoUrl: "/demo-projects/business/corporatepro",
+    enquiryType: "View Demo",
+    accentColor: "#29483b",
+    image: "/images/demo-projects/corporatepro/hero-advisory.jpg",
+    gallery: [
+      "/images/demo-projects/corporatepro/hero-advisory.jpg",
+      "/images/demo-projects/corporatepro/about-philosophy.jpg",
+      "/images/demo-projects/corporatepro/digital-transformation.jpg",
+      "/images/demo-projects/corporatepro/operations-case-study.jpg",
+    ],
+    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Framer Motion", "Lucide React"],
+    problemStatement: "Multi-practice consulting firms and large B2B enterprises need to project institutional credibility, executive depth, and global service capabilities without suffering from slow legacy CMS architectures.",
+    solutionOverview: "CorporatePro delivers an ultra-fast corporate digital flagship featuring interactive service matrices, leadership dossiers, investor governance repositories, and multi-office locator routing.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 7,
   },
+
+  // ── LIVE DEMO 8 ──
   {
     id: "leadpilot",
     name: "LeadPilot",
@@ -547,6 +293,324 @@ export const DEMO_PROJECTS: DemoProject[] = [
     relatedServiceSlug: "custom-software-development",
     displayOrder: 8,
   },
+
+  // ── CONCEPT 1 ──
+  {
+    id: "staysphere",
+    name: "StaySphere",
+    slug: "staysphere",
+    category: "Hotels & Travel",
+    shortDescription: "Luxury boutique resort & hotel website highlighting room categories, amenities, local experiences, and direct reservation inquiries.",
+    targetAudience: "Boutique hotels, luxury resorts, homestays, vacation rentals",
+    features: ["Room Suite Previews", "Amenities Grid", "Seasonal Offer Banners", "Direct Booking Inquiries"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+    accentColor: "#f59e0b",
+  },
+
+  // ── CONCEPT 2 ──
+  {
+    id: "creativefolio",
+    name: "CreativeFolio",
+    slug: "creativefolio",
+    category: "Creative & Marketing",
+    shortDescription: "Immersive agency portfolio designed to present case studies, brand identity transformations, motion showcases, and client impact.",
+    targetAudience: "Design studios, branding agencies, creative directors, production houses",
+    features: ["Case Study Deep-dives", "Interactive Client Grid", "Awards & Recognition", "Project Inquiry Builder"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+    accentColor: "#6366f1",
+  },
+
+  // ── CONCEPT 3 ──
+  {
+    id: "locallift",
+    name: "LocalLift",
+    slug: "locallift",
+    category: "Local Businesses",
+    shortDescription: "High-conversion local service business website built to capture local search leads, emergency booking, and customer trust.",
+    targetAudience: "Plumbing, electrical, home repairs, cleaning, local workshops",
+    features: ["Click-to-Call Floating CTA", "Service Radius Map", "Transparent Pricing Tiers", "Verified Customer Testimonials"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+    accentColor: "#eab308",
+  },
+
+  // ── CONCEPT 4 ──
+  {
+    id: "saaslaunch",
+    name: "SaaSLaunch",
+    slug: "saaslaunch",
+    category: "SaaS & Software",
+    shortDescription: "High-converting SaaS product landing page with interactive feature breakdowns, live interactive demo previews, and tiered pricing tables.",
+    targetAudience: "Tech startups, B2B software vendors, product teams, micro-SaaS",
+    features: ["Interactive Feature Showcase", "Interactive Pricing Calculator", "Customer Social Proof", "Free Trial Onboarding Funnel"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+    accentColor: "#3b82f6",
+  },
+
+  // ── CONCEPT 5 ──
+  {
+    id: "eventora",
+    name: "Eventora",
+    category: "Events",
+    shortDescription: "Conference & summit landing page with keynote speaker lineups, agenda tracks, venue guidance, and ticket tier registration.",
+    targetAudience: "Conference organizers, trade shows, event agencies, tech summits",
+    features: ["Multi-Track Agenda Timeline", "Speaker Spotlight Grid", "Sponsor Tiers Showcase", "Early Bird Pass Lead Flow"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 6 ──
+  {
+    id: "autocare-pro",
+    name: "AutoCare Pro",
+    category: "Local Businesses",
+    shortDescription: "Automotive repair & service workshop website with service packages, quote estimators, and vehicle diagnostic appointments.",
+    targetAudience: "Auto repair shops, detailing centers, car dealerships, mechanics",
+    features: ["Service Package Selector", "Instant Quote Form", "Customer Diagnostic Guide", "Location & Directions"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 7 ──
+  {
+    id: "consultedge",
+    name: "ConsultEdge",
+    category: "Professional Services",
+    shortDescription: "B2B management & strategic advisory consulting website highlighting industry practice areas, thought leadership, and partner bios.",
+    targetAudience: "Management consultants, strategy advisors, accounting firms, law practices",
+    features: ["Practice Area Deep-dives", "Whitepaper Downloads", "Partner Bios", "Confidential Consultation Request"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 8 ──
+  {
+    id: "impactnow",
+    name: "ImpactNow",
+    category: "Nonprofit",
+    shortDescription: "Non-profit & NGO website dedicated to community initiatives, transparent fund utilization reports, and volunteer sign-ups.",
+    targetAudience: "Charitable trusts, non-profits, international NGOs, community foundations",
+    features: ["Cause Impact Metrics", "Volunteer Application Portal", "Annual Reports Archive", "Transparent Fund Utilization"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 9 ──
+  {
+    id: "krishi-drishti-demo",
+    name: "Krishi Drishti",
+    category: "Agriculture & IoT",
+    shortDescription: "Smart agriculture & precision irrigation platform demo showcasing IoT sensor data, weather analytics, and crop advisory systems.",
+    targetAudience: "Agri-tech startups, farm cooperatives, government agro missions",
+    features: ["IoT Sensor Telemetry", "Automated Irrigation Controls", "Weather Advisory Forecast", "Crop Health Diagnostics"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 10 ──
+  {
+    id: "glowstudio",
+    name: "GlowStudio",
+    category: "Beauty & Lifestyle",
+    shortDescription: "Luxury salon, spa, and beauty studio website with service menus, aesthetic galleries, package bookings, and stylist profiles.",
+    targetAudience: "Spas, premium salons, aesthetic clinics, beauty practitioners",
+    features: ["Treatment Menu with Pricing", "Stylist Lookbook Gallery", "Online Appointment Request", "Gift Voucher Inquiries"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 11 ──
+  {
+    id: "cargoflow",
+    name: "CargoFlow",
+    category: "Logistics",
+    shortDescription: "Commercial logistics & freight forwarding website with shipment tracking previews, route coverage, and instant freight quote calculators.",
+    targetAudience: "Freight forwarders, 3PL providers, courier companies, warehousing firms",
+    features: ["Consignment Tracking Mockup", "Freight Rate Estimator", "Global Fleet Overview", "Port & Terminal Directory"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 12 ──
+  {
+    id: "talentbridge",
+    name: "TalentBridge",
+    category: "Recruitment",
+    shortDescription: "Executive search and staffing firm website showcasing candidate placements, employer hiring services, and active job listings.",
+    targetAudience: "Staffing agencies, executive search firms, HR consultancies",
+    features: ["Live Job Board", "Resume Drop Box", "Employer Talent Request", "Sector Specialization Matrix"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 13 ──
+  {
+    id: "finedge",
+    name: "FinEdge",
+    category: "Finance & Accounting",
+    shortDescription: "Corporate finance, tax advisory, and wealth management firm website built with security-first credibility and client portal gateways.",
+    targetAudience: "Chartered accountants, wealth managers, tax advisors, investment firms",
+    features: ["Financial Calculator Tools", "Tax Compliance Calendar", "Secure Client Portal Gateway", "Service Package Comparison"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 14 ──
+  {
+    id: "spacecraft",
+    name: "SpaceCraft",
+    category: "Professional Services",
+    shortDescription: "Architectural & interior design studio portfolio presenting 3D rendering case studies, material palettes, and consultation estimators.",
+    targetAudience: "Interior designers, architects, decor studios, turnkey builders",
+    features: ["Before/After Sliders", "Room Transformation Portfolio", "Material & Style Guide", "Design Consultation Form"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 15 ──
+  {
+    id: "stylestreet",
+    name: "StyleStreet",
+    category: "E-commerce",
+    shortDescription: "Trend-driven fashion apparel eCommerce demo highlighting lookbooks, size guide assistants, and seasonal collection curation.",
+    targetAudience: "Fashion labels, streetwear brands, apparel manufacturers",
+    features: ["Lookbook Interactive Hotspots", "Size Recommendation Guide", "Wishlist & Quick View", "Instagram Feed Integration"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 16 ──
+  {
+    id: "appnova",
+    name: "AppNova",
+    category: "SaaS & Software",
+    shortDescription: "Mobile app showcase landing page designed to drive App Store / Google Play downloads with interactive phone mockups and reviews.",
+    targetAudience: "Mobile app developers, consumer tech startups, app publishers",
+    features: ["Interactive Device Mockup", "Feature Walkthrough Carousel", "App Store Smart Badges", "Press & Media Kit"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 17 ──
+  {
+    id: "securestack",
+    name: "SecureStack",
+    category: "SaaS & Software",
+    shortDescription: "Cybersecurity & managed IT services provider website showcasing threat protection suites, compliance certifications, and audits.",
+    targetAudience: "Managed service providers (MSP), SOC teams, cybersecurity firms",
+    features: ["Security Audit Questionnaire", "Compliance Checklist (SOC2, ISO)", "24/7 Incident Response CTA", "Threat Intelligence Highlights"],
+    priority: "P2",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 18 ──
+  {
+    id: "learnsphere",
+    name: "LearnSphere",
+    category: "Education",
+    shortDescription: "Online learning platform demonstration with course video player, quiz engine, instructor management, and progress tracker.",
+    targetAudience: "EdTech platforms, online course creators, corporate training firms",
+    features: ["Curriculum & Module Viewer", "Video Lessons Interface", "Student Quiz & Certificate Mockup", "Instructor Analytics"],
+    priority: "P3",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 19 ──
+  {
+    id: "careernest",
+    name: "CareerNest",
+    category: "Recruitment",
+    shortDescription: "Full-scale job portal experience featuring applicant filtering, employer job posting workflows, and instant candidate matching.",
+    targetAudience: "Niche job boards, industry associations, university alumni networks",
+    features: ["Advanced Filter by Salary/Skill", "Candidate Application Funnel", "Employer Posting Wizard", "Email Job Alerts"],
+    priority: "P3",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 20 ──
+  {
+    id: "bookease",
+    name: "BookEase",
+    category: "Local Businesses",
+    shortDescription: "Universal appointment booking marketplace for local service providers, doctors, tutors, and consultants with calendar sync.",
+    targetAudience: "Service marketplaces, multi-vendor booking platforms, appointment aggregators",
+    features: ["Multi-provider Calendar Sync", "Time Slot Real-time Selector", "Automated SMS/Email Reminders", "Payment Milestone Preview"],
+    priority: "P3",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 21 ──
+  {
+    id: "rentpilot",
+    name: "RentPilot",
+    category: "Real Estate",
+    shortDescription: "Property management dashboard enabling landlords and tenants to monitor rent payments, maintenance tickets, and leases.",
+    targetAudience: "Property managers, real estate investment trusts, co-living operators",
+    features: ["Tenant Rent Collection Tracking", "Maintenance Ticket Workflow", "Lease Expiry Calendar", "Financial Inflow Breakdown"],
+    priority: "P3",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 22 ──
+  {
+    id: "stockwise",
+    name: "StockWise",
+    category: "Dashboards & Portals",
+    shortDescription: "Point-of-Sale and multi-store inventory dashboard showcasing low-stock alerts, barcode scanner integration, and daily revenue reports.",
+    targetAudience: "Retail chains, FMCG distributors, electronics stores, boutiques",
+    features: ["Real-time Inventory Ledger", "Low Stock Automated Alerts", "Multi-branch Reconciliation", "Sales Analytics Graphing"],
+    priority: "P3",
+    isFeatured: false,
+    status: "Coming Soon",
+    enquiryType: "Request a Similar Project",
+  },
+
+  // ── CONCEPT 23 ──
   {
     id: "teampulse",
     name: "TeamPulse",
@@ -559,6 +623,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 24 ──
   {
     id: "workboard",
     name: "WorkBoard",
@@ -571,6 +637,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 25 ──
   {
     id: "insightiq",
     name: "InsightIQ",
@@ -583,6 +651,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 26 ──
   {
     id: "helpdesk-pro",
     name: "HelpDesk Pro",
@@ -595,6 +665,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 27 ──
   {
     id: "axivon-assist",
     name: "Axivon Assist",
@@ -607,6 +679,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 28 ──
   {
     id: "smartfarm-iot",
     name: "SmartFarm IoT",
@@ -619,6 +693,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 29 ──
   {
     id: "caretrack",
     name: "CareTrack",
@@ -631,6 +707,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 30 ──
   {
     id: "quickbite",
     name: "QuickBite",
@@ -643,6 +721,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 31 ──
   {
     id: "eventdesk",
     name: "EventDesk",
@@ -655,6 +735,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 32 ──
   {
     id: "giveforward",
     name: "GiveForward",
@@ -667,6 +749,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 33 ──
   {
     id: "triptrail",
     name: "TripTrail",
@@ -679,6 +763,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 34 ──
   {
     id: "servestack",
     name: "ServeStack",
@@ -691,6 +777,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 35 ──
   {
     id: "campuscore",
     name: "CampusCore",
@@ -703,6 +791,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 36 ──
   {
     id: "clinicslot",
     name: "ClinicSlot",
@@ -715,6 +805,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 37 ──
   {
     id: "marketmint",
     name: "MarketMint",
@@ -727,6 +819,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 38 ──
   {
     id: "buildsphere",
     name: "BuildSphere",
@@ -739,6 +833,8 @@ export const DEMO_PROJECTS: DemoProject[] = [
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
   },
+
+  // ── CONCEPT 39 ──
   {
     id: "moments-studio",
     name: "Moments Studio",
@@ -750,8 +846,18 @@ export const DEMO_PROJECTS: DemoProject[] = [
     isFeatured: false,
     status: "Coming Soon",
     enquiryType: "Request a Similar Project",
-  },
+  }
 ];
+/**
+ * Returns demo projects respecting the SHOW_COMING_SOON_DEMOS configuration flag.
+ */
+export function getVisibleDemoProjects(): DemoProject[] {
+  if (SHOW_COMING_SOON_DEMOS) {
+    return DEMO_PROJECTS;
+  }
+  return DEMO_PROJECTS.filter((p) => p.status === "Live Demo");
+}
+
 
 /**
  * Maps a demo project to its verified image URL.
