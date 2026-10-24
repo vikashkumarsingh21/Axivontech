@@ -620,7 +620,7 @@ function StatsPanel({ prefersReducedMotion }: { prefersReducedMotion: boolean })
 
   const stats = [
     { value: "99.9%", label: "Reliability", color: "#d4915c" },
-    { value: "24/7", label: "Support", color: "#e8a064" },
+    { value: "Direct", label: "Founder Support", color: "#e8a064" },
     { value: "100%", label: "Client Focus", color: "#c9922a" },
     { value: "Fast", label: "Delivery", color: "#d4915c" },
   ];

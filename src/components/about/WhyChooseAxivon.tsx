@@ -22,6 +22,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui";
+import { SITE_FACTS } from "@/config/siteFacts";
 
 const EASE_PREMIUM = [0.22, 1, 0.36, 1] as const;
 
@@ -123,10 +124,10 @@ const CARDS: BentoCardData[] = [
 const STATS: StatData[] = [
   {
     id: "projects",
-    label: "Projects Delivered",
+    label: SITE_FACTS.projects.label,
     countUp: true,
-    target: 10,
-    suffix: "+",
+    target: SITE_FACTS.projects.count,
+    suffix: "",
   },
   {
     id: "focus",
@@ -137,9 +138,9 @@ const STATS: StatData[] = [
   },
   {
     id: "support",
-    label: "Support",
+    label: SITE_FACTS.support.label,
     countUp: false,
-    display: "24/7",
+    display: SITE_FACTS.support.display,
   },
   {
     id: "team",

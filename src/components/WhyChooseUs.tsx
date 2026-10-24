@@ -32,9 +32,9 @@ interface Stat {
 const FEATURES: Feature[] = [
   {
     icon: Users,
-    title: "Experienced Development Team",
+    title: "Founder-Led Engineering Team",
     description:
-      "Senior engineers and designers who've shipped products for startups and enterprises — not junior hires learning on your budget.",
+      "Founder-led team with direct access to the engineer building your project — thoughtful architecture built for real business impact.",
   },
   {
     icon: Layers,
@@ -250,7 +250,7 @@ export default function WhyChooseUs() {
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent" />
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-lg bg-[#0f0f0f]/80 px-3 py-2 text-[11px] font-medium text-[#a1a1aa] backdrop-blur-md">
                 <span>Human-Led Digital Craft</span>
-                <span className="text-[#e8a064]">Dedicated Squads</span>
+                <span className="text-[#e8a064]">Direct Collaboration</span>
               </div>
             </motion.div>
           </motion.div>

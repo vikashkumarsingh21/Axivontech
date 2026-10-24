@@ -150,7 +150,11 @@ export interface FAQProps {
 }
 
 export default function FAQ({ faqs }: FAQProps = {}) {
-  const items = faqs && faqs.length > 0 ? faqs : FAQ_ITEMS;
+  // Defensive filter: only include FAQ items with valid, non-empty questions and answers
+  const validFaqs = faqs?.filter(
+    (f) => Boolean(f?.question?.trim()) && Boolean(f?.answer?.trim())
+  );
+  const items = validFaqs && validFaqs.length > 0 ? validFaqs : FAQ_ITEMS;
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const handleToggle = (index: number) => {

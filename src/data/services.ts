@@ -128,7 +128,7 @@ export const servicesData: ServiceData[] = [
       {
         title: "QA, Testing & Performance Audit",
         description:
-          "Automated unit, integration, and end-to-end tests, combined with manual QA, ensure zero critical bugs at launch. We also run full Lighthouse audits and fix issues before go-live.",
+          "Automated tests, combined with hands-on manual QA, verify reliability and edge cases before release. We also run full Lighthouse audits and fix issues before go-live.",
       },
       {
         title: "Launch, Monitoring & Handover",
@@ -1277,3 +1277,5 @@ export function getServiceBySlug(slug: ServiceSlug): ServiceData {
 export function getAllServiceSlugs(): ServiceSlug[] {
   return servicesData.map((service) => service.slug);
 }
+
+export const services = servicesData;

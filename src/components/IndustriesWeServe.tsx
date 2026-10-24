@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { SectionHeader } from "@/components/ui";
 import type { IndustryItem } from "@/lib/content/content-db";
+import { SITE_FACTS } from "@/config/siteFacts";
 
 interface Industry {
   icon: LucideIcon;
@@ -193,7 +194,7 @@ export default function IndustriesWeServe({ industries }: IndustriesWeServeProps
               {/* Bottom callout on image */}
               <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-[#262626]/80 bg-[#141414]/85 p-4 backdrop-blur-md">
                 <p className="text-sm font-semibold text-[#f4f4f5]">
-                  12+ Industry Verticals
+                  {displayIndustries.length} Industry Verticals
                 </p>
                 <p className="mt-1 text-xs text-[#71717a] leading-relaxed">
                   From education to healthcare, retail to real estate — we build digital products that fit your sector.
@@ -204,9 +205,9 @@ export default function IndustriesWeServe({ industries }: IndustriesWeServeProps
             {/* Below-image stat strip */}
             <div className="mt-4 grid grid-cols-3 gap-3">
               {[
-                { value: "12+", label: "Industries" },
-                { value: "10+", label: "Projects Done" },
-                { value: "24/7", label: "Support" },
+                { value: `${displayIndustries.length}`, label: "Industries" },
+                { value: SITE_FACTS.projects.display, label: SITE_FACTS.projects.label },
+                { value: SITE_FACTS.support.display, label: SITE_FACTS.support.label },
               ].map(({ value, label }) => (
                 <div
                   key={label}

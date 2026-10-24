@@ -83,67 +83,10 @@ export default function ClientReviews() {
     );
   };
 
-  if (error) {
-    return (
-      <section className="bg-[#0f0f0f] py-12 sm:py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 text-center">
-          <SectionHeader
-            overline="Client Reviews"
-            heading={<>What Our <span className="text-gradient-amber">Clients</span> Say</>}
-            body="Client reviews are temporarily unavailable."
-          />
-        </div>
-      </section>
-    );
-  }
-
-  if (loading) {
-    return (
-      <section className="bg-[#0f0f0f] py-12 sm:py-16 lg:py-20 overflow-hidden">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-          <SectionHeader
-            overline="Client Reviews"
-            heading={<>What Our <span className="text-gradient-amber">Clients</span> Say</>}
-            body="Discover how we've helped businesses achieve their technology goals."
-          />
-          <div className="mt-12 flex gap-6 overflow-hidden">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="min-w-full md:min-w-[calc(50%-12px)] lg:min-w-[calc(33.333%-16px)] rounded-2xl border border-[#262626] bg-[#141414] p-6 animate-pulse">
-                <div className="h-4 w-24 bg-[#262626] rounded mb-4"></div>
-                <div className="h-4 w-full bg-[#262626] rounded mb-2"></div>
-                <div className="h-4 w-3/4 bg-[#262626] rounded mb-6"></div>
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-[#262626]"></div>
-                  <div>
-                    <div className="h-4 w-20 bg-[#262626] rounded mb-1"></div>
-                    <div className="h-3 w-16 bg-[#262626] rounded"></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (reviews.length === 0) {
-    return (
-      <section className="bg-[#0f0f0f] py-12 sm:py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 text-center">
-          <SectionHeader
-            overline="Client Reviews"
-            heading={<>What Our <span className="text-gradient-amber">Clients</span> Say</>}
-            body="Be among the first to share your experience with AXIVON."
-          />
-          <div className="mt-8 flex justify-center">
-            <Link href="/reviews#submit-review" className="inline-flex items-center justify-center rounded-full border border-[#e8a064] text-[#e8a064] px-6 py-3 font-medium transition-colors hover:bg-[rgba(232,160,100,0.1)]">
-              Share Your Experience
-            </Link>
-          </div>
-        </div>
-      </section>
-    );
+  // Homepage conditional render: hide the entire section if zero approved reviews exist.
+  // It will reappear automatically once approved reviews are returned.
+  if (error || loading || reviews.length === 0) {
+    return null;
   }
 
   return (

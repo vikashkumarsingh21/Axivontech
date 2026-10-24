@@ -14,6 +14,7 @@ import {
   Users,
 } from "lucide-react";
 import { Badge } from "@/components/ui";
+import { SITE_FACTS } from "@/config/siteFacts";
 
 const EASE_ABOUT = [0.22, 1, 0.36, 1] as const;
 
@@ -27,10 +28,11 @@ interface ChecklistItem {
   label: string;
 }
 
+// Grounded site stats from single source of truth (siteFacts.ts)
 const STATS: StatItem[] = [
-  { label: "Projects", value: "10+", icon: FolderKanban },
-  { label: "Clients", value: "8+", icon: Users },
-  { label: "Support", value: "24/7", icon: Headphones },
+  { label: "Projects", value: SITE_FACTS.projects.display, icon: FolderKanban },
+  { label: "Services", value: SITE_FACTS.services.display, icon: Sparkles },
+  { label: "Support", value: SITE_FACTS.support.display, icon: Headphones },
 ];
 
 const CHECKLIST: ChecklistItem[] = [

@@ -65,7 +65,7 @@ const STEPS: Step[] = [
     description:
       "Thorough quality checks — functionality, performance, cross-device responsiveness, and accessibility — so the product works in real-world conditions.",
     icon: Gauge,
-    outcome: "Zero critical bugs at launch",
+    outcome: "Rigorous QA testing before go-live",
     deliverables: ["QA testing", "Performance audit", "Accessibility check"],
   },
   {

@@ -212,19 +212,25 @@ export default function Navbar({ careersEnabled = false }: { careersEnabled?: bo
                   onMouseLeave={handleMouseLeavePortfolio}
                 >
                   <div className="flex items-center">
-                    <button
-                      type="button"
-                      onClick={() => setPortfolioOpen((v) => !v)}
-                      aria-expanded={portfolioOpen}
-                      aria-haspopup="true"
-                      aria-label="Portfolio menu options"
-                      className={`relative z-10 flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 ${
+                    <Link
+                      href={link.href}
+                      onClick={() => setPortfolioOpen(false)}
+                      className={`relative z-10 flex items-center rounded-l-full pl-4 pr-1 py-2 text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 ${
                         isActive(link.href)
                           ? "text-[#F3F5F7] font-semibold"
                           : "text-[#A7B0BC] hover:text-[#F3F5F7]"
                       }`}
                     >
                       <span>{link.label}</span>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setPortfolioOpen((v) => !v)}
+                      aria-expanded={portfolioOpen}
+                      aria-haspopup="true"
+                      aria-label="Portfolio menu options"
+                      className="relative z-10 flex items-center rounded-r-full pr-3 pl-1 py-2 text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 text-[#7E8997] hover:text-[#F3F5F7]"
+                    >
                       <ChevronDown
                         className={`h-3.5 w-3.5 transition-transform duration-200 ${
                           portfolioOpen ? "rotate-180 text-[#e8a064]" : "text-[#7E8997]"
@@ -467,23 +473,32 @@ export default function Navbar({ careersEnabled = false }: { careersEnabled?: bo
                 if (link.hasDropdown) {
                   return (
                     <motion.li key={link.href} variants={mobileLinkItemVariants} className="flex flex-col">
-                      <button
-                        type="button"
-                        onClick={() => setMobilePortfolioOpen((prev) => !prev)}
-                        aria-expanded={mobilePortfolioOpen}
-                        className={`group flex items-center justify-between rounded-2xl px-4 py-3 text-2xl font-medium transition-colors sm:text-3xl ${
-                          isActive(link.href)
-                            ? "text-[#e8a064]"
-                            : "text-[#d4d4d8] hover:text-[#f4f4f5]"
-                        }`}
-                      >
-                        <span>{link.label}</span>
-                        <ChevronDown
-                          className={`h-6 w-6 text-[#71717a] transition-transform duration-200 ${
-                            mobilePortfolioOpen ? "rotate-180 text-[#e8a064]" : ""
+                      <div className="flex items-center justify-between rounded-2xl px-2">
+                        <Link
+                          href={link.href}
+                          onClick={() => setIsOpen(false)}
+                          className={`flex-1 px-2 py-3 text-2xl font-medium transition-colors sm:text-3xl ${
+                            isActive(link.href)
+                              ? "text-[#e8a064]"
+                              : "text-[#d4d4d8] hover:text-[#f4f4f5]"
                           }`}
-                        />
-                      </button>
+                        >
+                          {link.label}
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => setMobilePortfolioOpen((prev) => !prev)}
+                          aria-expanded={mobilePortfolioOpen}
+                          aria-label="Toggle portfolio submenu"
+                          className="p-3 text-[#71717a] hover:text-[#f4f4f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 rounded-xl"
+                        >
+                          <ChevronDown
+                            className={`h-6 w-6 text-[#71717a] transition-transform duration-200 ${
+                              mobilePortfolioOpen ? "rotate-180 text-[#e8a064]" : ""
+                            }`}
+                          />
+                        </button>
+                      </div>
 
                       {/* Collapsible Mobile Submenu */}
                       <AnimatePresence>

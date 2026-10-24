@@ -221,7 +221,7 @@ export const DEFAULT_ABOUT_CONTENT: AboutPageContent = {
   mission:
     "To deliver high-impact, uncompromising software solutions that empower organizations to automate complex processes, engage users, and outcompete in a digital-first economy.",
   vision:
-    "To be the premier digital product engineering partner in Western India, recognized globally for technical excellence, engineering integrity, and sustainable software architecture.",
+    "To be a trusted digital product engineering partner in Gujarat and beyond, recognized for engineering integrity, thoughtful craft, and sustainable software architecture.",
   values: [
     {
       title: "Engineering Excellence",
@@ -264,7 +264,7 @@ export const DEFAULT_ABOUT_CONTENT: AboutPageContent = {
     },
     {
       year: "2026",
-      title: "National Client Roster & Demos",
+      title: "Demo Ecosystem & Platform Expansion",
       description: "Built 8 live full-stack demo platforms and expanded business partner network across tier-1 and tier-2 Indian cities.",
     },
   ],

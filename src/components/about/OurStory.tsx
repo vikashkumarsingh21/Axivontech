@@ -19,6 +19,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui";
+import { SITE_FACTS } from "@/config/siteFacts";
 
 const EASE_STORY = [0.22, 1, 0.36, 1] as const;
 
@@ -87,9 +88,9 @@ const TIMELINE: TimelineEntry[] = [
 ];
 
 const ACHIEVEMENTS: AchievementStat[] = [
-  { id: "projects", icon: Rocket, value: "10+", label: "Projects Delivered" },
-  { id: "services", icon: Cpu, value: "10", label: "Core Services" },
-  { id: "support", icon: Headphones, value: "24/7", label: "Dedicated Support" },
+  { id: "projects", icon: Rocket, value: SITE_FACTS.projects.display, label: SITE_FACTS.projects.label },
+  { id: "services", icon: Cpu, value: SITE_FACTS.services.display, label: SITE_FACTS.services.label },
+  { id: "support", icon: Headphones, value: SITE_FACTS.support.display, label: SITE_FACTS.support.label },
 ];
 
 const containerStagger = {

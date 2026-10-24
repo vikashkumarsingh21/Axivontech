@@ -37,6 +37,7 @@ import {
   Sparkles,
   type LucideIcon,
 } from "lucide-react";
+import { SITE_FACTS } from "@/config/siteFacts";
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -74,32 +75,31 @@ const STATS: readonly StatDefinition[] = [
   {
     id: "projects",
     icon: Rocket,
-    label: "Projects Delivered",
-    target: 10,
-    suffix: "+",
+    label: SITE_FACTS.projects.label,
+    target: SITE_FACTS.projects.count,
+    suffix: "",
     accent: ["#e8a064", "#d4915c"],
   },
   {
     id: "domains",
     icon: Cpu,
-    label: "Core Services",
-    target: 10,
+    label: SITE_FACTS.services.label,
+    target: SITE_FACTS.services.count,
     suffix: "",
     accent: ["#c9922a", "#e8a064"],
   },
   {
     id: "support",
     icon: Headphones,
-    label: "Dedicated Support",
-    target: 24,
-    secondaryTarget: 7,
-    divider: "/",
+    label: SITE_FACTS.support.label,
+    target: 100,
+    suffix: "%",
     accent: ["#c9922a", "#d4915c"],
   },
   {
     id: "quality",
     icon: ShieldCheck,
-    label: "Code Quality Focus",
+    label: SITE_FACTS.quality.label,
     target: 100,
     suffix: "%",
     accent: ["#d4915c", "#c9922a"],

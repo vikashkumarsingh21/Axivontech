@@ -5,23 +5,14 @@ import { motion, useInView, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-const INSIGHTS = [
-  {
-    id: "smart-agriculture",
-    title: "Building Smart Agriculture Platforms with IoT",
-    link: "/blog",
-  },
-  {
-    id: "product-development",
-    title: "How We Approach Product Development at Axivon",
-    link: "/blog",
-  },
-  {
-    id: "ai-environmental",
-    title: "The Role of AI in Environmental Technology",
-    link: "/blog",
-  },
-];
+import { BLOG_POSTS } from "@/data/blog-posts";
+
+const INSIGHTS = BLOG_POSTS.slice(0, 3).map((post) => ({
+  id: post.slug,
+  title: post.title,
+  category: post.category,
+  link: `/blog/${post.slug}`,
+}));
 
 export default function RelatedInsights() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -79,7 +70,7 @@ export default function RelatedInsights() {
               className="bg-[#141414] border border-[#1e1e1e] rounded-xl p-6 hover:border-[#2a2a2a] transition-colors"
             >
               <span className="uppercase text-[11px] tracking-widest font-medium text-[#e8a064]">
-                Blog
+                {insight.category}
               </span>
               <h3 className="text-base font-semibold text-[#f4f4f5] mt-3 leading-snug">
                 {insight.title}

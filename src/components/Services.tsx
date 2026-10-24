@@ -17,6 +17,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { SectionHeader } from "@/components/ui";
 import type { ServiceData } from "@/lib/content/content-db";
+import { SITE_FACTS } from "@/config/siteFacts";
 
 interface FlagshipService {
   id: string;
@@ -289,7 +290,7 @@ export default function Services({ services }: ServicesProps = {}) {
               href="/services"
               className="text-xs sm:text-sm font-semibold text-[#e8a064] hover:underline"
             >
-              View All 8 Services →
+              View All {SITE_FACTS.services.count} Services →
             </Link>
           </div>
 

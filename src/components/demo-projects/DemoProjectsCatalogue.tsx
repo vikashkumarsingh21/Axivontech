@@ -231,7 +231,7 @@ export default function DemoProjectsCatalogue() {
             </div>
             <div className="hidden sm:block h-3 w-px bg-[#262626]" />
             <div>
-              <span className="font-semibold text-[#e8a064] text-sm sm:text-base">100%</span> Production-Grade Architecture
+              <span className="font-semibold text-[#e8a064] text-sm sm:text-base">Modern</span> Full-Stack Architecture
             </div>
           </div>
         </div>

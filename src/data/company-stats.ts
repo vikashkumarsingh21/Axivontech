@@ -7,6 +7,8 @@
  * - Prevents zero-value count-up display bugs during SSR and initial viewport load
  */
 
+import { SITE_FACTS } from "@/config/siteFacts";
+
 export interface CompanyStat {
   id: string;
   value: string;
@@ -20,35 +22,35 @@ export interface CompanyStat {
 export const COMPANY_STATS = {
   projectsDelivered: {
     id: "projects",
-    value: "10+",
-    numericValue: 10,
-    suffix: "+",
-    label: "Projects Delivered",
-    description: "Successfully engineered websites, mobile applications, and custom systems",
+    value: SITE_FACTS.projects.display,
+    numericValue: SITE_FACTS.projects.count,
+    suffix: "",
+    label: SITE_FACTS.projects.label,
+    description: SITE_FACTS.projects.description,
   },
   coreServices: {
     id: "services",
-    value: "10",
-    numericValue: 10,
+    value: SITE_FACTS.services.display,
+    numericValue: SITE_FACTS.services.count,
     suffix: "",
-    label: "Core Services",
-    description: "Specialized engineering domains across web, mobile, AI, and cloud",
+    label: SITE_FACTS.services.label,
+    description: SITE_FACTS.services.description,
   },
   support: {
     id: "support",
-    value: "24/7",
-    numericValue: 24,
-    suffix: "/7",
-    label: "Dedicated Support",
-    description: "Dedicated round-the-clock technical monitoring and response",
+    value: SITE_FACTS.support.display,
+    numericValue: 1,
+    suffix: "",
+    label: SITE_FACTS.support.label,
+    description: SITE_FACTS.support.description,
   },
   codeQuality: {
     id: "quality",
-    value: "100%",
+    value: SITE_FACTS.quality.display,
     numericValue: 100,
     suffix: "%",
-    label: "Code Quality Focus",
-    description: "Rigorous type-safety, automated testing, and scalable architecture",
+    label: SITE_FACTS.quality.label,
+    description: SITE_FACTS.quality.description,
   },
 } as const;
 
@@ -58,3 +60,4 @@ export const HOMEPAGE_STATS: readonly CompanyStat[] = [
   COMPANY_STATS.support,
   COMPANY_STATS.codeQuality,
 ];
+

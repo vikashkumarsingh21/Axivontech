@@ -37,9 +37,13 @@ export default function ContactFAQ({ faqs }: ContactFAQProps = {}) {
   const isInView = useInView(sectionRef, { once: true, margin: "-50px" });
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
+  // Defensive filter: only keep FAQ items that contain non-empty questions and answers
+  const validFaqs = faqs?.filter(
+    (f) => Boolean(f?.question?.trim()) && Boolean(f?.answer?.trim())
+  );
   const displayedFaqs =
-    faqs && faqs.length > 0
-      ? faqs.map((f) => ({ question: f.question, answer: f.answer }))
+    validFaqs && validFaqs.length > 0
+      ? validFaqs.map((f) => ({ question: f.question, answer: f.answer }))
       : FAQS;
 
   return (
