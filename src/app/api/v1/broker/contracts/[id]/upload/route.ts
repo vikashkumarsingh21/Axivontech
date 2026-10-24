@@ -25,10 +25,8 @@ const uploadContractSchema = z.object({
   signedStorageKey: z.string().optional().nullable(),
   stampFileUrl: z.string().url().optional().nullable(),
   stampStorageKey: z.string().optional().nullable(),
-  signingConfirmed: z.literal(true, {
-    errorMap: () => ({
-      message: "You must confirm that the contract has been reviewed and executed.",
-    }),
+  signingConfirmed: z.boolean().refine((val) => val === true, {
+    message: "You must confirm that the contract has been reviewed and executed.",
   }),
   notes: z.string().max(1000).optional().nullable(),
 });

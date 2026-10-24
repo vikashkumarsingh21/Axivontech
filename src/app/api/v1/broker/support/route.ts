@@ -13,9 +13,7 @@ import {
 
 const createTicketSchema = z.object({
   subject: z.string().trim().min(3, "Subject must be at least 3 characters.").max(150),
-  category: z.enum(["PAYOUT", "PROJECT", "COMMISSION", "LEAD", "CONTRACT", "GENERAL"], {
-    errorMap: () => ({ message: "Select a valid support category." }),
-  }),
+  category: z.string().min(1, "Select a valid support category."),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional().default("MEDIUM"),
   message: z.string().trim().min(10, "Message must be at least 10 characters.").max(2000),
 });
@@ -46,12 +44,12 @@ export async function POST(req: NextRequest) {
     const { brokerProfile, session, user } = await requireBroker(req);
 
     // Rate limit: max 5 tickets per 10 minutes
-    await checkRateLimit(req, "create-support-ticket", 5, 600);
+    checkRateLimit(req, "create-support-ticket", 5, 600);
 
     const body = await req.json().catch(() => ({}));
     const validated = createTicketSchema.safeParse(body);
     if (!validated.success) {
-      throw new ApiError(400, validated.error.errors[0]?.message || "Invalid ticket data.");
+      throw new ApiError(400, validated.error.issues[0]?.message || "Invalid ticket data.");
     }
 
     const { subject, category, priority, message } = validated.data;
@@ -94,7 +92,6 @@ export async function POST(req: NextRequest) {
       create: {
         key: settingKey,
         value: existingTickets,
-        description: `Support tickets for broker ${brokerProfile.id}`,
       },
       update: {
         value: existingTickets,

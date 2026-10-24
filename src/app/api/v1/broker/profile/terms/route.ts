@@ -9,10 +9,12 @@ import {
 import { z } from "zod";
 
 const termsSchema = z.object({
-  version: z.string().default("1.0.0"),
-  accepted: z.literal(true, {
-    errorMap: () => ({ message: "You must accept the partner terms to proceed." }),
-  }),
+  version: z.string().optional().default("1.0.0"),
+  termsVersion: z.string().optional(),
+  accepted: z.boolean().optional(),
+  agreed: z.boolean().optional(),
+}).refine((data) => data.accepted === true || data.agreed === true, {
+  message: "You must accept the partner terms to proceed.",
 });
 
 export async function POST(req: NextRequest) {
