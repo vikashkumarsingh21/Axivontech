@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { validateActiveUser } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
+import { requireEmployee } from "@/lib/api/foundation";
 import { ROLE_PRIORITY, normalizeRole } from "@/lib/auth/roles";
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.headers.get("x-user-id");
-    const validatedUser = await validateActiveUser(userId);
+    const validatedUser = await requireEmployee(req);
 
     const user = await db.user.findUnique({
       where: { id: validatedUser.id },
@@ -45,26 +44,30 @@ export async function GET(req: NextRequest) {
     );
     const primaryRole = sortedRoles[0] || "EMPLOYEE";
 
+    const userData = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      avatarUrl: user.avatarUrl,
+      employeeId: user.employeeId || "AXV-EMP",
+      department: user.department || "Engineering",
+      designation: user.designation || "Specialist",
+      address: user.address,
+      emergencyContact: user.emergencyContact,
+      status: user.status,
+      requiredDailyMinutes: user.requiredDailyMinutes || 480,
+      organizationId: user.organizationId,
+      role: primaryRole,
+      roles: roleNames,
+      joinedAt: user.joiningDate || user.createdAt,
+      createdAt: user.createdAt,
+    };
+
     return NextResponse.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        avatarUrl: user.avatarUrl,
-        employeeId: user.employeeId,
-        department: user.department,
-        designation: user.designation,
-        address: user.address,
-        emergencyContact: user.emergencyContact,
-        status: user.status,
-        requiredDailyMinutes: user.requiredDailyMinutes || 480,
-        organizationId: user.organizationId,
-        role: primaryRole,
-        roles: roleNames,
-        joinedAt: user.joiningDate || user.createdAt,
-        createdAt: user.createdAt,
-      },
+      success: true,
+      user: userData,
+      data: userData,
     });
   } catch (error) {
     return handleApiError(error);
