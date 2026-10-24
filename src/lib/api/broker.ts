@@ -9,8 +9,8 @@ import {
   apiError,
   parseBody,
   getPagination,
-  checkIdempotency,
-  checkRateLimit,
+  checkIdempotency as foundationCheckIdempotency,
+  checkRateLimit as foundationCheckRateLimit,
 } from "./foundation";
 
 export interface BrokerAuthContext {
@@ -190,13 +190,65 @@ export async function notifyBroker(params: {
   }
 }
 
+/**
+ * Broker Idempotency Check.
+ * Returns true if duplicate submission, false if clean.
+ */
+export function checkIdempotency(
+  keyOrReq: string | Request | NextRequest,
+  actionOrTtl?: string | number,
+  keyDetails?: string
+): boolean {
+  let finalKey: string;
+  let ttlMs = 2500;
+
+  if (typeof keyOrReq === "string") {
+    finalKey = keyOrReq;
+    if (typeof actionOrTtl === "number") ttlMs = actionOrTtl;
+  } else {
+    finalKey = `${actionOrTtl || "action"}:${keyDetails || "broker"}`;
+  }
+
+  try {
+    foundationCheckIdempotency(finalKey, ttlMs);
+    return false;
+  } catch (err) {
+    return true;
+  }
+}
+
+/**
+ * Broker Rate Limit Check.
+ * Throws ApiError(429) if exceeded.
+ */
+export function checkRateLimit(
+  keyOrReq: string | Request | NextRequest,
+  actionOrMax?: string | number,
+  maxRequestsOrWindow?: number,
+  windowSeconds?: number
+): void {
+  let finalKey: string;
+  let maxReq = 10;
+  let windowSec = 60;
+
+  if (typeof keyOrReq === "string") {
+    finalKey = keyOrReq;
+    if (typeof actionOrMax === "number") maxReq = actionOrMax;
+    if (typeof maxRequestsOrWindow === "number") windowSec = maxRequestsOrWindow;
+  } else {
+    finalKey = `${actionOrMax || "action"}`;
+    if (typeof maxRequestsOrWindow === "number") maxReq = maxRequestsOrWindow;
+    if (typeof windowSeconds === "number") windowSec = windowSeconds;
+  }
+
+  foundationCheckRateLimit(finalKey, maxReq, windowSec);
+}
+
 export {
   apiSuccess,
   apiError,
   parseBody,
   getPagination,
-  checkIdempotency,
-  checkRateLimit,
 };
 
 export { ApiError, handleApiError } from "@/lib/api-error";
