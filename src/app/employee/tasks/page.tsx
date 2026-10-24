@@ -1,26 +1,26 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckSquare,
   Calendar,
   AlertCircle,
   Loader2,
   Search,
-  Filter,
   MessageSquare,
-  Clock,
   Briefcase,
   ChevronRight,
   Send,
   X,
   AlertTriangle,
   CheckCircle2,
-  ArrowRight,
+  RotateCw,
 } from "lucide-react";
+import { PageHeader } from "@/components/employee/PageHeader";
+import { SkeletonCard } from "@/components/employee/SkeletonCard";
+import { StatusBadge } from "@/components/employee/StatusBadge";
+import { EpButton } from "@/components/employee/EpButton";
 
 interface TaskComment {
   id: string;
@@ -71,7 +71,6 @@ export default function TasksPage() {
       const data = await res.json();
       if (data.success && Array.isArray(data.tasks)) {
         setTasks(data.tasks);
-        // If a task modal is open, refresh active task
         if (activeTask) {
           const updatedActive = data.tasks.find((t: TaskItem) => t.id === activeTask.id);
           if (updatedActive) setActiveTask(updatedActive);
@@ -184,7 +183,6 @@ export default function TasksPage() {
   const filteredTasks = useMemo(() => {
     const now = new Date();
     return tasks.filter((t) => {
-      // Search matching
       const matchesSearch =
         searchQuery === "" ||
         t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -193,14 +191,12 @@ export default function TasksPage() {
 
       if (!matchesSearch) return false;
 
-      // Status matching
       if (selectedStatus === "OVERDUE") {
         if (t.status === "COMPLETED" || !t.dueDate || new Date(t.dueDate) >= now) return false;
       } else if (selectedStatus !== "ALL" && t.status !== selectedStatus) {
         return false;
       }
 
-      // Priority matching
       if (selectedPriority !== "ALL" && t.priority !== selectedPriority) {
         return false;
       }
@@ -209,67 +205,66 @@ export default function TasksPage() {
     });
   }, [tasks, searchQuery, selectedStatus, selectedPriority]);
 
-  const getPriorityBadge = (priority: string) => {
+  const getPriorityVariant = (priority: string): "error" | "warning" | "info" | "neutral" => {
     switch (priority) {
       case "CRITICAL":
-        return "bg-rose-500/10 text-rose-400 border-rose-500/30";
+        return "error";
       case "HIGH":
-        return "bg-amber-500/10 text-amber-400 border-amber-500/30";
+        return "warning";
       case "MEDIUM":
-        return "bg-[#67C5D8]/10 text-[#67C5D8] border-[#67C5D8]/30";
+        return "info";
       default:
-        return "bg-slate-500/10 text-slate-400 border-slate-500/30";
+        return "neutral";
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusVariant = (status: string): "success" | "info" | "error" | "neutral" => {
     switch (status) {
       case "COMPLETED":
-        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+        return "success";
       case "IN_PROGRESS":
-        return "bg-amber-500/10 text-amber-400 border-amber-500/30";
+        return "info";
       case "BLOCKED":
-        return "bg-rose-500/10 text-rose-400 border-rose-500/30";
+        return "error";
       default:
-        return "bg-[#67C5D8]/10 text-[#67C5D8] border-[#67C5D8]/30";
+        return "neutral";
     }
   };
 
   return (
-    <div className="space-y-6 max-w-7xl">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="space-y-6 max-w-7xl"
+    >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#F3F5F7] tracking-tight">
-            My Assigned Tasks
-          </h1>
-          <p className="text-sm text-[#A7B0BC] mt-1">
-            Track sprints, change task execution status, and coordinate updates on deliverables.
-          </p>
-        </div>
-
-        <Button
-          onClick={loadData}
-          variant="outline"
-          size="sm"
-          disabled={loading}
-          className="self-start sm:self-auto border-[#29313B] bg-[#151A21] hover:bg-[#1B222B] text-[#A7B0BC] hover:text-[#F3F5F7]"
-        >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-          Refresh
-        </Button>
-      </div>
+      <PageHeader
+        title="My Assigned Tasks"
+        subtitle="Track sprints, change task execution status, and coordinate updates on deliverables."
+        action={
+          <EpButton
+            variant="secondary"
+            size="sm"
+            onClick={loadData}
+            loading={loading}
+            icon={<RotateCw className="w-3.5 h-3.5 text-[#5FA8A0]" />}
+          >
+            Refresh
+          </EpButton>
+        }
+      />
 
       {/* Alerts */}
       {actionSuccess && (
-        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm flex items-center gap-2">
+        <div className="p-3 bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] rounded-xl text-[#5FA8A0] text-xs font-semibold flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{actionSuccess}</span>
         </div>
       )}
 
       {actionError && (
-        <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-sm flex items-center gap-2">
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-semibold flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{actionError}</span>
         </div>
@@ -281,93 +276,93 @@ export default function TasksPage() {
           onClick={() => setSelectedStatus("ALL")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "ALL"
-              ? "bg-[#1B222B] border-emerald-500/40 shadow-sm"
-              : "bg-[#151A21] border-[#29313B] hover:border-[#364152]"
+              ? "bg-[#171A1F] border-[#5FA8A0]/50 shadow-sm"
+              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
           }`}
         >
-          <div className="text-xs text-[#7E8997] font-medium">Total Tasks</div>
-          <div className="text-2xl font-bold text-[#F3F5F7] mt-1">{stats.total}</div>
+          <div className="text-xs text-[#566171] font-medium">Total Tasks</div>
+          <div className="text-2xl font-bold text-[#E6E8EB] mt-1">{stats.total}</div>
         </div>
 
         <div
           onClick={() => setSelectedStatus("TODO")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "TODO"
-              ? "bg-[#1B222B] border-[#67C5D8]/50 shadow-sm"
-              : "bg-[#151A21] border-[#29313B] hover:border-[#364152]"
+              ? "bg-[#171A1F] border-[#5FA8A0]/50 shadow-sm"
+              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
           }`}
         >
-          <div className="text-xs text-[#67C5D8] font-medium">To Do</div>
-          <div className="text-2xl font-bold text-[#F3F5F7] mt-1">{stats.todo}</div>
+          <div className="text-xs text-[#8B94A1] font-medium">To Do</div>
+          <div className="text-2xl font-bold text-[#E6E8EB] mt-1">{stats.todo}</div>
         </div>
 
         <div
           onClick={() => setSelectedStatus("IN_PROGRESS")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "IN_PROGRESS"
-              ? "bg-[#1B222B] border-amber-500/40 shadow-sm"
-              : "bg-[#151A21] border-[#29313B] hover:border-[#364152]"
+              ? "bg-[#171A1F] border-[#5FA8A0]/50 shadow-sm"
+              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
           }`}
         >
-          <div className="text-xs text-amber-400 font-medium">In Progress</div>
-          <div className="text-2xl font-bold text-[#F3F5F7] mt-1">{stats.inProgress}</div>
+          <div className="text-xs text-[#5FA8A0] font-medium">In Progress</div>
+          <div className="text-2xl font-bold text-[#E6E8EB] mt-1">{stats.inProgress}</div>
         </div>
 
         <div
           onClick={() => setSelectedStatus("BLOCKED")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "BLOCKED"
-              ? "bg-[#1B222B] border-rose-500/40 shadow-sm"
-              : "bg-[#151A21] border-[#29313B] hover:border-[#364152]"
+              ? "bg-[#171A1F] border-red-500/50 shadow-sm"
+              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
           }`}
         >
-          <div className="text-xs text-rose-400 font-medium">Blocked</div>
-          <div className="text-2xl font-bold text-[#F3F5F7] mt-1">{stats.blocked}</div>
+          <div className="text-xs text-red-400 font-medium">Blocked</div>
+          <div className="text-2xl font-bold text-[#E6E8EB] mt-1">{stats.blocked}</div>
         </div>
 
         <div
           onClick={() => setSelectedStatus("COMPLETED")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "COMPLETED"
-              ? "bg-[#1B222B] border-emerald-500/40 shadow-sm"
-              : "bg-[#151A21] border-[#29313B] hover:border-[#364152]"
+              ? "bg-[#171A1F] border-[#34D399]/50 shadow-sm"
+              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
           }`}
         >
-          <div className="text-xs text-emerald-400 font-medium">Completed</div>
-          <div className="text-2xl font-bold text-[#F3F5F7] mt-1">{stats.completed}</div>
+          <div className="text-xs text-[#34D399] font-medium">Completed</div>
+          <div className="text-2xl font-bold text-[#E6E8EB] mt-1">{stats.completed}</div>
         </div>
 
         <div
           onClick={() => setSelectedStatus("OVERDUE")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "OVERDUE"
-              ? "bg-[#1B222B] border-rose-500/60 shadow-sm"
-              : "bg-[#151A21] border-[#29313B] hover:border-[#364152]"
+              ? "bg-[#171A1F] border-red-500/60 shadow-sm"
+              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
           }`}
         >
-          <div className="text-xs text-rose-400 font-medium flex items-center gap-1">
+          <div className="text-xs text-red-400 font-medium flex items-center gap-1">
             <AlertTriangle className="w-3 h-3" /> Overdue
           </div>
-          <div className="text-2xl font-bold text-rose-400 mt-1">{stats.overdue}</div>
+          <div className="text-2xl font-bold text-red-400 mt-1">{stats.overdue}</div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <Card className="p-4 bg-[#151A21] border-[#29313B] rounded-xl space-y-3">
+      <div className="p-4 bg-[#111317] border border-[#1E2530] rounded-xl space-y-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-[#566171] absolute left-3 top-3 pointer-events-none" />
-            <Input
+            <input
               type="text"
               placeholder="Search tasks by title, project, or description..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-[#10151B] border-[#29313B] text-[#F3F5F7] placeholder:text-[#566171] focus-visible:border-emerald-500"
+              className="w-full pl-9 pr-8 py-2 rounded-lg bg-[#0F1215] border border-[#1E2530] text-[#E6E8EB] text-xs placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0]"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-2.5 text-[#7E8997] hover:text-[#F3F5F7]"
+                className="absolute right-3 top-2.5 text-[#566171] hover:text-[#E6E8EB] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -378,7 +373,7 @@ export default function TasksPage() {
             <select
               value={selectedPriority}
               onChange={(e) => setSelectedPriority(e.target.value)}
-              className="h-10 px-3 bg-[#10151B] border border-[#29313B] rounded-lg text-xs text-[#A7B0BC] focus:outline-none focus:border-emerald-500"
+              className="h-9 px-3 bg-[#0F1215] border border-[#1E2530] rounded-lg text-xs text-[#8B94A1] focus:outline-hidden focus:border-[#5FA8A0] cursor-pointer"
             >
               <option value="ALL">All Priorities</option>
               <option value="CRITICAL">Critical</option>
@@ -402,37 +397,38 @@ export default function TasksPage() {
             <button
               key={tab.id}
               onClick={() => setSelectedStatus(tab.id)}
-              className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors cursor-pointer text-xs ${
                 selectedStatus === tab.id
-                  ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-                  : "bg-[#10151B] text-[#7E8997] hover:text-[#F3F5F7] border border-[#1E2530]"
+                  ? "bg-[var(--ep-accent-soft)] text-[#5FA8A0] border border-[var(--ep-accent-border)] font-semibold"
+                  : "bg-[#0F1215] text-[#8B94A1] hover:text-[#E6E8EB] border border-[#1E2530]"
               }`}
             >
               {tab.label}
             </button>
           ))}
         </div>
-      </Card>
+      </div>
 
       {/* Task List */}
       {loading ? (
-        <div className="flex items-center justify-center p-16 text-[#7E8997] gap-3">
-          <Loader2 className="animate-spin w-5 h-5 text-emerald-500" />
-          <span>Loading tasks...</span>
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
         </div>
       ) : filteredTasks.length === 0 ? (
-        <Card className="p-12 text-center bg-[#151A21] border-[#29313B] rounded-xl space-y-3">
+        <div className="p-12 text-center bg-[#111317] border border-[#1E2530] rounded-xl space-y-3">
           <CheckSquare className="w-10 h-10 text-[#566171] mx-auto" />
-          <h3 className="text-base font-semibold text-[#F3F5F7]">No tasks found</h3>
-          <p className="text-xs text-[#7E8997] max-w-sm mx-auto">
+          <h3 className="text-base font-semibold text-[#E6E8EB]">No tasks found</h3>
+          <p className="text-xs text-[#566171] max-w-sm mx-auto">
             {searchQuery || selectedStatus !== "ALL" || selectedPriority !== "ALL"
               ? "No tasks match your selected search criteria. Try resetting filters."
               : "You have no assigned tasks. When project leads assign deliverables, they will appear here."}
           </p>
           {(searchQuery || selectedStatus !== "ALL" || selectedPriority !== "ALL") && (
-            <Button
+            <EpButton
               size="sm"
-              variant="outline"
+              variant="secondary"
               onClick={() => {
                 setSearchQuery("");
                 setSelectedStatus("ALL");
@@ -441,158 +437,145 @@ export default function TasksPage() {
               className="mt-2"
             >
               Reset Filters
-            </Button>
+            </EpButton>
           )}
-        </Card>
+        </div>
       ) : (
-        <div className="grid gap-3.5">
-          {filteredTasks.map((t) => {
-            const isOverdue =
-              t.status !== "COMPLETED" && t.dueDate && new Date(t.dueDate) < new Date();
-            const isUpdating = updatingTaskId === t.id;
+        <div className="grid gap-3">
+          <AnimatePresence mode="popLayout">
+            {filteredTasks.map((t, index) => {
+              const isOverdue =
+                t.status !== "COMPLETED" && t.dueDate && new Date(t.dueDate) < new Date();
+              const isUpdating = updatingTaskId === t.id;
 
-            return (
-              <Card
-                key={t.id}
-                className="p-4 sm:p-5 bg-[#151A21] border-[#29313B] rounded-xl hover:border-[#364152] transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4"
-              >
-                {/* Left Task Content */}
-                <div
-                  className="space-y-2 flex-1 cursor-pointer min-w-0"
-                  onClick={() => setActiveTask(t)}
+              return (
+                <motion.div
+                  key={t.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.15, delay: Math.min(index * 0.03, 0.3) }}
+                  className="p-4 sm:p-5 bg-[#111317] border border-[#1E2530] rounded-xl hover:border-[#22262D] transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4"
                 >
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${getStatusBadge(
-                        t.status
-                      )}`}
-                    >
-                      {t.status.replace("_", " ")}
-                    </span>
-                    <span
-                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${getPriorityBadge(
-                        t.priority
-                      )}`}
-                    >
-                      {t.priority}
-                    </span>
-                    {t.project && (
-                      <span className="text-[11px] text-[#A7B0BC] bg-[#10151B] border border-[#29313B] px-2 py-0.5 rounded-md flex items-center gap-1">
-                        <Briefcase className="w-3 h-3 text-[#D6B779]" />
-                        {t.project.name}
-                      </span>
-                    )}
-                  </div>
-
-                  <h3 className="text-[#F3F5F7] font-semibold text-base hover:text-emerald-400 transition-colors">
-                    {t.title}
-                  </h3>
-
-                  {t.description && (
-                    <p className="text-xs text-[#A7B0BC] line-clamp-2 max-w-3xl">
-                      {t.description}
-                    </p>
-                  )}
-
-                  <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-[#7E8997]">
-                    {t.dueDate && (
-                      <span
-                        className={`flex items-center gap-1.5 ${
-                          isOverdue ? "text-rose-400 font-medium" : "text-[#A7B0BC]"
-                        }`}
-                      >
-                        <Calendar className="w-3.5 h-3.5" />
-                        Due: {new Date(t.dueDate).toLocaleDateString()}
-                        {isOverdue && " (Overdue)"}
-                      </span>
-                    )}
-
-                    <span className="flex items-center gap-1.5 hover:text-[#F3F5F7]">
-                      <MessageSquare className="w-3.5 h-3.5 text-[#566171]" />
-                      {t.comments?.length || 0} comments
-                    </span>
-                  </div>
-                </div>
-
-                {/* Right Status Actions */}
-                <div className="flex items-center gap-2.5 shrink-0 self-end lg:self-center pt-2 lg:pt-0 border-t lg:border-t-0 border-[#1E2530] w-full lg:w-auto justify-between lg:justify-end">
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={t.status}
-                      disabled={isUpdating}
-                      onChange={(e) => updateStatus(t.id, e.target.value)}
-                      className="h-8 px-2.5 bg-[#10151B] border border-[#29313B] rounded-lg text-xs text-[#F3F5F7] focus:outline-none focus:border-emerald-500 cursor-pointer disabled:opacity-50"
-                    >
-                      <option value="TODO">To Do</option>
-                      <option value="IN_PROGRESS">In Progress</option>
-                      <option value="BLOCKED">Blocked</option>
-                      <option value="COMPLETED">Completed</option>
-                    </select>
-
-                    {t.status !== "COMPLETED" && (
-                      <Button
-                        size="sm"
-                        disabled={isUpdating}
-                        onClick={() => updateStatus(t.id, "COMPLETED")}
-                        className="h-8 px-3 text-xs bg-emerald-500 hover:bg-emerald-600 text-[#04130E] font-semibold flex items-center gap-1.5"
-                      >
-                        {isUpdating ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <CheckSquare className="w-3.5 h-3.5" />
-                        )}
-                        <span>Done</span>
-                      </Button>
-                    )}
-                  </div>
-
-                  <button
+                  {/* Left Task Content */}
+                  <div
+                    className="space-y-2 flex-1 cursor-pointer min-w-0"
                     onClick={() => setActiveTask(t)}
-                    className="p-1.5 text-[#7E8997] hover:text-[#F3F5F7] hover:bg-[#1B222B] rounded-lg transition-colors"
-                    title="View details and comments"
                   >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </Card>
-            );
-          })}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <StatusBadge variant={getStatusVariant(t.status)}>
+                        {t.status.replace("_", " ")}
+                      </StatusBadge>
+                      <StatusBadge variant={getPriorityVariant(t.priority)}>
+                        {t.priority}
+                      </StatusBadge>
+                      {t.project && (
+                        <span className="text-[10px] text-[#8B94A1] bg-[#0F1215] border border-[#1E2530] px-2 py-0.5 rounded-md flex items-center gap-1 font-semibold">
+                          <Briefcase className="w-3 h-3 text-[#5FA8A0]" />
+                          {t.project.name}
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 className="text-[#E6E8EB] font-semibold text-sm sm:text-base hover:text-[#5FA8A0] transition-colors">
+                      {t.title}
+                    </h3>
+
+                    {t.description && (
+                      <p className="text-xs text-[#8B94A1] line-clamp-2 max-w-3xl">
+                        {t.description}
+                      </p>
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-[#566171]">
+                      {t.dueDate && (
+                        <span
+                          className={`flex items-center gap-1.5 ${
+                            isOverdue ? "text-red-400 font-medium" : "text-[#8B94A1]"
+                          }`}
+                        >
+                          <Calendar className="w-3.5 h-3.5" />
+                          Due: {new Date(t.dueDate).toLocaleDateString()}
+                          {isOverdue && " (Overdue)"}
+                        </span>
+                      )}
+
+                      <span className="flex items-center gap-1.5 hover:text-[#E6E8EB]">
+                        <MessageSquare className="w-3.5 h-3.5 text-[#566171]" />
+                        {t.comments?.length || 0} comments
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Right Status Actions */}
+                  <div className="flex items-center gap-2.5 shrink-0 self-end lg:self-center pt-2 lg:pt-0 border-t lg:border-t-0 border-[#1E2530] w-full lg:w-auto justify-between lg:justify-end">
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={t.status}
+                        disabled={isUpdating}
+                        onChange={(e) => updateStatus(t.id, e.target.value)}
+                        className="h-8 px-2.5 bg-[#0F1215] border border-[#1E2530] rounded-lg text-xs text-[#E6E8EB] focus:outline-hidden focus:border-[#5FA8A0] cursor-pointer disabled:opacity-50"
+                      >
+                        <option value="TODO">To Do</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="BLOCKED">Blocked</option>
+                        <option value="COMPLETED">Completed</option>
+                      </select>
+
+                      {t.status !== "COMPLETED" && (
+                        <EpButton
+                          size="sm"
+                          variant="primary"
+                          disabled={isUpdating}
+                          loading={isUpdating}
+                          onClick={() => updateStatus(t.id, "COMPLETED")}
+                          icon={<CheckSquare className="w-3.5 h-3.5" />}
+                        >
+                          Done
+                        </EpButton>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => setActiveTask(t)}
+                      className="p-1.5 text-[#566171] hover:text-[#E6E8EB] hover:bg-[#171A1F] rounded-lg transition-colors cursor-pointer"
+                      title="View details and comments"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
       )}
 
       {/* Task Details & Comments Modal Drawer */}
       {activeTask && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#151A21] border border-[#29313B] rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+          <div className="bg-[#111317] border border-[#1E2530] rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             {/* Modal Header */}
             <div className="p-5 border-b border-[#1E2530] flex items-start justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span
-                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${getStatusBadge(
-                      activeTask.status
-                    )}`}
-                  >
+                  <StatusBadge variant={getStatusVariant(activeTask.status)}>
                     {activeTask.status.replace("_", " ")}
-                  </span>
-                  <span
-                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${getPriorityBadge(
-                      activeTask.priority
-                    )}`}
-                  >
+                  </StatusBadge>
+                  <StatusBadge variant={getPriorityVariant(activeTask.priority)}>
                     {activeTask.priority}
-                  </span>
+                  </StatusBadge>
                   {activeTask.project && (
-                    <span className="text-[10px] text-[#A7B0BC] bg-[#10151B] border border-[#29313B] px-2 py-0.5 rounded">
+                    <span className="text-[10px] text-[#8B94A1] bg-[#0F1215] border border-[#1E2530] px-2 py-0.5 rounded font-semibold">
                       {activeTask.project.name}
                     </span>
                   )}
                 </div>
-                <h2 className="text-lg font-bold text-[#F3F5F7] mt-1">{activeTask.title}</h2>
+                <h2 className="text-lg font-bold text-[#E6E8EB] mt-1">{activeTask.title}</h2>
               </div>
               <button
                 onClick={() => setActiveTask(null)}
-                className="p-1.5 rounded-lg text-[#7E8997] hover:text-[#F3F5F7] hover:bg-[#1B222B]"
+                className="p-1.5 rounded-lg text-[#566171] hover:text-[#E6E8EB] hover:bg-[#171A1F] cursor-pointer transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -602,26 +585,26 @@ export default function TasksPage() {
             <div className="p-5 overflow-y-auto space-y-6 flex-1 text-sm">
               {/* Description */}
               <div>
-                <h4 className="text-xs font-semibold text-[#7E8997] uppercase tracking-wider mb-2">
+                <h4 className="text-xs font-semibold text-[#566171] uppercase tracking-wider mb-2">
                   Deliverable Description
                 </h4>
-                <div className="p-3.5 bg-[#10151B] border border-[#1E2530] rounded-xl text-[#F3F5F7] whitespace-pre-wrap leading-relaxed text-xs sm:text-sm">
+                <div className="p-3.5 bg-[#0F1215] border border-[#1E2530] rounded-xl text-[#E6E8EB] whitespace-pre-wrap leading-relaxed text-xs sm:text-sm">
                   {activeTask.description || "No specific details provided for this task."}
                 </div>
               </div>
 
               {/* Status Update Control */}
-              <div className="p-3.5 bg-[#1B222B] border border-[#29313B] rounded-xl flex items-center justify-between gap-4">
+              <div className="p-3.5 bg-[#171A1F] border border-[#22262D] rounded-xl flex items-center justify-between gap-4">
                 <div>
-                  <div className="text-xs font-medium text-[#F3F5F7]">Execution Status</div>
-                  <div className="text-[11px] text-[#7E8997]">
+                  <div className="text-xs font-medium text-[#E6E8EB]">Execution Status</div>
+                  <div className="text-[11px] text-[#566171]">
                     Change as work progresses across development phases.
                   </div>
                 </div>
                 <select
                   value={activeTask.status}
                   onChange={(e) => updateStatus(activeTask.id, e.target.value)}
-                  className="h-8 px-2.5 bg-[#10151B] border border-[#29313B] rounded-lg text-xs text-[#F3F5F7] focus:outline-none focus:border-emerald-500"
+                  className="h-8 px-2.5 bg-[#0F1215] border border-[#1E2530] rounded-lg text-xs text-[#E6E8EB] focus:outline-hidden focus:border-[#5FA8A0] cursor-pointer"
                 >
                   <option value="TODO">To Do</option>
                   <option value="IN_PROGRESS">In Progress</option>
@@ -632,17 +615,17 @@ export default function TasksPage() {
 
               {/* Metadata row */}
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="p-3 bg-[#10151B] border border-[#1E2530] rounded-xl">
-                  <div className="text-[#7E8997] mb-1">Due Date</div>
-                  <div className="font-medium text-[#F3F5F7]">
+                <div className="p-3 bg-[#0F1215] border border-[#1E2530] rounded-xl">
+                  <div className="text-[#566171] mb-1">Due Date</div>
+                  <div className="font-medium text-[#E6E8EB]">
                     {activeTask.dueDate
                       ? new Date(activeTask.dueDate).toLocaleDateString()
                       : "No deadline specified"}
                   </div>
                 </div>
-                <div className="p-3 bg-[#10151B] border border-[#1E2530] rounded-xl">
-                  <div className="text-[#7E8997] mb-1">Created</div>
-                  <div className="font-medium text-[#F3F5F7]">
+                <div className="p-3 bg-[#0F1215] border border-[#1E2530] rounded-xl">
+                  <div className="text-[#566171] mb-1">Created</div>
+                  <div className="font-medium text-[#E6E8EB]">
                     {new Date(activeTask.createdAt).toLocaleDateString()}
                   </div>
                 </div>
@@ -650,25 +633,24 @@ export default function TasksPage() {
 
               {/* Comments Section */}
               <div className="space-y-3 pt-2">
-                <h4 className="text-xs font-semibold text-[#7E8997] uppercase tracking-wider flex items-center gap-1.5">
-                  <MessageSquare className="w-3.5 h-3.5" />
+                <h4 className="text-xs font-semibold text-[#566171] uppercase tracking-wider flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5 text-[#5FA8A0]" />
                   <span>Discussion & Activity Log ({activeTask.comments?.length || 0})</span>
                 </h4>
 
                 <div className="space-y-2.5">
                   {!activeTask.comments || activeTask.comments.length === 0 ? (
-                    <div className="p-4 text-center text-xs text-[#566171] bg-[#10151B] border border-[#1E2530] rounded-xl">
-                      No comments logged yet. Use the input below to record task updates or ask
-                      questions.
+                    <div className="p-4 text-center text-xs text-[#566171] bg-[#0F1215] border border-[#1E2530] rounded-xl">
+                      No comments logged yet. Use the input below to record task updates or ask questions.
                     </div>
                   ) : (
                     activeTask.comments.map((c) => (
                       <div
                         key={c.id}
-                        className="p-3 bg-[#10151B] border border-[#1E2530] rounded-xl space-y-1"
+                        className="p-3 bg-[#0F1215] border border-[#1E2530] rounded-xl space-y-1"
                       >
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="font-semibold text-emerald-400">
+                          <span className="font-semibold text-[#5FA8A0]">
                             {c.user?.name || "Team Member"}
                           </span>
                           <span className="text-[#566171]">
@@ -679,7 +661,7 @@ export default function TasksPage() {
                             })}
                           </span>
                         </div>
-                        <p className="text-xs text-[#A7B0BC] whitespace-pre-wrap">{c.content}</p>
+                        <p className="text-xs text-[#8B94A1] whitespace-pre-wrap">{c.content}</p>
                       </div>
                     ))
                   )}
@@ -693,12 +675,12 @@ export default function TasksPage() {
                       placeholder="Add an update or leave a comment on this task..."
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
-                      className="w-full bg-[#10151B] border border-[#29313B] rounded-xl p-3 text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-emerald-500 resize-none pr-12"
+                      className="w-full bg-[#0F1215] border border-[#1E2530] rounded-xl p-3 text-xs text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0] resize-none pr-12"
                     />
                     <button
                       type="submit"
                       disabled={submittingComment || !newComment.trim()}
-                      className="absolute right-2.5 bottom-3.5 p-2 rounded-lg bg-emerald-500 text-[#04130E] hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                      className="absolute right-2.5 bottom-3.5 p-2 rounded-lg bg-[#5FA8A0] text-[#071918] hover:bg-[#6DB8B0] disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
                     >
                       {submittingComment ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -712,19 +694,18 @@ export default function TasksPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-[#1E2530] bg-[#10151B]/50 flex justify-end">
-              <Button
-                variant="outline"
+            <div className="p-4 border-t border-[#1E2530] bg-[#0F1215] flex justify-end">
+              <EpButton
+                variant="secondary"
                 size="sm"
                 onClick={() => setActiveTask(null)}
-                className="border-[#29313B] text-[#A7B0BC]"
               >
                 Close
-              </Button>
+              </EpButton>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
