@@ -40,12 +40,12 @@ export function EmployeeNavbar({ onToggleSidebar }: EmployeeNavbarProps) {
 
   return (
     <>
-      <header className="h-16 bg-[#0B0D10]/95 backdrop-blur-md border-b border-[#29313B] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 shrink-0 select-none">
+      <header className="h-16 bg-[#0B0D10]/95 backdrop-blur-md border-b border-[#1E2530] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 shrink-0 select-none">
         {/* Left: Hamburger (mobile only) + Search */}
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleSidebar}
-            className="lg:hidden p-2 rounded-lg text-[#7E8997] hover:text-[#F3F5F7] hover:bg-[#202833] transition-colors"
+            className="lg:hidden p-2 rounded-lg text-[#8B94A1] hover:text-[#E6E8EB] hover:bg-[#171A1F] transition-colors"
             aria-label="Toggle sidebar"
           >
             <Menu className="w-5 h-5" />
@@ -54,15 +54,15 @@ export function EmployeeNavbar({ onToggleSidebar }: EmployeeNavbarProps) {
           {/* Search Trigger Button */}
           <button
             onClick={() => setSearchOpen(true)}
-            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#10151B] hover:bg-[#202833] border border-[#29313B] text-[#7E8997] text-xs transition-colors"
+            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#111317] hover:bg-[#171A1F] border border-[#1E2530] hover:border-[#5FA8A0]/40 text-[#8B94A1] text-xs transition-all cursor-pointer focus:outline-hidden focus:border-[#5FA8A0]"
           >
             <Search className="w-3.5 h-3.5 text-[#566171]" />
             <span>Search tasks, announcements, docs...</span>
-            <kbd className="ml-2 px-1.5 py-0.5 rounded bg-[#151A21] border border-[#29313B] text-[10px] font-mono text-[#7E8997] shadow-2xs">Ctrl+K</kbd>
+            <kbd className="ml-2 px-1.5 py-0.5 rounded bg-[#171A1F] border border-[#22262D] text-[10px] font-mono text-[#8B94A1] shadow-2xs">Ctrl+K</kbd>
           </button>
 
           {/* Page title area on mobile */}
-          <span className="text-sm font-semibold text-[#F3F5F7] sm:hidden">
+          <span className="text-sm font-semibold text-[#E6E8EB] sm:hidden">
             Employee Workspace
           </span>
         </div>
@@ -71,7 +71,7 @@ export function EmployeeNavbar({ onToggleSidebar }: EmployeeNavbarProps) {
         <div className="flex items-center gap-2 sm:gap-4">
           <button
             onClick={() => setSearchOpen(true)}
-            className="sm:hidden p-2 text-[#7E8997] hover:text-[#F3F5F7] transition-colors rounded-lg hover:bg-[#202833]"
+            className="sm:hidden p-2 text-[#8B94A1] hover:text-[#E6E8EB] transition-colors rounded-lg hover:bg-[#171A1F]"
             aria-label="Search"
           >
             <Search className="w-5 h-5" />
@@ -80,26 +80,26 @@ export function EmployeeNavbar({ onToggleSidebar }: EmployeeNavbarProps) {
           {/* Notification Bell */}
           <Link
             href="/employee/notifications"
-            className="relative p-2 text-[#7E8997] hover:text-[#F3F5F7] transition-colors rounded-lg hover:bg-[#202833]"
+            className="relative p-2 text-[#8B94A1] hover:text-[#E6E8EB] transition-colors rounded-lg hover:bg-[#171A1F]"
             aria-label="Notifications"
           >
             <Bell className="w-5 h-5" />
             {unread > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#5FA8A0] rounded-full ring-2 ring-[#0B0D10]" />
             )}
           </Link>
 
           {/* User Avatar + Name */}
           <Link
             href="/employee/profile"
-            className="flex items-center gap-2.5 pl-3 sm:pl-4 border-l border-[#29313B] hover:opacity-85 transition-opacity"
+            className="flex items-center gap-2.5 pl-3 sm:pl-4 border-l border-[#1E2530] hover:opacity-85 transition-opacity"
           >
-            <div className="w-8 h-8 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] text-[#5FA8A0] flex items-center justify-center font-bold text-xs shrink-0">
               {initials}
             </div>
             <div className="hidden sm:block text-xs leading-tight">
-              <p className="text-[#F3F5F7] font-semibold truncate max-w-[120px]">{userName}</p>
-              <p className="text-[#7E8997] text-[11px]">Employee</p>
+              <p className="text-[#E6E8EB] font-semibold truncate max-w-[120px]">{userName}</p>
+              <p className="text-[#8B94A1] text-[11px]">Employee</p>
             </div>
           </Link>
         </div>

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   CalendarCheck,
@@ -100,8 +101,8 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
               priority
             />
           </Link>
-          <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <Shield className="w-3 h-3 text-emerald-500" />
+          <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[var(--ep-accent-soft)] text-[#5FA8A0] border border-[var(--ep-accent-border)]">
+            <Shield className="w-3 h-3 text-[#5FA8A0]" />
             <span>Employee Portal</span>
           </div>
         </div>
@@ -131,7 +132,7 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
                   onClick={onClose}
                   className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all group ${
                     active
-                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25"
+                      ? "bg-[var(--ep-accent-soft)] text-[#5FA8A0] border border-[var(--ep-accent-border)]"
                       : "text-[#A7B0BC] hover:text-[#F3F5F7] hover:bg-[#202833] border border-transparent"
                   }`}
                 >
@@ -139,7 +140,7 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
                     <Icon
                       className={`w-4 h-4 shrink-0 transition-colors ${
                         active
-                          ? "text-emerald-500"
+                          ? "text-[#5FA8A0]"
                           : "text-[#566171] group-hover:text-[#A7B0BC]"
                       }`}
                       strokeWidth={active ? 2.2 : 1.8}
@@ -147,7 +148,7 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
                     <span>{item.name}</span>
                   </div>
                   {active && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#5FA8A0]" />
                   )}
                 </Link>
               );
@@ -192,14 +193,20 @@ export function EmployeeSidebar({ isOpen, onClose }: EmployeeSidebarProps) {
         <SidebarInner pathname={pathname} onClose={onClose} />
       </div>
 
-      {/* Mobile/Tablet: slide-in drawer */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 lg:hidden transition-transform duration-300 ease-in-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <SidebarInner pathname={pathname} onClose={onClose} />
-      </div>
+      {/* Mobile/Tablet: slide-in drawer using framer-motion */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 240 }}
+            className="fixed inset-y-0 left-0 z-50 lg:hidden shadow-2xl"
+          >
+            <SidebarInner pathname={pathname} onClose={onClose} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

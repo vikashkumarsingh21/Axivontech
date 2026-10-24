@@ -36,6 +36,26 @@
   --portal-accent-soft:  rgba(16, 185, 129, 0.10);
   --portal-accent-border:rgba(16, 185, 129, 0.25);
 
+  /* ── Employee Portal Accent — Muted Teal ─────────────────────── */
+  --ep-accent:         #5FA8A0;
+  --ep-accent-hover:   #6DB8B0;
+  --ep-accent-dark:    #4A8A83;
+  --ep-accent-soft:    rgba(95, 168, 160, 0.10);
+  --ep-accent-border:  rgba(95, 168, 160, 0.25);
+  --ep-accent-bg:      #0D2220;
+  
+  /* ── Employee Portal Surfaces ───────────────────────────────── */
+  --ep-bg:             #0B0D10;
+  --ep-card:           #111317;
+  --ep-raised:         #171A1F;
+  --ep-border:         #1E2530;
+  --ep-border-2:       #22262D;
+  
+  /* ── Employee Portal Text ────────────────────────────────────── */
+  --ep-text-1:         #E6E8EB;
+  --ep-text-2:         #8B94A1;
+  --ep-text-3:         #566171;
+
   /* ── Secondary — Champagne Gold ──────────────────────────── */
   --gold:           #D6B779;
   --gold-soft:      rgba(214, 183, 121, 0.10);
@@ -95,6 +115,10 @@
   --color-secondary: #A7B0BC;
   --color-muted: #7E8997;
   --color-gold: #D6B779;
+  --color-ep-accent: #5FA8A0;
+  --color-ep-card: #111317;
+  --color-ep-raised: #171A1F;
+  --color-ep-border: #1E2530;
   --font-sans: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: var(--font-manrope), var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
