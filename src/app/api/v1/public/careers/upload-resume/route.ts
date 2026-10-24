@@ -39,10 +39,9 @@ export async function POST(req: NextRequest) {
       "application/pdf",
       "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/octet-stream",
     ];
 
-    if (!validExtensions.includes(ext) || (!validMimes.includes(file.type) && file.type)) {
+    if (!validExtensions.includes(ext) || (file.type && !validMimes.includes(file.type))) {
       throw new ApiError(
         400,
         "Invalid file format. Only PDF (.pdf) and Word documents (.doc, .docx) are accepted."
@@ -58,11 +57,18 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Sanitize safe filename
-    const safeBaseName = file.name
-      .replace(/[^a-zA-Z0-9.-]/g, "_")
-      .substring(0, 30);
-    const filename = `resume-${Date.now()}-${Math.random().toString(36).substring(2, 8)}-${safeBaseName}`;
+    // Validate magic bytes to prevent renamed binaries
+    const isPdf = buffer.length >= 4 && buffer[0] === 0x25 && buffer[1] === 0x50 && buffer[2] === 0x44 && buffer[3] === 0x46;
+    const isDocx = buffer.length >= 4 && buffer[0] === 0x50 && buffer[1] === 0x4B && buffer[2] === 0x03 && buffer[3] === 0x04;
+    const isDoc = buffer.length >= 4 && buffer[0] === 0xD0 && buffer[1] === 0xCF && buffer[2] === 0x11 && buffer[3] === 0xE0;
+
+    if (!isPdf && !isDocx && !isDoc) {
+      throw new ApiError(400, "Invalid file content. The file binary header does not match valid PDF or Word documents.");
+    }
+
+    // Sanitize safe filename with strictly validated extension
+    const baseName = path.basename(file.name, ext).replace(/[^a-zA-Z0-9_-]/g, "_").substring(0, 30);
+    const filename = `resume-${Date.now()}-${Math.random().toString(36).substring(2, 8)}-${baseName}${ext}`;
 
     const uploadDir = path.join(process.cwd(), "public", "uploads", "resumes");
     await mkdir(uploadDir, { recursive: true });

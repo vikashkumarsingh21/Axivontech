@@ -20,8 +20,8 @@ import {
   CheckCircle2,
   Save,
   X,
-  Code,
 } from "lucide-react";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 interface ServiceItem {
   id: string;
@@ -61,6 +61,7 @@ export default function ServicesManagementPage() {
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [stats, setStats] = useState({ total: 0, published: 0, draft: 0 });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [showModal, setShowModal] = useState(false);
@@ -72,15 +73,18 @@ export default function ServicesManagementPage() {
 
   const fetchServices = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/v1/admin/content/services");
-      if (res.ok) {
-        const data = await res.json();
-        setServices(data.services || []);
-        setStats(data.stats || { total: 0, published: 0, draft: 0 });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Failed to load services catalog");
       }
-    } catch {
-      // safe
+      const data = await res.json();
+      setServices(data.services || []);
+      setStats(data.stats || { total: 0, published: 0, draft: 0 });
+    } catch (err: any) {
+      setError(err.message || "Failed to load services catalog");
     } finally {
       setLoading(false);
     }
@@ -226,11 +230,18 @@ export default function ServicesManagementPage() {
           </div>
         </div>
 
-        {/* Table */}
+        {/* Table / Error */}
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <Loader2 className="w-6 h-6 text-red-500 animate-spin" />
           </div>
+        ) : error ? (
+          <ErrorState
+            title="Services Catalog Error"
+            message={error}
+            onRetry={fetchServices}
+            className="my-12"
+          />
         ) : (
           <div className="bg-[#111111] border border-white/5 rounded-2xl overflow-hidden">
             <table className="w-full text-xs">

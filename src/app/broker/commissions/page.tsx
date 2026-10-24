@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   HelpCircle,
 } from "lucide-react";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 interface Commission {
   id: string;
@@ -198,6 +199,20 @@ export default function BrokerCommissions() {
       <div className="min-h-[500px] flex flex-col items-center justify-center p-8 space-y-4">
         <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
         <p className="text-gray-400 text-sm">Loading verified commissions & payouts...</p>
+      </div>
+    );
+  }
+
+  if (error && commissions.length === 0) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <ErrorState
+          title="Failed to Load Commissions"
+          message={error}
+          onRetry={fetchCommissions}
+          backHref="/broker/dashboard"
+          backLabel="Back to Dashboard"
+        />
       </div>
     );
   }

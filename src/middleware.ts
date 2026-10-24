@@ -6,10 +6,14 @@ import { normalizeRole, resolveRoleDashboardUrl, canAccessPartnerPortal } from "
 // Need to duplicate secret resolution for Edge runtime compatibility
 // process.env.SESSION_SECRET is available in Edge middleware if defined in .env
 const rawSecret = process.env.SESSION_SECRET || "";
-if (!rawSecret && process.env.NODE_ENV === "production") {
-  console.error("[CRITICAL SECURITY]: SESSION_SECRET is not configured in production.");
+if (!rawSecret) {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("[CRITICAL SECURITY]: SESSION_SECRET must be configured in production.");
+  }
 }
-const secretKey = new TextEncoder().encode(rawSecret || "fallback-dev-session-secret-at-least-32-chars-long");
+const secretKey = new TextEncoder().encode(
+  rawSecret || "fallback-dev-session-secret-at-least-32-chars-long"
+);
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -41,6 +45,9 @@ export async function middleware(req: NextRequest) {
   // Protect /analytics API routes
   const isAnalyticsApiRoute = pathname.startsWith("/api/v1/analytics");
 
+  // Protect /api/v1/jobs route
+  const isJobsApiRoute = pathname.startsWith("/api/v1/jobs");
+
   // General authenticated APIs (applicable to all authenticated roles)
   const isGeneralAuthApiRoute =
     pathname.startsWith("/api/v1/me") ||
@@ -55,6 +62,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/api/v1/search");
 
   const isProtectedApiRoute =
+    isJobsApiRoute ||
     isEmployeeApiRoute ||
     isAdminApiRoute ||
     isExecutiveApiRoute ||
@@ -114,7 +122,12 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(getRoleRedirectUrl(role));
       }
 
-      if ((isEmployeeRoute || isEmployeeApiRoute) && (role === "BUSINESS_PARTNER" || role === "CLIENT")) {
+      if (isJobsApiRoute && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
+        return NextResponse.json({ error: "Forbidden: Administrative access required." }, { status: 403 });
+      }
+
+      const allowedEmployeeRoles = ["EMPLOYEE", "ADMIN", "FOUNDER", "CO_FOUNDER"];
+      if ((isEmployeeRoute || isEmployeeApiRoute) && !allowedEmployeeRoles.includes(role)) {
         if (isEmployeeApiRoute) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }

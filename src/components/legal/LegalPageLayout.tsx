@@ -16,7 +16,7 @@ import {
   ExternalLink,
   Sliders,
 } from "lucide-react";
-import { LegalPolicyItem, LEGAL_CATEGORIES } from "@/lib/legal/legal-db";
+import { LegalPolicyItem, LEGAL_CATEGORIES } from "@/lib/legal/types";
 
 interface LegalPageLayoutProps {
   policy: LegalPolicyItem;

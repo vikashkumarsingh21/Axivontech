@@ -19,24 +19,49 @@ export async function POST(req: Request, props: { params: Promise<{ [key: string
       throw new ApiError(403, "Forbidden: Self-approval is strictly prohibited by security policy.");
     }
 
-    const updated = await db.approvalRequest.update({
-      where: { id },
-      data: {
-        status: "APPROVED",
-        decidedById: adminId,
-        decidedAt: new Date(),
-      },
+    // Apply role change to database in transaction if request is role change
+    const meta = (approval.metadata || {}) as any;
+    const targetUserId = meta.targetUserId || meta.userId;
+    const targetRoleName = meta.newRole || meta.roleName || meta.role;
+    let targetRoleId = meta.newRoleId || meta.roleId;
+
+    let updatedApproval;
+    await db.$transaction(async (tx) => {
+      if ((approval.requestType === "HIGH_PRIVILEGE_ROLE_ASSIGNMENT" || approval.requestType === "ROLE_CHANGE") && targetUserId) {
+        if (!targetRoleId && targetRoleName) {
+          const roleRecord = await tx.role.findUnique({ where: { name: targetRoleName } });
+          if (roleRecord) targetRoleId = roleRecord.id;
+        }
+
+        if (targetRoleId) {
+          await tx.userRole.deleteMany({ where: { userId: targetUserId } });
+          await tx.userRole.create({
+            data: { userId: targetUserId, roleId: targetRoleId },
+          });
+          // Invalidate existing sessions so target user is forced to re-authenticate with new role JWT
+          await tx.session.deleteMany({ where: { userId: targetUserId } });
+        }
+      }
+
+      updatedApproval = await tx.approvalRequest.update({
+        where: { id },
+        data: {
+          status: "APPROVED",
+          decidedById: adminId,
+          decidedAt: new Date(),
+        },
+      });
+
+      await tx.securityEvent.create({
+        data: {
+          userId: adminId,
+          eventType: "ROLE_CHANGED",
+          details: { approvalId: id, requestType: approval.requestType, decision: "APPROVED", targetUserId, targetRoleId },
+        },
+      });
     });
 
-    await db.securityEvent.create({
-      data: {
-        userId: adminId,
-        eventType: "ROLE_CHANGED",
-        details: { approvalId: id, requestType: approval.requestType, decision: "APPROVED" },
-      },
-    });
-
-    return NextResponse.json({ data: updated });
+    return NextResponse.json({ data: updatedApproval });
   } catch (error: any) {
     return handleApiError(error);
   }

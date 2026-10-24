@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { db } from '@/lib/db';
 import { validateActiveUser } from '@/lib/auth/permissions';
 import { handleApiError, ApiError } from '@/lib/api-error';
+
+const leaveSchema = z.object({
+  leaveType: z.enum(["CASUAL", "SICK", "PAID", "REMOTE", "UNPAID"]),
+  startDate: z.string().min(1, "Start date is required"),
+  endDate: z.string().min(1, "End date is required"),
+  reason: z.string().trim().min(5, "Reason must be at least 5 characters").max(500),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,14 +24,30 @@ export async function POST(req: NextRequest) {
   try {
     const userId = req.headers.get('x-user-id');
     const user = await validateActiveUser(userId);
-    const { leaveType, startDate, endDate, reason } = await req.json();
+    const body = await req.json().catch(() => ({}));
 
-    if (!startDate || !endDate || !reason?.trim()) {
-      throw new ApiError(400, 'Start date, end date, and reason are required');
+    const parsed = leaveSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new ApiError(400, parsed.error.issues[0].message);
     }
 
-    if (new Date(startDate) > new Date(endDate)) {
-      throw new ApiError(400, 'End date cannot be earlier than start date');
+    const { leaveType, startDate, endDate, reason } = parsed.data;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      throw new ApiError(400, "Invalid start date or end date format");
+    }
+
+    if (start > end) {
+      throw new ApiError(400, "End date cannot be earlier than start date");
+    }
+
+    // Prohibit retroactive leave older than 30 days without special administrative exception
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    if (start < thirtyDaysAgo) {
+      throw new ApiError(400, "Retroactive leave requests older than 30 days are prohibited");
     }
 
     const request = await db.leaveRequest.create({

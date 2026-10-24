@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
-import { handleApiError } from "@/lib/api-error";
+import { handleApiError, ApiError } from "@/lib/api-error";
 
 export async function GET(req: Request) {
   try {
@@ -15,13 +16,22 @@ export async function GET(req: Request) {
   }
 }
 
+const updateSettingSchema = z.object({
+  key: z.string().trim().min(1, "Setting key is required"),
+  value: z.any(),
+});
+
 export async function PATCH(req: Request) {
   try {
     const userId = req.headers.get("x-user-id");
     await requirePermission(userId, "governance.settings.approve");
 
-    const body = await req.json();
-    const { key, value } = body;
+    const body = await req.json().catch(() => ({}));
+    const parsed = updateSettingSchema.safeParse(body);
+    if (!parsed.success) {
+      throw new ApiError(400, parsed.error.issues[0].message);
+    }
+    const { key, value } = parsed.data;
 
     const setting = await db.organizationSetting.upsert({
       where: { key },

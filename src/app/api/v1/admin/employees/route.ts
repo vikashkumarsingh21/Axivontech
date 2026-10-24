@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { z } from "zod";
-import bcrypt from "bcryptjs";
+import { hashPassword } from "@/lib/auth/password";
 
 const createEmployeeSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -142,7 +142,7 @@ export async function POST(req: Request) {
       });
     }
 
-    const passwordHash = await bcrypt.hash(validatedData.password, 10);
+    const passwordHash = await hashPassword(validatedData.password);
     const requiredDailyMinutes = Math.round(validatedData.requiredDailyHours * 60);
     const status = validatedData.status || "ACTIVE";
     const inactiveAt = status === "INACTIVE" ? new Date() : null;

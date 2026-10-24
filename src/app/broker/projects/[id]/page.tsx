@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ChevronLeft, FileText, CheckCircle, CreditCard, Download, Upload, Copy, AlertCircle, Building2, Smartphone } from "lucide-react";
 import Link from "next/link";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 export default function BrokerProjectDetailPage() {
   const params = useParams();
@@ -28,6 +29,10 @@ export default function BrokerProjectDetailPage() {
   const [submittingPayment, setSubmittingPayment] = useState(false);
 
   const fetchProject = async () => {
+    if (!params.id || params.id === "new") {
+      router.replace("/broker/projects/new");
+      return;
+    }
     try {
       const res = await fetch(`/api/v1/broker/projects/${params.id}`);
       const data = await res.json();
@@ -41,6 +46,10 @@ export default function BrokerProjectDetailPage() {
   };
 
   useEffect(() => {
+    if (params.id === "new") {
+      router.replace("/broker/projects/new");
+      return;
+    }
     fetchProject();
   }, [params.id]);
 
@@ -123,7 +132,19 @@ export default function BrokerProjectDetailPage() {
   };
 
   if (loading) return <div className="p-8 text-center text-gray-500">Loading project...</div>;
-  if (error || !project) return <div className="p-6 text-red-500">{error || "Project not found"}</div>;
+  if (error || !project) {
+    return (
+      <div className="p-6 max-w-5xl mx-auto">
+        <ErrorState
+          title="Project Not Available"
+          message={error || "Project not found or access denied."}
+          onRetry={fetchProject}
+          backHref="/broker/projects"
+          backLabel="Back to Projects"
+        />
+      </div>
+    );
+  }
 
   const tabs = [
     { id: "overview", label: "Overview" },

@@ -8,16 +8,18 @@ export async function GET(req: Request) {
     const userId = req.headers.get("x-user-id");
     const role = req.headers.get("x-user-role");
 
-    if (!userId || role !== "CLIENT") {
-      throw new ApiError(401, "Unauthorized");
+    const allowedRoles = ["CLIENT", "ADMIN", "FOUNDER", "CO_FOUNDER"];
+    if (!userId || !role || !allowedRoles.includes(role)) {
+      throw new ApiError(403, "Access denied.");
     }
 
     await validateActiveUser(userId);
 
+    const isStaff = ["ADMIN", "FOUNDER", "CO_FOUNDER"].includes(role);
+    const where = isStaff ? {} : { clientUserId: userId };
+
     const projects = await db.partnerProject.findMany({
-      where: {
-        clientUserId: userId,
-      },
+      where,
       select: {
         id: true,
         projectCode: true,

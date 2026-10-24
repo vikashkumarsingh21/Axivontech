@@ -249,6 +249,21 @@ export async function POST(req: NextRequest) {
 
       let record;
       if (todayRecord) {
+        // If the record was previously checked out, record the idle gap as an intermittent break
+        if (todayRecord.checkOutAt && todayRecord.checkOutAt < now) {
+          const gapMinutes = Math.max(0, Math.round((now.getTime() - todayRecord.checkOutAt.getTime()) / (1000 * 60)));
+          await db.attendanceBreak.create({
+            data: {
+              attendanceId: todayRecord.id,
+              startTime: todayRecord.checkOutAt,
+              endTime: now,
+              durationMinutes: gapMinutes,
+              type: "OTHER",
+              notes: "Intermittent logoff between attendance sessions",
+            },
+          });
+        }
+
         // Re-opening / updating today's attendance record
         record = await db.attendance.update({
           where: { id: todayRecord.id },

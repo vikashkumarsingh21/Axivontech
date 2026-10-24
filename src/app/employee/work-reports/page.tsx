@@ -195,8 +195,8 @@ export default function ReportsPage() {
               <h2 className="text-base sm:text-lg font-bold text-[#F3F5F7]">
                 {todayReport ? "Update Today's Work Report" : "Submit Today's Work Report"}
               </h2>
-              <p className="text-xs text-[#7E8997]">
-                Reporting for {new Date().toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric", year: "numeric" })}
+              <p className="text-xs text-[#7E8997]" suppressHydrationWarning>
+                Reporting for {new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", year: "numeric" })}
               </p>
             </div>
           </div>

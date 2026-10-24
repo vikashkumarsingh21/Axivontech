@@ -6,6 +6,9 @@ import { normalizeRole, canAccessPartnerPortal } from "@/lib/auth/roles";
 
 export async function GET(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
   const params = await props.params;
+  if (params.id === "new") {
+    return NextResponse.json({ error: "Invalid project ID: 'new' is a reserved action path." }, { status: 400 });
+  }
   try {
     const session = await getAuthenticatedSession(req);
     const role = normalizeRole(session.role);
@@ -52,6 +55,9 @@ export async function GET(req: Request, props: { params: Promise<{ [key: string]
 
 export async function PATCH(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
   const params = await props.params;
+  if (params.id === "new") {
+    return NextResponse.json({ error: "Invalid project ID: 'new' is a reserved action path." }, { status: 400 });
+  }
   try {
     const session = await getAuthenticatedSession(req);
     const role = normalizeRole(session.role);

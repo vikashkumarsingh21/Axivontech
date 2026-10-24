@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { BLOG_POSTS, BlogPost, ProjectIdea } from "@/data/blog-posts";
+import { sanitizeHtml } from "@/lib/sanitize";
 import {
   Calendar,
   Clock,
@@ -189,7 +190,7 @@ export default function ArticleDetailView({ post }: ArticleDetailViewProps) {
             {/* Article Content HTML */}
             <div
               className="prose prose-invert max-w-none prose-readable prose-headings:scroll-mt-24 prose-headings:font-heading prose-headings:font-bold prose-headings:text-[#F3F5F7] prose-headings:tracking-tight prose-h2:text-2xl sm:prose-h2:text-3xl prose-h2:border-b prose-h2:border-[#1E2530] prose-h2:pb-3 prose-h2:mt-12 prose-h2:mb-5 prose-h3:text-xl sm:prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4 prose-p:text-[#A7B0BC] prose-p:leading-[1.74] prose-p:mb-5 prose-li:text-[#A7B0BC] prose-li:leading-[1.7] prose-strong:text-[#F3F5F7] prose-strong:font-semibold prose-a:text-emerald-400 prose-a:font-medium prose-a:no-underline hover:prose-a:underline prose-table:w-full prose-table:border-collapse prose-th:border prose-th:border-[#1E2530] prose-th:bg-[#151A21] prose-th:p-3 prose-th:text-[#F3F5F7] prose-th:font-heading prose-td:border prose-td:border-[#1E2530] prose-td:p-3 prose-td:text-[#A7B0BC]"
-              dangerouslySetInnerHTML={{ __html: post.contentHtml }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.contentHtml) }}
             />
 
             {/* Interactive Project Ideas Section (Blog 3 only) */}
