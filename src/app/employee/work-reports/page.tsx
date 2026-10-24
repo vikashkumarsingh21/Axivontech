@@ -1,12 +1,9 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { motion } from "framer-motion";
 import {
   FileText,
-  Loader2,
   Send,
   Calendar,
   Clock,
@@ -15,9 +12,11 @@ import {
   ChevronDown,
   ChevronUp,
   Search,
-  Sparkles,
-  HelpCircle,
 } from "lucide-react";
+import { PageHeader } from "@/components/employee/PageHeader";
+import { SkeletonCard } from "@/components/employee/SkeletonCard";
+import { StatusBadge } from "@/components/employee/StatusBadge";
+import { EpButton } from "@/components/employee/EpButton";
 
 interface WorkReportItem {
   id: string;
@@ -39,6 +38,8 @@ export default function ReportsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [todayReport, setTodayReport] = useState<WorkReportItem | null>(null);
   const [userTargetHours, setUserTargetHours] = useState<number>(8);
+  const [mounted, setMounted] = useState(false);
+  const [todayDateString, setTodayDateString] = useState("");
 
   // Form State
   const [summary, setSummary] = useState("");
@@ -52,6 +53,18 @@ export default function ReportsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    setTodayDateString(
+      new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    );
+  }, []);
 
   const loadData = async () => {
     try {
@@ -157,55 +170,54 @@ export default function ReportsPage() {
   }, [reports, searchQuery]);
 
   return (
-    <div className="space-y-6 max-w-7xl">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="space-y-6 max-w-7xl"
+    >
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#F3F5F7] tracking-tight">
-          Daily Work Reports (EOD)
-        </h1>
-        <p className="text-sm text-[#A7B0BC] mt-1">
-          Submit end-of-day work summaries, track completed milestones, log blockers, and review
-          submission logs.
-        </p>
-      </div>
+      <PageHeader
+        title="Daily Work Reports (EOD)"
+        subtitle="Submit end-of-day work summaries, track completed milestones, log blockers, and review submission logs."
+      />
 
       {/* Action Messages */}
       {actionSuccess && (
-        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm flex items-center gap-2">
+        <div className="p-3 bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] rounded-xl text-[#5FA8A0] text-xs font-semibold flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{actionSuccess}</span>
         </div>
       )}
 
       {actionError && (
-        <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-sm flex items-center gap-2">
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-semibold flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{actionError}</span>
         </div>
       )}
 
       {/* Daily Submission Card */}
-      <Card className="p-5 sm:p-6 bg-[#151A21] border-[#29313B] rounded-2xl space-y-5">
+      <div className="p-5 sm:p-6 bg-[#111317] border border-[#1E2530] rounded-xl space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#1E2530]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="w-10 h-10 rounded-xl bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] flex items-center justify-center text-[#5FA8A0]">
               <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-[#F3F5F7]">
+              <h2 className="text-base sm:text-lg font-bold text-[#E6E8EB]">
                 {todayReport ? "Update Today's Work Report" : "Submit Today's Work Report"}
               </h2>
-              <p className="text-xs text-[#7E8997]" suppressHydrationWarning>
-                Reporting for {new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", year: "numeric" })}
+              <p className="text-xs text-[#566171]">
+                Reporting for {mounted ? todayDateString : "Today"}
               </p>
             </div>
           </div>
 
           {todayReport && (
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 self-start sm:self-auto">
-              <CheckCircle2 className="w-3.5 h-3.5" />
+            <StatusBadge variant="info">
               Report Submitted for Today
-            </span>
+            </StatusBadge>
           )}
         </div>
 
@@ -213,22 +225,23 @@ export default function ReportsPage() {
           {/* Summary and Hours Row */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div className="sm:col-span-3">
-              <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-                Executive Work Summary <span className="text-rose-400">*</span>
+              <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
+                Executive Work Summary <span className="text-red-400">*</span>
               </label>
-              <Input
+              <input
+                type="text"
                 placeholder="e.g. Completed frontend authentication & attendance integration"
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
                 required
-                className="bg-[#10151B] border-[#29313B] text-[#F3F5F7] placeholder:text-[#566171] focus-visible:border-emerald-500"
+                className="w-full h-10 px-3 bg-[#0F1215] border border-[#1E2530] rounded-xl text-xs sm:text-sm text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0]"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-                Hours Worked <span className="text-rose-400">*</span>
+              <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
+                Hours Worked <span className="text-red-400">*</span>
               </label>
-              <Input
+              <input
                 type="number"
                 min={1}
                 max={24}
@@ -236,19 +249,19 @@ export default function ReportsPage() {
                 value={hoursWorked}
                 onChange={(e) => setHoursWorked(e.target.value)}
                 required
-                className="bg-[#10151B] border-[#29313B] text-[#F3F5F7] focus-visible:border-emerald-500"
+                className="w-full h-10 px-3 bg-[#0F1215] border border-[#1E2530] rounded-xl text-xs sm:text-sm text-[#E6E8EB] focus:outline-hidden focus:border-[#5FA8A0]"
               />
             </div>
           </div>
 
           {/* Work Performed */}
           <div>
-            <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-              Detailed Work Performed <span className="text-rose-400">*</span>
+            <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
+              Detailed Work Performed <span className="text-red-400">*</span>
             </label>
             <textarea
               rows={4}
-              className="w-full bg-[#10151B] border border-[#29313B] rounded-xl p-3 text-xs sm:text-sm text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-emerald-500"
+              className="w-full bg-[#0F1215] border border-[#1E2530] rounded-xl p-3 text-xs sm:text-sm text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0] resize-none"
               placeholder="Provide a breakdown of features coded, tests written, bug investigations, or client meetings..."
               value={workPerformed}
               onChange={(e) => setWorkPerformed(e.target.value)}
@@ -259,12 +272,12 @@ export default function ReportsPage() {
           {/* Tasks Completed & Blockers (2 Columns) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
+              <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
                 Specific Tasks & PRs Completed (Optional)
               </label>
               <textarea
                 rows={2}
-                className="w-full bg-[#10151B] border border-[#29313B] rounded-xl p-3 text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-emerald-500"
+                className="w-full bg-[#0F1215] border border-[#1E2530] rounded-xl p-3 text-xs text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0] resize-none"
                 placeholder="- Fixed task status update API&#10;- Merged employee sidebar navigation"
                 value={tasksCompleted}
                 onChange={(e) => setTasksCompleted(e.target.value)}
@@ -272,12 +285,12 @@ export default function ReportsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
+              <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
                 Challenges / Blockers Encountered (Optional)
               </label>
               <textarea
                 rows={2}
-                className="w-full bg-[#10151B] border border-[#29313B] rounded-xl p-3 text-xs text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-emerald-500"
+                className="w-full bg-[#0F1215] border border-[#1E2530] rounded-xl p-3 text-xs text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0] resize-none"
                 placeholder="Mention API dependency delays, missing assets, or technical obstacles..."
                 value={challenges}
                 onChange={(e) => setChallenges(e.target.value)}
@@ -287,67 +300,67 @@ export default function ReportsPage() {
 
           {/* Next Steps */}
           <div>
-            <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
+            <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
               Planned Next Steps (Tomorrow / Next Working Day)
             </label>
-            <Input
+            <input
+              type="text"
               placeholder="e.g. Complete responsive audit for employee calendar & document browser"
               value={nextSteps}
               onChange={(e) => setNextSteps(e.target.value)}
-              className="bg-[#10151B] border-[#29313B] text-[#F3F5F7] placeholder:text-[#566171] focus-visible:border-emerald-500"
+              className="w-full h-10 px-3 bg-[#0F1215] border border-[#1E2530] rounded-xl text-xs sm:text-sm text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0]"
             />
           </div>
 
           {/* Submit Action */}
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#1E2530]">
-            <p className="text-[11px] text-[#7E8997]">
+            <p className="text-[11px] text-[#566171]">
               Submitted reports are logged into management dashboards and team records.
             </p>
-            <Button
+            <EpButton
               type="submit"
-              disabled={submitting}
-              className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-[#04130E] font-semibold flex items-center justify-center gap-2"
+              variant="primary"
+              size="md"
+              loading={submitting}
+              icon={<Send className="w-3.5 h-3.5" />}
+              className="w-full sm:w-auto"
             >
-              {submitting ? (
-                <Loader2 className="animate-spin w-4 h-4" />
-              ) : (
-                <Send className="w-4 h-4" />
-              )}
-              <span>{todayReport ? "Update Today's Report" : "Submit EOD Report"}</span>
-            </Button>
+              {todayReport ? "Update Today's Report" : "Submit EOD Report"}
+            </EpButton>
           </div>
         </form>
-      </Card>
+      </div>
 
       {/* Past Reports History */}
-      <Card className="p-5 sm:p-6 bg-[#151A21] border-[#29313B] rounded-2xl space-y-4">
+      <div className="p-5 sm:p-6 bg-[#111317] border border-[#1E2530] rounded-xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1E2530]">
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-[#F3F5F7]">
+            <h2 className="text-base sm:text-lg font-bold text-[#E6E8EB]">
               Past Work Report Submissions
             </h2>
-            <p className="text-xs text-[#7E8997]">History of all submitted daily logs</p>
+            <p className="text-xs text-[#566171]">History of all submitted daily logs</p>
           </div>
 
           <div className="relative w-full sm:w-64">
             <Search className="w-3.5 h-3.5 text-[#566171] absolute left-3 top-3 pointer-events-none" />
-            <Input
+            <input
               type="text"
               placeholder="Search past reports..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9 pl-8 bg-[#10151B] border-[#29313B] text-xs text-[#F3F5F7] placeholder:text-[#566171] focus-visible:border-emerald-500"
+              className="w-full h-9 pl-8 pr-3 bg-[#0F1215] border border-[#1E2530] rounded-xl text-xs text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0]"
             />
           </div>
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center p-12 text-[#7E8997] gap-2">
-            <Loader2 className="animate-spin w-4 h-4 text-emerald-500" />
-            <span className="text-xs">Loading submission history...</span>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
         ) : filteredReports.length === 0 ? (
-          <div className="text-center py-12 text-[#7E8997] text-xs">
+          <div className="text-center py-12 text-[#566171] text-xs">
             {searchQuery
               ? "No work reports match your search query."
               : "No past work reports logged yet. Your submissions will appear here."}
@@ -356,17 +369,19 @@ export default function ReportsPage() {
           <div className="space-y-3">
             {filteredReports.map((r) => {
               const isExpanded = expandedReportId === r.id;
-              const formattedDate = new Date(r.date).toLocaleDateString(undefined, {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              });
+              const formattedDate = mounted
+                ? new Date(r.date).toLocaleDateString(undefined, {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })
+                : "";
 
               return (
                 <div
                   key={r.id}
-                  className="border border-[#29313B] rounded-xl bg-[#10151B] overflow-hidden transition-all hover:border-[#364152]"
+                  className="border border-[#1E2530] rounded-xl bg-[#0F1215] overflow-hidden transition-all hover:border-[#22262D]"
                 >
                   {/* Collapsed Header */}
                   <div
@@ -375,49 +390,49 @@ export default function ReportsPage() {
                   >
                     <div className="space-y-1 min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+                        <StatusBadge variant="info">
                           {r.status || "SUBMITTED"}
-                        </span>
-                        <span className="text-xs text-[#7E8997] flex items-center gap-1">
+                        </StatusBadge>
+                        <span className="text-xs text-[#566171] flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           {formattedDate}
                         </span>
-                        <span className="text-xs text-[#A7B0BC] bg-[#151A21] border border-[#29313B] px-2 py-0.5 rounded flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-[#D6B779]" />
+                        <span className="text-xs text-[#8B94A1] bg-[#171A1F] border border-[#1E2530] px-2 py-0.5 rounded flex items-center gap-1 font-semibold">
+                          <Clock className="w-3 h-3 text-[#5FA8A0]" />
                           {r.hoursWorked || 8} hrs
                         </span>
                       </div>
-                      <h4 className="text-sm font-semibold text-[#F3F5F7] truncate">{r.summary}</h4>
+                      <h4 className="text-sm font-semibold text-[#E6E8EB] truncate">{r.summary}</h4>
                     </div>
 
-                    <div className="flex items-center gap-2 self-end sm:self-center text-xs text-[#7E8997]">
+                    <div className="flex items-center gap-2 self-end sm:self-center text-xs text-[#566171]">
                       <span>{isExpanded ? "Collapse" : "Details"}</span>
                       {isExpanded ? (
-                        <ChevronUp className="w-4 h-4 text-[#A7B0BC]" />
+                        <ChevronUp className="w-4 h-4 text-[#8B94A1]" />
                       ) : (
-                        <ChevronDown className="w-4 h-4 text-[#A7B0BC]" />
+                        <ChevronDown className="w-4 h-4 text-[#8B94A1]" />
                       )}
                     </div>
                   </div>
 
                   {/* Expanded Details */}
                   {isExpanded && (
-                    <div className="p-4 pt-2 border-t border-[#1E2530] bg-[#151A21]/50 space-y-4 text-xs">
+                    <div className="p-4 pt-2 border-t border-[#1E2530] bg-[#111317] space-y-4 text-xs">
                       <div>
-                        <div className="font-semibold text-[#A7B0BC] uppercase tracking-wider mb-1">
+                        <div className="font-semibold text-[#8B94A1] uppercase tracking-wider mb-1">
                           Detailed Work Performed
                         </div>
-                        <div className="p-3 bg-[#10151B] border border-[#1E2530] rounded-lg text-[#F3F5F7] whitespace-pre-wrap leading-relaxed">
+                        <div className="p-3 bg-[#0F1215] border border-[#1E2530] rounded-xl text-[#E6E8EB] whitespace-pre-wrap leading-relaxed">
                           {r.workPerformed}
                         </div>
                       </div>
 
                       {r.tasksCompleted && (
                         <div>
-                          <div className="font-semibold text-[#A7B0BC] uppercase tracking-wider mb-1">
+                          <div className="font-semibold text-[#8B94A1] uppercase tracking-wider mb-1">
                             Specific Tasks Completed
                           </div>
-                          <div className="p-3 bg-[#10151B] border border-[#1E2530] rounded-lg text-[#A7B0BC] whitespace-pre-wrap">
+                          <div className="p-3 bg-[#0F1215] border border-[#1E2530] rounded-xl text-[#8B94A1] whitespace-pre-wrap">
                             {r.tasksCompleted}
                           </div>
                         </div>
@@ -425,10 +440,10 @@ export default function ReportsPage() {
 
                       {r.challenges && (
                         <div>
-                          <div className="font-semibold text-rose-400 uppercase tracking-wider mb-1">
+                          <div className="font-semibold text-red-400 uppercase tracking-wider mb-1">
                             Blockers & Challenges
                           </div>
-                          <div className="p-3 bg-rose-500/5 border border-rose-500/20 rounded-lg text-rose-300 whitespace-pre-wrap">
+                          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-300 whitespace-pre-wrap">
                             {r.challenges}
                           </div>
                         </div>
@@ -436,10 +451,10 @@ export default function ReportsPage() {
 
                       {r.nextSteps && (
                         <div>
-                          <div className="font-semibold text-emerald-400 uppercase tracking-wider mb-1">
+                          <div className="font-semibold text-[#5FA8A0] uppercase tracking-wider mb-1">
                             Next Steps
                           </div>
-                          <div className="p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-lg text-emerald-300">
+                          <div className="p-3 bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] rounded-xl text-[#5FA8A0]">
                             {r.nextSteps}
                           </div>
                         </div>
@@ -451,7 +466,7 @@ export default function ReportsPage() {
             })}
           </div>
         )}
-      </Card>
-    </div>
+      </div>
+    </motion.div>
   );
 }
