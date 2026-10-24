@@ -2,19 +2,21 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { PageHeader } from "@/components/employee/PageHeader";
+import { EpButton } from "@/components/employee/EpButton";
+import { SkeletonCard } from "@/components/employee/SkeletonCard";
 import {
   Bell,
   Check,
   CheckCheck,
-  Loader2,
+  Trash2,
   ExternalLink,
-  Calendar,
   AlertTriangle,
-  Info,
   Clock,
   Sparkles,
+  Info,
 } from "lucide-react";
 
 interface NotificationItem {
@@ -31,6 +33,8 @@ export default function NotificationsPage() {
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [markingAll, setMarkingAll] = useState(false);
+  const [clearingRead, setClearingRead] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [filterMode, setFilterMode] = useState<"ALL" | "UNREAD">("ALL");
 
   const loadData = async () => {
@@ -81,7 +85,46 @@ export default function NotificationsPage() {
     }
   };
 
+  const deleteNotification = async (id: string) => {
+    try {
+      setDeletingId(id);
+      const res = await fetch("/api/v1/employee/notifications", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setItems((prev) => prev.filter((n) => n.id !== id));
+      }
+    } catch {
+      // ignore
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const clearAllRead = async () => {
+    try {
+      setClearingRead(true);
+      const res = await fetch("/api/v1/employee/notifications", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clearAllRead: true }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setItems((prev) => prev.filter((n) => !n.isRead));
+      }
+    } catch {
+      // ignore
+    } finally {
+      setClearingRead(false);
+    }
+  };
+
   const unreadCount = useMemo(() => items.filter((n) => !n.isRead).length, [items]);
+  const hasReadItems = useMemo(() => items.some((n) => n.isRead), [items]);
 
   const displayedItems = useMemo(() => {
     if (filterMode === "UNREAD") return items.filter((n) => !n.isRead);
@@ -94,161 +137,196 @@ export default function NotificationsPage() {
       case "ALERT":
         return <AlertTriangle className="w-4 h-4 text-amber-400" />;
       case "SUCCESS":
-        return <Check className="w-4 h-4 text-emerald-400" />;
+        return <Check className="w-4 h-4 text-[#34D399]" />;
       default:
-        return <Bell className="w-4 h-4 text-emerald-400" />;
+        return <Bell className="w-4 h-4 text-[#5FA8A0]" />;
     }
   };
 
   return (
-    <div className="space-y-6 max-w-5xl">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#F3F5F7] tracking-tight">
-              Notifications & Alerts
-            </h1>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="space-y-6 max-w-5xl"
+    >
+      {/* Page Header */}
+      <PageHeader
+        title="Notifications & Alerts"
+        subtitle="System updates, task status changes, leave approvals, and workspace reminders."
+        icon={Bell}
+        action={
+          <div className="flex flex-wrap items-center gap-2">
             {unreadCount > 0 && (
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                {unreadCount} unread
-              </span>
+              <EpButton
+                size="sm"
+                variant="primary"
+                onClick={markAllAsRead}
+                isLoading={markingAll}
+                className="text-xs h-8 px-3"
+              >
+                <CheckCheck className="w-3.5 h-3.5 mr-1.5" />
+                <span>Mark All Read</span>
+              </EpButton>
+            )}
+
+            {hasReadItems && (
+              <EpButton
+                size="sm"
+                variant="outline"
+                onClick={clearAllRead}
+                isLoading={clearingRead}
+                className="text-xs h-8 px-3 text-[#8B94A1] hover:text-rose-400 hover:border-rose-500/40"
+              >
+                <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                <span>Clear Read</span>
+              </EpButton>
             )}
           </div>
-          <p className="text-sm text-[#A7B0BC] mt-1">
-            System updates, task status changes, leave approvals, and workspace reminders.
-          </p>
-        </div>
-
-        {unreadCount > 0 && (
-          <Button
-            size="sm"
-            onClick={markAllAsRead}
-            disabled={markingAll}
-            className="self-start sm:self-auto bg-[#1B222B] hover:bg-[#202833] text-[#F3F5F7] border border-[#29313B] flex items-center gap-2"
-          >
-            {markingAll ? (
-              <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
-            ) : (
-              <CheckCheck className="w-4 h-4 text-emerald-400" />
-            )}
-            <span>Mark All as Read</span>
-          </Button>
-        )}
-      </div>
+        }
+      />
 
       {/* Filter Tabs */}
       <div className="flex items-center gap-2 border-b border-[#1E2530] pb-2 text-xs">
         <button
           onClick={() => setFilterMode("ALL")}
-          className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
+          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors ${
             filterMode === "ALL"
-              ? "bg-[#1B222B] text-[#F3F5F7] border border-[#29313B]"
-              : "text-[#7E8997] hover:text-[#F3F5F7]"
+              ? "bg-[#171A1F] text-[#E6E8EB] border border-[#22262D]"
+              : "text-[#8B94A1] hover:text-[#E6E8EB]"
           }`}
         >
           All Notifications ({items.length})
         </button>
         <button
           onClick={() => setFilterMode("UNREAD")}
-          className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
+          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors flex items-center gap-1.5 ${
             filterMode === "UNREAD"
-              ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-              : "text-[#7E8997] hover:text-[#F3F5F7]"
+              ? "bg-[#5FA8A0]/15 text-[#5FA8A0] border border-[#5FA8A0]/30 font-semibold"
+              : "text-[#8B94A1] hover:text-[#E6E8EB]"
           }`}
         >
-          Unread Only ({unreadCount})
+          <span>Unread Only</span>
+          {unreadCount > 0 && (
+            <span className="w-4 h-4 rounded-full bg-[#5FA8A0] text-[#0B0D10] text-[10px] font-bold flex items-center justify-center">
+              {unreadCount}
+            </span>
+          )}
         </button>
       </div>
 
       {/* Notification List */}
       {loading ? (
-        <div className="flex items-center justify-center p-16 text-[#7E8997] gap-3">
-          <Loader2 className="animate-spin w-5 h-5 text-emerald-500" />
-          <span>Loading notifications...</span>
+        <div className="space-y-3">
+          <SkeletonCard rows={2} />
+          <SkeletonCard rows={2} />
+          <SkeletonCard rows={2} />
         </div>
       ) : displayedItems.length === 0 ? (
-        <Card className="p-12 text-center bg-[#151A21] border-[#29313B] rounded-xl space-y-2">
-          <Bell className="w-10 h-10 text-[#566171] mx-auto" />
-          <h3 className="text-base font-semibold text-[#F3F5F7]">No notifications</h3>
-          <p className="text-xs text-[#7E8997]">
+        <Card className="p-12 text-center bg-[#111317] border-[#1E2530] rounded-2xl space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-[#171A1F] border border-[#22262D] flex items-center justify-center mx-auto text-[#566171]">
+            <Bell className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-semibold text-[#E6E8EB]">No notifications</h3>
+          <p className="text-xs text-[#8B94A1] max-w-sm mx-auto">
             {filterMode === "UNREAD"
-              ? "You are all caught up! There are no unread notifications."
+              ? "You are all caught up! There are no unread notifications right now."
               : "No notification records found for your account."}
           </p>
         </Card>
       ) : (
         <div className="space-y-3">
-          {displayedItems.map((n) => (
-            <Card
-              key={n.id}
-              className={`p-4 sm:p-5 rounded-xl border transition-all ${
-                n.isRead
-                  ? "bg-[#151A21] border-[#29313B]/70"
-                  : "bg-[#1B222B] border-emerald-500/30 shadow-xs"
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                      n.isRead
-                        ? "bg-[#10151B] border border-[#29313B]"
-                        : "bg-emerald-500/10 border border-emerald-500/25"
-                    }`}
-                  >
-                    {getTypeIcon(n.type)}
-                  </div>
+          <AnimatePresence initial={false}>
+            {displayedItems.map((n) => (
+              <motion.div
+                key={n.id}
+                layout
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.15 }}
+              >
+                <Card
+                  className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+                    n.isRead
+                      ? "bg-[#111317] border-[#1E2530]"
+                      : "bg-[#171A1F] border-[#5FA8A0]/30 shadow-xs"
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      <div
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                          n.isRead
+                            ? "bg-[#0B0D10] border border-[#1E2530]"
+                            : "bg-[#5FA8A0]/10 border border-[#5FA8A0]/25"
+                        }`}
+                      >
+                        {getTypeIcon(n.type)}
+                      </div>
 
-                  <div className="space-y-1 min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          {!n.isRead && (
+                            <span className="w-2 h-2 rounded-full bg-[#5FA8A0] shrink-0" />
+                          )}
+                          <h3 className="text-[#E6E8EB] font-semibold text-sm truncate">{n.title}</h3>
+                        </div>
+
+                        <p className="text-xs text-[#8B94A1] leading-relaxed">{n.message}</p>
+
+                        <div className="flex items-center gap-3 pt-1 text-[11px] text-[#566171]">
+                          <span className="flex items-center gap-1 text-[#8B94A1]">
+                            <Clock className="w-3 h-3 text-[#566171]" />
+                            {new Date(n.createdAt).toLocaleDateString()}{" "}
+                            {new Date(n.createdAt).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+
+                          {n.link && (
+                            <Link
+                              href={n.link}
+                              className="text-[#5FA8A0] hover:text-[#5FA8A0]/80 flex items-center gap-1 font-medium transition-colors"
+                            >
+                              <span>Open link</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                       {!n.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                      )}
-                      <h3 className="text-[#F3F5F7] font-semibold text-sm truncate">{n.title}</h3>
-                    </div>
-
-                    <p className="text-xs text-[#A7B0BC] leading-relaxed">{n.message}</p>
-
-                    <div className="flex items-center gap-3 pt-1 text-[11px] text-[#7E8997]">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {new Date(n.createdAt).toLocaleDateString()}{" "}
-                        {new Date(n.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-
-                      {n.link && (
-                        <Link
-                          href={n.link}
-                          className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-medium"
+                        <EpButton
+                          size="sm"
+                          variant="outline"
+                          onClick={() => markRead(n.id)}
+                          className="text-xs h-7 px-2.5"
                         >
-                          <span>Open link</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </Link>
+                          <Check className="w-3 h-3 mr-1 text-[#5FA8A0]" />
+                          Mark Read
+                        </EpButton>
                       )}
+
+                      <button
+                        onClick={() => deleteNotification(n.id)}
+                        disabled={deletingId === n.id}
+                        className="p-1.5 rounded-lg border border-transparent hover:border-[#22262D] text-[#566171] hover:text-rose-400 hover:bg-[#0B0D10] transition-colors"
+                        title="Delete notification"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
-                </div>
-
-                {!n.isRead && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => markRead(n.id)}
-                    className="shrink-0 self-start sm:self-center text-xs border-[#29313B] bg-[#10151B] hover:bg-[#151A21] text-[#A7B0BC] hover:text-[#F3F5F7]"
-                  >
-                    <Check className="w-3.5 h-3.5 mr-1 text-emerald-400" />
-                    Mark Read
-                  </Button>
-                )}
-              </div>
-            </Card>
-          ))}
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
