@@ -1,21 +1,106 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
-import { validateActiveUser } from "@/lib/auth/permissions";
+import {
+  requireEmployee,
+  apiSuccess,
+  apiError,
+  parseBody,
+  checkIdempotency,
+  checkRateLimit,
+  getCompanyCalendarDate,
+  getCompanyDateString,
+  getCompanyTimezone,
+} from "@/lib/api/foundation";
 import { AttendanceService } from "@/lib/services/attendance.service";
-import { getUtcCalendarDate, isSameCalendarDay } from "@/lib/date-utils";
+import { isSameCalendarDay } from "@/lib/date-utils";
+
+const attendanceActionSchema = z.object({
+  action: z.enum(["check-in", "check-out", "break-start", "break-end"]),
+  breakType: z.enum(["LUNCH", "TEA", "SHORT_BREAK", "PERSONAL", "OTHER"]).optional().default("LUNCH"),
+  notes: z.string().max(500, "Notes cannot exceed 500 characters").optional(),
+});
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.headers.get("x-user-id");
-    const user = await validateActiveUser(userId);
-
+    const { user } = await requireEmployee(req);
+    const timezone = await getCompanyTimezone();
     const policy = await AttendanceService.getPolicy();
     const requiredMinutes = user.requiredDailyMinutes || policy.defaultRequiredMinutes || 480;
 
-    const today = getUtcCalendarDate();
+    const { searchParams } = new URL(req.url);
+    const view = searchParams.get("view"); // "live", "monthly", or default "full"
+    const now = new Date();
+    const todayCalendarDate = getCompanyCalendarDate(now, timezone);
 
-    // Fetch up to 90 days history
+    // ─── Auto-close forgotten open sessions from past days ─────────────
+    const forgottenSessions = await db.attendance.findMany({
+      where: {
+        userId: user.id,
+        checkOutAt: null,
+        date: { lt: todayCalendarDate },
+      },
+      include: { breaks: true },
+    });
+
+    for (const session of forgottenSessions) {
+      // Close open breaks
+      for (const b of session.breaks) {
+        if (!b.endTime) {
+          const autoBreakEnd = new Date(new Date(b.startTime).getTime() + 30 * 60000);
+          await db.attendanceBreak.update({
+            where: { id: b.id },
+            data: {
+              endTime: autoBreakEnd,
+              durationMinutes: 30,
+              notes: (b.notes ? b.notes + " " : "") + "[Auto-closed at session cutoff]",
+            },
+          });
+        }
+      }
+
+      // Close session at workWindowEnd or 9 hours after checkin
+      const checkInTime = new Date(session.checkInAt || session.date);
+      const autoCheckOut = new Date(checkInTime.getTime() + requiredMinutes * 60000);
+
+      const updatedBreaks = await db.attendanceBreak.findMany({ where: { attendanceId: session.id } });
+      const calc = AttendanceService.calculateDay({
+        checkInAt: session.checkInAt,
+        checkOutAt: autoCheckOut,
+        breaks: updatedBreaks,
+        requiredDailyMinutes: session.requiredDailyMinutes || requiredMinutes,
+        policy,
+      });
+
+      await db.attendance.update({
+        where: { id: session.id },
+        data: {
+          checkOutAt: autoCheckOut,
+          grossMinutes: calc.grossMinutes,
+          breakMinutes: calc.breakMinutes,
+          netMinutes: calc.netMinutes,
+          totalMinutes: calc.netMinutes,
+          status: "INCOMPLETE",
+          completionStatus: "INCOMPLETE",
+          notes: (session.notes ? session.notes + " " : "") + "[System auto-checkout: missed checkout. Regularization required]",
+        },
+      });
+
+      // Notify employee to regularize missed checkout
+      await db.notification.create({
+        data: {
+          userId: user.id,
+          type: "ATTENDANCE_MISSED_CHECKOUT",
+          title: "Attendance Auto-Closed",
+          message: `Your check-out for ${session.date.toISOString().split("T")[0]} was missed and automatically closed. Please submit an attendance regularization request.`,
+          priority: "HIGH",
+          link: "/employee/attendance",
+        },
+      });
+    }
+
+    // ─── Fetch 90 days history ──────────────────────────────────────────
     const records = await db.attendance.findMany({
       where: { userId: user.id },
       include: {
@@ -28,25 +113,22 @@ export async function GET(req: NextRequest) {
       take: 90,
     });
 
-    // Locate ongoing active session (where checkOutAt is null)
     const activeSession = records.find((r) => !r.checkOutAt && !!r.checkInAt);
-
-    // Today's record is either the active session or today's calendar day record
     const todayRecord =
       activeSession ||
       records.find(
-        (r) => isSameCalendarDay(r.date, today) || (r.checkInAt && isSameCalendarDay(r.checkInAt, today))
+        (r) => isSameCalendarDay(r.date, todayCalendarDate) || (r.checkInAt && isSameCalendarDay(r.checkInAt, todayCalendarDate))
       );
 
-    // Check if user is on approved leave today (safely handled with try/catch)
+    // Approved Leave check for today
     let todayLeave = null;
     try {
       todayLeave = await db.leaveRequest.findFirst({
         where: {
           userId: user.id,
           status: "APPROVED",
-          startDate: { lte: today },
-          endDate: { gte: today },
+          startDate: { lte: todayCalendarDate },
+          endDate: { gte: todayCalendarDate },
         },
         select: { id: true, leaveType: true },
       });
@@ -54,22 +136,24 @@ export async function GET(req: NextRequest) {
       todayLeave = null;
     }
 
-    // Check if today is a holiday (safe query preventing P2022 column mismatch crashes)
+    // Company Holiday check for today
     let todayHoliday = null;
     try {
       todayHoliday = await db.holiday.findFirst({
-        where: { date: today },
+        where: { date: todayCalendarDate },
         select: { id: true, name: true, date: true },
       });
     } catch {
       todayHoliday = null;
     }
 
+    const dayOfWeek = todayCalendarDate.getUTCDay();
     const isWeeklyOff = Array.isArray(policy?.weeklyOffDays)
-      ? policy.weeklyOffDays.includes(today.getDay())
+      ? policy.weeklyOffDays.includes(dayOfWeek)
       : false;
 
-    const calc = AttendanceService.calculateDay({
+    // Today's live calculation
+    const todayCalc = AttendanceService.calculateDay({
       checkInAt: todayRecord?.checkInAt || null,
       checkOutAt: todayRecord?.checkOutAt || null,
       breaks: todayRecord?.breaks || [],
@@ -78,10 +162,37 @@ export async function GET(req: NextRequest) {
       isLeave: !!todayLeave,
       isHoliday: !!todayHoliday,
       isWeeklyOff,
-      referenceTime: new Date(),
+      referenceTime: now,
     });
 
-    // Format historical records
+    // ─── Live State Response (for running timers) ──────────────────────
+    const ongoingBreak = todayRecord?.breaks?.find((b) => !b.endTime);
+    const liveTimer = {
+      isWorking: todayCalc.isWorking,
+      isOnBreak: todayCalc.isOnBreak,
+      activeBreak: ongoingBreak
+        ? {
+            id: ongoingBreak.id,
+            startTime: ongoingBreak.startTime,
+            type: ongoingBreak.type,
+            elapsedSeconds: Math.max(0, Math.floor((now.getTime() - new Date(ongoingBreak.startTime).getTime()) / 1000)),
+          }
+        : null,
+      checkInAt: todayRecord?.checkInAt || null,
+      checkOutAt: todayRecord?.checkOutAt || null,
+      serverTime: now.toISOString(),
+      netMinutes: todayCalc.netMinutes,
+      breakMinutes: todayCalc.breakMinutes,
+      requiredMinutes: todayRecord?.requiredDailyMinutes || requiredMinutes,
+      remainingMinutes: todayCalc.remainingMinutes,
+      status: todayRecord?.checkInAt ? (activeSession ? "IN_PROGRESS" : todayCalc.completionStatus) : "NOT_STARTED",
+    };
+
+    if (view === "live") {
+      return apiSuccess(liveTimer, undefined, { live: liveTimer });
+    }
+
+    // ─── Format Historical Records & Monthly Summary ───────────────────
     const history = records.map((r) => {
       const reqMins = r.requiredDailyMinutes || requiredMinutes;
       const isActive = !r.checkOutAt && !!r.checkInAt;
@@ -92,7 +203,7 @@ export async function GET(req: NextRequest) {
         breaks: r.breaks || [],
         requiredDailyMinutes: reqMins,
         policy,
-        referenceTime: new Date(),
+        referenceTime: now,
       });
 
       return {
@@ -118,41 +229,86 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json({
-      success: true,
+    // Monthly summary calculation (current month or requested month)
+    const currentMonthPrefix = getCompanyDateString(now, timezone).slice(0, 7); // "YYYY-MM"
+    const targetMonthPrefix = searchParams.get("month") || currentMonthPrefix;
+
+    const monthRecords = history.filter((r) => {
+      const rDateStr = r.date instanceof Date ? r.date.toISOString().slice(0, 7) : String(r.date).slice(0, 7);
+      return rDateStr === targetMonthPrefix;
+    });
+
+    let presentDays = 0;
+    let lateDays = 0;
+    let halfDays = 0;
+    let totalWorkedMinutes = 0;
+    let totalRequiredMinutes = 0;
+
+    for (const r of monthRecords) {
+      if (["COMPLETE", "PRESENT", "IN_PROGRESS"].includes(r.status)) presentDays += 1;
+      if (r.status === "HALF_DAY") halfDays += 1;
+      if (r.isLate) lateDays += 1;
+      totalWorkedMinutes += r.netMinutes || 0;
+      totalRequiredMinutes += r.requiredMinutes || requiredMinutes;
+    }
+
+    const monthlySummary = {
+      month: targetMonthPrefix,
+      presentDays,
+      halfDays,
+      lateDays,
+      totalWorkedMinutes,
+      totalWorkedHours: parseFloat((totalWorkedMinutes / 60).toFixed(1)),
+      totalRequiredMinutes,
+      totalRequiredHours: parseFloat((totalRequiredMinutes / 60).toFixed(1)),
+      overtimeMinutes: Math.max(0, totalWorkedMinutes - totalRequiredMinutes),
+      shortfallMinutes: Math.max(0, totalRequiredMinutes - totalWorkedMinutes),
+    };
+
+    const responsePayload = {
       policy: {
         workWindowStart: policy.workWindowStart,
         workWindowEnd: policy.workWindowEnd,
         defaultRequiredMinutes: policy.defaultRequiredMinutes,
         graceMinutes: policy.graceMinutes,
         cutoffTime: policy.cutoffTime,
+        weeklyOffDays: policy.weeklyOffDays,
       },
       today: {
         id: todayRecord?.id || null,
-        isWorking: calc.isWorking,
-        isOnBreak: calc.isOnBreak,
-        activeBreakStartTime: calc.activeBreakStartTime,
+        isWorking: todayCalc.isWorking,
+        isOnBreak: todayCalc.isOnBreak,
+        activeBreakStartTime: todayCalc.activeBreakStartTime,
         checkInAt: todayRecord?.checkInAt || null,
         checkOutAt: todayRecord?.checkOutAt || null,
-        grossMinutes: calc.grossMinutes,
-        breakMinutes: calc.breakMinutes,
-        workedMinutes: calc.netMinutes,
-        netMinutes: calc.netMinutes,
+        grossMinutes: todayCalc.grossMinutes,
+        breakMinutes: todayCalc.breakMinutes,
+        workedMinutes: todayCalc.netMinutes,
+        netMinutes: todayCalc.netMinutes,
         requiredMinutes: todayRecord?.requiredDailyMinutes || requiredMinutes,
-        remainingMinutes: calc.remainingMinutes,
-        differenceMinutes: calc.netMinutes - (todayRecord?.requiredDailyMinutes || requiredMinutes),
-        isLate: calc.isLate,
-        lateMinutes: calc.lateMinutes,
-        isEarlyExit: calc.isEarlyExit,
-        earlyExitMinutes: calc.earlyExitMinutes,
-        status: todayRecord?.checkInAt ? (activeSession ? "IN_PROGRESS" : calc.completionStatus) : "NOT_STARTED",
-        completionStatus: calc.completionStatus,
+        remainingMinutes: todayCalc.remainingMinutes,
+        differenceMinutes: todayCalc.netMinutes - (todayRecord?.requiredDailyMinutes || requiredMinutes),
+        isLate: todayCalc.isLate,
+        lateMinutes: todayCalc.lateMinutes,
+        isEarlyExit: todayCalc.isEarlyExit,
+        earlyExitMinutes: todayCalc.earlyExitMinutes,
+        status: todayRecord?.checkInAt ? (activeSession ? "IN_PROGRESS" : todayCalc.completionStatus) : "NOT_STARTED",
+        completionStatus: todayCalc.completionStatus,
         breaks: todayRecord?.breaks || [],
         isLeave: !!todayLeave,
         isHoliday: !!todayHoliday,
         isWeeklyOff,
       },
       records: history,
+      monthlySummary,
+      live: liveTimer,
+    };
+
+    return apiSuccess(responsePayload, undefined, {
+      policy: responsePayload.policy,
+      today: responsePayload.today,
+      records: history,
+      summary: monthlySummary,
     });
   } catch (e) {
     return handleApiError(e);
@@ -161,20 +317,23 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = req.headers.get("x-user-id");
-    const user = await validateActiveUser(userId);
-
-    const body = await req.json();
-    const { action, breakType, notes } = body;
-
+    const { user } = await requireEmployee(req);
+    const timezone = await getCompanyTimezone();
     const policy = await AttendanceService.getPolicy();
     const requiredMinutes = user.requiredDailyMinutes || policy.defaultRequiredMinutes || 480;
 
-    const today = getUtcCalendarDate();
-    const endOfToday = new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1);
-    const now = new Date();
+    const body = await parseBody(req, attendanceActionSchema);
+    const { action, breakType, notes } = body;
 
-    // 1. Locate any ongoing active session for this user (where checkOutAt is null)
+    // Double-click idempotency protection (2.5s window per user action)
+    checkIdempotency(`${user.id}:attendance:${action}`, 2500);
+    // Rate limit: max 25 mutations per minute
+    checkRateLimit(`${user.id}:attendance`, 25, 60);
+
+    const now = new Date();
+    const todayCalendarDate = getCompanyCalendarDate(now, timezone);
+
+    // 1. Locate active open session (where checkOutAt is null)
     const activeSession = await db.attendance.findFirst({
       where: {
         userId: user.id,
@@ -188,17 +347,14 @@ export async function POST(req: NextRequest) {
       orderBy: { checkInAt: "desc" },
     });
 
-    // 2. Locate today's record (may already have checkOutAt set)
+    // 2. Locate today's existing attendance record
     const todayRecord =
-      (activeSession && (isSameCalendarDay(activeSession.date, today) || (activeSession.checkInAt && isSameCalendarDay(activeSession.checkInAt, today))))
+      (activeSession && isSameCalendarDay(activeSession.date, todayCalendarDate))
         ? activeSession
         : await db.attendance.findFirst({
             where: {
               userId: user.id,
-              OR: [
-                { date: today },
-                { checkInAt: { gte: today, lte: endOfToday } },
-              ],
+              date: todayCalendarDate,
             },
             include: {
               breaks: {
@@ -208,63 +364,54 @@ export async function POST(req: NextRequest) {
             orderBy: { checkInAt: "desc" },
           });
 
-    // ─── 1. CHECK-IN ────────────────────────────────────────────────────────
+    // ─── ACTION 1: CHECK-IN ────────────────────────────────────────────────
     if (action === "check-in") {
-      // If there is already an active session for today
-      if (activeSession && (isSameCalendarDay(activeSession.date, today) || (activeSession.checkInAt && isSameCalendarDay(activeSession.checkInAt, today)))) {
-        throw new ApiError(400, "You already have an active check-in session for today");
+      // Prevent double check-in if already in an active working session
+      if (activeSession && isSameCalendarDay(activeSession.date, todayCalendarDate)) {
+        throw new ApiError(400, "You already have an active check-in session for today", undefined, "ALREADY_CHECKED_IN");
       }
 
-      // If there was an active session from a previous day left open, cleanly close it first
-      if (activeSession) {
-        const danglingBreak = activeSession.breaks.find((b) => !b.endTime);
-        if (danglingBreak) {
-          const bDuration = Math.max(1, Math.floor((now.getTime() - new Date(danglingBreak.startTime).getTime()) / 60000));
-          await db.attendanceBreak.update({
-            where: { id: danglingBreak.id },
-            data: { endTime: now, durationMinutes: bDuration },
-          });
-        }
-        const updatedBreaks = await db.attendanceBreak.findMany({ where: { attendanceId: activeSession.id } });
-        const prevCalc = AttendanceService.calculateDay({
-          checkInAt: activeSession.checkInAt,
-          checkOutAt: now,
-          breaks: updatedBreaks,
-          requiredDailyMinutes: activeSession.requiredDailyMinutes || requiredMinutes,
-          policy,
-        });
-        await db.attendance.update({
-          where: { id: activeSession.id },
-          data: {
-            checkOutAt: now,
-            grossMinutes: prevCalc.grossMinutes,
-            breakMinutes: prevCalc.breakMinutes,
-            netMinutes: prevCalc.netMinutes,
-            totalMinutes: prevCalc.netMinutes,
-            status: prevCalc.completionStatus,
-            completionStatus: prevCalc.completionStatus,
-          },
-        });
+      // Check for approved leave or holiday warning (warn, do not crash)
+      let leaveWarning: string | null = null;
+      const leave = await db.leaveRequest.findFirst({
+        where: {
+          userId: user.id,
+          status: "APPROVED",
+          startDate: { lte: todayCalendarDate },
+          endDate: { gte: todayCalendarDate },
+        },
+      });
+      if (leave) {
+        leaveWarning = `Notice: You have an approved ${leave.leaveType} leave scheduled for today.`;
+      }
+
+      const holiday = await db.holiday.findFirst({
+        where: { date: todayCalendarDate },
+      });
+      if (holiday) {
+        leaveWarning = `Notice: Today is observed as a company holiday (${holiday.name}).`;
       }
 
       let record;
       if (todayRecord) {
-        // If the record was previously checked out, record the idle gap as an intermittent break
+        // Multi-session in a day (BUG-008 fix):
+        // If employee checked out earlier today, record the idle gap as an intermittent break
         if (todayRecord.checkOutAt && todayRecord.checkOutAt < now) {
-          const gapMinutes = Math.max(0, Math.round((now.getTime() - todayRecord.checkOutAt.getTime()) / (1000 * 60)));
-          await db.attendanceBreak.create({
-            data: {
-              attendanceId: todayRecord.id,
-              startTime: todayRecord.checkOutAt,
-              endTime: now,
-              durationMinutes: gapMinutes,
-              type: "OTHER",
-              notes: "Intermittent logoff between attendance sessions",
-            },
-          });
+          const gapMinutes = Math.max(0, Math.round((now.getTime() - todayRecord.checkOutAt.getTime()) / 60000));
+          if (gapMinutes > 0) {
+            await db.attendanceBreak.create({
+              data: {
+                attendanceId: todayRecord.id,
+                startTime: todayRecord.checkOutAt,
+                endTime: now,
+                durationMinutes: gapMinutes,
+                type: "OTHER",
+                notes: "Intermittent logoff between attendance sessions",
+              },
+            });
+          }
         }
 
-        // Re-opening / updating today's attendance record
         record = await db.attendance.update({
           where: { id: todayRecord.id },
           data: {
@@ -273,7 +420,7 @@ export async function POST(req: NextRequest) {
             requiredDailyMinutes: requiredMinutes,
             status: "IN_PROGRESS",
             completionStatus: "INCOMPLETE",
-            notes: notes || todayRecord.notes,
+            notes: notes ? (todayRecord.notes ? `${todayRecord.notes} | ${notes}` : notes) : todayRecord.notes,
           },
           include: { breaks: true },
         });
@@ -281,7 +428,7 @@ export async function POST(req: NextRequest) {
         record = await db.attendance.create({
           data: {
             userId: user.id,
-            date: today,
+            date: todayCalendarDate,
             checkInAt: now,
             requiredDailyMinutes: requiredMinutes,
             status: "IN_PROGRESS",
@@ -308,25 +455,29 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      return NextResponse.json({
-        success: true,
-        record,
-        message: "Checked in successfully",
-      });
+      const message = leaveWarning
+        ? `Checked in successfully. ${leaveWarning}`
+        : "Checked in successfully";
+
+      return apiSuccess(
+        { record, calc, warning: leaveWarning },
+        undefined,
+        { record, message },
+        200
+      );
     }
 
-    // Target active session for break or checkout
     const activeTarget = activeSession || (todayRecord && !todayRecord.checkOutAt ? todayRecord : null);
 
-    // ─── 2. BREAK-START ─────────────────────────────────────────────────────
+    // ─── ACTION 2: BREAK-START ─────────────────────────────────────────────
     if (action === "break-start") {
       if (!activeTarget) {
-        throw new ApiError(400, "You must be checked in to start a break");
+        throw new ApiError(400, "You must be checked in before starting a break", undefined, "NOT_CHECKED_IN");
       }
 
       const ongoingBreak = activeTarget.breaks.find((b) => !b.endTime);
       if (ongoingBreak) {
-        throw new ApiError(400, "You already have an ongoing active break");
+        throw new ApiError(400, "You already have an active ongoing break", undefined, "BREAK_ALREADY_ACTIVE");
       }
 
       const newBreak = await db.attendanceBreak.create({
@@ -338,22 +489,23 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      return NextResponse.json({
-        success: true,
-        break: newBreak,
-        message: `Break (${breakType || "LUNCH"}) started`,
-      });
+      return apiSuccess(
+        { break: newBreak },
+        undefined,
+        { break: newBreak, message: `Break (${breakType || "LUNCH"}) started` },
+        200
+      );
     }
 
-    // ─── 3. BREAK-END ───────────────────────────────────────────────────────
+    // ─── ACTION 3: BREAK-END ───────────────────────────────────────────────
     if (action === "break-end") {
       if (!activeTarget) {
-        throw new ApiError(400, "No active attendance record found");
+        throw new ApiError(400, "No active attendance session found", undefined, "NOT_CHECKED_IN");
       }
 
       const ongoingBreak = activeTarget.breaks.find((b) => !b.endTime);
       if (!ongoingBreak) {
-        throw new ApiError(400, "No active break found to end");
+        throw new ApiError(400, "No active break found to end", undefined, "NO_ACTIVE_BREAK");
       }
 
       const durationMinutes = Math.max(
@@ -369,7 +521,6 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Recalculate attendance
       const updatedBreaks = await db.attendanceBreak.findMany({
         where: { attendanceId: activeTarget.id },
       });
@@ -392,19 +543,21 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      return NextResponse.json({
-        success: true,
-        message: `Break ended. Duration: ${durationMinutes} minutes`,
-      });
+      return apiSuccess(
+        { durationMinutes, calc },
+        undefined,
+        { message: `Break ended. Duration: ${durationMinutes} minutes` },
+        200
+      );
     }
 
-    // ─── 4. CHECK-OUT ───────────────────────────────────────────────────────
+    // ─── ACTION 4: CHECK-OUT ───────────────────────────────────────────────
     if (action === "check-out") {
       if (!activeTarget) {
-        throw new ApiError(400, "You are not currently checked in");
+        throw new ApiError(400, "You are not currently checked in", undefined, "NOT_CHECKED_IN");
       }
 
-      // Close any active break automatically upon check-out
+      // Auto-close any dangling break upon checkout
       const ongoingBreak = activeTarget.breaks.find((b) => !b.endTime);
       if (ongoingBreak) {
         const breakDuration = Math.max(
@@ -425,7 +578,6 @@ export async function POST(req: NextRequest) {
       });
 
       const targetRequiredMinutes = activeTarget.requiredDailyMinutes || requiredMinutes;
-
       const calc = AttendanceService.calculateDay({
         checkInAt: activeTarget.checkInAt,
         checkOutAt: now,
@@ -450,22 +602,24 @@ export async function POST(req: NextRequest) {
           isEarlyExit: calc.isEarlyExit,
           status: calc.completionStatus,
           completionStatus: calc.completionStatus,
-          notes: notes || activeTarget.notes,
+          notes: notes ? (activeTarget.notes ? `${activeTarget.notes} | ${notes}` : notes) : activeTarget.notes,
         },
-        include: {
-          breaks: true,
-        },
+        include: { breaks: true },
       });
 
-      return NextResponse.json({
-        success: true,
-        record,
-        calc,
-        message: `Checked out. Net work time: ${Math.floor(calc.netMinutes / 60)}h ${calc.netMinutes % 60}m (${calc.completionStatus})`,
-      });
+      const hours = Math.floor(calc.netMinutes / 60);
+      const mins = calc.netMinutes % 60;
+      const message = `Checked out. Net worked: ${hours}h ${mins}m (${calc.completionStatus})`;
+
+      return apiSuccess(
+        { record, calc },
+        undefined,
+        { record, calc, message },
+        200
+      );
     }
 
-    throw new ApiError(400, "Invalid attendance action specified");
+    throw new ApiError(400, "Invalid attendance action specified", undefined, "INVALID_ACTION");
   } catch (e) {
     return handleApiError(e);
   }
