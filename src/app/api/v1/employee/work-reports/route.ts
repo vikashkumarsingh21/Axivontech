@@ -7,6 +7,7 @@ import {
   checkIdempotency,
   getCompanyDateString,
   getCompanyCalendarDate,
+  getPlatformAdmins,
 } from "@/lib/api/foundation";
 
 const createWorkReportSchema = z.object({
@@ -152,7 +153,6 @@ export async function POST(req: NextRequest) {
     } = parsed.data;
 
     // Date resolution
-    const todayStr = getCompanyDateString();
     const today = getCompanyCalendarDate();
 
     const reportDate = date ? new Date(date) : today;
@@ -178,13 +178,7 @@ export async function POST(req: NextRequest) {
 
     // Double submit protection
     const idempotencyKey = `work-report:${user.id}:${reportDate.toISOString().split("T")[0]}`;
-    if (!checkIdempotency(idempotencyKey, 3000)) {
-      throw new ApiError(
-        429,
-        "A work report submission is already in progress. Please wait.",
-        "DUPLICATE_SUBMISSION"
-      );
-    }
+    checkIdempotency(idempotencyKey, 3000);
 
     // Check if an existing report exists and whether it is within the 48-hour edit window
     const existing = await db.workReport.findUnique({
@@ -229,13 +223,7 @@ export async function POST(req: NextRequest) {
     // Notify admins / platform event
     if (status === "SUBMITTED") {
       try {
-        const admins = await db.user.findMany({
-          where: {
-            role: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] },
-            status: "ACTIVE",
-          },
-          select: { id: true },
-        });
+        const admins = await getPlatformAdmins();
 
         if (admins.length > 0) {
           await db.notification.createMany({

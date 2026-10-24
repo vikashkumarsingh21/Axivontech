@@ -31,16 +31,14 @@ export async function GET(req: NextRequest) {
       where.type = type;
     }
 
+    const pagination = getPagination(req, 50, 100);
+
     const [notifications, totalUnread, totalCount] = await Promise.all([
       db.notification.findMany({
         where,
         orderBy: { createdAt: "desc" },
-        ...(hasPagination
-          ? {
-              skip: getPagination(req, 50, 100).skip,
-              take: getPagination(req, 50, 100).limit,
-            }
-          : { take: 100 }),
+        skip: hasPagination ? pagination.skip : 0,
+        take: hasPagination ? pagination.limit : 100,
       }),
       db.notification.count({
         where: { userId: user.id, isRead: false },

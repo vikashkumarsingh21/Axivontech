@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
-import { requireEmployee, getPagination } from "@/lib/api/foundation";
+import { requireEmployee, getPagination, getPlatformAdmins } from "@/lib/api/foundation";
 
 const patchTaskSchema = z.object({
   taskId: z.string().min(1, "Task ID is required"),
@@ -174,13 +174,7 @@ export async function PATCH(req: NextRequest) {
     // Notify admins if task was completed or blocked
     if (status === "COMPLETED" || status === "BLOCKED") {
       try {
-        const admins = await db.user.findMany({
-          where: {
-            role: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] },
-            status: "ACTIVE",
-          },
-          select: { id: true },
-        });
+        const admins = await getPlatformAdmins();
 
         if (admins.length > 0) {
           const actionWord = status === "COMPLETED" ? "completed" : "marked as blocked";
@@ -276,7 +270,7 @@ export async function POST(req: NextRequest) {
       const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
       if (EventBus) {
         await EventBus.emit({
-          eventType: "TASK_COMMENT_ADDED",
+          eventType: "TASK_UPDATED",
           actorId: user.id,
           entityType: "TASK",
           entityId: taskId,

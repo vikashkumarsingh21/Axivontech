@@ -5,27 +5,29 @@ import { ApiError } from "@/lib/api-error";
 import { getAuthenticatedSession, SessionPayload } from "@/lib/auth/session";
 import { normalizeRole } from "@/lib/auth/roles";
 
-export interface AuthenticatedUserContext {
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    status: string;
-    department?: string | null;
-    designation?: string | null;
-    employeeId?: string | null;
-    requiredDailyMinutes?: number | null;
-    organizationId?: string | null;
-    userRoles: Array<{
-      role: {
-        id: string;
-        name: string;
-      };
-    }>;
-  };
+export interface AuthenticatedUserPayload {
+  id: string;
+  email: string;
+  name: string;
+  status: string;
+  department?: string | null;
+  designation?: string | null;
+  employeeId?: string | null;
+  requiredDailyMinutes?: number | null;
+  organizationId?: string | null;
+  userRoles: Array<{
+    role: {
+      id: string;
+      name: string;
+    };
+  }>;
+}
+
+export type AuthenticatedUserContext = AuthenticatedUserPayload & {
+  user: AuthenticatedUserPayload;
   session: SessionPayload;
   role: string;
-}
+};
 
 // ─────────────────────────────────────────────────────────────
 // 1. Session & Role Verification Helpers
@@ -96,6 +98,7 @@ export async function getSessionUser(req: Request | NextRequest): Promise<Authen
   const primaryRole = normalizeRole(session.role || user.userRoles[0]?.role?.name || "EMPLOYEE");
 
   return {
+    ...user,
     user,
     session,
     role: primaryRole,
@@ -129,6 +132,25 @@ export async function requireEmployee(
   return context;
 }
 
+/**
+ * Safely fetches active platform administrators and founders for event/task notifications.
+ */
+export async function getPlatformAdmins() {
+  return db.user.findMany({
+    where: {
+      status: "ACTIVE",
+      userRoles: {
+        some: {
+          role: {
+            name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER", "SUPER_ADMIN"] },
+          },
+        },
+      },
+    },
+    select: { id: true, name: true, email: true },
+  });
+}
+
 // ─────────────────────────────────────────────────────────────
 // 2. Consistent Response Envelopes
 // ─────────────────────────────────────────────────────────────
@@ -144,22 +166,24 @@ export function apiSuccess<T>(
   data: T,
   meta?: Record<string, any>,
   extra?: Record<string, any>,
-  status: number = 200
+  status = 200
 ): NextResponse {
-  const payload: ApiSuccessPayload<T> = {
-    success: true,
-    data,
-    ...(meta ? { meta } : {}),
-    ...(extra || {}),
-  };
-  return NextResponse.json(payload, { status });
+  return NextResponse.json(
+    {
+      success: true,
+      data,
+      ...(meta ? { meta } : {}),
+      ...(extra || {}),
+    },
+    { status }
+  );
 }
 
 export function apiError(
   code: string,
   message: string,
-  status: number = 400,
-  fields?: Record<string, string[]>
+  status = 400,
+  fields?: Record<string, string>
 ): NextResponse {
   return NextResponse.json(
     {
@@ -176,100 +200,68 @@ export function apiError(
 }
 
 // ─────────────────────────────────────────────────────────────
-// 3. Zod Request Parser Helper
+// 3. Request Body Parsing & Zod Validation
 // ─────────────────────────────────────────────────────────────
 
-/**
- * Safely parses and validates a JSON request body using the supplied Zod schema.
- * Rejects malformed JSON with 400 Bad Request.
- */
 export async function parseBody<T>(req: Request | NextRequest, schema: ZodSchema<T>): Promise<T> {
-  let body: any;
+  let bodyJson: unknown;
+
   try {
-    body = await req.json();
-  } catch (err) {
-    throw new ApiError(400, "Invalid JSON payload in request body", undefined, "MALFORMED_JSON");
+    bodyJson = await req.json();
+  } catch {
+    throw new ApiError(400, "Malformed JSON in request body", undefined, "MALFORMED_JSON");
   }
 
-  const result = schema.safeParse(body);
+  const result = schema.safeParse(bodyJson);
   if (!result.success) {
-    const fields: Record<string, string[]> = {};
+    const fields: Record<string, string> = {};
     for (const issue of result.error.issues) {
-      const fieldPath = issue.path.join(".") || "root";
-      if (!fields[fieldPath]) fields[fieldPath] = [];
-      fields[fieldPath].push(issue.message);
+      const fieldPath = issue.path.join(".");
+      if (fieldPath && !fields[fieldPath]) {
+        fields[fieldPath] = issue.message;
+      }
     }
-    const firstMsg = result.error.issues[0]?.message || "Validation Error";
-    throw new ApiError(400, firstMsg, undefined, "VALIDATION_ERROR", fields);
+    const firstMessage = result.error.issues[0]?.message || "Validation failed";
+    throw new ApiError(400, firstMessage, fields, "VALIDATION_ERROR");
   }
 
   return result.data;
 }
 
 // ─────────────────────────────────────────────────────────────
-// 4. Pagination Helper
+// 4. Pagination & Query Helpers
 // ─────────────────────────────────────────────────────────────
 
 export interface PaginationParams {
   page: number;
   limit: number;
   skip: number;
-  take: number;
 }
 
-export function getPagination(
-  req: Request | NextRequest,
-  defaultLimit = 20,
-  maxLimit = 50
-): PaginationParams {
-  const { searchParams } = new URL(req.url);
-  const rawPage = parseInt(searchParams.get("page") || "1", 10);
-  const rawLimit = parseInt(searchParams.get("limit") || String(defaultLimit), 10);
+export function getPagination(req: Request | NextRequest, defaultLimit = 20, maxLimit = 100): PaginationParams {
+  const url = new URL(req.url);
+  const pageParam = parseInt(url.searchParams.get("page") || "1", 10);
+  const limitParam = parseInt(url.searchParams.get("limit") || String(defaultLimit), 10);
 
-  const page = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
-  const limit = isNaN(rawLimit) || rawLimit < 1 ? defaultLimit : Math.min(rawLimit, maxLimit);
+  const page = isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
+  const limit = isNaN(limitParam) || limitParam < 1 ? defaultLimit : Math.min(limitParam, maxLimit);
   const skip = (page - 1) * limit;
 
-  return {
-    page,
-    limit,
-    skip,
-    take: limit,
-  };
+  return { page, limit, skip };
 }
 
 // ─────────────────────────────────────────────────────────────
-// 5. Company Timezone & Calendar Normalization
+// 5. Timezone & Company Date Helpers
 // ─────────────────────────────────────────────────────────────
-
-let cachedTimezone: { value: string; expiresAt: number } | null = null;
 
 export async function getCompanyTimezone(): Promise<string> {
-  const now = Date.now();
-  if (cachedTimezone && cachedTimezone.expiresAt > now) {
-    return cachedTimezone.value;
-  }
-
-  try {
-    const setting = await db.organizationSetting.findFirst({
-      where: { key: "COMPANY_TIMEZONE" },
-      select: { value: true },
-    });
-    const tz = (setting?.value as string) || "Asia/Kolkata";
-    cachedTimezone = { value: tz, expiresAt: now + 60000 };
-    return tz;
-  } catch {
-    return "Asia/Kolkata";
-  }
+  return "Asia/Kolkata";
 }
 
-/**
- * Returns YYYY-MM-DD representing the calendar date in the company timezone.
- */
-export function getCompanyDateString(date: Date = new Date(), timeZone = "Asia/Kolkata"): string {
+export function getCompanyDateString(date = new Date(), timezone = "Asia/Kolkata"): string {
   try {
     const formatter = new Intl.DateTimeFormat("en-CA", {
-      timeZone,
+      timeZone: timezone,
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -280,43 +272,37 @@ export function getCompanyDateString(date: Date = new Date(), timeZone = "Asia/K
   }
 }
 
-/**
- * Returns a Date object anchored at 00:00:00 UTC for the given calendar date string or Date.
- */
-export function getCompanyCalendarDate(date: Date | string = new Date(), timeZone = "Asia/Kolkata"): Date {
-  const dateStr = typeof date === "string" ? date.split("T")[0] : getCompanyDateString(date, timeZone);
-  const [year, month, day] = dateStr.split("-").map(Number);
-  return new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+export function getCompanyCalendarDate(date = new Date(), timezone = "Asia/Kolkata"): Date {
+  const dateStr = getCompanyDateString(date, timezone);
+  return new Date(`${dateStr}T00:00:00.000Z`);
 }
 
 // ─────────────────────────────────────────────────────────────
-// 6. Idempotency & Rate Limiting Helpers
+// 6. Sliding Memory Cache for Idempotency & Rate Limiting
 // ─────────────────────────────────────────────────────────────
 
-interface IdempotencyEntry {
+interface CacheEntry {
   timestamp: number;
+  count?: number;
 }
 
-const idempotencyCache = new Map<string, IdempotencyEntry>();
-const rateLimitCache = new Map<string, { count: number; resetAt: number }>();
+const idempotencyCache = new Map<string, CacheEntry>();
+const rateLimitCache = new Map<string, CacheEntry>();
 
-// Periodic memory cleanup every 5 minutes
-if (typeof setInterval !== "undefined") {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of idempotencyCache.entries()) {
-      if (now - entry.timestamp > 60000) idempotencyCache.delete(key);
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of idempotencyCache.entries()) {
+    if (now - entry.timestamp > 60000) {
+      idempotencyCache.delete(key);
     }
-    for (const [key, entry] of rateLimitCache.entries()) {
-      if (now > entry.resetAt) rateLimitCache.delete(key);
+  }
+  for (const [key, entry] of rateLimitCache.entries()) {
+    if (now - entry.timestamp > 60000) {
+      rateLimitCache.delete(key);
     }
-  }, 300000);
-}
+  }
+}, 30000);
 
-/**
- * Protects mutating endpoints against rapid accidental double-clicks or duplicate submissions.
- * Rejects identical requests arriving within ttlMs (default 2500ms).
- */
 export function checkIdempotency(key: string, ttlMs = 2500): void {
   const now = Date.now();
   const existing = idempotencyCache.get(key);
@@ -333,27 +319,24 @@ export function checkIdempotency(key: string, ttlMs = 2500): void {
   idempotencyCache.set(key, { timestamp: now });
 }
 
-/**
- * Lightweight in-memory sliding window rate limiter for employee mutations.
- */
-export function checkRateLimit(key: string, maxRequests = 30, windowSeconds = 60): void {
+export function checkRateLimit(key: string, maxRequests = 10, windowSeconds = 60): void {
   const now = Date.now();
-  const existing = rateLimitCache.get(key);
+  const windowMs = windowSeconds * 1000;
+  const entry = rateLimitCache.get(key);
 
-  if (!existing || now > existing.resetAt) {
-    rateLimitCache.set(key, { count: 1, resetAt: now + windowSeconds * 1000 });
+  if (!entry || now - entry.timestamp > windowMs) {
+    rateLimitCache.set(key, { timestamp: now, count: 1 });
     return;
   }
 
-  if (existing.count >= maxRequests) {
-    const waitSec = Math.ceil((existing.resetAt - now) / 1000);
+  if ((entry.count || 0) >= maxRequests) {
     throw new ApiError(
       429,
-      `Rate limit exceeded. Please try again in ${waitSec} seconds.`,
-      { waitSeconds: waitSec },
+      `Too many requests. Please slow down and try again in ${Math.ceil((windowMs - (now - entry.timestamp)) / 1000)} seconds.`,
+      undefined,
       "RATE_LIMIT_EXCEEDED"
     );
   }
 
-  existing.count += 1;
+  entry.count = (entry.count || 0) + 1;
 }

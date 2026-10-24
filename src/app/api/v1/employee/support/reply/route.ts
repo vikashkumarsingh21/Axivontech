@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
-import { requireEmployee } from "@/lib/api/foundation";
+import { requireEmployee, getPlatformAdmins } from "@/lib/api/foundation";
 
 const replySchema = z.object({
   ticketId: z.string().min(1, "Ticket ID is required"),
@@ -69,15 +69,7 @@ export async function POST(req: NextRequest) {
     try {
       const recipientIds = ticket.assignedToId
         ? [ticket.assignedToId]
-        : (
-            await db.user.findMany({
-              where: {
-                role: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] },
-                status: "ACTIVE",
-              },
-              select: { id: true },
-            })
-          ).map((u) => u.id);
+        : (await getPlatformAdmins()).map((u) => u.id);
 
       if (recipientIds.length > 0) {
         await db.notification.createMany({

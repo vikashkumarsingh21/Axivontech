@@ -6,6 +6,7 @@ import {
   requireEmployee,
   checkIdempotency,
   getCompanyDateString,
+  getPlatformAdmins,
 } from "@/lib/api/foundation";
 import {
   calculateLeaveDays,
@@ -124,13 +125,7 @@ export async function POST(req: NextRequest) {
 
     // Idempotency check (prevent double submit within 5 seconds)
     const idempotencyKey = `leave:create:${user.id}:${startDate}:${endDate}:${leaveType}`;
-    if (!checkIdempotency(idempotencyKey, 5000)) {
-      throw new ApiError(
-        429,
-        "A duplicate leave request is currently being processed. Please wait.",
-        "DUPLICATE_SUBMISSION"
-      );
-    }
+    checkIdempotency(idempotencyKey, 5000);
 
     // Retroactive leave check (max 30 days past)
     const thirtyDaysAgo = new Date();
@@ -234,13 +229,7 @@ export async function POST(req: NextRequest) {
 
     // Notify admins / platform event
     try {
-      const admins = await db.user.findMany({
-        where: {
-          role: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] },
-          status: "ACTIVE",
-        },
-        select: { id: true },
-      });
+      const admins = await getPlatformAdmins();
 
       if (admins.length > 0) {
         await db.notification.createMany({
@@ -393,13 +382,7 @@ export async function PATCH(req: NextRequest) {
         });
 
         // Notify admins that an approved leave was cancelled by employee
-        const admins = await db.user.findMany({
-          where: {
-            role: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] },
-            status: "ACTIVE",
-          },
-          select: { id: true },
-        });
+        const admins = await getPlatformAdmins();
 
         if (admins.length > 0) {
           await db.notification.createMany({

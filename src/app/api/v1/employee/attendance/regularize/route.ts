@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     const body = await parseBody(req, regularizeSchema);
     const { date, requestedCheckIn, requestedCheckOut, reason, attendanceId, requestedBreaks } = body;
 
-    const targetDate = getCompanyCalendarDate(date, timezone);
+    const targetDate = getCompanyCalendarDate(new Date(date), timezone);
     const today = getCompanyCalendarDate(new Date(), timezone);
 
     // 1. Regularization is only allowed for past dates (cannot regularize today or future)

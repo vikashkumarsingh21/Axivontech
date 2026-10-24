@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
-import { requireEmployee, checkIdempotency } from "@/lib/api/foundation";
+import {
+  requireEmployee,
+  checkIdempotency,
+  getPlatformAdmins,
+} from "@/lib/api/foundation";
 
 const createTicketSchema = z.object({
   subject: z
@@ -57,7 +61,7 @@ export async function GET(req: NextRequest) {
           assignedTo: { select: { id: true, name: true, email: true } },
           replies: {
             include: {
-              user: { select: { id: true, name: true, avatarUrl: true, role: true } },
+              user: { select: { id: true, name: true, avatarUrl: true } },
             },
             orderBy: { createdAt: "asc" },
           },
@@ -118,13 +122,7 @@ export async function POST(req: NextRequest) {
 
     // Double submit protection
     const idempotencyKey = `ticket:${user.id}:${subject.slice(0, 30)}`;
-    if (!checkIdempotency(idempotencyKey, 4000)) {
-      throw new ApiError(
-        429,
-        "A duplicate support request is already processing. Please wait.",
-        "DUPLICATE_SUBMISSION"
-      );
-    }
+    checkIdempotency(idempotencyKey, 4000);
 
     // Generate unique ticket number
     const randomSuffix = Math.floor(100 + Math.random() * 900);
@@ -145,13 +143,7 @@ export async function POST(req: NextRequest) {
 
     // Notify Admins
     try {
-      const admins = await db.user.findMany({
-        where: {
-          role: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] },
-          status: "ACTIVE",
-        },
-        select: { id: true },
-      });
+      const admins = await getPlatformAdmins();
 
       if (admins.length > 0) {
         await db.notification.createMany({
@@ -179,7 +171,7 @@ export async function POST(req: NextRequest) {
       const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
       if (EventBus) {
         await EventBus.emit({
-          eventType: "SUPPORT_TICKET_CREATED",
+          eventType: "SYSTEM_EVENT",
           actorId: user.id,
           entityType: "SUPPORT_TICKET",
           entityId: ticket.id,
