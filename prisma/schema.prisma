@@ -125,6 +125,15 @@ model User {
   assignedPrivacyRequests  PrivacyRequest[] @relation("PrivacyRequestAssignee")
   emailChangeRequests      EmailChangeRequest[] @relation("UserEmailChangeRequests")
 
+  // Employee Portal Enhanced Relations
+  leaveBalances            LeaveBalance[]          @relation("UserLeaveBalances")
+  approvedLeaves           LeaveRequest[]          @relation("LeaveApprovals")
+  supportTickets           SupportTicket[]         @relation("UserSupportTickets")
+  assignedSupportTickets   SupportTicket[]         @relation("AssignedSupportTickets")
+  supportTicketReplies     SupportTicketReply[]    @relation("UserSupportTicketReplies")
+  announcementReads        AnnouncementRead[]
+  documentAcknowledgments  DocumentAcknowledgment[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -687,6 +696,7 @@ model Task {
   @@index([userId])
   @@index([projectId])
   @@index([status])
+  @@index([userId, dueDate])
 }
 
 model TaskComment {
@@ -733,18 +743,26 @@ model LeaveRequest {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  leaveType String // SICK, CASUAL, ANNUAL, UNPAID
+  leaveType String // SICK, CASUAL, ANNUAL, UNPAID, REMOTE
   startDate DateTime @db.Date
   endDate   DateTime @db.Date
   reason    String
 
-  status String @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  isHalfDay   Boolean @default(false)
+  halfDayType String? // FIRST_HALF, SECOND_HALF
+
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  approvedById    String?
+  approvedBy      User?     @relation("LeaveApprovals", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedAt      DateTime?
+  rejectionReason String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
+  @@index([userId, startDate])
 }
 
 model Notification {
@@ -782,6 +800,8 @@ model Announcement {
   publishedAt   DateTime  @default(now())
   expiresAt     DateTime?
 
+  reads AnnouncementRead[]
+
   createdById String?
   createdBy   User?   @relation("AnnouncementCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
@@ -795,6 +815,7 @@ model Announcement {
 
 model Document {
   id              String  @id @default(cuid())
+  acknowledgments DocumentAcknowledgment[]
   title           String
   description     String?
   category        String // COMPANY_POLICY, GUIDELINE, FORM, HR_DOCUMENT, PROJECT_DOCUMENT, CLIENT_DOCUMENT, TEMPLATE, INTERNAL_RESOURCE
@@ -2064,3 +2085,88 @@ model EmailChangeRequest {
 }
 
 
+
+
+model LeaveBalance {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation("UserLeaveBalances", fields: [userId], references: [id], onDelete: Cascade)
+  year          Int
+  leaveType     String   // CASUAL, SICK, PAID, UNPAID
+  totalDays     Float    @default(12)
+  usedDays      Float    @default(0)
+  pendingDays   Float    @default(0)
+  remainingDays Float    @default(12)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, year, leaveType])
+  @@index([userId])
+}
+
+model SupportTicket {
+  id            String               @id @default(cuid())
+  ticketNumber  String               @unique
+  userId        String
+  user          User                 @relation("UserSupportTickets", fields: [userId], references: [id], onDelete: Cascade)
+  category      String               @default("TECHNICAL") // TECHNICAL, HR, PAYROLL, INFRASTRUCTURE, GENERAL
+  priority      String               @default("NORMAL")    // LOW, NORMAL, HIGH, URGENT
+  subject       String
+  message       String
+  attachmentUrl String?
+  status        String               @default("OPEN")      // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+  assignedToId  String?
+  assignedTo    User?                @relation("AssignedSupportTickets", fields: [assignedToId], references: [id], onDelete: SetNull)
+  replies       SupportTicketReply[]
+  resolvedAt    DateTime?
+  closedAt      DateTime?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+  @@index([assignedToId])
+}
+
+model SupportTicketReply {
+  id            String        @id @default(cuid())
+  ticketId      String
+  ticket        SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User          @relation("UserSupportTicketReplies", fields: [userId], references: [id], onDelete: Cascade)
+  message       String
+  attachmentUrl String?
+  isStaffReply  Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+
+  @@index([ticketId])
+  @@index([userId])
+}
+
+model AnnouncementRead {
+  id             String       @id @default(cuid())
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  readAt         DateTime     @default(now())
+
+  @@unique([announcementId, userId])
+  @@index([userId])
+  @@index([announcementId])
+}
+
+model DocumentAcknowledgment {
+  id             String   @id @default(cuid())
+  documentId     String
+  document       Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  acknowledgedAt DateTime @default(now())
+
+  @@unique([documentId, userId])
+  @@index([userId])
+  @@index([documentId])
+}
