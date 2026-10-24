@@ -1,17 +1,18 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { motion } from "framer-motion";
 import {
   Briefcase,
-  Loader2,
   Calendar,
   CheckSquare,
   Search,
   Users,
   FolderGit2,
 } from "lucide-react";
+import { PageHeader } from "@/components/employee/PageHeader";
+import { SkeletonCard } from "@/components/employee/SkeletonCard";
+import { StatusBadge } from "@/components/employee/StatusBadge";
 
 interface ProjectItem {
   id: string;
@@ -51,111 +52,124 @@ export default function EmployeeProjectsPage() {
     );
   }, [projects, searchQuery]);
 
-  const getStatusBadge = (status: string) => {
+  const getStatusVariant = (status: string): "info" | "success" | "warning" | "neutral" => {
     switch (status) {
       case "ACTIVE":
-        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+        return "info";
       case "COMPLETED":
-        return "bg-[#67C5D8]/10 text-[#67C5D8] border-[#67C5D8]/30";
+        return "success";
       case "ON_HOLD":
-        return "bg-amber-500/10 text-amber-400 border-amber-500/30";
+        return "warning";
       default:
-        return "bg-slate-500/10 text-slate-400 border-slate-500/30";
+        return "neutral";
     }
   };
 
   return (
-    <div className="space-y-6 max-w-7xl">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="space-y-6 max-w-7xl"
+    >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#F3F5F7] tracking-tight">
-            Assigned Projects
-          </h1>
-          <p className="text-sm text-[#A7B0BC] mt-1">
-            Active engineering projects, sprint milestones, and team workload assignments.
-          </p>
-        </div>
-
-        <div className="relative w-full sm:w-64">
-          <Search className="w-3.5 h-3.5 text-[#566171] absolute left-3 top-3 pointer-events-none" />
-          <Input
-            type="text"
-            placeholder="Search projects..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-9 pl-8 bg-[#10151B] border-[#29313B] text-xs text-[#F3F5F7] placeholder:text-[#566171] focus-visible:border-emerald-500"
-          />
-        </div>
-      </div>
+      <PageHeader
+        title="Assigned Projects"
+        subtitle="Active engineering projects, sprint milestones, and team workload assignments."
+        action={
+          <div className="relative w-full sm:w-64">
+            <Search className="w-3.5 h-3.5 text-[#566171] absolute left-3 top-3 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search projects..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-9 pl-8 pr-3 bg-[#111317] border border-[#1E2530] rounded-xl text-xs text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0]"
+            />
+          </div>
+        }
+      />
 
       {loading ? (
-        <div className="flex items-center justify-center p-16 text-[#7E8997] gap-3">
-          <Loader2 className="animate-spin w-5 h-5 text-emerald-500" />
-          <span>Loading project workload...</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonCard key={i} className="h-48" />
+          ))}
         </div>
       ) : filteredProjects.length === 0 ? (
-        <Card className="p-12 text-center bg-[#151A21] border-[#29313B] rounded-xl space-y-2">
-          <FolderGit2 className="w-10 h-10 text-[#566171] mx-auto" />
-          <h3 className="text-base font-semibold text-[#F3F5F7]">No projects found</h3>
-          <p className="text-xs text-[#7E8997]">
-            {searchQuery
-              ? "No projects match your query."
-              : "No projects are currently assigned to your team profile."}
-          </p>
-        </Card>
+        <div className="p-12 text-center bg-[#111317] border border-[#1E2530] rounded-xl space-y-4">
+          <div className="w-16 h-16 mx-auto rounded-full bg-[#171A1F] flex items-center justify-center border border-[#22262D]">
+            <svg
+              className="w-8 h-8 text-[#5FA8A0]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-base font-semibold text-[#E6E8EB]">No projects found</h3>
+            <p className="text-xs text-[#566171] max-w-sm mx-auto mt-1">
+              {searchQuery
+                ? "No projects match your search query."
+                : "No projects are currently assigned to your team profile."}
+            </p>
+          </div>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredProjects.map((p) => (
-            <Card
+            <div
               key={p.id}
-              className="p-6 bg-[#151A21] border-[#29313B] rounded-2xl space-y-4 hover:border-[#364152] transition-all flex flex-col justify-between"
+              className="p-6 bg-[#111317] border border-[#1E2530] rounded-xl space-y-4 hover:border-[#22262D] transition-all flex flex-col justify-between"
             >
               <div className="space-y-3">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] flex items-center justify-center text-[#5FA8A0] shrink-0">
                       <Briefcase className="w-5 h-5" />
                     </div>
                     <div>
-                      <h2 className="text-base font-bold text-[#F3F5F7]">{p.name}</h2>
-                      <span className="text-xs text-[#7E8997] flex items-center gap-1.5 mt-0.5">
+                      <h2 className="text-base font-bold text-[#E6E8EB]">{p.name}</h2>
+                      <span className="text-xs text-[#566171] flex items-center gap-1.5 mt-0.5">
                         <Calendar className="w-3 h-3 text-[#D6B779]" />
                         {p.startDate ? new Date(p.startDate).toLocaleDateString() : "Active Sprint"}
                       </span>
                     </div>
                   </div>
 
-                  <span
-                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${getStatusBadge(
-                      p.status
-                    )}`}
-                  >
+                  <StatusBadge variant={getStatusVariant(p.status)}>
                     {p.status}
-                  </span>
+                  </StatusBadge>
                 </div>
 
-                <p className="text-xs text-[#A7B0BC] leading-relaxed line-clamp-3">
+                <p className="text-xs text-[#8B94A1] leading-relaxed line-clamp-3">
                   {p.description || "Production engineering project for Axivon client deliverables."}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#1E2530] text-xs text-[#7E8997]">
+              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#1E2530] text-xs text-[#566171]">
                 <div className="flex items-center gap-1.5">
-                  <CheckSquare className="w-4 h-4 text-emerald-400" />
-                  <span className="text-[#F3F5F7] font-medium">{p._count?.tasks || 0}</span>
+                  <CheckSquare className="w-4 h-4 text-[#5FA8A0]" />
+                  <span className="text-[#E6E8EB] font-medium">{p._count?.tasks || 0}</span>
                   <span>Tasks</span>
                 </div>
                 <div className="flex items-center gap-1.5 justify-end">
                   <Users className="w-4 h-4 text-[#67C5D8]" />
-                  <span className="text-[#F3F5F7] font-medium">{p._count?.members || 1}</span>
+                  <span className="text-[#E6E8EB] font-medium">{p._count?.members || 1}</span>
                   <span>Members</span>
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
