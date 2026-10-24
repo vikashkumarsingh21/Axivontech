@@ -1,8 +1,28 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { portfolioProjects, getProjectBySlug } from "@/data/portfolio";
 import { generateStaticParams, generateMetadata } from "@/app/portfolio/[slug]/page";
 import sitemap from "@/app/sitemap";
 import robots from "@/app/robots";
+
+vi.mock("@/lib/db", () => ({
+  db: {
+    systemSetting: {
+      findUnique: vi.fn().mockResolvedValue(null),
+    },
+    service: {
+      findMany: vi.fn().mockResolvedValue([]),
+    },
+    article: {
+      findMany: vi.fn().mockResolvedValue([]),
+    },
+    jobPosting: {
+      findMany: vi.fn().mockResolvedValue([]),
+    },
+    careersPageSetting: {
+      findUnique: vi.fn().mockResolvedValue(null),
+    },
+  },
+}));
 
 describe("Portfolio Case Studies & SEO Synchronization Tests", () => {
   it("should have all 4 canonical projects with comprehensive case study data", () => {

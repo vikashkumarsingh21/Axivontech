@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { JobRunner } from "@/lib/jobs/runner";
+import { verifyCronRequest } from "@/lib/auth/cron";
+import { handleApiError } from "@/lib/api-error";
 
-// In production, this would be secured by a cron secret (e.g., verifying a Vercel Cron header)
 export async function GET(req: Request) {
   try {
+    // Strictly verify cron authentication before any job scheduling or execution
+    verifyCronRequest(req);
+
     // Enqueue the job so the background worker or POST /api/v1/admin/jobs can pick it up
     const job = await JobRunner.enqueue("INACTIVE_USER_CLEANUP");
     
@@ -12,6 +16,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ success: true, enqueued: job, processed: results });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return handleApiError(error);
   }
 }
+

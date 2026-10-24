@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
       db.user.count({
         where: {
           status: "ACTIVE",
-          userRoles: { none: { role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER", "BROKER", "CLIENT"] } } } },
+          userRoles: { none: { role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER", "BROKER", "BUSINESS_PARTNER", "CLIENT"] } } } },
         },
       }),
       db.attendance.count({

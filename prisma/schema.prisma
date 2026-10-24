@@ -123,6 +123,7 @@ model User {
   // Legal & Privacy Relations
   publishedPolicies        LegalPolicy[]    @relation("PolicyPublisher")
   assignedPrivacyRequests  PrivacyRequest[] @relation("PrivacyRequestAssignee")
+  emailChangeRequests      EmailChangeRequest[] @relation("UserEmailChangeRequests")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -2032,6 +2033,34 @@ model UserConsentRecord {
 
   @@index([consentKey])
   @@index([timestamp])
+}
+
+// -----------------------------------------------------------------------------
+// PROFILE & ACCOUNT SECURITY MODELS
+// -----------------------------------------------------------------------------
+
+model EmailChangeRequest {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation("UserEmailChangeRequests", fields: [userId], references: [id], onDelete: Cascade)
+  oldEmail    String
+  newEmail    String
+  tokenHash   String    @unique
+  status      String    @default("PENDING") // PENDING, VERIFIED, EXPIRED, CANCELLED, SUPERSEDED
+  expiresAt   DateTime
+  requestedAt DateTime  @default(now())
+  verifiedAt  DateTime?
+  cancelledAt DateTime?
+  ipAddress   String?
+  userAgent   String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([newEmail])
+  @@index([status])
 }
 
 

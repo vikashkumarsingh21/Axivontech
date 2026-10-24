@@ -35,15 +35,15 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. Forward to external script if configured
-    fetch(
-      "https://script.google.com/macros/s/AKfycbwXF63WF4xQAMDJbv2yLiJSXamBxC47Ndu3M921vKteL3WsHYPnaEih-otyWSf6Xdg6/exec",
-      {
+    // 1. Forward to external script if securely configured via env
+    const leadWebhookUrl = process.env.GOOGLE_SHEETS_LEAD_WEBHOOK_URL?.trim();
+    if (leadWebhookUrl && leadWebhookUrl.startsWith("https://")) {
+      fetch(leadWebhookUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      }
-    ).catch((err) => console.error("Google script webhook error:", err));
+      }).catch((err) => console.error("Google script webhook error:", err));
+    }
 
     // 2. Create CRM Lead in database automatically
     const normalizedEmail = email.trim().toLowerCase();

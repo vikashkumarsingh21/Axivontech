@@ -2,21 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { validateActiveUser } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
-
-const ROLE_PRIORITY: Record<string, number> = {
-  FOUNDER: 100,
-  CO_FOUNDER: 95,
-  ADMIN: 90,
-  EXECUTIVE: 80,
-  HR: 70,
-  FINANCE: 70,
-  LEAD_DEVELOPER: 60,
-  EMPLOYEE: 50,
-  BROKER: 40,
-  BUSINESS_PARTNER: 40,
-  CLIENT: 30,
-  USER: 10,
-};
+import { ROLE_PRIORITY, normalizeRole } from "@/lib/auth/roles";
 
 export async function GET(req: NextRequest) {
   try {
@@ -53,7 +39,7 @@ export async function GET(req: NextRequest) {
       throw new ApiError(404, "User not found");
     }
 
-    const roleNames = user.userRoles.map((ur) => ur.role.name);
+    const roleNames = user.userRoles.map((ur) => normalizeRole(ur.role.name));
     const sortedRoles = [...roleNames].sort(
       (a, b) => (ROLE_PRIORITY[b] || 0) - (ROLE_PRIORITY[a] || 0)
     );

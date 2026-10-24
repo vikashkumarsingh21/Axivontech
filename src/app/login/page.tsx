@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { Eye, EyeOff, AlertCircle, Lock, Mail, CheckCircle2, X } from "lucide-react";
 import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 import { LoginPosterCarousel } from "@/components/auth/LoginPosterCarousel";
+import { resolveRoleDashboardUrl } from "@/lib/auth/roles";
 
 export default function LoginPage() {
   // Form input states
@@ -114,19 +115,8 @@ export default function LoginPage() {
         throw new Error(data.error || "Login failed");
       }
 
-      // Success, route based on user primary role
-      const userRole = data.user.role;
-      if (userRole === "FOUNDER" || userRole === "CO_FOUNDER") {
-        router.push("/executive/dashboard");
-      } else if (userRole === "ADMIN") {
-        router.push("/admin/dashboard");
-      } else if (userRole === "BROKER" || userRole === "BUSINESS_PARTNER") {
-        router.push("/broker/dashboard");
-      } else if (userRole === "CLIENT") {
-        router.push("/client/dashboard");
-      } else {
-        router.push("/employee/dashboard");
-      }
+      // Success, route based on normalized primary role via centralized resolver
+      router.push(resolveRoleDashboardUrl(data.user.role));
     } catch (err: any) {
       setCaptchaToken("");
       setRecaptchaResetCount((prev) => prev + 1);

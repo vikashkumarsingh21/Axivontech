@@ -62,6 +62,17 @@ export async function POST(req: NextRequest) {
       throw new ApiError(400, "A pending regularization request already exists for this date");
     }
 
+    // IDOR Protection: If attendanceId is provided, verify it belongs to the authenticated user
+    if (attendanceId) {
+      const targetAttendance = await db.attendance.findUnique({
+        where: { id: attendanceId },
+        select: { userId: true },
+      });
+      if (!targetAttendance || targetAttendance.userId !== user.id) {
+        throw new ApiError(403, "Forbidden: You can only regularize your own attendance records");
+      }
+    }
+
     const regularization = await db.regularizationRequest.create({
       data: {
         userId: user.id,

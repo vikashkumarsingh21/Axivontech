@@ -187,8 +187,8 @@ export async function POST(req: NextRequest) {
     });
 
     // Synchronize to Google Sheets / Excel external integration (resilient: failure does not block lead creation)
-    const googleSheetWebhook = process.env.GOOGLE_SHEETS_LEAD_WEBHOOK_URL || "https://script.google.com/macros/s/AKfycbwXF63WF4xQAMDJbv2yLiJSXamBxC47Ndu3M921vKteL3WsHYPnaEih-otyWSf6Xdg6/exec";
-    if (googleSheetWebhook) {
+    const googleSheetWebhook = process.env.GOOGLE_SHEETS_LEAD_WEBHOOK_URL?.trim();
+    if (googleSheetWebhook && googleSheetWebhook.startsWith("https://")) {
       fetch(googleSheetWebhook, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

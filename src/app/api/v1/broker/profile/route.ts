@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ApiError, handleApiError } from "@/lib/api-error";
+import { getAuthenticatedSession } from "@/lib/auth/session";
+import { normalizeRole, canAccessPartnerPortal } from "@/lib/auth/roles";
 
 export async function GET(req: Request) {
   try {
-    const brokerId = req.headers.get("x-user-id");
-    const role = req.headers.get("x-user-role");
+    const session = await getAuthenticatedSession(req);
+    const role = normalizeRole(session.role);
 
-    if (!brokerId || role !== "BROKER") {
-      throw new ApiError(403, "Access denied. Brokers only.");
+    if (!canAccessPartnerPortal(role)) {
+      throw new ApiError(403, "Access denied. Partners only.");
     }
+
+    const brokerId = session.userId;
 
     const user = await db.user.findUnique({
       where: { id: brokerId },

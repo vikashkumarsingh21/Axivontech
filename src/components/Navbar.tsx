@@ -12,6 +12,7 @@ import {
 } from "framer-motion";
 import { ChevronDown, Briefcase, Sparkles, ArrowRight } from "lucide-react";
 import { isPortalOrStandaloneRoute } from "@/lib/utils";
+import { trackCtaClick } from "@/lib/analytics";
 
 const EASE_NAV = [0.22, 1, 0.36, 1] as const;
 
@@ -372,12 +373,23 @@ export default function Navbar({ careersEnabled = false }: { careersEnabled?: bo
 
           <motion.a
             href="/contact#contact-form"
+            onClick={() => trackCtaClick("Get Free Quote", "header_desktop")}
             whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
             whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
             className="hidden rounded-full bg-[#e8a064] px-5 py-2.5 text-sm font-semibold tracking-tight text-[#0f0f0f] shadow-[0_4px_16px_rgba(232,160,100,0.25)] transition-colors hover:bg-[#f0b07a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40 lg:inline-flex"
           >
-            Book Consultation
+            Get Free Quote
           </motion.a>
+
+          {/* ── Quick Header CTA (mobile / tablet) ─────────────── */}
+          <Link
+            href="/contact#contact-form"
+            onClick={() => trackCtaClick("Get Quote", "header_mobile")}
+            className="inline-flex lg:hidden items-center justify-center rounded-full bg-[#e8a064] px-3.5 py-2 text-xs font-bold tracking-tight text-[#0f0f0f] shadow-[0_2px_12px_rgba(232,160,100,0.25)] hover:bg-[#f0b07a] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/50"
+            aria-label="Get Free Project Quote"
+          >
+            Get Quote
+          </Link>
 
           {/* ── Hamburger Button (mobile / tablet) ───────────────── */}
           <button
@@ -574,10 +586,13 @@ export default function Navbar({ careersEnabled = false }: { careersEnabled?: bo
               <div className="flex flex-col gap-3">
                 <Link
                   href="/contact#contact-form"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    trackCtaClick("Get Free Quote", "header_mobile_drawer");
+                    setIsOpen(false);
+                  }}
                   className="flex items-center justify-center gap-2 rounded-full bg-[#e8a064] px-6 py-4 text-base font-semibold text-[#0f0f0f] shadow-[0_4px_16px_rgba(232,160,100,0.25)] transition-colors hover:bg-[#f0b07a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]/40"
                 >
-                  Book Consultation
+                  Get Free Quote
                 </Link>
                 <Link
                   href="/login"

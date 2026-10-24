@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getAuthenticatedSession } from "@/lib/auth/session";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { resolveDateRange, DateRangePreset } from "@/lib/bi/date-filters";
 import { BusinessIntelligenceService } from "@/lib/bi/metrics";
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      throw new ApiError(401, "Unauthorized");
-    }
+    const session = await getAuthenticatedSession(req);
+    const userId = session.userId;
 
     const user = await db.user.findUnique({
       where: { id: userId },

@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
+import { getAuthenticatedSession } from "@/lib/auth/session";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { resolveDateRange, DateRangePreset } from "@/lib/bi/date-filters";
 import { generateCsv, CsvColumn } from "@/lib/bi/csv-export";
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      throw new ApiError(401, "Unauthorized");
-    }
+    const session = await getAuthenticatedSession(req);
+    const userId = session.userId;
 
     const { searchParams } = new URL(req.url);
     const reportType = searchParams.get("reportType") || "leads";

@@ -1,16 +1,20 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { handleApiError, ApiError } from "@/lib/api-error";
+import { getAuthenticatedSession } from "@/lib/auth/session";
+import { normalizeRole, canAccessPartnerPortal } from "@/lib/auth/roles";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
   try {
-    const brokerId = req.headers.get("x-user-id");
-    const role = req.headers.get("x-user-role");
+    const session = await getAuthenticatedSession(req);
+    const role = normalizeRole(session.role);
 
-    if (!brokerId || role !== "BROKER") {
-      throw new ApiError(403, "Forbidden. Only Brokers can generate a referral code.");
+    if (!canAccessPartnerPortal(role)) {
+      throw new ApiError(403, "Forbidden. Only Partners can generate a referral code.");
     }
+
+    const brokerId = session.userId;
 
     const brokerProfile = await db.brokerProfile.findUnique({
       where: { userId: brokerId },

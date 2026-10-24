@@ -33,7 +33,7 @@ export async function GET(req: Request) {
     const skip = (page - 1) * limit;
 
     const where: any = {
-      userRoles: { some: { role: { name: "BROKER" } } },
+      userRoles: { some: { role: { name: { in: ["BUSINESS_PARTNER", "BROKER"] } } } },
     };
 
     if (statusFilter) {
@@ -113,10 +113,13 @@ export async function POST(req: Request) {
       throw new ApiError(409, "An account with this email address already exists.");
     }
 
-    let brokerRole = await db.role.findUnique({ where: { name: "BROKER" } });
+    let brokerRole = await db.role.findFirst({
+      where: { name: { in: ["BUSINESS_PARTNER", "BROKER"] } },
+      orderBy: { name: "asc" }, // prefers BUSINESS_PARTNER if present
+    });
     if (!brokerRole) {
       brokerRole = await db.role.create({
-        data: { name: "BROKER", description: "External Referral Partner" },
+        data: { name: "BUSINESS_PARTNER", description: "Business Partner / Broker" },
       });
     }
 

@@ -21,20 +21,21 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
       throw new ApiError(400, "Administrators cannot approve their own leave requests");
     }
 
-    const updated = await db.leaveRequest.update({
-      where: { id },
-      data: { status: "APPROVED" },
-    });
-
-    await db.notification.create({
-      data: {
-        userId: leave.userId,
-        type: "LEAVE_UPDATED",
-        title: "Leave Approved",
-        message: `Your ${leave.leaveType.toLowerCase()} leave request has been approved.`,
-        link: "/employee/leave",
-      },
-    });
+    const [updated] = await db.$transaction([
+      db.leaveRequest.update({
+        where: { id },
+        data: { status: "APPROVED" },
+      }),
+      db.notification.create({
+        data: {
+          userId: leave.userId,
+          type: "LEAVE_UPDATED",
+          title: "Leave Approved",
+          message: `Your ${leave.leaveType.toLowerCase()} leave request has been approved.`,
+          link: "/employee/leave",
+        },
+      }),
+    ]);
 
     const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
     if (EventBus) {

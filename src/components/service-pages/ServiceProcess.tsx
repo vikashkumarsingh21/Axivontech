@@ -525,6 +525,74 @@ function StepCard({
 
 // ─── Desktop Zigzag Layout ─────────────────────────────────────────────────────
 
+function DesktopTimelineRow({
+  step,
+  index,
+  reduced,
+}: {
+  step: { title: string; description: string };
+  index: number;
+  reduced: boolean;
+}) {
+  const isLeft = index % 2 === 0;
+  const accent = ACCENT_CYCLE[index % 3];
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(cardRef, { once: true, margin: "-60px" });
+
+  return (
+    <div ref={cardRef} className="relative grid grid-cols-2 gap-0 items-center">
+      {/* Left slot */}
+      <div className="pr-12 flex justify-end">
+        {isLeft ? (
+          <div className="w-full max-w-[420px]">
+            <StepCard step={step} index={index} side="left" reduced={reduced} />
+          </div>
+        ) : (
+          <div className="flex-1 flex items-center justify-end pr-0">
+            <motion.div
+              className="h-[1px] flex-1 max-w-[80px]"
+              style={{
+                background: `linear-gradient(to left, ${accent.primary}00, ${accent.primary}60)`,
+                originX: 1,
+              }}
+              initial={{ scaleX: 0 }}
+              animate={isInView ? { scaleX: 1 } : {}}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Center connector */}
+      <div className="absolute left-1/2 -translate-x-1/2 z-10">
+        <ConnectorDot color={accent.primary} reduced={reduced} inView={isInView} />
+      </div>
+
+      {/* Right slot */}
+      <div className="pl-12 flex justify-start">
+        {!isLeft ? (
+          <div className="w-full max-w-[420px]">
+            <StepCard step={step} index={index} side="right" reduced={reduced} />
+          </div>
+        ) : (
+          <div className="flex-1 flex items-center pl-0">
+            <motion.div
+              className="h-[1px] flex-1 max-w-[80px]"
+              style={{
+                background: `linear-gradient(to right, ${accent.primary}00, ${accent.primary}60)`,
+                originX: 0,
+              }}
+              initial={{ scaleX: 0 }}
+              animate={isInView ? { scaleX: 1 } : {}}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function DesktopTimeline({
   steps,
   reduced,
@@ -537,72 +605,39 @@ function DesktopTimeline({
       <TimelineBeam reduced={reduced} />
 
       <div className="relative space-y-16">
-        {steps.map((step, i) => {
-          const isLeft = i % 2 === 0;
-          const accent = ACCENT_CYCLE[i % 3];
-          const cardRef = useRef<HTMLDivElement>(null);
-          const isInView = useInView(cardRef, { once: true, margin: "-60px" });
-
-          return (
-            <div key={step.title} ref={cardRef} className="relative grid grid-cols-2 gap-0 items-center">
-              {/* Left slot */}
-              <div className="pr-12 flex justify-end">
-                {isLeft ? (
-                  <div className="w-full max-w-[420px]">
-                    <StepCard step={step} index={i} side="left" reduced={reduced} />
-                  </div>
-                ) : (
-                  /* Connector line from center to left card area */
-                  <div className="flex-1 flex items-center justify-end pr-0">
-                    <motion.div
-                      className="h-[1px] flex-1 max-w-[80px]"
-                      style={{
-                        background: `linear-gradient(to left, ${accent.primary}00, ${accent.primary}60)`,
-                        originX: 1,
-                      }}
-                      initial={{ scaleX: 0 }}
-                      animate={isInView ? { scaleX: 1 } : {}}
-                      transition={{ duration: 0.6, delay: 0.2 }}
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Center connector */}
-              <div className="absolute left-1/2 -translate-x-1/2 z-10">
-                <ConnectorDot color={accent.primary} reduced={reduced} inView={isInView} />
-              </div>
-
-              {/* Right slot */}
-              <div className="pl-12 flex justify-start">
-                {!isLeft ? (
-                  <div className="w-full max-w-[420px]">
-                    <StepCard step={step} index={i} side="right" reduced={reduced} />
-                  </div>
-                ) : (
-                  <div className="flex-1 flex items-center pl-0">
-                    <motion.div
-                      className="h-[1px] flex-1 max-w-[80px]"
-                      style={{
-                        background: `linear-gradient(to right, ${accent.primary}00, ${accent.primary}60)`,
-                        originX: 0,
-                      }}
-                      initial={{ scaleX: 0 }}
-                      animate={isInView ? { scaleX: 1 } : {}}
-                      transition={{ duration: 0.6, delay: 0.2 }}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {steps.map((step, i) => (
+          <DesktopTimelineRow key={step.title} step={step} index={i} reduced={reduced} />
+        ))}
       </div>
     </div>
   );
 }
 
 // ─── Mobile / Tablet Single Column ────────────────────────────────────────────
+
+function MobileTimelineItem({
+  step,
+  index,
+  reduced,
+}: {
+  step: { title: string; description: string };
+  index: number;
+  reduced: boolean;
+}) {
+  const accent = ACCENT_CYCLE[index % 3];
+  const dotRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(dotRef, { once: true, margin: "-60px" });
+
+  return (
+    <div className="relative">
+      {/* Dot on left rail */}
+      <div ref={dotRef} className="absolute -left-14 top-6 z-10">
+        <ConnectorDot color={accent.primary} reduced={reduced} inView={isInView} />
+      </div>
+      <StepCard step={step} index={index} side="right" reduced={reduced} />
+    </div>
+  );
+}
 
 function MobileTimeline({
   steps,
@@ -616,21 +651,9 @@ function MobileTimeline({
       <MobileTimelineLine reduced={reduced} />
 
       <div className="space-y-10">
-        {steps.map((step, i) => {
-          const accent = ACCENT_CYCLE[i % 3];
-          const dotRef = useRef<HTMLDivElement>(null);
-          const isInView = useInView(dotRef, { once: true, margin: "-60px" });
-
-          return (
-            <div key={step.title} className="relative">
-              {/* Dot on left rail */}
-              <div ref={dotRef} className="absolute -left-14 top-6 z-10">
-                <ConnectorDot color={accent.primary} reduced={reduced} inView={isInView} />
-              </div>
-              <StepCard step={step} index={i} side="right" reduced={reduced} />
-            </div>
-          );
-        })}
+        {steps.map((step, i) => (
+          <MobileTimelineItem key={step.title} step={step} index={i} reduced={reduced} />
+        ))}
       </div>
     </div>
   );

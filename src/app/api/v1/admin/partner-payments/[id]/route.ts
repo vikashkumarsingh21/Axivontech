@@ -65,9 +65,9 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
       let commAmount = 0;
       if (activeRule && brokerProfileId) {
         if (activeRule.type === "PERCENTAGE") {
-          commAmount = (payment.projectPrice * activeRule.value) / 100;
+          commAmount = Math.round(((payment.projectPrice * activeRule.value) / 100) * 100) / 100;
         } else {
-          commAmount = activeRule.value;
+          commAmount = Math.round(activeRule.value * 100) / 100;
         }
       }
 

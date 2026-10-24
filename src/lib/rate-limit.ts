@@ -66,4 +66,8 @@ export const RATE_LIMIT_PRESETS = {
   RESUME_UPLOAD: { windowMs: 15 * 60 * 1000, maxRequests: 5 },    // 5 uploads per 15 min
   SENSITIVE_API: { windowMs: 60 * 1000, maxRequests: 30 },        // 30 req per min
   GENERAL_API: { windowMs: 60 * 1000, maxRequests: 100 },         // 100 req per min
+  EMAIL_CHANGE_REQUEST: { windowMs: 15 * 60 * 1000, maxRequests: 3 }, // 3 requests per 15 min
+  EMAIL_CHANGE_VERIFY: { windowMs: 15 * 60 * 1000, maxRequests: 10 }, // 10 attempts per 15 min
+  PROFILE_UPDATE: { windowMs: 60 * 1000, maxRequests: 30 },       // 30 req per min
 };
+

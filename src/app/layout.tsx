@@ -14,6 +14,7 @@ import CookieConsentBanner from "@/components/legal/CookieConsentBanner";
 import CookieSettingsButton from "@/components/legal/CookieSettingsButton";
 
 const ChatWidget = dynamic(() => import('@/components/chatbot/ChatWidget'));
+const FloatingWhatsAppButton = dynamic(() => import('@/components/conversion/FloatingWhatsAppButton'));
 
 import { Inter, Manrope, JetBrains_Mono } from "next/font/google";
 
@@ -155,6 +156,7 @@ export default async function RootLayout({
 
         <GoogleAnalytics measurementId={seo.gaMeasurementId} />
 
+        <FloatingWhatsAppButton />
         <ChatWidget />
         <CookieConsentBanner />
         <CookieSettingsButton />

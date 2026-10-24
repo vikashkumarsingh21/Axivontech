@@ -19,20 +19,21 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
     if (!leave) throw new ApiError(404, "Leave request not found");
     if (leave.status !== "PENDING") throw new ApiError(400, "This leave request has already been processed");
 
-    const updated = await db.leaveRequest.update({
-      where: { id },
-      data: { status: "REJECTED" },
-    });
-
-    await db.notification.create({
-      data: {
-        userId: leave.userId,
-        type: "LEAVE_UPDATED",
-        title: "Leave Request Rejected",
-        message: reason,
-        link: "/employee/leave",
-      },
-    });
+    const [updated] = await db.$transaction([
+      db.leaveRequest.update({
+        where: { id },
+        data: { status: "REJECTED" },
+      }),
+      db.notification.create({
+        data: {
+          userId: leave.userId,
+          type: "LEAVE_UPDATED",
+          title: "Leave Request Rejected",
+          message: reason,
+          link: "/employee/leave",
+        },
+      }),
+    ]);
 
     const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
     if (EventBus) {

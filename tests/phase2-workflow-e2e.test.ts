@@ -523,7 +523,7 @@ describe("Phase 2: Broker-to-Client Business Workflow & Direct Client Lifecycle"
       expect(reportHtml).toContain("AXIVON TECHNOLOGIES");
       expect(reportHtml).toContain("PRJ-20261021-0001");
       expect(reportHtml).toContain("DirectTech Pvt Ltd");
-      expect(reportHtml).toContain("Architecture & Infrastructure");
+      expect(reportHtml).toContain("Architecture &amp; Infrastructure");
       expect(reportHtml).toContain("Direct Contractual Handover Certification");
       expect(reportHtml).toContain("executed directly by");
       expect(reportHtml).toContain("Axivon Technologies");

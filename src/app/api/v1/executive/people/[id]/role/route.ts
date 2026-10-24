@@ -8,9 +8,7 @@ import { handleApiError, ApiError } from "@/lib/api-error";
 const VALID_ROLES = ["EMPLOYEE", "ADMIN", "CO_FOUNDER"] as const;
 
 const changeRoleSchema = z.object({
-  roleName: z.enum(VALID_ROLES, {
-    message: "Invalid role. Allowed: EMPLOYEE, ADMIN, CO_FOUNDER"
-  }),
+  roleName: z.enum(VALID_ROLES),
 });
 
 export async function PATCH(

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
+import { normalizeRole, resolveRoleDashboardUrl, canAccessPartnerPortal } from "@/lib/auth/roles";
 
 // Need to duplicate secret resolution for Edge runtime compatibility
 // process.env.SESSION_SECRET is available in Edge middleware if defined in .env
@@ -92,23 +93,11 @@ export async function middleware(req: NextRequest) {
         algorithms: ["HS256"],
       });
 
-      // Role based basic checks
-      const role = payload.role as string;
+      // Role based checks with canonical role normalization
+      const role = normalizeRole(payload.role as string);
       
       const getRoleRedirectUrl = (userRole: string) => {
-        if (userRole === "BROKER" || userRole === "BUSINESS_PARTNER") {
-          return new URL("/broker/dashboard", req.url);
-        }
-        if (userRole === "CLIENT") {
-          return new URL("/client/dashboard", req.url);
-        }
-        if (userRole === "FOUNDER" || userRole === "CO_FOUNDER") {
-          return new URL("/executive/dashboard", req.url);
-        }
-        if (userRole === "ADMIN") {
-          return new URL("/admin/dashboard", req.url);
-        }
-        return new URL("/employee/dashboard", req.url);
+        return new URL(resolveRoleDashboardUrl(userRole), req.url);
       };
 
       if ((isAdminRoute || isAdminApiRoute || isAnalyticsApiRoute) && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
@@ -125,14 +114,14 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(getRoleRedirectUrl(role));
       }
 
-      if ((isEmployeeRoute || isEmployeeApiRoute) && (role === "BROKER" || role === "BUSINESS_PARTNER" || role === "CLIENT")) {
+      if ((isEmployeeRoute || isEmployeeApiRoute) && (role === "BUSINESS_PARTNER" || role === "CLIENT")) {
         if (isEmployeeApiRoute) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
         return NextResponse.redirect(getRoleRedirectUrl(role));
       }
 
-      if ((isBrokerRoute || isBrokerApiRoute) && role !== "BROKER" && role !== "BUSINESS_PARTNER" && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
+      if ((isBrokerRoute || isBrokerApiRoute) && !canAccessPartnerPortal(role)) {
         if (isBrokerApiRoute) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
@@ -146,9 +135,9 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(getRoleRedirectUrl(role));
       }
 
-      // Add user info to headers for downstream consumption securely
+      // Add user info to headers for downstream consumption securely (always canonical role)
       requestHeaders.set("x-user-id", payload.userId as string);
-      requestHeaders.set("x-user-role", payload.role as string);
+      requestHeaders.set("x-user-role", role);
 
       return NextResponse.next({
         request: {
@@ -188,6 +177,8 @@ export const config = {
     "/api/v1/client/:path*",
     "/crm/:path*",
     "/api/v1/crm/:path*",
+    "/api/v1/analytics/:path*",
+    "/api/v1/jobs/:path*",
     "/api/v1/me/:path*",
     "/api/v1/notifications/:path*",
     "/api/v1/reminders/:path*",

@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Mail,
+  Phone,
   MessageCircle,
   Globe2,
   Sparkles,
@@ -18,12 +19,15 @@ import {
   Clock,
   Layers,
   RotateCcw,
+  FileText,
 } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import Link from "next/link";
 import { trackLeadSubmission, trackWhatsAppClick } from "@/lib/analytics";
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
 import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
+import { CONTACT_CONFIG, getWhatsAppUrl, getPhoneTelLink, getEmailMailtoLink } from "@/config/contact";
 
 interface FormData {
   service: string;
@@ -109,6 +113,13 @@ export default function ContactForm() {
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{
+    service?: string;
+    message?: string;
+    fullName?: string;
+    email?: string;
+    phone?: string;
+  }>({});
   const [assignedLeadCode, setAssignedLeadCode] = useState<string | null>(null);
   const [contextSource, setContextSource] = useState<{ label: string; type: "demo" | "service" | "industry" } | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string>("");
@@ -175,23 +186,30 @@ export default function ContactForm() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
     setErrorMsg("");
   };
 
   const handleClearContext = () => {
     setContextSource(null);
     setFormData(INITIAL_FORM_DATA);
+    setFieldErrors({});
     setCurrentStep(1);
   };
 
   const validateStep1 = (): boolean => {
+    const errors: { service?: string; message?: string } = {};
     if (!formData.service) {
-      setErrorMsg("Please select a primary service.");
-      return false;
+      errors.service = "Please select a required primary service.";
     }
     if (!formData.message || formData.message.trim().length < 10) {
-      setErrorMsg("Please provide a brief description of your project (minimum 10 characters).");
+      errors.message = "Please describe your project brief (minimum 10 characters).";
+    }
+    setFieldErrors((prev) => ({ ...prev, ...errors }));
+    if (errors.service || errors.message) {
+      setErrorMsg("Please complete the required project scope fields below.");
       return false;
     }
     setErrorMsg("");
@@ -199,16 +217,19 @@ export default function ContactForm() {
   };
 
   const validateStep2 = (): boolean => {
+    const errors: { fullName?: string; email?: string; phone?: string } = {};
     if (!formData.fullName || formData.fullName.trim().length === 0) {
-      setErrorMsg("Please enter your full name.");
-      return false;
+      errors.fullName = "Please enter your full name.";
     }
     if (!formData.email || !EMAIL_REGEX.test(formData.email.trim())) {
-      setErrorMsg("Please enter a valid email address.");
-      return false;
+      errors.email = "Please enter a valid work or personal email address.";
     }
     if (!formData.phone || !PHONE_REGEX.test(formData.phone.trim())) {
-      setErrorMsg("Please enter a valid phone number (7 to 15 digits).");
+      errors.phone = "Please enter a valid phone number (at least 7 digits).";
+    }
+    setFieldErrors((prev) => ({ ...prev, ...errors }));
+    if (errors.fullName || errors.email || errors.phone) {
+      setErrorMsg("Please complete the required contact information fields below.");
       return false;
     }
     setErrorMsg("");
@@ -335,45 +356,146 @@ export default function ContactForm() {
                 Whether you have a full functional specification, want to build on one of our live demo architectures, or just have an idea, we&apos;re here to engineer a system that delivers measurable results.
               </p>
               
-              <div className="mt-10 space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
-                    <Mail className="h-4 w-4 text-[#e8a064]" />
+              <div className="mt-8 space-y-4">
+                {/* Direct Phone / Click to Call */}
+                <div className="flex items-start gap-3.5 rounded-xl border border-[#222730] bg-[#141820]/60 p-4 transition-colors hover:border-[#e8a064]/40">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1a202a] border border-[#2a3340] text-[#e8a064]">
+                    <Phone className="h-4 w-4" />
                   </div>
-                  <div>
-                    <h3 className="font-heading text-sm font-semibold text-[#F3F5F7]">Direct Inquiries</h3>
-                    <a href="mailto:contact@axivontech.in" className="mt-0.5 text-sm text-[#A7B0BC] hover:text-[#e8a064] transition-colors block">
-                      contact@axivontech.in
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-heading text-xs font-semibold uppercase tracking-wider text-[#7E8997]">
+                        Direct Phone
+                      </h3>
+                      <span className="text-[10px] font-mono font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                        Click to call
+                      </span>
+                    </div>
+                    <a
+                      href={getPhoneTelLink()}
+                      className="mt-1 text-sm font-semibold text-[#F3F5F7] hover:text-[#e8a064] transition-colors block font-mono"
+                    >
+                      {CONTACT_CONFIG.phoneDisplay}
                     </a>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
-                    <MessageCircle className="h-4 w-4 text-[#e8a064]" />
+                {/* Direct WhatsApp Consultation */}
+                <div className="flex items-start gap-3.5 rounded-xl border border-[#222730] bg-[#141820]/60 p-4 transition-colors hover:border-[#25D366]/40">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1a241e] border border-[#25462f] text-[#25D366]">
+                    <FaWhatsapp className="h-4 w-4" />
                   </div>
-                  <div>
-                    <h3 className="font-heading text-sm font-semibold text-[#F3F5F7]">WhatsApp Consultation</h3>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-heading text-xs font-semibold uppercase tracking-wider text-[#7E8997]">
+                        WhatsApp Consultation
+                      </h3>
+                      <span className="text-[10px] font-mono font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                        Fastest response
+                      </span>
+                    </div>
                     <a
-                      href="https://wa.me/919157226367"
+                      href={getWhatsAppUrl("Hi Axivon, I would like to consult on a project.")}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={() => trackWhatsAppClick("contact_form")}
-                      className="mt-0.5 text-sm text-[#A7B0BC] hover:text-[#e8a064] transition-colors block"
+                      onClick={() => trackWhatsAppClick("contact_page_block")}
+                      className="mt-1 text-sm font-semibold text-[#F3F5F7] hover:text-[#25D366] transition-colors block font-mono"
                     >
-                      +91 91572 26367
+                      {CONTACT_CONFIG.phoneDisplay}
                     </a>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
-                    <Globe2 className="h-4 w-4 text-[#e8a064]" />
+                {/* Email Inquiries */}
+                <div className="flex items-start gap-3.5 rounded-xl border border-[#222730] bg-[#141820]/60 p-4 transition-colors hover:border-[#e8a064]/40">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1a202a] border border-[#2a3340] text-[#e8a064]">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-heading text-xs font-semibold uppercase tracking-wider text-[#7E8997]">
+                      Email Inquiries
+                    </h3>
+                    <a
+                      href={getEmailMailtoLink()}
+                      className="mt-1 text-sm font-semibold text-[#F3F5F7] hover:text-[#e8a064] transition-colors block font-mono"
+                    >
+                      {CONTACT_CONFIG.email}
+                    </a>
+                  </div>
+                </div>
+
+                {/* Operating Business Hours (rendered ONLY if set in config) */}
+                {CONTACT_CONFIG.businessHours && (
+                  <div className="flex items-start gap-3.5 rounded-xl border border-[#222730] bg-[#141820]/60 p-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1a202a] border border-[#2a3340] text-[#e8a064]">
+                      <Clock className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading text-xs font-semibold uppercase tracking-wider text-[#7E8997]">
+                        Business Hours
+                      </h3>
+                      <p className="mt-1 text-xs text-[#A7B0BC] leading-relaxed">
+                        {CONTACT_CONFIG.businessHours}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Office City / Address (rendered ONLY if set in config) */}
+                {CONTACT_CONFIG.officeAddress && (
+                  <div className="flex items-start gap-3.5 rounded-xl border border-[#222730] bg-[#141820]/60 p-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1a202a] border border-[#2a3340] text-[#e8a064]">
+                      <Building2 className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading text-xs font-semibold uppercase tracking-wider text-[#7E8997]">
+                        Office Address
+                      </h3>
+                      <p className="mt-1 text-xs text-[#A7B0BC] leading-relaxed">
+                        {CONTACT_CONFIG.officeAddress}
+                        {CONTACT_CONFIG.officeCity ? `, ${CONTACT_CONFIG.officeCity}` : ""}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* GST / Udyam Number (rendered ONLY if set in config) */}
+                {(CONTACT_CONFIG.gstNumber || CONTACT_CONFIG.udyamNumber) && (
+                  <div className="flex items-start gap-3.5 rounded-xl border border-[#222730] bg-[#141820]/60 p-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1a202a] border border-[#2a3340] text-[#e8a064]">
+                      <FileText className="h-4 w-4" />
+                    </div>
+                    <div className="text-xs text-[#A7B0BC] space-y-1">
+                      {CONTACT_CONFIG.gstNumber && (
+                        <p>GSTIN: <span className="font-mono text-[#F3F5F7]">{CONTACT_CONFIG.gstNumber}</span></p>
+                      )}
+                      {CONTACT_CONFIG.udyamNumber && (
+                        <p>Udyam: <span className="font-mono text-[#F3F5F7]">{CONTACT_CONFIG.udyamNumber}</span></p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Delivery Model & 24h Promise */}
+                <div className="flex items-start gap-3.5 rounded-xl border border-[#222730] bg-[#141820]/60 p-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#1a202a] border border-[#2a3340] text-[#e8a064]">
+                    <Globe2 className="h-4 w-4" />
                   </div>
                   <div>
-                    <h3 className="font-heading text-sm font-semibold text-[#F3F5F7]">Delivery Model</h3>
-                    <p className="mt-0.5 text-sm text-[#A7B0BC]">Remote-first engineering collaborating with clients across India &amp; globally</p>
+                    <h3 className="font-heading text-xs font-semibold uppercase tracking-wider text-[#7E8997]">
+                      Delivery Model
+                    </h3>
+                    <p className="mt-1 text-xs text-[#A7B0BC] leading-relaxed">
+                      Remote-first technology company collaborating with clients across India &amp; globally.
+                    </p>
                   </div>
+                </div>
+
+                <div className="flex items-center gap-2.5 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-xs text-emerald-400">
+                  <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                  <span className="font-medium">
+                    We reply within 24 hours guaranteed.
+                  </span>
                 </div>
               </div>
             </div>
@@ -504,28 +626,43 @@ export default function ContactForm() {
                     {currentStep === 1 && (
                       <div className="space-y-6">
                         <div>
-                          <h3 className="font-heading text-xs font-semibold uppercase tracking-[0.16em] text-[#e8a064] mb-4">
+                          <h3 className="font-heading text-xs font-semibold uppercase tracking-[0.16em] text-[#e8a064] mb-2">
                             Step 1 &middot; Project Scope &amp; Requirements
                           </h3>
+
+                          <div className="flex items-center justify-between text-[11px] text-[#7E8997] mb-4 pb-2 border-b border-white/5">
+                            <span><span className="text-[#e8a064] font-bold">*</span> Indicates required field</span>
+                            <span className="text-emerald-400 font-mono flex items-center gap-1.5">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                              Guaranteed reply within 24h
+                            </span>
+                          </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {/* Service Selection */}
                             <div>
                               <label htmlFor="service" className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-                                Required Service <span className="text-[#e8a064]">*</span>
+                                Required Service <span className="text-[#e8a064] font-bold">*</span>
                               </label>
                               <select
                                 id="service"
                                 name="service"
                                 value={formData.service}
                                 onChange={handleChange}
-                                className="w-full bg-[#0f0f0f] border border-[#2a2a2a] rounded-xl p-3 text-[#F3F5F7] text-sm focus:outline-none focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064] transition-colors"
+                                className={`w-full bg-[#0f0f0f] border rounded-xl p-3 text-[#F3F5F7] text-sm focus:outline-none transition-colors ${
+                                  fieldErrors.service
+                                    ? "border-red-500/70 focus:border-red-500 focus:ring-1 focus:ring-red-500/30"
+                                    : "border-[#2a2a2a] focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064]"
+                                }`}
                               >
                                 <option value="" disabled>Select primary service...</option>
                                 {SERVICE_OPTIONS.map((opt) => (
                                   <option key={opt} value={opt}>{opt}</option>
                                 ))}
                               </select>
+                              {fieldErrors.service && (
+                                <p className="mt-1 text-[11px] text-red-400">{fieldErrors.service}</p>
+                              )}
                             </div>
 
                             {/* Industry Selection */}
@@ -588,7 +725,7 @@ export default function ContactForm() {
                             {/* Project Description */}
                             <div className="sm:col-span-2">
                               <label htmlFor="message" className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-                                Project Brief &amp; Requirements <span className="text-[#e8a064]">*</span>
+                                Project Brief &amp; Requirements <span className="text-[#e8a064] font-bold">*</span>
                               </label>
                               <textarea
                                 id="message"
@@ -596,9 +733,16 @@ export default function ContactForm() {
                                 value={formData.message}
                                 onChange={handleChange}
                                 rows={4}
-                                className="w-full bg-[#0f0f0f] border border-[#2a2a2a] rounded-xl p-3.5 text-[#F3F5F7] text-sm placeholder:text-[#566171] focus:outline-none focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064] transition-colors resize-none"
+                                className={`w-full bg-[#0f0f0f] border rounded-xl p-3.5 text-[#F3F5F7] text-sm placeholder:text-[#566171] focus:outline-none transition-colors resize-none ${
+                                  fieldErrors.message
+                                    ? "border-red-500/70 focus:border-red-500 focus:ring-1 focus:ring-red-500/30"
+                                    : "border-[#2a2a2a] focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064]"
+                                }`}
                                 placeholder="Describe what you want to build, key features, business objectives, or reference links..."
                               />
+                              {fieldErrors.message && (
+                                <p className="mt-1 text-[11px] text-red-400">{fieldErrors.message}</p>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -621,15 +765,20 @@ export default function ContactForm() {
                     {currentStep === 2 && (
                       <div className="space-y-6">
                         <div>
-                          <h3 className="font-heading text-xs font-semibold uppercase tracking-[0.16em] text-[#e8a064] mb-4">
+                          <h3 className="font-heading text-xs font-semibold uppercase tracking-[0.16em] text-[#e8a064] mb-2">
                             Step 2 &middot; Your Contact Information
                           </h3>
+
+                          <div className="flex items-center justify-between text-[11px] text-[#7E8997] mb-4 pb-2 border-b border-white/5">
+                            <span><span className="text-[#e8a064] font-bold">*</span> Indicates required field</span>
+                            <span className="text-[#A7B0BC]">Direct contact only &middot; No spam</span>
+                          </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {/* Full Name */}
                             <div className="sm:col-span-2">
                               <label htmlFor="fullName" className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-                                Full Name <span className="text-[#e8a064]">*</span>
+                                Full Name <span className="text-[#e8a064] font-bold">*</span>
                               </label>
                               <input
                                 id="fullName"
@@ -637,15 +786,22 @@ export default function ContactForm() {
                                 name="fullName"
                                 value={formData.fullName}
                                 onChange={handleChange}
-                                className="w-full bg-[#0f0f0f] border border-[#2a2a2a] rounded-xl p-3 text-[#F3F5F7] text-sm placeholder:text-[#566171] focus:outline-none focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064] transition-colors"
+                                className={`w-full bg-[#0f0f0f] border rounded-xl p-3 text-[#F3F5F7] text-sm placeholder:text-[#566171] focus:outline-none transition-colors ${
+                                  fieldErrors.fullName
+                                    ? "border-red-500/70 focus:border-red-500 focus:ring-1 focus:ring-red-500/30"
+                                    : "border-[#2a2a2a] focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064]"
+                                }`}
                                 placeholder="e.g. John Doe"
                               />
+                              {fieldErrors.fullName && (
+                                <p className="mt-1 text-[11px] text-red-400">{fieldErrors.fullName}</p>
+                              )}
                             </div>
 
                             {/* Work Email */}
                             <div>
                               <label htmlFor="email" className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-                                Business / Work Email <span className="text-[#e8a064]">*</span>
+                                Business / Work Email <span className="text-[#e8a064] font-bold">*</span>
                               </label>
                               <input
                                 id="email"
@@ -653,15 +809,22 @@ export default function ContactForm() {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="w-full bg-[#0f0f0f] border border-[#2a2a2a] rounded-xl p-3 text-[#F3F5F7] text-sm placeholder:text-[#566171] focus:outline-none focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064] transition-colors"
+                                className={`w-full bg-[#0f0f0f] border rounded-xl p-3 text-[#F3F5F7] text-sm placeholder:text-[#566171] focus:outline-none transition-colors ${
+                                  fieldErrors.email
+                                    ? "border-red-500/70 focus:border-red-500 focus:ring-1 focus:ring-red-500/30"
+                                    : "border-[#2a2a2a] focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064]"
+                                }`}
                                 placeholder="name@company.com"
                               />
+                              {fieldErrors.email && (
+                                <p className="mt-1 text-[11px] text-red-400">{fieldErrors.email}</p>
+                              )}
                             </div>
 
                             {/* Phone */}
                             <div>
                               <label htmlFor="phone" className="block text-xs font-medium text-[#A7B0BC] mb-1.5">
-                                Phone Number <span className="text-[#e8a064]">*</span>
+                                Phone Number <span className="text-[#e8a064] font-bold">*</span>
                               </label>
                               <input
                                 id="phone"
@@ -669,9 +832,16 @@ export default function ContactForm() {
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleChange}
-                                className="w-full bg-[#0f0f0f] border border-[#2a2a2a] rounded-xl p-3 text-[#F3F5F7] text-sm placeholder:text-[#566171] focus:outline-none focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064] transition-colors"
+                                className={`w-full bg-[#0f0f0f] border rounded-xl p-3 text-[#F3F5F7] text-sm placeholder:text-[#566171] focus:outline-none transition-colors ${
+                                  fieldErrors.phone
+                                    ? "border-red-500/70 focus:border-red-500 focus:ring-1 focus:ring-red-500/30"
+                                    : "border-[#2a2a2a] focus:border-[#e8a064] focus:ring-1 focus:ring-[#e8a064]"
+                                }`}
                                 placeholder="+91 98765 43210"
                               />
+                              {fieldErrors.phone && (
+                                <p className="mt-1 text-[11px] text-red-400">{fieldErrors.phone}</p>
+                              )}
                             </div>
 
                             {/* Company Name */}
@@ -794,6 +964,14 @@ export default function ContactForm() {
                                 &ldquo;{formData.message}&rdquo;
                               </p>
                             </div>
+                          </div>
+
+                          {/* Guaranteed Response SLA Badge */}
+                          <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-xs text-emerald-400">
+                            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                            <span className="leading-relaxed">
+                              <strong>Guaranteed response:</strong> We review your requirements and respond within 24 hours.
+                            </span>
                           </div>
                         </div>
 

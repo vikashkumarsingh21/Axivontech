@@ -34,11 +34,11 @@ export async function POST(
       where: { email: application.email },
     });
 
-    // We require a BROKER or PARTNER role. The existing app uses BROKER role logic. Let's ensure it exists.
+    // In Axivon Technologies, Business Partner and Broker are the same role. Canonical role is BUSINESS_PARTNER.
     const partnerRole = await db.role.upsert({
-      where: { name: "BROKER" },
+      where: { name: "BUSINESS_PARTNER" },
       update: {},
-      create: { name: "BROKER", description: "Business Partner / Broker" },
+      create: { name: "BUSINESS_PARTNER", description: "Business Partner / Broker" },
     });
 
     // Idempotency: Check if Partner account is already linked

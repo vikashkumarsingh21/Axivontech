@@ -11,6 +11,29 @@ import {
 // Shared state for controlling mocked careers recruitment toggle in tests
 let mockCareersEnabled = false;
 
+vi.mock("@/lib/db", () => ({
+  db: {
+    jobPosting: {
+      findFirst: vi.fn().mockResolvedValue(null),
+      findUnique: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+    },
+    careerApplication: {
+      findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockImplementation(({ data }: any) =>
+        Promise.resolve({ id: "mock-app-id", ...data, createdAt: new Date() })
+      ),
+    },
+    careersPageSetting: {
+      findUnique: vi.fn().mockResolvedValue({
+        careersPageEnabled: true,
+        heroTitle: "Careers at Axivon",
+        heroSubtitle: "Build the future with us",
+      }),
+    },
+  },
+}));
+
 vi.mock("@/lib/careers/careers-db", async () => {
   const actual = await vi.importActual<any>("@/lib/careers/careers-db");
   return {
@@ -23,6 +46,10 @@ vi.mock("@/lib/careers/careers-db", async () => {
     getPublishedJobBySlug: vi.fn(async (_slug: string) => {
       return null;
     }),
+    getCareersPageSettings: vi.fn(async () => ({
+      heroTitle: "Careers at Axivon",
+      careersPageEnabled: true,
+    })),
   };
 });
 

@@ -17,10 +17,11 @@ export async function GET() {
     };
   } catch (err: any) {
     isReady = false;
+    console.error("[Readiness Check] Database check failed:", err.message);
     checks.database = {
       status: "DOWN",
       latencyMs: Date.now() - dbStart,
-      error: err.message,
+      error: "Database connection failed",
     };
   }
 
@@ -32,9 +33,10 @@ export async function GET() {
       latencyMs: 0,
     };
   } catch (err: any) {
+    console.error("[Readiness Check] Attendance policy check failed:", err.message);
     checks.attendancePolicy = {
       status: "DOWN",
-      error: err.message,
+      error: "Attendance policy query failed",
     };
   }
 

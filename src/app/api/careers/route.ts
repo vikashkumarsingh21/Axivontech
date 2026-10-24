@@ -4,9 +4,6 @@ import { isCareersPageEnabled } from "@/lib/careers/careers-db";
 import { verifyFormProtection } from "@/lib/captcha";
 import { RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
 
-const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbwk0wNZz3agHASmWb3PUXfYRvijng6rN7SLPf2AoiHnLdpo-gxEKSnCqKOT25rht-Mg/exec";
-
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: Request) {
@@ -154,7 +151,7 @@ export async function POST(req: Request) {
       console.error("[Career API] Failed to persist in database:", dbErr?.message);
     }
 
-    // 6. Forward application to Google Apps Script integration
+    // 6. Forward application to external webhook integration only if securely configured via env
     const payload = {
       fullName,
       email,
@@ -170,19 +167,22 @@ export async function POST(req: Request) {
       applicationId: savedApplication?.id || "direct-submit",
     };
 
+    const webhookUrl = process.env.GOOGLE_SHEETS_CAREERS_WEBHOOK_URL?.trim();
     let scriptResponseText = "";
-    try {
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(15000),
-      });
-      scriptResponseText = await response.text();
-    } catch (err: any) {
-      console.warn("[Career API] Forwarding to Google Apps Script timed out or failed:", err.message);
+    if (webhookUrl && webhookUrl.startsWith("https://")) {
+      try {
+        const response = await fetch(webhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(10000),
+        });
+        scriptResponseText = await response.text();
+      } catch (err: any) {
+        console.warn("[Career API] Forwarding to careers webhook timed out or failed:", err.message);
+      }
     }
 
     return NextResponse.json(

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth/password";
 import { signSession } from "@/lib/auth/session";
+import { ROLE_HIERARCHY, normalizeRole } from "@/lib/auth/roles";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
 import { verifyFormProtection } from "@/lib/captcha";
@@ -71,22 +72,9 @@ export async function POST(req: NextRequest) {
       throw new ApiError(403, "Please complete your account activation and password setup using the link sent to your email.");
     }
 
-    // Identify primary role for session based on role hierarchy
-    const roleHierarchy = [
-      "FOUNDER",
-      "CO_FOUNDER",
-      "ADMIN",
-      "EXECUTIVE",
-      "BROKER",
-      "BUSINESS_PARTNER",
-      "CLIENT",
-      "HR",
-      "FINANCE",
-      "LEAD_DEVELOPER",
-      "EMPLOYEE",
-    ];
-    const userRoleNames = user.userRoles.map((ur) => ur.role.name);
-    const role = roleHierarchy.find((r) => userRoleNames.includes(r)) || userRoleNames[0] || "EMPLOYEE";
+    // Identify primary role for session based on centralized role hierarchy and canonical normalization
+    const userRoleNames = user.userRoles.map((ur) => normalizeRole(ur.role.name));
+    const role = ROLE_HIERARCHY.find((r) => userRoleNames.includes(r)) || userRoleNames[0] || "EMPLOYEE";
 
     // Generate Session
     const sessionToken = await signSession({

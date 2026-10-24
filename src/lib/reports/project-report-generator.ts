@@ -42,6 +42,21 @@ export interface ProjectReportData {
 }
 
 /**
+ * Robust HTML entity encoder to prevent Cross-Site Scripting (XSS)
+ * when rendering dynamic database strings into HTML reports.
+ */
+export function escapeHtml(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  const str = String(value);
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
  * Compiles a self-contained, printable, branded HTML delivery & verification report.
  */
 export function compileDeliveryReportHtml(data: ProjectReportData): string {
@@ -55,7 +70,7 @@ export function compileDeliveryReportHtml(data: ProjectReportData): string {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Project Delivery & Verification Report — ${data.projectCode}</title>
+  <title>Project Delivery & Verification Report — ${escapeHtml(data.projectCode)}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -215,7 +230,7 @@ export function compileDeliveryReportHtml(data: ProjectReportData): string {
       <div class="report-meta">
         <span class="badge badge-verified">Verified Delivery</span>
         <div style="font-size: 12px; color: #64748b; margin-top: 6px; font-family: monospace;">
-          ${data.projectCode}
+          ${escapeHtml(data.projectCode)}
         </div>
       </div>
     </div>
@@ -233,27 +248,27 @@ export function compileDeliveryReportHtml(data: ProjectReportData): string {
     <div class="grid-2">
       <div class="meta-item">
         <div class="meta-label">Project Name</div>
-        <div class="meta-value">${data.projectName}</div>
+        <div class="meta-value">${escapeHtml(data.projectName)}</div>
       </div>
       <div class="meta-item">
         <div class="meta-label">Client Company</div>
-        <div class="meta-value">${data.companyName}</div>
+        <div class="meta-value">${escapeHtml(data.companyName)}</div>
       </div>
       <div class="meta-item">
         <div class="meta-label">Client Contact</div>
-        <div class="meta-value">${data.clientName} (${data.clientEmail})</div>
+        <div class="meta-value">${escapeHtml(data.clientName)} (${escapeHtml(data.clientEmail)})</div>
       </div>
       <div class="meta-item">
         <div class="meta-label">Service Domain</div>
-        <div class="meta-value">${data.requiredService}</div>
+        <div class="meta-value">${escapeHtml(data.requiredService)}</div>
       </div>
       <div class="meta-item">
         <div class="meta-label">Lifecycle Status</div>
-        <div class="meta-value">${data.status}</div>
+        <div class="meta-value">${escapeHtml(data.status)}</div>
       </div>
       <div class="meta-item">
         <div class="meta-label">QA / UAT Status</div>
-        <div class="meta-value" style="color: #16a34a;">${data.qaStatus || "UAT_APPROVED"}</div>
+        <div class="meta-value" style="color: #16a34a;">${escapeHtml(data.qaStatus || "UAT_APPROVED")}</div>
       </div>
     </div>
 
@@ -277,10 +292,10 @@ export function compileDeliveryReportHtml(data: ProjectReportData): string {
           <tr>
             <td>${idx + 1}</td>
             <td>
-              <div style="font-weight: 600; color: #0f172a;">${m.title}</div>
-              ${m.description ? `<div style="font-size: 11px; color: #64748b;">${m.description}</div>` : ""}
+              <div style="font-weight: 600; color: #0f172a;">${escapeHtml(m.title)}</div>
+              ${m.description ? `<div style="font-size: 11px; color: #64748b;">${escapeHtml(m.description)}</div>` : ""}
             </td>
-            <td><span class="status-completed">${m.status}</span></td>
+            <td><span class="status-completed">${escapeHtml(m.status)}</span></td>
             <td>${m.completionDate ? new Date(m.completionDate).toLocaleDateString() : "Verified"}</td>
           </tr>`
                 )
@@ -302,9 +317,9 @@ export function compileDeliveryReportHtml(data: ProjectReportData): string {
     <div class="contract-box">
       <div class="contract-highlight" style="margin-bottom: 4px;">Direct Contractual Handover Certification</div>
       This certifies that the engineering deliverables and software infrastructure for Project
-      <span class="contract-highlight">${data.projectCode}</span> were executed directly by
+      <span class="contract-highlight">${escapeHtml(data.projectCode)}</span> were executed directly by
       <span class="contract-highlight">Axivon Technologies</span> for
-      <span class="contract-highlight">${data.companyName}</span> in accordance with the verified agreement.
+      <span class="contract-highlight">${escapeHtml(data.companyName)}</span> in accordance with the verified agreement.
       All intellectual property and verified deliverables specified in the project scope have been officially delivered.
     </div>
 

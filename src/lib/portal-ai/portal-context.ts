@@ -45,8 +45,7 @@ export async function resolvePortalContext(userId: string | null): Promise<Porta
     else if (roleNames.includes("CO_FOUNDER")) detectedRole = "CO_FOUNDER";
     else if (roleNames.includes("ADMIN")) detectedRole = "ADMIN";
     else if (roleNames.includes("CLIENT")) detectedRole = "CLIENT";
-    else if (roleNames.includes("BROKER")) detectedRole = "BROKER";
-    else if (roleNames.includes("PARTNER")) detectedRole = "PARTNER";
+    else if (roleNames.includes("BROKER") || roleNames.includes("BUSINESS_PARTNER") || roleNames.includes("PARTNER")) detectedRole = "BROKER";
     else detectedRole = "EMPLOYEE";
 
     for (const ur of user.userRoles || []) {

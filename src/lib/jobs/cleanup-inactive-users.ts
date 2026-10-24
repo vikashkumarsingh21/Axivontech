@@ -76,9 +76,20 @@ export async function cleanupInactiveUsers(thirtyDaysMsOverride?: number): Promi
             data: { userId: null },
           });
 
-          // Delete user record
-          await tx.user.delete({
+          // Soft-anonymize user record to preserve critical statutory attendance,
+          // work reports, tasks, and avoid breaking foreign keys with Restrict (e.g. QaIssue)
+          await tx.user.update({
             where: { id: candidate.id },
+            data: {
+              email: `anonymized_${candidate.id}@archived.axivontech.in`,
+              name: "Archived Former Employee",
+              status: "ARCHIVED",
+              phone: null,
+              address: null,
+              emergencyContact: null,
+              passwordHash: "ACCOUNT_ARCHIVED_NO_LOGIN",
+              avatarUrl: null,
+            },
           });
         });
 

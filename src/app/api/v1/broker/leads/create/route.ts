@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ApiError, handleApiError } from "@/lib/api-error";
+import { getAuthenticatedSession } from "@/lib/auth/session";
+import { normalizeRole, canAccessPartnerPortal } from "@/lib/auth/roles";
 import { z } from "zod";
 
 const createLeadSchema = z.object({
@@ -25,12 +27,13 @@ const createLeadSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     // Authenticate: Partner only
-    const userId = req.headers.get("x-user-id");
-    const role = req.headers.get("x-user-role");
+    const session = await getAuthenticatedSession(req);
+    const role = normalizeRole(session.role);
 
-    if (!userId || role !== "BROKER") {
+    if (!canAccessPartnerPortal(role)) {
       throw new ApiError(403, "Access denied. Partners only.");
     }
+    const userId = session.userId;
 
     // Resolve BrokerProfile — server-side attribution
     const brokerProfile = await db.brokerProfile.findUnique({

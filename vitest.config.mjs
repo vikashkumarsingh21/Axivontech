@@ -8,6 +8,7 @@ export default defineConfig({
     env: {
       DATABASE_URL: "postgresql://testuser:testpass@localhost:5432/axivon_test?schema=public",
       SESSION_SECRET: "mock_session_secret_at_least_32_characters_long_for_test",
+      CRON_SECRET: "mock_cron_secret_at_least_32_characters_long_for_test",
       NODE_ENV: "test",
     },
   },

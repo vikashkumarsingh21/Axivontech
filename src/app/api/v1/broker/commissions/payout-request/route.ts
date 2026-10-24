@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ApiError, handleApiError } from "@/lib/api-error";
+import { getAuthenticatedSession } from "@/lib/auth/session";
+import { normalizeRole, canAccessPartnerPortal } from "@/lib/auth/roles";
 
 export async function POST(req: NextRequest) {
   try {
-    const brokerUserId = req.headers.get("x-user-id");
-    const role = req.headers.get("x-user-role");
+    const session = await getAuthenticatedSession(req);
+    const role = normalizeRole(session.role);
 
-    if (!brokerUserId || role !== "BROKER") {
-      throw new ApiError(403, "Access denied. Only authenticated brokers can request payouts.");
+    if (!canAccessPartnerPortal(role)) {
+      throw new ApiError(403, "Access denied. Only authenticated partners can request payouts.");
     }
+
+    const brokerUserId = session.userId;
 
     const brokerProfile = await db.brokerProfile.findUnique({
       where: { userId: brokerUserId },

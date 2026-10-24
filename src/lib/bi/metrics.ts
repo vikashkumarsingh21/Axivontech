@@ -83,7 +83,7 @@ export class BusinessIntelligenceService {
         where: {
           status: "ACTIVE",
           userRoles: {
-            none: { role: { name: { in: ["CLIENT", "BROKER"] } } },
+            none: { role: { name: { in: ["CLIENT", "BROKER", "BUSINESS_PARTNER"] } } },
           },
         },
       }),

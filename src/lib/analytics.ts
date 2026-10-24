@@ -16,6 +16,8 @@ declare global {
   }
 }
 
+import { getStoredConsent } from "@/lib/legal/cookie-consent";
+
 /** Blocklist of sensitive field names that must never be sent to analytics */
 const PII_EXACT_OR_SUFFIX = [
   "email",
@@ -116,19 +118,28 @@ export function sanitizeAnalyticsParams(params?: Record<string, any>): Record<st
 }
 
 /**
- * Core event dispatcher
+ * Checks whether analytics is enabled and user has granted explicit cookie consent.
+ */
+export function isAnalyticsAllowed(): boolean {
+  if (typeof window === "undefined") return false;
+  if (typeof window.gtag !== "function") return false;
+  try {
+    const consent = getStoredConsent();
+    return Boolean(consent?.analytics);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Core event dispatcher — strictly does nothing unless analytics is enabled AND cookie consent is given.
  */
 export function trackEvent(eventName: string, params?: Record<string, any>) {
   if (typeof window === "undefined") return;
+  if (!isAnalyticsAllowed()) return;
 
   const sanitized = sanitizeAnalyticsParams(params);
-
-  if (typeof window.gtag === "function") {
-    window.gtag("event", eventName, sanitized);
-  } else if (process.env.NODE_ENV === "development") {
-    // Helpful debug logging in dev mode
-    console.debug(`[Analytics Event] ${eventName}:`, sanitized);
-  }
+  window.gtag!("event", eventName, sanitized);
 }
 
 /**
@@ -238,6 +249,16 @@ export function trackWhatsAppClick(sourcePage: string) {
 export function trackServiceCtaClick(serviceSlug: string, ctaLocation: string) {
   trackEvent("service_cta_click", {
     service_slug: serviceSlug,
+    cta_location: ctaLocation,
+  });
+}
+
+/**
+ * Fires when user clicks a primary conversion CTA button (e.g. Get Quote, Book Consultation).
+ */
+export function trackCtaClick(ctaLabel: string, ctaLocation: string = "header") {
+  trackEvent("cta_click", {
+    cta_label: ctaLabel,
     cta_location: ctaLocation,
   });
 }

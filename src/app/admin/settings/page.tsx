@@ -18,6 +18,7 @@ import {
   Cpu,
   UserCheck,
 } from "lucide-react";
+import { AccountProfileSettings } from "@/components/portal/AccountProfileSettings";
 
 interface CaptchaStatusData {
   success: boolean;
@@ -342,41 +343,7 @@ export default function AdminSettingsPage() {
         </div>
       ) : (
         /* Admin Profile Tab */
-        <div className="bg-[#151A21] border border-[#29313B] rounded-xl p-6 space-y-4">
-          <h3 className="text-base font-semibold text-[#F3F5F7]">Administrator Credentials</h3>
-          <p className="text-xs text-[#7E8997]">
-            Core administrator account details for managing the AXIVON ONE control center.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <div>
-              <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">Display Name</label>
-              <input
-                type="text"
-                defaultValue="Admin User"
-                disabled
-                className="w-full bg-[#10151B] border border-[#29313B] rounded-lg px-3.5 py-2 text-xs text-[#7E8997] cursor-not-allowed"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-[#A7B0BC] mb-1.5">Email</label>
-              <input
-                type="email"
-                defaultValue="admin@axivon.dev"
-                disabled
-                className="w-full bg-[#10151B] border border-[#29313B] rounded-lg px-3.5 py-2 text-xs text-[#7E8997] cursor-not-allowed"
-              />
-            </div>
-          </div>
-
-          <div className="p-3.5 rounded-lg bg-[#10151B] border border-[#29313B] text-xs text-[#7E8997] flex items-start gap-2.5 mt-4">
-            <Lock className="w-4 h-4 shrink-0 text-[#D6B779] mt-0.5" />
-            <p className="leading-relaxed">
-              To update administrator email addresses, two-factor authentication, or modify security parameters,
-              contact your Executive Founder or submit a change request.
-            </p>
-          </div>
-        </div>
+        <AccountProfileSettings portalTheme="admin" />
       )}
     </div>
   );

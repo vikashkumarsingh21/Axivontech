@@ -5,6 +5,7 @@ import {
   isSameCalendarDay,
   getUtcDayRange,
 } from "@/lib/date-utils";
+import { resolveRoleDashboardUrl } from "@/lib/auth/roles";
 
 describe("Platform Recovery & Attendance Date Normalization", () => {
   describe("Calendar Date Normalization (date-utils)", () => {
@@ -48,19 +49,7 @@ describe("Platform Recovery & Attendance Date Normalization", () => {
   });
 
   describe("Role Routing Contract Verification", () => {
-    function resolveLoginRoute(userRole: string): string {
-      if (userRole === "FOUNDER" || userRole === "CO_FOUNDER") {
-        return "/executive/dashboard";
-      } else if (userRole === "ADMIN") {
-        return "/admin/dashboard";
-      } else if (userRole === "BROKER" || userRole === "BUSINESS_PARTNER") {
-        return "/broker/dashboard";
-      } else if (userRole === "CLIENT") {
-        return "/client/dashboard";
-      } else {
-        return "/employee/dashboard";
-      }
-    }
+    const resolveLoginRoute = resolveRoleDashboardUrl;
 
     it("routes FOUNDER and CO_FOUNDER to executive dashboard", () => {
       expect(resolveLoginRoute("FOUNDER")).toBe("/executive/dashboard");

@@ -31,7 +31,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
     const existingBroker = await db.user.findFirst({
       where: {
         id: brokerId,
-        userRoles: { some: { role: { name: "BROKER" } } },
+        userRoles: { some: { role: { name: { in: ["BUSINESS_PARTNER", "BROKER"] } } } },
       },
       include: { brokerProfile: true },
     });

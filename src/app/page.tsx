@@ -21,6 +21,7 @@ const Process = dynamic(() => import("@/components/Process"));
 const FAQ = dynamic(() => import("@/components/FAQ"));
 const ClientReviews = dynamic(() => import("@/components/ClientReviews"));
 const CTA = dynamic(() => import("@/components/CTA"));
+const HomeTrustStrip = dynamic(() => import("@/components/HomeTrustStrip"));
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getHomepageContent();
@@ -52,6 +53,7 @@ export default async function Home() {
     <>
       <HomeFAQSchema faqs={faqs} />
       {content.sectionsVisibility.hero && <Hero content={content.hero} />}
+      <HomeTrustStrip />
       {content.sectionsVisibility.services && <Services services={services} />}
       {content.sectionsVisibility.whyChooseUs && <WhyChooseUs />}
       {content.sectionsVisibility.industries && <IndustriesWeServe industries={industries} />}

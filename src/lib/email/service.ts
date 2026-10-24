@@ -145,6 +145,89 @@ export class EmailService {
               </p>
             </div>
           `;
+        } else if (templateKey === "EMAIL_CHANGE_VERIFICATION") {
+          subject = variables.title || "Verify your new email address — Axivon Technologies";
+          body = `
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e5e7eb; border-radius: 16px; background: #ffffff; color: #111827;">
+              <div style="border-bottom: 2px solid #10b981; padding-bottom: 16px; margin-bottom: 24px;">
+                <h1 style="margin: 0; color: #111827; font-size: 22px; font-weight: 700;">Axivon Technologies</h1>
+                <p style="margin: 4px 0 0; font-size: 13px; color: #6b7280;">Secure Identity &amp; Account Protection</p>
+              </div>
+              <h2 style="font-size: 18px; margin: 0 0 12px; color: #111827;">Verify Your New Email Address</h2>
+              <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0 0 16px;">
+                Hello <strong>${variables.name || "there"}</strong>,
+              </p>
+              <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0 0 24px;">
+                We received a request to update the primary email address for your Axivon Technologies account (${variables.role || "Executive/Admin"}). To complete this change and verify ownership of this email address, please click the verification button below:
+              </p>
+              <div style="text-align: center; margin: 32px 0;">
+                <a href="${variables.link}" style="background: #10b981; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);">Confirm Email Address &rarr;</a>
+              </div>
+              <div style="background: #f9fafb; border-left: 4px solid #f59e0b; padding: 14px; border-radius: 6px; margin-bottom: 24px; font-size: 13px; color: #4b5563; line-height: 1.5;">
+                <strong>Security Information:</strong><br />
+                • This verification link will expire in <strong>60 minutes</strong>.<br />
+                • This link can only be used once.<br />
+                • If you did not initiate this request, your account may be compromised. Please contact support immediately.
+              </div>
+              <p style="font-size: 12px; line-height: 1.5; color: #9ca3af; word-break: break-all;">
+                If the button above does not work, copy and paste this URL into your browser:<br />
+                <a href="${variables.link}" style="color: #10b981;">${variables.link}</a>
+              </p>
+              <p style="font-size: 12px; color: #9ca3af; margin-top: 32px; border-top: 1px solid #f3f4f6; padding-top: 16px;">
+                &copy; ${new Date().getFullYear()} Axivon Technologies. Automated Security System.
+              </p>
+            </div>
+          `;
+        } else if (templateKey === "EMAIL_CHANGE_SECURITY_ALERT") {
+          subject = variables.title || "Security Alert: Account email address has been changed — Axivon Technologies";
+          body = `
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; border: 1px solid #fee2e2; border-radius: 16px; background: #ffffff; color: #111827;">
+              <div style="border-bottom: 2px solid #ef4444; padding-bottom: 16px; margin-bottom: 24px;">
+                <h1 style="margin: 0; color: #111827; font-size: 22px; font-weight: 700;">Axivon Technologies</h1>
+                <p style="margin: 4px 0 0; font-size: 13px; color: #ef4444; font-weight: 600;">Critical Security Notification</p>
+              </div>
+              <h2 style="font-size: 18px; margin: 0 0 12px; color: #111827;">Your Account Email Address Was Changed</h2>
+              <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0 0 16px;">
+                Hello <strong>${variables.name || "User"}</strong>,
+              </p>
+              <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0 0 16px;">
+                The primary email address associated with your Axivon Technologies account was successfully changed to:
+              </p>
+              <div style="background: #f3f4f6; padding: 14px 18px; border-radius: 8px; font-family: monospace; font-size: 15px; font-weight: bold; color: #111827; margin-bottom: 24px;">
+                ${variables.newEmail}
+              </div>
+              <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 13px; color: #991b1b; line-height: 1.6;">
+                <strong>Did you not make this change?</strong><br />
+                If you did not authorize this change, someone else may have gained unauthorized access to your account. Please contact the security team immediately at <a href="mailto:security@axivontech.in" style="color: #b91c1c; font-weight: bold;">security@axivontech.in</a> or call your administrative liaison.
+              </div>
+              <p style="font-size: 12px; color: #9ca3af; margin-top: 32px; border-top: 1px solid #f3f4f6; padding-top: 16px;">
+                &copy; ${new Date().getFullYear()} Axivon Technologies. All rights reserved.
+              </p>
+            </div>
+          `;
+        } else if (templateKey === "EMAIL_CHANGE_CONFIRMED") {
+          subject = variables.title || "Your email address has been updated — Axivon Technologies";
+          body = `
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e5e7eb; border-radius: 16px; background: #ffffff; color: #111827;">
+              <div style="border-bottom: 2px solid #10b981; padding-bottom: 16px; margin-bottom: 24px;">
+                <h1 style="margin: 0; color: #111827; font-size: 22px; font-weight: 700;">Axivon Technologies</h1>
+                <p style="margin: 4px 0 0; font-size: 13px; color: #10b981; font-weight: 600;">Verification Successful</p>
+              </div>
+              <h2 style="font-size: 18px; margin: 0 0 12px; color: #111827;">Email Address Verified Successfully</h2>
+              <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0 0 16px;">
+                Hello <strong>${variables.name || "User"}</strong>,
+              </p>
+              <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0 0 24px;">
+                Your new email address (<strong>${variables.newEmail}</strong>) has been verified and is now the primary login and contact email for your account.
+              </p>
+              <div style="text-align: center; margin: 28px 0;">
+                <a href="${variables.link || "https://axivontech.in/login"}" style="background: #10b981; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-block;">Go to Login &rarr;</a>
+              </div>
+              <p style="font-size: 12px; color: #9ca3af; margin-top: 32px; border-top: 1px solid #f3f4f6; padding-top: 16px;">
+                &copy; ${new Date().getFullYear()} Axivon Technologies. All rights reserved.
+              </p>
+            </div>
+          `;
         } else {
           if (variables.title) subject = String(variables.title);
           if (variables.message) body = String(variables.message);

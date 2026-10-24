@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ApiError, handleApiError } from "@/lib/api-error";
+import { getAuthenticatedSession } from "@/lib/auth/session";
+import { normalizeRole, canAccessPartnerPortal } from "@/lib/auth/roles";
 
 export async function GET(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
   const params = await props.params;
   try {
-    const brokerId = req.headers.get("x-user-id");
-    const role = req.headers.get("x-user-role");
-    if (!brokerId || role !== "BROKER") throw new ApiError(403, "Access denied.");
+    const session = await getAuthenticatedSession(req);
+    const role = normalizeRole(session.role);
+    if (!canAccessPartnerPortal(role)) throw new ApiError(403, "Access denied.");
+    const brokerId = session.userId;
 
     const brokerProfile = await db.brokerProfile.findUnique({ where: { userId: brokerId } });
     if (!brokerProfile) throw new ApiError(404, "Broker profile not found.");
@@ -50,9 +53,10 @@ export async function GET(req: Request, props: { params: Promise<{ [key: string]
 export async function PATCH(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
   const params = await props.params;
   try {
-    const brokerId = req.headers.get("x-user-id");
-    const role = req.headers.get("x-user-role");
-    if (!brokerId || role !== "BROKER") throw new ApiError(403, "Access denied.");
+    const session = await getAuthenticatedSession(req);
+    const role = normalizeRole(session.role);
+    if (!canAccessPartnerPortal(role)) throw new ApiError(403, "Access denied.");
+    const brokerId = session.userId;
 
     const brokerProfile = await db.brokerProfile.findUnique({ where: { userId: brokerId } });
     if (!brokerProfile) throw new ApiError(404, "Broker profile not found.");
