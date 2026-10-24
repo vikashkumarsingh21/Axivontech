@@ -27,6 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/demo-projects/real-estate/estatevista`, lastModified, changeFrequency: "weekly", priority: 0.8 },
     { url: `${baseUrl}/demo-projects/saas/leadpilot`, lastModified, changeFrequency: "weekly", priority: 0.8 },
     { url: `${baseUrl}/blog`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/pricing`, lastModified, changeFrequency: "weekly", priority: 0.8 },
     { url: `${baseUrl}/contact`, lastModified, changeFrequency: "monthly", priority: 0.8 },
     // Legal & Compliance Pages
     { url: `${baseUrl}/legal`, lastModified, changeFrequency: "monthly", priority: 0.6 },

@@ -77,6 +77,15 @@ export default function Navbar({ careersEnabled = false }: { careersEnabled?: bo
     return NAV_LINKS.filter((link: NavLink) => link.href !== "/careers" || careersEnabled);
   }, [careersEnabled]);
 
+  const mobileNavLinks: NavLink[] = useMemo(() => {
+    const links = [...NAV_LINKS];
+    const servicesIdx = links.findIndex((l) => l.href === "/services");
+    if (servicesIdx !== -1) {
+      links.splice(servicesIdx + 1, 0, { label: "Pricing & Packages", href: "/pricing" });
+    }
+    return links.filter((link: NavLink) => link.href !== "/careers" || careersEnabled);
+  }, [careersEnabled]);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -481,7 +490,7 @@ export default function Navbar({ careersEnabled = false }: { careersEnabled?: bo
               exit="closed"
               className="flex flex-1 flex-col justify-center gap-1 px-6 sm:px-10 py-6"
             >
-              {navLinks.map((link) => {
+              {mobileNavLinks.map((link) => {
                 if (link.hasDropdown) {
                   return (
                     <motion.li key={link.href} variants={mobileLinkItemVariants} className="flex flex-col">

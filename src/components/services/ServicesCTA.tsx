@@ -54,7 +54,7 @@ export default function ServicesCTA() {
               Tell us about the problem you're trying to solve. We can help define the right technology approach and architecture before you commit.
             </motion.p>
             
-            <motion.div variants={fadeUp} className="mt-10 flex flex-col sm:flex-row gap-4">
+            <motion.div variants={fadeUp} className="mt-10 flex flex-wrap gap-4">
               <Link 
                 href="/contact"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-[#e8a064] px-8 py-4 text-sm font-semibold text-[#0f0f0f] transition-colors hover:bg-[#d4915c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414]"
@@ -63,8 +63,14 @@ export default function ServicesCTA() {
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
               <Link 
-                href="/portfolio"
+                href="/pricing"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-white/5 border border-white/10 px-8 py-4 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414] backdrop-blur-sm"
+              >
+                Explore Packages &amp; Pricing
+              </Link>
+              <Link 
+                href="/portfolio"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-transparent px-6 py-4 text-sm font-medium text-[#A7B0BC] transition-colors hover:text-white hover:border-white/20"
               >
                 View Our Work
               </Link>

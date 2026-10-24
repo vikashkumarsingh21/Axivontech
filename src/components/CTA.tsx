@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Clock, Mail, MessageCircle, Rocket, Shield, Zap } from "lucide-react";
 import { Badge } from "@/components/ui";
@@ -95,7 +96,7 @@ export default function CTA({ content }: CTAProps = {}) {
             </div>
 
             {/* Right — actions */}
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4">
               <a
                 href={content?.primaryButtonLink || CONSULTATION_LINK}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#e8a064] px-7 py-4 text-sm font-semibold text-[#0f0f0f] shadow-[0_4px_20px_rgba(232,160,100,0.3)] transition-all hover:bg-[#f0b07a] hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#e8a064]"
@@ -114,7 +115,18 @@ export default function CTA({ content }: CTAProps = {}) {
                 <span>{content?.secondaryButtonText || "Chat On WhatsApp"}</span>
               </a>
 
-              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-[#71717a]">
+              {/* Secondary Pricing Link */}
+              <div className="pt-1 flex items-center justify-center text-center">
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#e8a064] hover:underline transition-colors"
+                >
+                  <span>Looking for website packages? View transparent pricing plans</span>
+                  <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
+
+              <div className="mt-1 flex items-center justify-center gap-2 text-sm text-[#71717a]">
                 <a
                   href={`mailto:${EMAIL}`}
                   className="flex items-center gap-2 transition-colors hover:text-[#e8a064]"
