@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
+import { calculateLeaveDays } from "@/lib/leave/balance";
 
 export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
   try {
@@ -14,17 +15,37 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 
     const leave = await db.leaveRequest.findUnique({
       where: { id },
-      include: { user: { select: { name: true, email: true } } },
+      include: { user: { select: { id: true, name: true, email: true } } },
     });
     if (!leave) throw new ApiError(404, "Leave request not found");
     if (leave.status !== "PENDING") throw new ApiError(400, "This leave request has already been processed");
 
-    const [updated] = await db.$transaction([
-      db.leaveRequest.update({
+    const days = calculateLeaveDays(leave.startDate, leave.endDate, leave.isHalfDay);
+    const leaveYear = leave.startDate.getFullYear();
+
+    const [updated] = await db.$transaction(async (tx) => {
+      const updatedLeave = await tx.leaveRequest.update({
         where: { id },
-        data: { status: "REJECTED" },
-      }),
-      db.notification.create({
+        data: {
+          status: "REJECTED",
+          rejectionReason: reason,
+        },
+      });
+
+      if (leave.leaveType !== "UNPAID") {
+        await tx.leaveBalance.updateMany({
+          where: {
+            userId: leave.userId,
+            year: leaveYear,
+            leaveType: leave.leaveType,
+          },
+          data: {
+            pendingDays: { decrement: days },
+          },
+        });
+      }
+
+      await tx.notification.create({
         data: {
           userId: leave.userId,
           type: "LEAVE_UPDATED",
@@ -32,8 +53,10 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
           message: reason,
           link: "/employee/leave",
         },
-      }),
-    ]);
+      });
+
+      return [updatedLeave];
+    });
 
     const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
     if (EventBus) {
