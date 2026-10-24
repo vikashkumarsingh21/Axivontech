@@ -1,9 +1,15 @@
-export function SkeletonCard({ className = "" }: { className?: string }) {
+export function SkeletonCard({ className = "", rows = 3 }: { className?: string; rows?: number }) {
   return (
-    <div className={`animate-pulse rounded-xl bg-[#111317] border border-[#1E2530] p-5 ${className}`}>
-      <div className="h-3 bg-[#1E2530] rounded w-1/3 mb-3" />
-      <div className="h-6 bg-[#1E2530] rounded w-2/3 mb-2" />
-      <div className="h-3 bg-[#1E2530] rounded w-1/2" />
+    <div className={`animate-pulse rounded-xl bg-[#111317] border border-[#1E2530] p-5 space-y-3 ${className}`}>
+      <div className="h-3 bg-[#1E2530] rounded w-1/3" />
+      <div className="h-5 bg-[#1E2530] rounded w-2/3" />
+      {Array.from({ length: Math.max(0, rows - 2) }).map((_, i) => (
+        <div
+          key={i}
+          className="h-3 bg-[#1E2530] rounded"
+          style={{ width: `${Math.max(40, 90 - i * 15)}%` }}
+        />
+      ))}
     </div>
   );
 }
