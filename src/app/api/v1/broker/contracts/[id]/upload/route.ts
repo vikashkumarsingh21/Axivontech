@@ -1,41 +1,100 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/lib/db";
-import { ApiError, handleApiError } from "@/lib/api-error";
-import { getAuthenticatedSession } from "@/lib/auth/session";
-import { normalizeRole, canAccessPartnerPortal } from "@/lib/auth/roles";
+import {
+  requireBroker,
+  checkIdempotency,
+  checkRateLimit,
+  logBrokerAudit,
+  notifyAdmins,
+  apiSuccess,
+  handleApiError,
+  ApiError,
+} from "@/lib/api/broker";
 
-export async function POST(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
-  const params = await props.params;
+const uploadContractSchema = z.object({
+  versionId: z.string().min(1, "versionId is required"),
+  signedFileUrl: z
+    .string()
+    .url("A valid signed file URL is required")
+    .refine((url) => {
+      // Must point to a PDF document or verified secure upload
+      const clean = url.split("?")[0].toLowerCase();
+      return clean.endsWith(".pdf") || clean.includes("/uploads/") || clean.includes("blob:");
+    }, "Only PDF contract files are permitted"),
+  signedStorageKey: z.string().optional().nullable(),
+  stampFileUrl: z.string().url().optional().nullable(),
+  stampStorageKey: z.string().optional().nullable(),
+  signingConfirmed: z.literal(true, {
+    errorMap: () => ({
+      message: "You must confirm that the contract has been reviewed and executed.",
+    }),
+  }),
+  notes: z.string().max(1000).optional().nullable(),
+});
+
+export async function POST(
+  req: NextRequest,
+  props: { params: Promise<{ id: string }> }
+) {
+  const { id } = await props.params;
   try {
-    const session = await getAuthenticatedSession(req);
-    const role = normalizeRole(session.role);
-    if (!canAccessPartnerPortal(role)) throw new ApiError(403, "Access denied.");
-    const brokerId = session.userId;
+    const { brokerProfile, session } = await requireBroker(req);
 
-    const brokerProfile = await db.brokerProfile.findUnique({ where: { userId: brokerId } });
-    if (!brokerProfile) throw new ApiError(404, "Broker profile not found.");
+    // Rate limit: max 10 submissions per 60s
+    await checkRateLimit(req, "contract-upload", 10, 60);
+
+    const body = await req.json().catch(() => ({}));
+    const validated = uploadContractSchema.safeParse(body);
+    if (!validated.success) {
+      throw new ApiError(400, validated.error.errors[0]?.message || "Invalid input");
+    }
+
+    const { versionId, signedFileUrl, signedStorageKey, stampFileUrl, stampStorageKey, notes } =
+      validated.data;
+
+    // Idempotency check
+    const idempotencyKey = `${id}:${versionId}:${signedFileUrl}`;
+    const isDuplicate = await checkIdempotency(req, "contract_upload", idempotencyKey);
+    if (isDuplicate) {
+      return apiSuccess({
+        contractId: id,
+        message: "Signed contract has already been submitted and is currently under review.",
+      });
+    }
 
     const contract = await db.partnerContract.findUnique({
-      where: { id: params.id },
-      include: { partnerProject: { select: { brokerProfileId: true, id: true, projectCode: true } } },
+      where: { id },
+      include: {
+        partnerProject: {
+          select: {
+            id: true,
+            projectCode: true,
+            projectName: true,
+            brokerProfileId: true,
+          },
+        },
+      },
     });
-    if (!contract) throw new ApiError(404, "Contract not found.");
+
+    if (!contract) {
+      throw new ApiError(404, "Contract not found.");
+    }
+
+    // IDOR Protection
     if (contract.partnerProject.brokerProfileId !== brokerProfile.id) {
-      throw new ApiError(403, "Access denied.");
+      throw new ApiError(403, "Access denied. You do not own this contract.");
     }
 
-    const body = await req.json();
-    const { versionId, signedFileUrl, signedStorageKey, stampFileUrl, stampStorageKey, signingConfirmed } = body;
-
-    if (!versionId) throw new ApiError(400, "versionId is required.");
-    if (!signedFileUrl) throw new ApiError(400, "Signed contract file is required.");
-    if (!signingConfirmed) throw new ApiError(400, "You must confirm that the contract has been reviewed and signed.");
-
-    // verify version belongs to this contract
-    const version = await db.partnerContractVersion.findUnique({ where: { id: versionId } });
-    if (!version || version.partnerContractId !== params.id) {
-        throw new ApiError(404, "Contract version not found.");
+    // Verify version belongs to this contract
+    const version = await db.partnerContractVersion.findUnique({
+      where: { id: versionId },
+    });
+    if (!version || version.partnerContractId !== id) {
+      throw new ApiError(404, "Contract version not found for this contract.");
     }
+
+    const signedAt = new Date();
 
     await db.$transaction([
       db.partnerContractVersion.update({
@@ -45,40 +104,46 @@ export async function POST(req: Request, props: { params: Promise<{ [key: string
           signedStorageKey: signedStorageKey || null,
           stampFileUrl: stampFileUrl || null,
           stampStorageKey: stampStorageKey || null,
-          signedAt: new Date(),
+          signedAt,
           signingConfirmed: true,
           status: "UNDER_REVIEW",
         },
       }),
       db.partnerContract.update({
-        where: { id: params.id },
-        data: { status: "UNDER_REVIEW" }
+        where: { id },
+        data: { status: "UNDER_REVIEW" },
       }),
       db.partnerProject.update({
         where: { id: contract.partnerProject.id },
         data: { status: "CONTRACT_SIGNED" },
       }),
-      db.auditLog.create({
-        data: { userId: brokerId, action: "SIGNED_CONTRACT_UPLOADED", resource: "PartnerContract", details: { contractId: params.id, versionId, projectCode: contract.partnerProject.projectCode } },
-      }),
     ]);
 
-    // Notify admins
-    const admins = await db.user.findMany({
-      where: { userRoles: { some: { role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] } } } }, status: "ACTIVE" },
-      select: { id: true },
-    });
-    if (admins.length > 0) {
-      await db.notification.createMany({
-        data: admins.map((a) => ({
-          userId: a.id, type: "SYSTEM" as const, title: "Signed Contract Uploaded",
-          message: `Broker uploaded signed contract for project ${contract.partnerProject.projectCode}. Review required.`,
-          link: `/admin/crm/partner-projects/${contract.partnerProject.id}`,
-        })),
-      });
-    }
+    await logBrokerAudit(
+      session.userId,
+      "SIGNED_CONTRACT_UPLOADED",
+      "PartnerContract",
+      {
+        contractId: id,
+        versionId,
+        projectCode: contract.partnerProject.projectCode,
+        notes: notes || undefined,
+      }
+    );
 
-    return NextResponse.json({ success: true, message: "Signed contract uploaded. Under review." });
+    await notifyAdmins({
+      title: "Signed Contract Uploaded",
+      message: `Broker ${session.userId} uploaded signed contract for project ${contract.partnerProject.projectCode}. Verification required.`,
+      link: `/admin/crm/partner-projects/${contract.partnerProject.id}`,
+    });
+
+    return apiSuccess({
+      contractId: id,
+      versionId,
+      status: "UNDER_REVIEW",
+      projectStatus: "CONTRACT_SIGNED",
+      message: "Signed contract uploaded successfully and submitted for review.",
+    });
   } catch (error) {
     return handleApiError(error);
   }

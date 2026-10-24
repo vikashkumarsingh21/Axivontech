@@ -1,60 +1,149 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { ApiError, handleApiError } from "@/lib/api-error";
-import { getAuthenticatedSession } from "@/lib/auth/session";
-import { normalizeRole, canAccessPartnerPortal } from "@/lib/auth/roles";
+import { requireBroker, getBrokerPagination, apiSuccess, handleApiError } from "@/lib/api/broker";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
-    const session = await getAuthenticatedSession(req);
-    const role = normalizeRole(session.role);
-    if (!canAccessPartnerPortal(role)) throw new ApiError(403, "Access denied.");
-    const brokerId = session.userId;
+    const { brokerProfile } = await requireBroker(req);
+    const { page, limit, skip } = getBrokerPagination(req);
+    const { searchParams } = new URL(req.url);
 
-    const brokerProfile = await db.brokerProfile.findUnique({ where: { userId: brokerId } });
-    if (!brokerProfile) throw new ApiError(404, "Broker profile not found.");
+    const status = searchParams.get("status");
+    const search = searchParams.get("search")?.trim();
 
-    const commissions = await db.commission.findMany({
+    // 1. Fetch all commissions for this broker to compute accurate overall summary stats
+    const allBrokerCommissions = await db.commission.findMany({
       where: { brokerProfileId: brokerProfile.id },
       select: {
         id: true,
-        partnerProjectId: true,
-        projectValue: true,
-        commissionType: true,
-        commissionRate: true,
         commissionAmount: true,
-        currency: true,
         status: true,
-        eligibleAt: true,
-        approvedAt: true,
         paidAt: true,
-        payoutReference: true,
-        payoutRequestedAt: true,
-        payoutDueAt: true,
-        payoutMethod: true,
-        payoutDetails: true,
-        payoutNotes: true,
-        rejectionReason: true,
+        eligibleAt: true,
         createdAt: true,
-        updatedAt: true,
-        partnerProject: { select: { projectCode: true, projectName: true } },
-        commissionRule: { select: { name: true, type: true, value: true } },
       },
-      orderBy: { createdAt: "desc" }
     });
 
-    // Calculate stats
-    const stats = {
-      total: commissions.reduce((sum, c) => sum + c.commissionAmount, 0),
-      eligible: commissions.filter(c => c.status === "ELIGIBLE").reduce((sum, c) => sum + c.commissionAmount, 0),
-      requested: commissions.filter(c => c.status === "REQUESTED").reduce((sum, c) => sum + c.commissionAmount, 0),
-      processing: commissions.filter(c => c.status === "PROCESSING" || c.status === "APPROVED").reduce((sum, c) => sum + c.commissionAmount, 0),
-      pending: commissions.filter(c => c.status === "PENDING" || c.status === "ELIGIBLE").reduce((sum, c) => sum + c.commissionAmount, 0),
-      approved: commissions.filter(c => c.status === "APPROVED").reduce((sum, c) => sum + c.commissionAmount, 0),
-      paid: commissions.filter(c => c.status === "PAID").reduce((sum, c) => sum + c.commissionAmount, 0),
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    let totalEarned = 0;
+    let pendingAmount = 0;
+    let eligibleAmount = 0;
+    let requestedAmount = 0;
+    let processingAmount = 0;
+    let paidAmount = 0;
+    let thisMonthEarned = 0;
+
+    for (const c of allBrokerCommissions) {
+      const amt = c.commissionAmount || 0;
+      if (c.status === "PAID") {
+        totalEarned += amt;
+        paidAmount += amt;
+
+        if (c.paidAt) {
+          const pDate = new Date(c.paidAt);
+          if (pDate.getFullYear() === currentYear && pDate.getMonth() === currentMonth) {
+            thisMonthEarned += amt;
+          }
+        }
+      } else if (c.status === "PENDING") {
+        pendingAmount += amt;
+      } else if (c.status === "ELIGIBLE") {
+        eligibleAmount += amt;
+      } else if (c.status === "REQUESTED") {
+        requestedAmount += amt;
+      } else if (c.status === "PROCESSING" || c.status === "APPROVED") {
+        processingAmount += amt;
+      }
+    }
+
+    const summary = {
+      totalEarned,
+      pending: pendingAmount,
+      eligible: eligibleAmount,
+      requested: requestedAmount,
+      processing: processingAmount,
+      paid: paidAmount,
+      thisMonth: thisMonthEarned,
+      totalCommissionsCount: allBrokerCommissions.length,
     };
 
-    return NextResponse.json({ data: commissions, stats });
+    // 2. Build filtered where clause for paginated list
+    const where: any = {
+      brokerProfileId: brokerProfile.id,
+    };
+
+    if (status && status !== "ALL") {
+      where.status = status;
+    }
+
+    if (search) {
+      where.partnerProject = {
+        OR: [
+          { projectCode: { contains: search, mode: "insensitive" } },
+          { projectName: { contains: search, mode: "insensitive" } },
+        ],
+      };
+    }
+
+    const [commissions, filteredCount] = await Promise.all([
+      db.commission.findMany({
+        where,
+        select: {
+          id: true,
+          partnerProjectId: true,
+          projectValue: true,
+          commissionType: true,
+          commissionRate: true,
+          commissionAmount: true,
+          currency: true,
+          status: true,
+          eligibleAt: true,
+          approvedAt: true,
+          paidAt: true,
+          payoutReference: true,
+          payoutRequestedAt: true,
+          payoutDueAt: true,
+          payoutMethod: true,
+          payoutDetails: true,
+          payoutNotes: true,
+          rejectionReason: true,
+          createdAt: true,
+          updatedAt: true,
+          partnerProject: {
+            select: {
+              projectCode: true,
+              projectName: true,
+              status: true,
+            },
+          },
+          commissionRule: {
+            select: {
+              name: true,
+              type: true,
+              value: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      db.commission.count({ where }),
+    ]);
+
+    return apiSuccess({
+      commissions,
+      summary,
+      pagination: {
+        page,
+        limit,
+        total: filteredCount,
+        totalPages: Math.ceil(filteredCount / limit),
+      },
+    });
   } catch (error) {
     return handleApiError(error);
   }

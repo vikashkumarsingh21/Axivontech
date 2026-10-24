@@ -1,54 +1,96 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { ApiError, handleApiError } from "@/lib/api-error";
-import { getAuthenticatedSession } from "@/lib/auth/session";
-import { normalizeRole, canAccessPartnerPortal } from "@/lib/auth/roles";
+import { requireBroker, logBrokerAudit, apiSuccess, handleApiError, ApiError } from "@/lib/api/broker";
 
-export async function POST(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
+async function handleContractDownload(
+  req: NextRequest,
+  params: { id: string }
+) {
+  const { brokerProfile, session } = await requireBroker(req);
+  const { searchParams } = new URL(req.url);
+  const versionId = searchParams.get("versionId");
+
+  const contract = await db.partnerContract.findUnique({
+    where: { id: params.id },
+    include: {
+      partnerProject: {
+        select: {
+          brokerProfileId: true,
+          projectCode: true,
+          projectName: true,
+        },
+      },
+      versions: versionId
+        ? { where: { id: versionId } }
+        : { orderBy: { versionNumber: "desc" }, take: 1 },
+    },
+  });
+
+  if (!contract || contract.versions.length === 0) {
+    throw new ApiError(404, "Contract or contract version not found.");
+  }
+
+  // IDOR Protection: broker must own the project
+  if (contract.partnerProject.brokerProfileId !== brokerProfile.id) {
+    throw new ApiError(403, "Access denied. You do not own this contract.");
+  }
+
+  const targetVersion = contract.versions[0];
+
+  if (targetVersion.status === "SENT") {
+    await db.$transaction([
+      db.partnerContractVersion.update({
+        where: { id: targetVersion.id },
+        data: { status: "DOWNLOADED" },
+      }),
+      db.partnerContract.update({
+        where: { id: params.id },
+        data: { status: "DOWNLOADED" },
+      }),
+    ]);
+  }
+
+  await logBrokerAudit(
+    session.userId,
+    "CONTRACT_DOWNLOADED",
+    "PartnerContract",
+    {
+      contractId: params.id,
+      versionId: targetVersion.id,
+      projectCode: contract.partnerProject.projectCode,
+    }
+  );
+
+  return apiSuccess({
+    contractId: contract.id,
+    versionId: targetVersion.id,
+    versionNumber: targetVersion.versionNumber,
+    contractName: contract.contractName,
+    projectCode: contract.partnerProject.projectCode,
+    fileUrl: targetVersion.contractFileUrl,
+    status: targetVersion.status === "SENT" ? "DOWNLOADED" : targetVersion.status,
+  });
+}
+
+export async function GET(
+  req: NextRequest,
+  props: { params: Promise<{ id: string }> }
+) {
   const params = await props.params;
   try {
-    const session = await getAuthenticatedSession(req);
-    const role = normalizeRole(session.role);
-    if (!canAccessPartnerPortal(role)) throw new ApiError(403, "Access denied.");
-    const brokerId = session.userId;
+    return await handleContractDownload(req, params);
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
 
-    const brokerProfile = await db.brokerProfile.findUnique({ where: { userId: brokerId } });
-    if (!brokerProfile) throw new ApiError(404, "Broker profile not found.");
-
-    const { searchParams } = new URL(req.url);
-    const versionId = searchParams.get("versionId");
-
-    const contract = await db.partnerContract.findUnique({
-      where: { id: params.id },
-      include: {
-        partnerProject: { select: { brokerProfileId: true, projectCode: true } },
-        versions: versionId
-          ? { where: { id: versionId } }
-          : { orderBy: { versionNumber: "desc" }, take: 1 },
-      },
-    });
-    if (!contract || contract.versions.length === 0) throw new ApiError(404, "Contract or version not found.");
-    if (contract.partnerProject.brokerProfileId !== brokerProfile.id) throw new ApiError(403, "Access denied.");
-
-    const targetVersion = contract.versions[0];
-
-    if (targetVersion.status === "SENT") {
-      await db.$transaction([
-        db.partnerContractVersion.update({
-          where: { id: targetVersion.id },
-          data: { status: "DOWNLOADED" },
-        }),
-        db.partnerContract.update({
-          where: { id: params.id },
-          data: { status: "DOWNLOADED" },
-        }),
-        db.auditLog.create({
-          data: { userId: brokerId, action: "CONTRACT_DOWNLOADED", resource: "PartnerContract", details: { contractId: params.id, versionId: targetVersion.id, projectCode: contract.partnerProject.projectCode } },
-        })
-      ]);
-    }
-
-    return NextResponse.json({ success: true, fileUrl: targetVersion.contractFileUrl });
+export async function POST(
+  req: NextRequest,
+  props: { params: Promise<{ id: string }> }
+) {
+  const params = await props.params;
+  try {
+    return await handleContractDownload(req, params);
   } catch (error) {
     return handleApiError(error);
   }

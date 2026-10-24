@@ -1,78 +1,144 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/lib/db";
-import { ApiError, handleApiError } from "@/lib/api-error";
-import { getAuthenticatedSession } from "@/lib/auth/session";
-import { normalizeRole, canAccessPartnerPortal } from "@/lib/auth/roles";
+import {
+  requireBroker,
+  checkIdempotency,
+  checkRateLimit,
+  logBrokerAudit,
+  notifyAdmins,
+  apiSuccess,
+  handleApiError,
+  ApiError,
+} from "@/lib/api/broker";
 
-export async function POST(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
-  const params = await props.params;
+const submitPaymentSchema = z.object({
+  paymentMethod: z.enum(["BANK", "UPI"], {
+    errorMap: () => ({ message: "Payment method must be 'BANK' or 'UPI'." }),
+  }),
+  amountPaid: z.coerce.number().positive("Amount paid must be greater than 0."),
+  transactionId: z
+    .string()
+    .trim()
+    .min(6, "Transaction ID / UTR must be at least 6 characters.")
+    .max(50, "Transaction ID / UTR must not exceed 50 characters."),
+  paymentDate: z.string().optional().nullable(),
+  proofFileUrl: z.string().url("A valid payment proof screenshot URL is required."),
+  proofStorageKey: z.string().optional().nullable(),
+  additionalNotes: z.string().max(1000).optional().nullable(),
+});
+
+export async function POST(
+  req: NextRequest,
+  props: { params: Promise<{ id: string }> }
+) {
+  const { id } = await props.params;
   try {
-    const session = await getAuthenticatedSession(req);
-    const role = normalizeRole(session.role);
-    if (!canAccessPartnerPortal(role)) throw new ApiError(403, "Access denied.");
-    const brokerId = session.userId;
+    const { brokerProfile, session } = await requireBroker(req);
 
-    const brokerProfile = await db.brokerProfile.findUnique({ where: { userId: brokerId } });
-    if (!brokerProfile) throw new ApiError(404, "Broker profile not found.");
+    // Rate limit: max 10 submissions per 60s
+    await checkRateLimit(req, "payment-submit", 10, 60);
+
+    const body = await req.json().catch(() => ({}));
+    const validated = submitPaymentSchema.safeParse(body);
+    if (!validated.success) {
+      throw new ApiError(400, validated.error.errors[0]?.message || "Invalid input data");
+    }
+
+    const {
+      paymentMethod,
+      amountPaid,
+      transactionId,
+      paymentDate,
+      proofFileUrl,
+      proofStorageKey,
+      additionalNotes,
+    } = validated.data;
+
+    // Idempotency guard: prevent duplicate submission of the exact same payment proof
+    const idempotencyKey = `${id}:${transactionId}:${amountPaid}`;
+    const isDuplicate = await checkIdempotency(req, "payment_submit", idempotencyKey);
+    if (isDuplicate) {
+      return apiSuccess({
+        paymentId: id,
+        message: "Payment proof has already been submitted and is currently being verified.",
+      });
+    }
 
     const payment = await db.partnerPayment.findUnique({
-      where: { id: params.id },
-      include: { 
-        partnerProject: { 
-          select: { 
-            id: true, projectCode: true, brokerProfileId: true,
-            contract: { select: { status: true } }
-          } 
-        } 
+      where: { id },
+      include: {
+        partnerProject: {
+          select: {
+            id: true,
+            projectCode: true,
+            projectName: true,
+            brokerProfileId: true,
+            contract: { select: { status: true } },
+          },
+        },
       },
     });
-    if (!payment) throw new ApiError(404, "Payment not found.");
-    if (payment.partnerProject.brokerProfileId !== brokerProfile.id) throw new ApiError(403, "Access denied.");
+
+    if (!payment) {
+      throw new ApiError(404, "Payment record not found.");
+    }
+
+    // IDOR Protection: broker must own the project
+    if (payment.partnerProject.brokerProfileId !== brokerProfile.id) {
+      throw new ApiError(403, "Access denied. You do not own this payment record.");
+    }
+
     if (payment.status !== "PENDING" && payment.status !== "REJECTED") {
-      throw new ApiError(400, "Payment has already been submitted.");
+      throw new ApiError(400, `Payment is in '${payment.status}' status and cannot be resubmitted.`);
     }
-    
-    // Phase 7: Payment Gate
+
+    // Contract gate: project contract must be VERIFIED
     if (!payment.partnerProject.contract || payment.partnerProject.contract.status !== "VERIFIED") {
-       throw new ApiError(400, "Project contract must be VERIFIED before payment can be submitted.");
+      throw new ApiError(
+        400,
+        "Project contract must be signed and VERIFIED by Axivon before advance payment can be submitted."
+      );
     }
 
-    const body = await req.json();
-    const { paymentMethod, amountPaid, transactionId, paymentDate, proofFileUrl, proofStorageKey, additionalNotes } = body;
-
-    if (!paymentMethod || (paymentMethod !== "BANK" && paymentMethod !== "UPI")) throw new ApiError(400, "Payment method must be BANK or UPI.");
-    if (!amountPaid || amountPaid <= 0) throw new ApiError(400, "Valid amount is required.");
-    if (!transactionId) throw new ApiError(400, "Transaction ID / UTR is required.");
-    if (!proofFileUrl) throw new ApiError(400, "Payment screenshot is required.");
-    
-    // Validate exact amount
-    const submittedAmount = parseFloat(amountPaid);
-    if (submittedAmount !== payment.advanceAmount) {
-       throw new ApiError(400, `Submitted amount (${submittedAmount}) does not match the required advance amount (${payment.advanceAmount}).`);
+    // Amount validation with safe IEEE-754 precision tolerance
+    const expectedAmount = payment.advanceAmount ?? payment.projectPrice ?? 0;
+    if (Math.abs(amountPaid - expectedAmount) > 0.05) {
+      throw new ApiError(
+        400,
+        `Submitted amount (₹${amountPaid}) does not match the required advance amount (₹${expectedAmount}).`
+      );
     }
-    
-    // Duplicate UTR check
+
+    // Duplicate UTR check across all payments
     const existingUtr = await db.partnerPayment.findFirst({
-      where: { transactionId: transactionId.trim(), id: { not: params.id } }
+      where: {
+        transactionId,
+        id: { not: id },
+      },
     });
     if (existingUtr) {
-      throw new ApiError(400, "This Transaction ID / UTR has already been submitted for another payment.");
+      throw new ApiError(
+        400,
+        `Transaction ID / UTR '${transactionId}' has already been submitted for another payment.`
+      );
     }
+
+    const submittedDate = paymentDate ? new Date(paymentDate) : new Date();
 
     await db.$transaction([
       db.partnerPayment.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           paymentMethod,
-          amountPaid: parseFloat(amountPaid),
-          transactionId: transactionId.trim(),
-          paymentDate: paymentDate ? new Date(paymentDate) : new Date(),
+          amountPaid,
+          transactionId,
+          paymentDate: submittedDate,
           proofFileUrl,
           proofStorageKey: proofStorageKey || null,
-          additionalNotes: additionalNotes?.trim() || null,
+          additionalNotes: additionalNotes || null,
           status: "SUBMITTED",
           submittedAt: new Date(),
-          // Clear any previous rejection
           rejectionReason: null,
           rejectedAt: null,
         },
@@ -81,30 +147,33 @@ export async function POST(req: Request, props: { params: Promise<{ [key: string
         where: { id: payment.partnerProject.id },
         data: { status: "PAYMENT_SUBMITTED" },
       }),
-      db.auditLog.create({
-        data: {
-          userId: brokerId, action: "PAYMENT_SUBMITTED", resource: "PartnerPayment",
-          details: { paymentId: params.id, projectCode: payment.partnerProject.projectCode, method: paymentMethod, amount: amountPaid, utr: transactionId },
-        },
-      }),
     ]);
 
-    // Notify admins
-    const admins = await db.user.findMany({
-      where: { userRoles: { some: { role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] } } } }, status: "ACTIVE" },
-      select: { id: true },
-    });
-    if (admins.length > 0) {
-      await db.notification.createMany({
-        data: admins.map((a) => ({
-          userId: a.id, type: "SYSTEM" as const, title: "Payment Proof Submitted",
-          message: `Payment proof submitted for project ${payment.partnerProject.projectCode}. UTR: ${transactionId}. Verification required.`,
-          link: `/admin/crm/partner-projects/${payment.partnerProject.id}`,
-        })),
-      });
-    }
+    await logBrokerAudit(
+      session.userId,
+      "PAYMENT_SUBMITTED",
+      "PartnerPayment",
+      {
+        paymentId: id,
+        projectCode: payment.partnerProject.projectCode,
+        amount: amountPaid,
+        method: paymentMethod,
+        utr: transactionId,
+      }
+    );
 
-    return NextResponse.json({ success: true, message: "Payment submitted for verification." });
+    await notifyAdmins({
+      title: "Payment Proof Submitted",
+      message: `Payment proof submitted for project ${payment.partnerProject.projectCode}. UTR: ${transactionId}, Amount: ₹${amountPaid.toLocaleString()}. Verification required.`,
+      link: `/admin/crm/partner-projects/${payment.partnerProject.id}`,
+    });
+
+    return apiSuccess({
+      paymentId: id,
+      status: "SUBMITTED",
+      projectStatus: "PAYMENT_SUBMITTED",
+      message: "Payment proof submitted successfully. Verification SLA is 24 business hours.",
+    });
   } catch (error) {
     return handleApiError(error);
   }

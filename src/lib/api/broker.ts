@@ -86,25 +86,50 @@ export function getBrokerPagination(req: Request | NextRequest, defaultLimit = 1
 }
 
 /**
- * Central helper to create AuditLog entries safely for broker operations
+ * Central helper to create AuditLog entries safely for broker operations.
+ * Supports both object argument and positional arguments.
  */
-export async function logBrokerAudit(params: {
-  userId: string;
-  action: string;
-  resource: string;
-  details?: Record<string, unknown>;
-}) {
+export async function logBrokerAudit(
+  paramOrUserId:
+    | string
+    | {
+        userId: string;
+        action: string;
+        resource: string;
+        details?: Record<string, unknown>;
+      },
+  action?: string,
+  resource?: string,
+  details?: Record<string, unknown>
+) {
   try {
+    let uId: string;
+    let act: string;
+    let res: string;
+    let det: Record<string, unknown> | undefined;
+
+    if (typeof paramOrUserId === "object") {
+      uId = paramOrUserId.userId;
+      act = paramOrUserId.action;
+      res = paramOrUserId.resource;
+      det = paramOrUserId.details;
+    } else {
+      uId = paramOrUserId;
+      act = action || "UNKNOWN_ACTION";
+      res = resource || "Broker";
+      det = details;
+    }
+
     await db.auditLog.create({
       data: {
-        userId: params.userId,
-        action: params.action,
-        resource: params.resource,
-        details: params.details as any,
+        userId: uId,
+        action: act,
+        resource: res,
+        details: det as any,
       },
     });
   } catch (err) {
-    console.error(`[AuditLog] Failed to record broker action '${params.action}':`, err);
+    console.error(`[AuditLog] Failed to record broker action:`, err);
   }
 }
 
@@ -173,3 +198,5 @@ export {
   checkIdempotency,
   checkRateLimit,
 };
+
+export { ApiError, handleApiError } from "@/lib/api-error";
