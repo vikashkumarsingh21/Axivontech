@@ -377,9 +377,10 @@ describe("Phase 4: Broker Workflow Gap Closure, Financial Safeguards & Acceptanc
 
       const res = await POST(req);
       const json = await res.json();
+      const errorText = typeof json.error === "object" ? json.error.message : (json.error || json.message);
 
       expect(res.status).toBe(400);
-      expect(json.error).toContain("Invalid IFSC code format");
+      expect(errorText).toContain("Invalid IFSC code format");
     });
   });
 
@@ -403,9 +404,10 @@ describe("Phase 4: Broker Workflow Gap Closure, Financial Safeguards & Acceptanc
 
       const res = await PATCH(req, { params: Promise.resolve({ id: "comm-pay-1" }) });
       const json = await res.json();
+      const errorText = typeof json.error === "object" ? json.error.message : (json.error || json.message);
 
       expect(res.status).toBe(400);
-      expect(json.error).toContain("Bank transaction reference (UTR) is strictly required");
+      expect(errorText).toContain("Bank transaction reference (UTR) is strictly required");
     });
 
     it("strictly rejects duplicate UTR reuse across settled payouts", async () => {
@@ -434,9 +436,10 @@ describe("Phase 4: Broker Workflow Gap Closure, Financial Safeguards & Acceptanc
 
       const res = await PATCH(req, { params: Promise.resolve({ id: "comm-pay-2" }) });
       const json = await res.json();
+      const errorText = typeof json.error === "object" ? json.error.message : (json.error || json.message);
 
       expect(res.status).toBe(400);
-      expect(json.error).toContain("has already been recorded for another settled commission");
+      expect(errorText).toContain("has already been recorded for another settled commission");
     });
 
     it("successfully settles commission when unique valid UTR is provided", async () => {
@@ -497,9 +500,10 @@ describe("Phase 4: Broker Workflow Gap Closure, Financial Safeguards & Acceptanc
 
       const res = await POST(req);
       const json = await res.json();
+      const errorText = typeof json.error === "object" ? json.error.message : (json.error || json.message);
 
       expect(res.status).toBe(403);
-      expect(json.error).toContain("Access denied. This commission does not belong to your broker account.");
+      expect(errorText).toContain("Access denied. This commission does not belong to your broker account.");
     });
   });
 });

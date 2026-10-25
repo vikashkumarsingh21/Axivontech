@@ -188,7 +188,8 @@ describe("AXIVON ONE: Login Route Anti-Bot & CAPTCHA Verification Security Suite
       expect(res.status).toBe(401);
 
       const data = await res.json();
-      expect(data.error).toBe("Invalid email or password");
+      const errorMessage = typeof data.error === "object" ? data.error.message : (data.error || data.message);
+      expect(errorMessage).toBe("Invalid email or password");
     });
 
     it("rejects login with HTTP 401 when password does not match", async () => {
@@ -215,7 +216,8 @@ describe("AXIVON ONE: Login Route Anti-Bot & CAPTCHA Verification Security Suite
       expect(res.status).toBe(401);
 
       const data = await res.json();
-      expect(data.error).toBe("Invalid email or password");
+      const errorMessage = typeof data.error === "object" ? data.error.message : (data.error || data.message);
+      expect(errorMessage).toBe("Invalid email or password");
     });
 
     it("rejects login with HTTP 403 when account is INACTIVE or SUSPENDED", async () => {
@@ -242,7 +244,8 @@ describe("AXIVON ONE: Login Route Anti-Bot & CAPTCHA Verification Security Suite
       expect(res.status).toBe(403);
 
       const data = await res.json();
-      expect(data.error).toContain("Account is SUSPENDED");
+      const errorMessage = typeof data.error === "object" ? data.error.message : (data.error || data.message);
+      expect(errorMessage).toContain("Account is SUSPENDED");
     });
 
     it("rejects login with HTTP 403 when user must change password", async () => {
@@ -269,7 +272,8 @@ describe("AXIVON ONE: Login Route Anti-Bot & CAPTCHA Verification Security Suite
       expect(res.status).toBe(403);
 
       const data = await res.json();
-      expect(data.error).toContain("Please complete your account activation");
+      const errorMessage = typeof data.error === "object" ? data.error.message : (data.error || data.message);
+      expect(errorMessage).toContain("Please complete your account activation");
     });
   });
 

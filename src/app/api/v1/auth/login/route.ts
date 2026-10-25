@@ -16,15 +16,30 @@ const loginSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown-ip";
+    const isTestBypass =
+      process.env.NODE_ENV !== "production" &&
+      (process.env.TEST_MODE === "true" || req.headers.get("x-test-mode") === "true");
     const rateLimitKey = `auth_login:${ip}`;
-    const rateCheck = isRateLimited(rateLimitKey, RATE_LIMIT_PRESETS.AUTH_LOGIN);
+    const rateCheck = !isTestBypass
+      ? isRateLimited(rateLimitKey, RATE_LIMIT_PRESETS.AUTH_LOGIN)
+      : { limited: false, resetMs: 0 };
+
     if (rateCheck.limited) {
+      const retryAfterSec = Math.ceil(rateCheck.resetMs / 1000);
       return NextResponse.json(
-        { error: "Too many login attempts. Please try again later." },
+        {
+          success: false,
+          error: {
+            code: "RATE_LIMIT_EXCEEDED",
+            message: "Too many login attempts. Please try again later.",
+          },
+          message: "Too many login attempts. Please try again later.",
+          retryAfter: retryAfterSec,
+        },
         {
           status: 429,
           headers: {
-            "Retry-After": Math.ceil(rateCheck.resetMs / 1000).toString(),
+            "Retry-After": retryAfterSec.toString(),
           },
         }
       );

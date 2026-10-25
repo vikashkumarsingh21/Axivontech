@@ -9,6 +9,9 @@ import { Eye, EyeOff, AlertCircle, Lock, Mail, CheckCircle2, X } from "lucide-re
 import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 import { LoginPosterCarousel } from "@/components/auth/LoginPosterCarousel";
 import { resolveRoleDashboardUrl } from "@/lib/auth/roles";
+import { parseApiResponse } from "@/lib/errors/client";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginPage() {
   // Form input states
@@ -16,26 +19,31 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
+  const [rateLimitCountdown, setRateLimitCountdown] = useState<number>(0);
   const [loggedOutNotice, setLoggedOutNotice] = useState(false);
   const [captchaToken, setCaptchaToken] = useState("");
   const [recaptchaResetCount, setRecaptchaResetCount] = useState(0);
   const [prefersReduced, setPrefersReduced] = useState(false);
 
-  // DOM input references for Chrome Autofill synchronization
+  // DOM input references for Chrome Autofill synchronization and focus management
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // Check URL parameters for logout or error notice safely
+  // Check URL parameters for logout, expired session, or error notice safely
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       if (params.get("logged_out") === "1" || params.get("logout") === "true") {
         setLoggedOutNotice(true);
       }
+      if (params.get("expired") === "1" || params.get("session_expired") === "true") {
+        setError("Session expired, please sign in again.");
+      }
       if (params.get("error") === "account_suspended") {
-        setError("Your partner account has been suspended. Please contact AXIVON administration (admin@axivon.com) for assistance.");
+        setError("Your partner account has been suspended. Please contact AXIVON administration (admin@axivontech.in) for assistance.");
       }
     }
   }, []);
@@ -72,10 +80,52 @@ export default function LoginPage() {
     };
   }, [email, password]);
 
+  // Rate limit countdown timer effect
+  useEffect(() => {
+    if (rateLimitCountdown <= 0) return;
+    const interval = setInterval(() => {
+      setRateLimitCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setError("");
+          return 0;
+        }
+        const next = prev - 1;
+        setError(`Too many attempts. Please try again in ${next} second${next === 1 ? "" : "s"}.`);
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [rateLimitCountdown]);
+
+  // Helper to clear errors when a field is edited
+  const handleEmailChange = (val: string) => {
+    setEmail(val);
+    if (error && rateLimitCountdown === 0) setError("");
+    if (fieldErrors.email) {
+      setFieldErrors((prev) => ({ ...prev, email: undefined }));
+    }
+  };
+
+  const handlePasswordChange = (val: string) => {
+    setPassword(val);
+    if (error && rateLimitCountdown === 0) setError("");
+    if (fieldErrors.password) {
+      setFieldErrors((prev) => ({ ...prev, password: undefined }));
+    }
+  };
+
   // Auth form submit handler
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
+
+    // Prevent double submission or submit during rate-limit cooldown
+    if (loading || rateLimitCountdown > 0) {
+      return;
+    }
+
+    if (error && rateLimitCountdown === 0) setError("");
+    setFieldErrors({});
 
     // Pull values directly from DOM elements to ensure browser-autofilled credentials are captured
     const form = e.currentTarget;
@@ -85,14 +135,34 @@ export default function LoginPage() {
     const activeEmail = (emailEl?.value || emailInputRef.current?.value || email).trim();
     const activePassword = passwordEl?.value || passwordInputRef.current?.value || password;
 
-    if (!activeEmail || !activePassword) {
-      setError("Please enter your work email and password.");
+    // Validate inputs client-side and set per-field errors under the respective inputs
+    const newFieldErrors: { email?: string; password?: string } = {};
+
+    if (!activeEmail) {
+      newFieldErrors.email = "Please enter your work email.";
+    } else if (!EMAIL_REGEX.test(activeEmail)) {
+      newFieldErrors.email = "Please enter a valid work email address.";
+    }
+
+    if (!activePassword) {
+      newFieldErrors.password = "Please enter your password.";
+    }
+
+    if (Object.keys(newFieldErrors).length > 0) {
+      setFieldErrors(newFieldErrors);
+      // Focus first erroneous field
+      if (newFieldErrors.email) {
+        emailInputRef.current?.focus();
+      } else if (newFieldErrors.password) {
+        passwordInputRef.current?.focus();
+      }
       return;
     }
 
     // Validate security verification presence client-side before sending network request
     if (!captchaToken) {
-      setError("Please complete the security verification before signing in.");
+      setError("Please confirm you are not a robot.");
+      setRecaptchaResetCount((prev) => prev + 1);
       return;
     }
 
@@ -110,20 +180,106 @@ export default function LoginPage() {
         }),
       });
 
-      const data = await res.json();
+      const parsed = await parseApiResponse<{ user: { role: string } }>(res);
 
-      if (!res.ok) {
+      if (!parsed.ok) {
+        // Failed attempt cleanup actions:
+        // 1. Keep the email
+        setEmail(activeEmail);
+        if (emailInputRef.current) {
+          emailInputRef.current.value = activeEmail;
+        }
+
+        // 2. Clear the password
+        setPassword("");
+        if (passwordInputRef.current) {
+          passwordInputRef.current.value = "";
+        }
+
+        // 3. Reset the CAPTCHA widget
         setCaptchaToken("");
         setRecaptchaResetCount((prev) => prev + 1);
-        throw new Error(data.error || "Login failed");
+
+        // 4. Focus the password field
+        setTimeout(() => {
+          passwordInputRef.current?.focus();
+        }, 50);
+
+        // Case 1: 429 Rate Limited with countdown
+        if (parsed.status === 429) {
+          const seconds = parsed.retryAfter && parsed.retryAfter > 0 ? parsed.retryAfter : 30;
+          setRateLimitCountdown(seconds);
+          setError(`Too many attempts. Please try again in ${seconds} second${seconds === 1 ? "" : "s"}.`);
+          return;
+        }
+
+        // Case 2: 401 Wrong password / Unknown email (identical message to prevent user enumeration)
+        if (parsed.status === 401) {
+          setError("Incorrect email or password.");
+          return;
+        }
+
+        // Case 3: Captcha failed or missing on server
+        if (
+          parsed.code === "MISSING_TOKEN" ||
+          parsed.code === "CAPTCHA_REQUIRED" ||
+          parsed.code === "CAPTCHA_FAILED" ||
+          parsed.code === "INVALID_TOKEN" ||
+          parsed.errorMessage?.toLowerCase().includes("robot") ||
+          parsed.errorMessage?.toLowerCase().includes("verification")
+        ) {
+          setError("Please confirm you are not a robot.");
+          return;
+        }
+
+        // Case 4: Field-level validation returned by server
+        if (parsed.fieldErrors && Object.keys(parsed.fieldErrors).length > 0) {
+          setFieldErrors({
+            email: parsed.fieldErrors.email,
+            password: parsed.fieldErrors.password,
+          });
+          if (parsed.errorMessage) {
+            setError(parsed.errorMessage);
+          }
+          return;
+        }
+
+        // Case 5: 403 Suspended / Inactive account / Must change password
+        if (parsed.status === 403) {
+          setError(
+            parsed.errorMessage ||
+              "Your account is inactive or suspended. Please contact AXIVON administration (admin@axivontech.in)."
+          );
+          return;
+        }
+
+        // Case 6: 500+ Internal Server Error
+        if (parsed.status >= 500) {
+          setError("Could not reach the server. Check your connection and try again.");
+          return;
+        }
+
+        // Case 7: Other failure cases (guaranteed never [object Object])
+        setError(parsed.errorMessage || "Something went wrong. Please try again.");
+        return;
       }
 
-      // Success, route based on normalized primary role via centralized resolver
-      router.push(resolveRoleDashboardUrl(data.user.role));
-    } catch (err: any) {
+      // Success: route based on normalized primary role via centralized resolver
+      router.push(resolveRoleDashboardUrl(parsed.data?.user?.role || "EMPLOYEE"));
+    } catch {
+      // Network failure / server offline
+      setEmail(activeEmail);
+      setPassword("");
+      if (passwordInputRef.current) {
+        passwordInputRef.current.value = "";
+      }
+      setTimeout(() => {
+        passwordInputRef.current?.focus();
+      }, 50);
       setCaptchaToken("");
       setRecaptchaResetCount((prev) => prev + 1);
-      setError(err.message || "An unexpected error occurred.");
+
+      setError("Could not reach the server. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -134,10 +290,10 @@ export default function LoginPage() {
     if (e.animationName.includes("autofill") || e.animationName.includes("AutoFill")) {
       const target = e.target as HTMLInputElement;
       if (target.name === "email" && target.value) {
-        setEmail(target.value);
+        handleEmailChange(target.value);
       }
       if (target.name === "password" && target.value) {
-        setPassword(target.value);
+        handlePasswordChange(target.value);
       }
     }
   };
@@ -187,7 +343,7 @@ export default function LoginPage() {
             </p>
           </motion.div>
 
-          {/* Logged Out Success Notice */}
+          {/* Logged Out / Session Notice */}
           {loggedOutNotice && !error && (
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
@@ -209,15 +365,30 @@ export default function LoginPage() {
             </motion.div>
           )}
 
-          {/* Error Message Box */}
+          {/* Accessible, Dismissible Central Error Box */}
           {error && (
             <motion.div
+              role="alert"
+              aria-live="assertive"
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-5 flex items-start gap-2.5 p-3.5 rounded-lg bg-red-500/[0.08] border border-red-500/20 text-[13px] text-red-400"
+              className="mb-5 flex items-start justify-between gap-2.5 p-3.5 rounded-lg bg-red-500/[0.08] border border-red-500/20 text-[13px] text-red-400"
             >
-              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-400" />
-              <span>{error}</span>
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-400" />
+                <span className="leading-snug">{error}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setError("");
+                  if (rateLimitCountdown > 0) setRateLimitCountdown(0);
+                }}
+                className="text-red-400/70 hover:text-red-300 p-0.5 transition-colors shrink-0"
+                aria-label="Dismiss error"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </motion.div>
           )}
 
@@ -226,6 +397,7 @@ export default function LoginPage() {
             onSubmit={handleLogin}
             method="post"
             action="#"
+            noValidate
             className="space-y-5"
           >
             {/* Work Email Field */}
@@ -248,15 +420,26 @@ export default function LoginPage() {
                   name="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onInput={(e) => setEmail((e.target as HTMLInputElement).value)}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  onInput={(e) => handleEmailChange((e.target as HTMLInputElement).value)}
                   onAnimationStart={handleAutofillAnimation}
                   placeholder="you@axivontech.in"
                   autoComplete="username"
-                  required
-                  className="w-full h-11 pl-10 pr-3.5 rounded-lg bg-[#10151B] border border-[#29313B] text-[16px] sm:text-[14px] text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-colors duration-150"
+                  aria-invalid={!!fieldErrors.email}
+                  aria-describedby={fieldErrors.email ? "email-error" : undefined}
+                  className={`w-full h-11 pl-10 pr-3.5 rounded-lg bg-[#10151B] border ${
+                    fieldErrors.email
+                      ? "border-red-500/60 focus:border-red-500 focus:ring-red-500/30"
+                      : "border-[#29313B] focus:border-emerald-500/50 focus:ring-emerald-500/30"
+                  } text-[16px] sm:text-[14px] text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:ring-1 transition-colors duration-150`}
                 />
               </div>
+              {fieldErrors.email && (
+                <p id="email-error" role="alert" className="mt-1.5 text-xs text-red-400 flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{fieldErrors.email}</span>
+                </p>
+              )}
             </motion.div>
 
             {/* Password Field */}
@@ -279,13 +462,18 @@ export default function LoginPage() {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  onInput={(e) => handlePasswordChange((e.target as HTMLInputElement).value)}
                   onAnimationStart={handleAutofillAnimation}
                   placeholder="Enter your password"
                   autoComplete="current-password"
-                  required
-                  className="w-full h-11 pl-10 pr-11 rounded-lg bg-[#10151B] border border-[#29313B] text-[16px] sm:text-[14px] text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 transition-colors duration-150"
+                  aria-invalid={!!fieldErrors.password}
+                  aria-describedby={fieldErrors.password ? "password-error" : undefined}
+                  className={`w-full h-11 pl-10 pr-11 rounded-lg bg-[#10151B] border ${
+                    fieldErrors.password
+                      ? "border-red-500/60 focus:border-red-500 focus:ring-red-500/30"
+                      : "border-[#29313B] focus:border-emerald-500/50 focus:ring-emerald-500/30"
+                  } text-[16px] sm:text-[14px] text-[#F3F5F7] placeholder:text-[#566171] focus:outline-none focus:ring-1 transition-colors duration-150`}
                 />
                 <button
                   type="button"
@@ -301,6 +489,12 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
+              {fieldErrors.password && (
+                <p id="password-error" role="alert" className="mt-1.5 text-xs text-red-400 flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{fieldErrors.password}</span>
+                </p>
+              )}
             </motion.div>
 
             {/* Honeypot trap input */}
@@ -324,7 +518,9 @@ export default function LoginPage() {
               <GoogleRecaptchaWidget
                 onVerify={(token) => {
                   setCaptchaToken(token);
-                  setError("");
+                  if (error && error.includes("robot")) {
+                    setError("");
+                  }
                 }}
                 onExpire={() => {
                   setCaptchaToken("");
@@ -338,7 +534,7 @@ export default function LoginPage() {
               />
             </motion.div>
 
-            {/* Sign In Button */}
+            {/* Sign In Button with Double Submit Prevention & 429 Countdown */}
             <motion.div
               initial={prefersReduced ? false : { opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -346,9 +542,9 @@ export default function LoginPage() {
             >
               <motion.button
                 type="submit"
-                disabled={loading}
-                whileHover={prefersReduced ? undefined : { scale: 1.01 }}
-                whileTap={prefersReduced ? undefined : { scale: 0.99 }}
+                disabled={loading || rateLimitCountdown > 0}
+                whileHover={prefersReduced || rateLimitCountdown > 0 ? undefined : { scale: 1.01 }}
+                whileTap={prefersReduced || rateLimitCountdown > 0 ? undefined : { scale: 0.99 }}
                 className="w-full h-11 mt-1 bg-emerald-500 text-[#04130E] font-semibold text-[14px] rounded-lg hover:bg-emerald-600 active:bg-emerald-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:ring-offset-2 focus:ring-offset-[#0B0D10] shadow-lg shadow-emerald-500/20"
               >
                 {loading ? (
@@ -359,6 +555,8 @@ export default function LoginPage() {
                     </svg>
                     Signing in…
                   </span>
+                ) : rateLimitCountdown > 0 ? (
+                  <span>Try again in {rateLimitCountdown}s</span>
                 ) : (
                   "Sign In"
                 )}

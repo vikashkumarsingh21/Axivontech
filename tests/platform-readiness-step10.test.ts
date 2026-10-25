@@ -221,7 +221,8 @@ describe("Step 10: Final Platform-Wide Audit & Production Readiness", () => {
       const res = await getFinanceAnalytics(req);
       expect(res.status).toBe(403);
       const data = await res.json();
-      expect(data.error).toMatch(/Founder or Finance authorization/i);
+      const errorMessage = typeof data.error === "object" ? data.error.message : (data.error || data.message);
+      expect(errorMessage).toMatch(/Founder or Finance authorization/i);
     });
 
     it("should grant FOUNDER access to financial metrics", async () => {
