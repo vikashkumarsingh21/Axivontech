@@ -3,10 +3,8 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Card } from "@/components/ui/Card";
 import { EpButton } from "@/components/employee/EpButton";
 import { PageHeader } from "@/components/employee/PageHeader";
-import { SkeletonCard } from "@/components/employee/SkeletonCard";
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
@@ -251,21 +249,21 @@ export default function EmployeeCalendarPage() {
   const getEventBadgeClass = (type: CalendarEventItem["type"]) => {
     switch (type) {
       case "COMPANY_HOLIDAY":
-        return "bg-[#5FA8A0]/15 text-[#5FA8A0] border border-[#5FA8A0]/30";
+        return "bg-[#4F9D83]/15 text-[#4F9D83] border border-[#4F9D83]/30";
       case "PUBLIC_HOLIDAY":
-        return "bg-[#D6B779]/15 text-[#D6B779] border border-[#D6B779]/30";
+        return "bg-[#C9A15B]/15 text-[#C9A15B] border border-[#C9A15B]/30";
       case "FESTIVAL_OR_OBSERVANCE":
-        return "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+        return "bg-[#C9A15B]/10 text-[#C9A15B] border border-[#C9A15B]/20";
       case "OPTIONAL_HOLIDAY":
-        return "bg-[#67C5D8]/10 text-[#67C5D8] border border-[#67C5D8]/25";
+        return "bg-[#8E9AAF]/10 text-[#8E9AAF] border border-[#8E9AAF]/25";
       case "LEAVE":
-        return "bg-purple-500/10 text-purple-400 border border-purple-500/25";
+        return "bg-[#8E9AAF]/15 text-[#8E9AAF] border border-[#8E9AAF]/30";
       case "TASK":
-        return "bg-rose-500/10 text-rose-400 border border-rose-500/25";
+        return "bg-[#C46A62]/10 text-[#C46A62] border border-[#C46A62]/25";
       case "ANNOUNCEMENT":
-        return "bg-blue-500/10 text-blue-400 border border-blue-500/25";
+        return "bg-[#4F9D83]/10 text-[#4F9D83] border border-[#4F9D83]/25";
       default:
-        return "bg-[#171A1F] text-[#8B94A1] border border-[#22262D]";
+        return "bg-[#232324] text-[#8A867E] border border-[#2E2E30]";
     }
   };
 
@@ -274,7 +272,7 @@ export default function EmployeeCalendarPage() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="space-y-6 max-w-7xl"
+      className="space-y-6 max-w-7xl pb-12"
     >
       {/* Page Header */}
       <PageHeader
@@ -282,15 +280,15 @@ export default function EmployeeCalendarPage() {
         subtitle="Organization-wide weekly offs, Indian public holidays, festival observances, and personal sprint deadlines."
         icon={CalendarCheck}
         action={
-          <div className="flex items-center gap-1.5 p-1 bg-[#111317] border border-[#1E2530] rounded-xl text-xs">
+          <div className="flex items-center gap-1.5 p-1 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl text-xs">
             {(["MONTH", "WEEK", "DAY", "AGENDA"] as CalendarView[]).map((v) => (
               <button
                 key={v}
                 onClick={() => setActiveView(v)}
-                className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
                   activeView === v
-                    ? "bg-[#5FA8A0] text-[#0B0D10] font-semibold shadow-xs"
-                    : "text-[#8B94A1] hover:text-[#E6E8EB]"
+                    ? "bg-[#4F9D83] text-[#0F1A16] font-semibold shadow-xs"
+                    : "text-[#8A867E] hover:text-[#EDEBE6]"
                 }`}
               >
                 {v.charAt(0) + v.slice(1).toLowerCase()}
@@ -301,7 +299,7 @@ export default function EmployeeCalendarPage() {
       />
 
       {/* Navigation & Filter Bar */}
-      <Card className="p-4 bg-[#111317] border-[#1E2530] rounded-xl space-y-3">
+      <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           {/* Month / Period Controls */}
           <div className="flex items-center gap-2">
@@ -317,21 +315,21 @@ export default function EmployeeCalendarPage() {
             <div className="flex items-center gap-1">
               <button
                 onClick={handlePrev}
-                className="p-1.5 rounded-lg border border-[#1E2530] bg-[#0B0D10] text-[#8B94A1] hover:text-[#E6E8EB] hover:bg-[#171A1F] transition-colors"
+                className="p-1.5 rounded-lg border border-[#2E2E30] bg-[#232324] text-[#8A867E] hover:text-[#EDEBE6] hover:bg-[#2E2E30] transition-colors cursor-pointer"
                 aria-label="Previous"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={handleNext}
-                className="p-1.5 rounded-lg border border-[#1E2530] bg-[#0B0D10] text-[#8B94A1] hover:text-[#E6E8EB] hover:bg-[#171A1F] transition-colors"
+                className="p-1.5 rounded-lg border border-[#2E2E30] bg-[#232324] text-[#8A867E] hover:text-[#EDEBE6] hover:bg-[#2E2E30] transition-colors cursor-pointer"
                 aria-label="Next"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
 
-            <h2 className="text-base sm:text-lg font-bold text-[#E6E8EB] ml-2">
+            <h2 className="text-base sm:text-lg font-semibold text-[#EDEBE6] ml-2">
               {activeView === "MONTH" && `${monthNames[currentMonth]} ${currentYear}`}
               {activeView === "WEEK" &&
                 `Week of ${weekDays[0].date.toLocaleDateString(undefined, {
@@ -355,11 +353,11 @@ export default function EmployeeCalendarPage() {
 
           {/* Filter Dropdown */}
           <div className="flex items-center gap-2 self-end sm:self-auto">
-            <Filter className="w-3.5 h-3.5 text-[#566171]" />
+            <Filter className="w-3.5 h-3.5 text-[#8A867E]" />
             <select
               value={selectedFilter}
               onChange={(e) => setSelectedFilter(e.target.value)}
-              className="h-8 px-2.5 bg-[#0B0D10] border border-[#1E2530] rounded-lg text-xs text-[#8B94A1] focus:outline-none focus:border-[#5FA8A0]"
+              className="h-8 px-2.5 bg-[#232324] border border-[#2E2E30] rounded-lg text-xs text-[#B3AFA6] focus:outline-hidden focus:border-[#4F9D83] cursor-pointer"
             >
               <option value="ALL">All Events & Deadlines</option>
               <option value="COMPANY_HOLIDAY">Company Holidays (Offices Closed)</option>
@@ -373,7 +371,7 @@ export default function EmployeeCalendarPage() {
             {selectedFilter !== "ALL" && (
               <button
                 onClick={() => setSelectedFilter("ALL")}
-                className="p-1.5 rounded-lg text-[#8B94A1] hover:text-[#E6E8EB]"
+                className="p-1.5 rounded-lg text-[#8A867E] hover:text-[#EDEBE6] cursor-pointer"
                 title="Clear Filter"
               >
                 <X className="w-3.5 h-3.5" />
@@ -383,61 +381,61 @@ export default function EmployeeCalendarPage() {
         </div>
 
         {/* Legend strip */}
-        <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-[#1E2530] text-[11px] text-[#8B94A1]">
+        <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-[#2E2E30] text-[11px] text-[#8A867E]">
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#566171]" />
-            <strong className="text-[#E6E8EB]">Weekly Off:</strong> Sundays & Configured Saturdays
+            <span className="w-2 h-2 rounded-full bg-[#8A867E]" />
+            <strong className="text-[#EDEBE6]">Weekly Off:</strong> Sundays & Saturdays
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#5FA8A0]" />
-            <strong className="text-[#5FA8A0]">Company Holiday:</strong> Office Closed
+            <span className="w-2 h-2 rounded-full bg-[#4F9D83]" />
+            <strong className="text-[#4F9D83]">Company Holiday:</strong> Office Closed
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-            <strong className="text-amber-400">Observance:</strong> Indian Festival (Work Day)
+            <span className="w-2 h-2 rounded-full bg-[#C9A15B]" />
+            <strong className="text-[#C9A15B]">Observance:</strong> Festival / Event
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-purple-400" />
-            <strong className="text-purple-400">Leave:</strong> My Time Off
+            <span className="w-2 h-2 rounded-full bg-[#8E9AAF]" />
+            <strong className="text-[#8E9AAF]">Leave:</strong> My Time Off
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
-            <strong className="text-rose-400">Task:</strong> Sprint Due Date
+            <span className="w-2 h-2 rounded-full bg-[#C46A62]" />
+            <strong className="text-[#C46A62]">Task:</strong> Sprint Due Date
           </span>
         </div>
-      </Card>
+      </div>
 
       {/* Main Grid + Sidebar Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Calendar View Area (2 cols on desktop) */}
         <div className="lg:col-span-2 space-y-4">
           {loading ? (
-            <Card className="p-5 bg-[#111317] border-[#1E2530] rounded-2xl space-y-4">
+            <div className="p-5 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-4">
               <div className="grid grid-cols-7 gap-2 pb-2">
                 {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className="h-4 bg-[#1E2530] rounded-md animate-pulse" />
+                  <div key={i} className="h-4 bg-[#232324] rounded-md animate-pulse" />
                 ))}
               </div>
               <div className="grid grid-cols-7 gap-2">
                 {Array.from({ length: 35 }).map((_, i) => (
-                  <div key={i} className="h-20 bg-[#171A1F] rounded-xl border border-[#1E2530] animate-pulse" />
+                  <div key={i} className="h-20 bg-[#121212] rounded-xl border border-[#2E2E30] animate-pulse" />
                 ))}
               </div>
-            </Card>
+            </div>
           ) : (
             <>
               {/* VIEW A: MONTH VIEW */}
               {activeView === "MONTH" && (
-                <Card className="p-3 sm:p-5 bg-[#111317] border-[#1E2530] rounded-2xl space-y-2">
+                <div className="p-3 sm:p-5 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-2">
                   {/* Weekday Column Headers (Sun to Sat) */}
-                  <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-[#8B94A1] pb-2 border-b border-[#1E2530]">
-                    <span className="text-rose-400 font-bold">Sun</span>
+                  <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-[#8A867E] pb-2 border-b border-[#2E2E30]">
+                    <span className="text-[#C46A62] font-semibold">Sun</span>
                     <span>Mon</span>
                     <span>Tue</span>
                     <span>Wed</span>
                     <span>Thu</span>
                     <span>Fri</span>
-                    <span className="text-[#8B94A1]">Sat</span>
+                    <span className="text-[#8A867E]">Sat</span>
                   </div>
 
                   {/* Month Grid Cells */}
@@ -455,29 +453,29 @@ export default function EmployeeCalendarPage() {
                         <div
                           key={cell.dateString}
                           onClick={() => setSelectedDate(cell.date)}
-                          className={`min-h-[85px] sm:min-h-[105px] p-1.5 sm:p-2 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                          className={`min-h-[85px] sm:min-h-[105px] p-1.5 sm:p-2 rounded-xl border transition-colors cursor-pointer flex flex-col justify-between ${
                             isSelected
-                              ? "bg-[#171A1F] border-[#5FA8A0] shadow-md ring-1 ring-[#5FA8A0]/30"
+                              ? "bg-[#232324] border-[#4F9D83] shadow-md ring-1 ring-[#4F9D83]/30"
                               : isToday
-                              ? "bg-[#0B0D10] border-[#5FA8A0]/50"
+                              ? "bg-[#121212] border-[#4F9D83]/50"
                               : cell.isCurrentMonth
-                              ? "bg-[#0B0D10] border-[#1E2530] hover:border-[#22262D]"
-                              : "bg-[#0B0D10]/40 border-transparent opacity-40 hover:opacity-75"
+                              ? "bg-[#121212]/60 border-[#2E2E30] hover:border-[#3A3A3D]"
+                              : "bg-[#121212]/20 border-transparent opacity-30 hover:opacity-60"
                           }`}
                         >
                           {/* Top Row: Date Number and Off Indicator */}
                           <div className="flex items-center justify-between">
                             <span
-                              className={`text-xs font-bold ${
+                              className={`text-xs font-semibold ${
                                 isToday
-                                  ? "w-6 h-6 rounded-full bg-[#5FA8A0] text-[#0B0D10] flex items-center justify-center font-bold"
+                                  ? "w-6 h-6 rounded-full bg-[#4F9D83] text-[#0F1A16] flex items-center justify-center font-bold"
                                   : isSelected
-                                  ? "text-[#5FA8A0]"
+                                  ? "text-[#4F9D83]"
                                   : cell.dayOfWeek === 0
-                                  ? "text-rose-400"
+                                  ? "text-[#C46A62]"
                                   : cell.isCurrentMonth
-                                  ? "text-[#E6E8EB]"
-                                  : "text-[#566171]"
+                                  ? "text-[#EDEBE6]"
+                                  : "text-[#8A867E]"
                               }`}
                             >
                               {cell.dayNumber}
@@ -485,7 +483,7 @@ export default function EmployeeCalendarPage() {
 
                             {isWeeklyOff && (
                               <span
-                                className="text-[9px] font-semibold text-[#8B94A1] bg-[#171A1F] border border-[#22262D] px-1 py-0.2 rounded"
+                                className="text-[9px] font-medium text-[#8A867E] bg-[#232324] border border-[#2E2E30] px-1 py-0.2 rounded"
                                 title={weeklyOffInfo.reason}
                               >
                                 Off
@@ -508,7 +506,7 @@ export default function EmployeeCalendarPage() {
                             ))}
 
                             {dayEvents.length > 2 && (
-                              <div className="text-[10px] font-semibold text-[#5FA8A0] pl-1">
+                              <div className="text-[10px] font-semibold text-[#4F9D83] pl-1">
                                 +{dayEvents.length - 2} more
                               </div>
                             )}
@@ -517,12 +515,12 @@ export default function EmployeeCalendarPage() {
                       );
                     })}
                   </div>
-                </Card>
+                </div>
               )}
 
               {/* VIEW B: WEEK VIEW */}
               {activeView === "WEEK" && (
-                <Card className="p-4 sm:p-5 bg-[#111317] border-[#1E2530] rounded-2xl space-y-4">
+                <div className="p-4 sm:p-5 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-7 gap-2">
                     {weekDays.map((day) => {
                       const dayEvents = filteredEvents.filter((e) => e.date === day.dateString);
@@ -534,25 +532,25 @@ export default function EmployeeCalendarPage() {
                         <div
                           key={day.dateString}
                           onClick={() => setSelectedDate(day.date)}
-                          className={`p-3 rounded-xl border cursor-pointer transition-all space-y-2 ${
+                          className={`p-3 rounded-xl border cursor-pointer transition-colors space-y-2 ${
                             isSelected
-                              ? "bg-[#171A1F] border-[#5FA8A0] ring-1 ring-[#5FA8A0]/30"
+                              ? "bg-[#232324] border-[#4F9D83] ring-1 ring-[#4F9D83]/30"
                               : isToday
-                              ? "bg-[#0B0D10] border-[#5FA8A0]/40"
-                              : "bg-[#0B0D10] border-[#1E2530] hover:border-[#22262D]"
+                              ? "bg-[#121212] border-[#4F9D83]/40"
+                              : "bg-[#121212]/60 border-[#2E2E30] hover:border-[#3A3A3D]"
                           }`}
                         >
-                          <div className="border-b border-[#1E2530] pb-1.5 flex items-center justify-between">
+                          <div className="border-b border-[#2E2E30] pb-1.5 flex items-center justify-between">
                             <div>
-                              <div className="text-[11px] font-semibold text-[#8B94A1]">
+                              <div className="text-[11px] font-semibold text-[#8A867E]">
                                 {day.date.toLocaleDateString(undefined, { weekday: "short" })}
                               </div>
-                              <div className="text-sm font-bold text-[#E6E8EB]">
+                              <div className="text-sm font-semibold text-[#EDEBE6]">
                                 {day.dayNumber}
                               </div>
                             </div>
                             {weeklyOffInfo.isOff && (
-                              <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-[#8B94A1] border border-white/10">
+                              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#232324] text-[#8A867E] border border-[#2E2E30]">
                                 Off
                               </span>
                             )}
@@ -560,7 +558,7 @@ export default function EmployeeCalendarPage() {
 
                           <div className="space-y-1.5 min-h-[90px]">
                             {dayEvents.length === 0 ? (
-                              <span className="text-[11px] text-[#566171] italic block pt-2">
+                              <span className="text-[11px] text-[#8A867E] italic block pt-2">
                                 No events
                               </span>
                             ) : (
@@ -580,15 +578,15 @@ export default function EmployeeCalendarPage() {
                       );
                     })}
                   </div>
-                </Card>
+                </div>
               )}
 
               {/* VIEW C: DAY VIEW */}
               {activeView === "DAY" && (
-                <Card className="p-5 sm:p-6 bg-[#111317] border-[#1E2530] rounded-2xl space-y-5">
-                  <div className="flex items-center justify-between pb-3 border-b border-[#1E2530]">
+                <div className="p-5 sm:p-6 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-5">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#2E2E30]">
                     <div>
-                      <h3 className="text-lg font-bold text-[#E6E8EB]">
+                      <h3 className="text-lg font-semibold text-[#EDEBE6]">
                         {selectedDate.toLocaleDateString(undefined, {
                           weekday: "long",
                           month: "long",
@@ -596,7 +594,7 @@ export default function EmployeeCalendarPage() {
                           year: "numeric",
                         })}
                       </h3>
-                      <p className="text-xs text-[#8B94A1] mt-0.5">
+                      <p className="text-xs text-[#8A867E] mt-0.5">
                         {selectedDayWeeklyOff.isOff
                           ? selectedDayWeeklyOff.reason
                           : "Regular Company Workday"}
@@ -604,27 +602,27 @@ export default function EmployeeCalendarPage() {
                     </div>
 
                     {selectedDayWeeklyOff.isOff && (
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-[#8B94A1]">
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#232324] border border-[#2E2E30] text-[#8A867E]">
                         {selectedDayWeeklyOff.reason}
                       </span>
                     )}
                   </div>
 
                   {selectedDateEvents.length === 0 && !selectedDayWeeklyOff.isOff ? (
-                    <div className="py-12 text-center text-[#8B94A1] text-xs">
+                    <div className="py-12 text-center text-[#8A867E] text-xs">
                       No specific holidays, leaves, or deadlines scheduled for this date.
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {selectedDayWeeklyOff.isOff && (
-                        <div className="p-4 rounded-xl bg-[#0B0D10] border border-[#1E2530] flex items-center gap-3">
-                          <Sun className="w-5 h-5 text-[#D6B779]" />
+                        <div className="p-4 rounded-xl bg-[#121212]/60 border border-[#2E2E30] flex items-center gap-3">
+                          <Sun className="w-5 h-5 text-[#C9A15B]" />
                           <div>
-                            <div className="font-bold text-sm text-[#E6E8EB]">
+                            <div className="font-semibold text-sm text-[#EDEBE6]">
                               {selectedDayWeeklyOff.reason}
                             </div>
-                            <div className="text-xs text-[#8B94A1]">
-                              Configured weekly off day per Axivon calendar schedule settings.
+                            <div className="text-xs text-[#8A867E]">
+                              Configured weekly off day per calendar schedule settings.
                             </div>
                           </div>
                         </div>
@@ -633,45 +631,45 @@ export default function EmployeeCalendarPage() {
                       {selectedDateEvents.map((ev) => (
                         <div
                           key={ev.id}
-                          className="p-4 rounded-xl bg-[#0B0D10] border border-[#1E2530] space-y-1"
+                          className="p-4 rounded-xl bg-[#121212]/60 border border-[#2E2E30] space-y-1"
                         >
                           <div className="flex items-center justify-between">
                             <span
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${getEventBadgeClass(
+                              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${getEventBadgeClass(
                                 ev.type
                               )}`}
                             >
                               {ev.type.replace(/_/g, " ")}
                             </span>
                             {ev.status && (
-                              <span className="text-xs font-mono text-[#5FA8A0]">{ev.status}</span>
+                              <span className="text-xs font-mono text-[#4F9D83]">{ev.status}</span>
                             )}
                           </div>
-                          <h4 className="text-base font-bold text-[#E6E8EB] mt-1">{ev.title}</h4>
+                          <h4 className="text-base font-semibold text-[#EDEBE6] mt-1">{ev.title}</h4>
                           {ev.subtitle && (
-                            <p className="text-xs text-[#8B94A1] leading-relaxed">{ev.subtitle}</p>
+                            <p className="text-xs text-[#8A867E] leading-relaxed">{ev.subtitle}</p>
                           )}
                         </div>
                       ))}
                     </div>
                   )}
-                </Card>
+                </div>
               )}
 
               {/* VIEW D: AGENDA VIEW */}
               {activeView === "AGENDA" && (
-                <Card className="p-5 sm:p-6 bg-[#111317] border-[#1E2530] rounded-2xl space-y-4">
-                  <div className="pb-3 border-b border-[#1E2530]">
-                    <h3 className="text-base font-bold text-[#E6E8EB]">
+                <div className="p-5 sm:p-6 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-4">
+                  <div className="pb-3 border-b border-[#2E2E30]">
+                    <h3 className="text-base font-semibold text-[#EDEBE6]">
                       Upcoming Calendar Agenda ({currentYear})
                     </h3>
-                    <p className="text-xs text-[#8B94A1]">
+                    <p className="text-xs text-[#8A867E]">
                       Chronological upcoming holidays, festival observances, approved leaves, and deadlines.
                     </p>
                   </div>
 
                   {filteredEvents.length === 0 ? (
-                    <div className="py-12 text-center text-[#8B94A1] text-xs">
+                    <div className="py-12 text-center text-[#8A867E] text-xs">
                       No calendar events recorded for this period.
                     </div>
                   ) : (
@@ -690,14 +688,14 @@ export default function EmployeeCalendarPage() {
                                 setSelectedDate(dateObj);
                                 setActiveView("DAY");
                               }}
-                              className="p-3.5 rounded-xl border border-[#1E2530] bg-[#0B0D10] hover:border-[#22262D] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer"
+                              className="p-3.5 rounded-xl border border-[#2E2E30] bg-[#121212]/60 hover:border-[#3A3A3D] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer"
                             >
                               <div className="flex items-start gap-3">
-                                <div className="w-12 h-12 rounded-xl bg-[#111317] border border-[#1E2530] flex flex-col items-center justify-center shrink-0">
-                                  <span className="text-[10px] text-[#8B94A1] font-bold uppercase">
+                                <div className="w-12 h-12 rounded-xl bg-[#1A1A1B] border border-[#2E2E30] flex flex-col items-center justify-center shrink-0">
+                                  <span className="text-[10px] text-[#8A867E] font-semibold uppercase">
                                     {dateObj.toLocaleDateString(undefined, { month: "short" })}
                                   </span>
-                                  <span className="text-base font-bold text-[#E6E8EB]">
+                                  <span className="text-base font-semibold text-[#EDEBE6]">
                                     {dateObj.getDate()}
                                   </span>
                                 </div>
@@ -705,24 +703,24 @@ export default function EmployeeCalendarPage() {
                                 <div className="space-y-0.5">
                                   <div className="flex items-center gap-2">
                                     <span
-                                      className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${getEventBadgeClass(
+                                      className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${getEventBadgeClass(
                                         ev.type
                                       )}`}
                                     >
                                       {ev.type.replace(/_/g, " ")}
                                     </span>
-                                    <span className="text-xs font-semibold text-[#5FA8A0]">
+                                    <span className="text-xs font-semibold text-[#4F9D83]">
                                       {countdown}
                                     </span>
                                   </div>
-                                  <h4 className="text-sm font-semibold text-[#E6E8EB]">{ev.title}</h4>
+                                  <h4 className="text-sm font-semibold text-[#EDEBE6]">{ev.title}</h4>
                                   {ev.subtitle && (
-                                    <p className="text-xs text-[#8B94A1]">{ev.subtitle}</p>
+                                    <p className="text-xs text-[#8A867E]">{ev.subtitle}</p>
                                   )}
                                 </div>
                               </div>
 
-                              <div className="text-xs text-[#8B94A1] self-end sm:self-center">
+                              <div className="text-xs text-[#8A867E] self-end sm:self-center">
                                 {dateObj.toLocaleDateString(undefined, { weekday: "long" })}
                               </div>
                             </div>
@@ -730,7 +728,7 @@ export default function EmployeeCalendarPage() {
                         })}
                     </div>
                   )}
-                </Card>
+                </div>
               )}
             </>
           )}
@@ -738,29 +736,29 @@ export default function EmployeeCalendarPage() {
 
         {/* Selected Day Agenda Side Drawer (1 col) */}
         <div className="space-y-4">
-          <Card className="p-5 bg-[#111317] border-[#1E2530] rounded-2xl space-y-4">
-            <div className="flex items-center gap-3 pb-3 border-b border-[#1E2530]">
-              <div className="w-9 h-9 rounded-xl bg-[#5FA8A0]/10 border border-[#5FA8A0]/20 flex items-center justify-center text-[#5FA8A0]">
+          <div className="p-5 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-4">
+            <div className="flex items-center gap-3 pb-3 border-b border-[#2E2E30]">
+              <div className="w-9 h-9 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#4F9D83]">
                 <CalendarIcon className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-[#E6E8EB]">
+                <h3 className="text-base font-semibold text-[#EDEBE6]">
                   {selectedDate.toLocaleDateString(undefined, {
                     weekday: "short",
                     month: "short",
                     day: "numeric",
                   })}
                 </h3>
-                <p className="text-xs text-[#8B94A1]">Day agenda & scheduled items</p>
+                <p className="text-xs text-[#8A867E]">Day agenda & scheduled items</p>
               </div>
             </div>
 
             {/* Weekly Off Notice for Selected Day */}
             {selectedDayWeeklyOff.isOff && (
-              <div className="p-3 bg-white/5 border border-white/10 rounded-xl flex items-center gap-2.5 text-xs text-[#8B94A1]">
-                <Sun className="w-4 h-4 text-[#D6B779] shrink-0" />
+              <div className="p-3 bg-[#232324] border border-[#2E2E30] rounded-xl flex items-center gap-2.5 text-xs text-[#8A867E]">
+                <Sun className="w-4 h-4 text-[#C9A15B] shrink-0" />
                 <span>
-                  <strong className="text-[#E6E8EB]">{selectedDayWeeklyOff.reason}</strong> (Company
+                  <strong className="text-[#EDEBE6]">{selectedDayWeeklyOff.reason}</strong> (Company
                   Non-Working Day)
                 </span>
               </div>
@@ -768,8 +766,8 @@ export default function EmployeeCalendarPage() {
 
             {/* Day Events List */}
             {selectedDateEvents.length === 0 ? (
-              <div className="py-8 text-center text-[#8B94A1] text-xs space-y-1">
-                <Clock className="w-6 h-6 text-[#566171] mx-auto mb-2" />
+              <div className="py-8 text-center text-[#8A867E] text-xs space-y-1">
+                <Clock className="w-6 h-6 text-[#8A867E] mx-auto mb-2" />
                 <p>No specific holidays or deadlines for this day.</p>
               </div>
             ) : (
@@ -777,30 +775,30 @@ export default function EmployeeCalendarPage() {
                 {selectedDateEvents.map((e) => (
                   <div
                     key={e.id}
-                    className="p-3 rounded-xl border border-[#1E2530] bg-[#0B0D10] space-y-1"
+                    className="p-3 rounded-xl border border-[#2E2E30] bg-[#121212]/60 space-y-1"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span
-                        className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${getEventBadgeClass(
+                        className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${getEventBadgeClass(
                           e.type
                         )}`}
                       >
                         {e.type.replace(/_/g, " ")}
                       </span>
                       {e.status && (
-                        <span className="text-[10px] text-[#8B94A1] font-mono">{e.status}</span>
+                        <span className="text-[10px] text-[#8A867E] font-mono">{e.status}</span>
                       )}
                     </div>
 
-                    <h4 className="text-xs sm:text-sm font-semibold text-[#E6E8EB]">{e.title}</h4>
+                    <h4 className="text-xs sm:text-sm font-semibold text-[#EDEBE6]">{e.title}</h4>
 
-                    {e.subtitle && <p className="text-[11px] text-[#8B94A1]">{e.subtitle}</p>}
+                    {e.subtitle && <p className="text-[11px] text-[#8A867E]">{e.subtitle}</p>}
 
                     {e.type === "TASK" && (
                       <div className="pt-1">
                         <Link
                           href="/employee/tasks"
-                          className="text-[11px] text-[#5FA8A0] hover:text-[#5FA8A0]/80 flex items-center gap-1 font-medium"
+                          className="text-[11px] text-[#4F9D83] hover:text-[#5BB094] flex items-center gap-1 font-medium"
                         >
                           <span>Open in Tasks</span>
                           <ExternalLink className="w-3 h-3" />
@@ -811,27 +809,27 @@ export default function EmployeeCalendarPage() {
                 ))}
               </div>
             )}
-          </Card>
+          </div>
 
           {/* Upcoming Holidays & Long Weekends Card */}
-          <Card className="p-5 bg-[#111317] border-[#1E2530] rounded-2xl space-y-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8B94A1] flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#D6B779]" />
+          <div className="p-5 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-3">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8A867E] flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#C9A15B]" />
               <span>Upcoming Holidays & Festivals</span>
             </h3>
 
             {summary?.upcomingHolidays?.length === 0 ? (
-              <p className="text-xs text-[#8B94A1]">No upcoming holidays this month.</p>
+              <p className="text-xs text-[#8A867E]">No upcoming holidays this month.</p>
             ) : (
               <div className="space-y-2">
                 {summary?.upcomingHolidays?.slice(0, 4).map((h: any) => (
                   <div
                     key={h.id}
-                    className="p-2.5 rounded-lg bg-[#0B0D10] border border-[#1E2530] flex items-center justify-between text-xs"
+                    className="p-2.5 rounded-lg bg-[#121212]/60 border border-[#2E2E30] flex items-center justify-between text-xs"
                   >
                     <div>
-                      <div className="font-semibold text-[#E6E8EB]">{h.name}</div>
-                      <div className="text-[11px] text-[#8B94A1]">
+                      <div className="font-medium text-[#EDEBE6]">{h.name}</div>
+                      <div className="text-[11px] text-[#8A867E]">
                         {new Date(`${h.date}T00:00:00`).toLocaleDateString(undefined, {
                           month: "short",
                           day: "numeric",
@@ -839,14 +837,14 @@ export default function EmployeeCalendarPage() {
                         • {h.isCompanyHoliday ? "Day Off" : "Observance"}
                       </div>
                     </div>
-                    <span className="text-[11px] font-semibold text-[#5FA8A0]">
+                    <span className="text-[11px] font-semibold text-[#4F9D83]">
                       {h.relativeTime}
                     </span>
                   </div>
                 ))}
               </div>
             )}
-          </Card>
+          </div>
         </div>
       </div>
     </motion.div>
