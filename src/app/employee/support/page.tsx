@@ -1,16 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { motion } from "framer-motion";
 import { PageHeader } from "@/components/employee/PageHeader";
 import { EpButton } from "@/components/employee/EpButton";
 import { StatusBadge } from "@/components/employee/StatusBadge";
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
 import {
   HelpCircle,
-  Mail,
   ShieldAlert,
   Send,
   CheckCircle2,
@@ -267,7 +264,7 @@ export default function SupportPage() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="space-y-6 max-w-7xl"
+      className="space-y-6 max-w-7xl pb-12"
     >
       {/* Page Header */}
       <PageHeader
@@ -278,7 +275,7 @@ export default function SupportPage() {
           <div className="flex items-center gap-2">
             <EpButton
               size="sm"
-              variant={activeTab === "NEW_TICKET" ? "primary" : "outline"}
+              variant={activeTab === "NEW_TICKET" ? "primary" : "secondary"}
               onClick={() => setActiveTab("NEW_TICKET")}
               className="text-xs h-8 px-3"
             >
@@ -291,77 +288,77 @@ export default function SupportPage() {
 
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-4 bg-[#111317] border-[#1E2530] rounded-xl flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-[#5FA8A0]/10 border border-[#5FA8A0]/20 flex items-center justify-center text-[#5FA8A0] shrink-0">
+        <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#4F9D83] shrink-0">
             <Headphones className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[11px] text-[#8B94A1]">Total Inquiries</div>
-            <div className="text-xl font-bold text-[#E6E8EB]">{ticketCounts.total}</div>
+            <div className="text-[11px] text-[#8A867E]">Total Inquiries</div>
+            <div className="text-xl font-semibold text-[#EDEBE6]">{ticketCounts.total}</div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-4 bg-[#111317] border-[#1E2530] rounded-xl flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+        <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#C9A15B] shrink-0">
             <Clock className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[11px] text-[#8B94A1]">Open / In Review</div>
-            <div className="text-xl font-bold text-[#E6E8EB]">{ticketCounts.open}</div>
+            <div className="text-[11px] text-[#8A867E]">Open / In Review</div>
+            <div className="text-xl font-semibold text-[#EDEBE6]">{ticketCounts.open}</div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-4 bg-[#111317] border-[#1E2530] rounded-xl flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-[#34D399]/10 border border-[#34D399]/20 flex items-center justify-center text-[#34D399] shrink-0">
+        <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#5FAE7E] shrink-0">
             <Check className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[11px] text-[#8B94A1]">Resolved</div>
-            <div className="text-xl font-bold text-[#E6E8EB]">{ticketCounts.resolved}</div>
+            <div className="text-[11px] text-[#8A867E]">Resolved</div>
+            <div className="text-xl font-semibold text-[#EDEBE6]">{ticketCounts.resolved}</div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-4 bg-[#111317] border-[#1E2530] rounded-xl flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-[#F87171]/10 border border-[#F87171]/20 flex items-center justify-center text-[#F87171] shrink-0">
+        <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#C46A62] shrink-0">
             <ShieldAlert className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[11px] text-[#8B94A1]">Emergency Helpline</div>
-            <div className="text-xs font-mono font-bold text-[#F87171] mt-0.5">
+            <div className="text-[11px] text-[#8A867E]">Emergency Helpline</div>
+            <div className="text-xs font-mono font-semibold text-[#C46A62] mt-0.5">
               +91 (800) AXIVON-SOS
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#1E2530] pb-2 text-xs">
+      <div className="flex items-center gap-2 border-b border-[#2E2E30] pb-2 text-xs">
         <button
           onClick={() => setActiveTab("TICKETS")}
-          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors ${
+          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
             activeTab === "TICKETS"
-              ? "bg-[#5FA8A0]/15 text-[#5FA8A0] border border-[#5FA8A0]/30 font-semibold"
-              : "text-[#8B94A1] hover:text-[#E6E8EB]"
+              ? "bg-[#4F9D83]/15 text-[#4F9D83] border border-[#4F9D83]/30 font-semibold"
+              : "text-[#8A867E] hover:text-[#EDEBE6]"
           }`}
         >
           My Tickets ({tickets.length})
         </button>
         <button
           onClick={() => setActiveTab("NEW_TICKET")}
-          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors ${
+          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
             activeTab === "NEW_TICKET"
-              ? "bg-[#5FA8A0]/15 text-[#5FA8A0] border border-[#5FA8A0]/30 font-semibold"
-              : "text-[#8B94A1] hover:text-[#E6E8EB]"
+              ? "bg-[#4F9D83]/15 text-[#4F9D83] border border-[#4F9D83]/30 font-semibold"
+              : "text-[#8A867E] hover:text-[#EDEBE6]"
           }`}
         >
-          Submit Inquiries
+          Submit Inquiry
         </button>
         <button
           onClick={() => setActiveTab("FAQS")}
-          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors ${
+          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
             activeTab === "FAQS"
-              ? "bg-[#5FA8A0]/15 text-[#5FA8A0] border border-[#5FA8A0]/30 font-semibold"
-              : "text-[#8B94A1] hover:text-[#E6E8EB]"
+              ? "bg-[#4F9D83]/15 text-[#4F9D83] border border-[#4F9D83]/30 font-semibold"
+              : "text-[#8A867E] hover:text-[#EDEBE6]"
           }`}
         >
           Desk Channels & FAQs
@@ -373,19 +370,19 @@ export default function SupportPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Ticket list */}
           <div className="lg:col-span-1 space-y-3">
-            <div className="text-xs font-semibold text-[#8B94A1] uppercase tracking-wider px-1">
+            <div className="text-xs font-semibold text-[#8A867E] uppercase tracking-wider px-1">
               Active & Past Tickets
             </div>
             {loadingTickets ? (
               <div className="space-y-3">
-                <SkeletonCard rows={2} />
-                <SkeletonCard rows={2} />
+                <SkeletonCard />
+                <SkeletonCard />
               </div>
             ) : tickets.length === 0 ? (
-              <Card className="p-8 text-center bg-[#111317] border-[#1E2530] rounded-xl space-y-2">
-                <Headphones className="w-8 h-8 text-[#566171] mx-auto" />
-                <h4 className="text-sm font-semibold text-[#E6E8EB]">No tickets yet</h4>
-                <p className="text-xs text-[#8B94A1]">
+              <div className="p-8 text-center bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-2">
+                <Headphones className="w-8 h-8 text-[#8A867E] mx-auto" />
+                <h4 className="text-sm font-semibold text-[#EDEBE6]">No tickets yet</h4>
+                <p className="text-xs text-[#8A867E]">
                   You have not raised any support inquiries yet.
                 </p>
                 <EpButton
@@ -396,7 +393,7 @@ export default function SupportPage() {
                 >
                   Create Your First Ticket
                 </EpButton>
-              </Card>
+              </div>
             ) : (
               tickets.map((t) => {
                 const isSelected = selectedTicket?.id === t.id;
@@ -404,22 +401,22 @@ export default function SupportPage() {
                   <div
                     key={t.id}
                     onClick={() => setSelectedTicket(t)}
-                    className={`p-3.5 rounded-xl border cursor-pointer transition-all space-y-2 ${
+                    className={`p-3.5 rounded-xl border cursor-pointer transition-colors space-y-2 ${
                       isSelected
-                        ? "bg-[#171A1F] border-[#5FA8A0] shadow-sm ring-1 ring-[#5FA8A0]/30"
-                        : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
+                        ? "bg-[#232324] border-[#4F9D83] shadow-xs ring-1 ring-[#4F9D83]/30"
+                        : "bg-[#1A1A1B] border-[#2E2E30] hover:border-[#3A3A3D]"
                     }`}
                   >
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-mono text-[11px] text-[#5FA8A0] font-semibold">
+                      <span className="font-mono text-[11px] text-[#4F9D83] font-semibold">
                         {t.ticketNumber}
                       </span>
                       <StatusBadge status={t.status} />
                     </div>
-                    <h4 className="text-xs sm:text-sm font-semibold text-[#E6E8EB] line-clamp-1">
+                    <h4 className="text-xs sm:text-sm font-medium text-[#EDEBE6] line-clamp-1">
                       {t.subject}
                     </h4>
-                    <div className="flex items-center justify-between text-[11px] text-[#566171] pt-1">
+                    <div className="flex items-center justify-between text-[11px] text-[#8A867E] pt-1">
                       <span>{t.category}</span>
                       <span>{new Date(t.createdAt).toLocaleDateString()}</span>
                     </div>
@@ -432,26 +429,26 @@ export default function SupportPage() {
           {/* Ticket Detail */}
           <div className="lg:col-span-2">
             {selectedTicket ? (
-              <Card className="p-5 sm:p-6 bg-[#111317] border-[#1E2530] rounded-2xl space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#1E2530]">
+              <div className="p-5 sm:p-6 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#2E2E30]">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono font-bold text-[#5FA8A0]">
+                      <span className="text-xs font-mono font-bold text-[#4F9D83]">
                         {selectedTicket.ticketNumber}
                       </span>
                       <StatusBadge status={selectedTicket.status} />
-                      <span className="text-xs px-2 py-0.5 rounded bg-[#171A1F] border border-[#22262D] text-[#8B94A1]">
+                      <span className="text-xs px-2 py-0.5 rounded bg-[#232324] border border-[#2E2E30] text-[#8A867E]">
                         {selectedTicket.priority}
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-[#E6E8EB] mt-1.5">
+                    <h3 className="text-lg font-semibold text-[#EDEBE6] mt-1.5">
                       {selectedTicket.subject}
                     </h3>
                   </div>
 
                   <EpButton
                     size="sm"
-                    variant="outline"
+                    variant="secondary"
                     onClick={() =>
                       handleToggleCloseTicket(selectedTicket.id, selectedTicket.status)
                     }
@@ -459,12 +456,12 @@ export default function SupportPage() {
                   >
                     {selectedTicket.status === "CLOSED" ? (
                       <>
-                        <RotateCcw className="w-3.5 h-3.5 mr-1.5 text-[#5FA8A0]" />
+                        <RotateCcw className="w-3.5 h-3.5 mr-1.5 text-[#4F9D83]" />
                         <span>Reopen Ticket</span>
                       </>
                     ) : (
                       <>
-                        <XCircle className="w-3.5 h-3.5 mr-1.5 text-rose-400" />
+                        <XCircle className="w-3.5 h-3.5 mr-1.5 text-[#C46A62]" />
                         <span>Close Ticket</span>
                       </>
                     )}
@@ -472,20 +469,20 @@ export default function SupportPage() {
                 </div>
 
                 {/* Original Message */}
-                <div className="p-4 rounded-xl bg-[#0B0D10] border border-[#1E2530] space-y-2">
-                  <div className="flex items-center justify-between text-xs text-[#8B94A1]">
-                    <span className="font-semibold text-[#E6E8EB]">Initial Request:</span>
+                <div className="p-4 rounded-xl bg-[#121212]/60 border border-[#2E2E30] space-y-2">
+                  <div className="flex items-center justify-between text-xs text-[#8A867E]">
+                    <span className="font-semibold text-[#EDEBE6]">Initial Request:</span>
                     <span>{new Date(selectedTicket.createdAt).toLocaleString()}</span>
                   </div>
-                  <p className="text-xs text-[#8B94A1] whitespace-pre-wrap leading-relaxed">
+                  <p className="text-xs text-[#8A867E] whitespace-pre-wrap leading-relaxed">
                     {selectedTicket.message}
                   </p>
                 </div>
 
                 {/* Replies Thread */}
                 <div className="space-y-3">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-[#8B94A1] flex items-center gap-2">
-                    <MessageSquare className="w-3.5 h-3.5 text-[#5FA8A0]" />
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-[#8A867E] flex items-center gap-2">
+                    <MessageSquare className="w-3.5 h-3.5 text-[#4F9D83]" />
                     <span>Conversation ({selectedTicket.replies?.length || 0})</span>
                   </h4>
 
@@ -494,20 +491,20 @@ export default function SupportPage() {
                       {selectedTicket.replies.map((r) => (
                         <div
                           key={r.id}
-                          className="p-3 rounded-xl bg-[#171A1F] border border-[#22262D] space-y-1.5 text-xs"
+                          className="p-3 rounded-xl bg-[#232324] border border-[#2E2E30] space-y-1.5 text-xs"
                         >
-                          <div className="flex items-center justify-between text-[11px] text-[#8B94A1]">
-                            <span className="font-semibold text-[#5FA8A0]">
+                          <div className="flex items-center justify-between text-[11px] text-[#8A867E]">
+                            <span className="font-semibold text-[#4F9D83]">
                               {r.user?.name || "Support Agent"}
                             </span>
                             <span>{new Date(r.createdAt).toLocaleString()}</span>
                           </div>
-                          <p className="text-[#E6E8EB] leading-relaxed">{r.message}</p>
+                          <p className="text-[#EDEBE6] leading-relaxed">{r.message}</p>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-[#566171] italic">
+                    <p className="text-xs text-[#8A867E] italic">
                       No replies logged yet. Helpdesk team will acknowledge shortly.
                     </p>
                   )}
@@ -515,17 +512,17 @@ export default function SupportPage() {
                   {/* Send Reply Box */}
                   {selectedTicket.status !== "CLOSED" && (
                     <div className="pt-2 flex gap-2">
-                      <Input
+                      <input
                         placeholder="Type a message or response..."
                         value={replyMessage}
                         onChange={(e) => setReplyMessage(e.target.value)}
-                        className="bg-[#0B0D10] border-[#1E2530] text-[#E6E8EB] placeholder:text-[#566171] text-xs h-9"
+                        className="flex-1 bg-[#232324] border border-[#2E2E30] rounded-lg px-3 text-[#EDEBE6] placeholder:text-[#7C786F] text-xs h-9 focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
                       />
                       <EpButton
                         size="sm"
                         variant="primary"
                         onClick={() => handleSendReply(selectedTicket.id)}
-                        isLoading={sendingReply}
+                        loading={sendingReply}
                         className="h-9 px-3 shrink-0 text-xs"
                       >
                         <Send className="w-3.5 h-3.5 mr-1.5" />
@@ -534,15 +531,15 @@ export default function SupportPage() {
                     </div>
                   )}
                 </div>
-              </Card>
+              </div>
             ) : (
-              <Card className="p-12 text-center bg-[#111317] border-[#1E2530] rounded-2xl space-y-2">
-                <MessageSquare className="w-8 h-8 text-[#566171] mx-auto" />
-                <h4 className="text-sm font-semibold text-[#E6E8EB]">Select a ticket</h4>
-                <p className="text-xs text-[#8B94A1]">
+              <div className="p-12 text-center bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-2">
+                <MessageSquare className="w-8 h-8 text-[#8A867E] mx-auto" />
+                <h4 className="text-sm font-semibold text-[#EDEBE6]">Select a ticket</h4>
+                <p className="text-xs text-[#8A867E]">
                   Click any ticket from the left column to view message thread and status updates.
                 </p>
-              </Card>
+              </div>
             )}
           </div>
         </div>
@@ -551,28 +548,28 @@ export default function SupportPage() {
       {/* TAB 2: SUBMIT INQUIRY */}
       {activeTab === "NEW_TICKET" && (
         <div className="max-w-2xl mx-auto">
-          <Card className="p-6 bg-[#111317] border-[#1E2530] rounded-2xl space-y-4">
-            <div className="flex items-center gap-3 pb-3 border-b border-[#1E2530]">
-              <div className="w-9 h-9 rounded-xl bg-[#5FA8A0]/10 border border-[#5FA8A0]/20 flex items-center justify-center text-[#5FA8A0]">
+          <div className="p-6 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-4">
+            <div className="flex items-center gap-3 pb-3 border-b border-[#2E2E30]">
+              <div className="w-9 h-9 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#4F9D83]">
                 <Headphones className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-[#E6E8EB]">Submit an Internal Request</h2>
-                <p className="text-xs text-[#8B94A1]">
+                <h2 className="text-base font-semibold text-[#EDEBE6]">Submit an Internal Request</h2>
+                <p className="text-xs text-[#8A867E]">
                   Logged in administrative queues with automatic ticket acknowledgment.
                 </p>
               </div>
             </div>
 
             {successMsg && (
-              <div className="p-3 bg-[#34D399]/10 border border-[#34D399]/20 rounded-xl text-[#34D399] text-xs flex items-center gap-2">
+              <div className="p-3 bg-[#4F9D83]/10 border border-[#4F9D83]/25 rounded-xl text-[#4F9D83] text-xs flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{successMsg}</span>
               </div>
             )}
 
             {errorMsg && (
-              <div className="p-3 bg-[#F87171]/10 border border-[#F87171]/20 rounded-xl text-[#F87171] text-xs flex items-center gap-2">
+              <div className="p-3 bg-[#C46A62]/10 border border-[#C46A62]/25 rounded-xl text-[#C46A62] text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{errorMsg}</span>
               </div>
@@ -581,11 +578,11 @@ export default function SupportPage() {
             <form onSubmit={handleSubmitTicket} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#8B94A1] mb-1.5">Category</label>
+                  <label className="block text-xs font-medium text-[#B3AFA6] mb-1.5">Category</label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full h-10 px-3 bg-[#0B0D10] border border-[#1E2530] rounded-xl text-xs text-[#E6E8EB] focus:outline-none focus:border-[#5FA8A0]"
+                    className="w-full h-10 px-3 bg-[#232324] border border-[#2E2E30] rounded-lg text-xs text-[#EDEBE6] focus:outline-hidden focus:border-[#4F9D83] cursor-pointer"
                   >
                     <option value="Technical Support">Technical Support & Access</option>
                     <option value="HR & Attendance">HR & Attendance Policies</option>
@@ -595,11 +592,11 @@ export default function SupportPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-[#8B94A1] mb-1.5">Priority</label>
+                  <label className="block text-xs font-medium text-[#B3AFA6] mb-1.5">Priority</label>
                   <select
                     value={priority}
                     onChange={(e) => setPriority(e.target.value as any)}
-                    className="w-full h-10 px-3 bg-[#0B0D10] border border-[#1E2530] rounded-xl text-xs text-[#E6E8EB] focus:outline-none focus:border-[#5FA8A0]"
+                    className="w-full h-10 px-3 bg-[#232324] border border-[#2E2E30] rounded-lg text-xs text-[#EDEBE6] focus:outline-hidden focus:border-[#4F9D83] cursor-pointer"
                   >
                     <option value="NORMAL">Normal Priority</option>
                     <option value="HIGH">High Priority</option>
@@ -609,25 +606,25 @@ export default function SupportPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-[#8B94A1] mb-1.5">
-                  Subject <span className="text-[#F87171]">*</span>
+                <label className="block text-xs font-medium text-[#B3AFA6] mb-1.5">
+                  Subject <span className="text-[#C46A62]">*</span>
                 </label>
-                <Input
+                <input
                   placeholder="e.g. Need AWS Cloud Sandbox credentials for development"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   required
-                  className="bg-[#0B0D10] border-[#1E2530] text-[#E6E8EB] placeholder:text-[#566171] focus-visible:border-[#5FA8A0]"
+                  className="w-full bg-[#232324] border border-[#2E2E30] rounded-lg px-3 py-2 text-xs sm:text-sm text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-[#8B94A1] mb-1.5">
-                  Detailed Message <span className="text-[#F87171]">*</span>
+                <label className="block text-xs font-medium text-[#B3AFA6] mb-1.5">
+                  Detailed Message <span className="text-[#C46A62]">*</span>
                 </label>
                 <textarea
                   rows={4}
-                  className="w-full bg-[#0B0D10] border border-[#1E2530] rounded-xl p-3 text-xs text-[#E6E8EB] placeholder:text-[#566171] focus:outline-none focus:border-[#5FA8A0]"
+                  className="w-full bg-[#232324] border border-[#2E2E30] rounded-lg p-3 text-xs text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83] resize-none"
                   placeholder="Explain the issue, error logs, or specific requirement in detail..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -638,14 +635,14 @@ export default function SupportPage() {
               <EpButton
                 type="submit"
                 variant="primary"
-                isLoading={submitting}
+                loading={submitting}
                 className="w-full text-xs h-10 font-semibold"
               >
                 <Send className="w-4 h-4 mr-2" />
                 <span>Submit Ticket</span>
               </EpButton>
             </form>
-          </Card>
+          </div>
         </div>
       )}
 
@@ -653,48 +650,48 @@ export default function SupportPage() {
       {activeTab === "FAQS" && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="p-4 bg-[#111317] border-[#1E2530] rounded-xl space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-[#5FA8A0]/10 border border-[#5FA8A0]/20 flex items-center justify-center text-[#5FA8A0]">
+            <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-2">
+              <div className="w-9 h-9 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#4F9D83]">
                 <Users className="w-4 h-4" />
               </div>
-              <h3 className="text-sm font-semibold text-[#E6E8EB]">HR & People Operations</h3>
-              <p className="text-xs text-[#8B94A1]">Policy, onboarding, and workplace queries</p>
-              <div className="text-xs font-mono text-[#5FA8A0] pt-1">hr@axivontech.in</div>
-            </Card>
+              <h3 className="text-sm font-semibold text-[#EDEBE6]">HR & People Operations</h3>
+              <p className="text-xs text-[#8A867E]">Policy, onboarding, and workplace queries</p>
+              <div className="text-xs font-mono text-[#4F9D83] pt-1">hr@axivontech.in</div>
+            </div>
 
-            <Card className="p-4 bg-[#111317] border-[#1E2530] rounded-xl space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-[#67C5D8]/10 border border-[#67C5D8]/20 flex items-center justify-center text-[#67C5D8]">
+            <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-2">
+              <div className="w-9 h-9 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#8E9AAF]">
                 <Laptop className="w-4 h-4" />
               </div>
-              <h3 className="text-sm font-semibold text-[#E6E8EB]">IT & Technical Desk</h3>
-              <p className="text-xs text-[#8B94A1]">VPN, email accounts, repository & laptop</p>
-              <div className="text-xs font-mono text-[#67C5D8] pt-1">it-support@axivontech.in</div>
-            </Card>
+              <h3 className="text-sm font-semibold text-[#EDEBE6]">IT & Technical Desk</h3>
+              <p className="text-xs text-[#8A867E]">VPN, email accounts, repository & laptop</p>
+              <div className="text-xs font-mono text-[#8E9AAF] pt-1">it-support@axivontech.in</div>
+            </div>
 
-            <Card className="p-4 bg-[#111317] border-[#1E2530] rounded-xl space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-[#D6B779]/10 border border-[#D6B779]/20 flex items-center justify-center text-[#D6B779]">
+            <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-2">
+              <div className="w-9 h-9 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#C9A15B]">
                 <CreditCard className="w-4 h-4" />
               </div>
-              <h3 className="text-sm font-semibold text-[#E6E8EB]">Payroll & Finance</h3>
-              <p className="text-xs text-[#8B94A1]">Salaries, tax receipts, and expense claims</p>
-              <div className="text-xs font-mono text-[#D6B779] pt-1">finance@axivontech.in</div>
-            </Card>
+              <h3 className="text-sm font-semibold text-[#EDEBE6]">Payroll & Finance</h3>
+              <p className="text-xs text-[#8A867E]">Salaries, tax receipts, and expense claims</p>
+              <div className="text-xs font-mono text-[#C9A15B] pt-1">finance@axivontech.in</div>
+            </div>
 
-            <Card className="p-4 bg-[#111317] border-[#1E2530] rounded-xl space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-[#F87171]/10 border border-[#F87171]/20 flex items-center justify-center text-[#F87171]">
+            <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-2">
+              <div className="w-9 h-9 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#C46A62]">
                 <ShieldAlert className="w-4 h-4" />
               </div>
-              <h3 className="text-sm font-semibold text-[#E6E8EB]">Emergency Escalation</h3>
-              <p className="text-xs text-[#8B94A1]">Immediate executive or security alerts</p>
-              <div className="text-xs font-mono text-[#F87171] pt-1">+91 (800) AXIVON-SOS</div>
-            </Card>
+              <h3 className="text-sm font-semibold text-[#EDEBE6]">Emergency Escalation</h3>
+              <p className="text-xs text-[#8A867E]">Immediate executive or security alerts</p>
+              <div className="text-xs font-mono text-[#C46A62] pt-1">+91 (800) AXIVON-SOS</div>
+            </div>
           </div>
 
-          <Card className="p-5 sm:p-6 bg-[#111317] border-[#1E2530] rounded-2xl space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1E2530]">
+          <div className="p-5 sm:p-6 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#2E2E30]">
               <div className="flex items-center gap-2">
-                <FileQuestion className="w-5 h-5 text-[#5FA8A0]" />
-                <h2 className="text-base font-bold text-[#E6E8EB]">Frequently Asked Questions</h2>
+                <FileQuestion className="w-5 h-5 text-[#4F9D83]" />
+                <h2 className="text-base font-semibold text-[#EDEBE6]">Frequently Asked Questions</h2>
               </div>
 
               {/* Category Filter */}
@@ -703,10 +700,10 @@ export default function SupportPage() {
                   <button
                     key={cat}
                     onClick={() => setActiveFaqCategory(cat)}
-                    className={`px-2 py-1 rounded transition-colors ${
+                    className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
                       activeFaqCategory === cat
-                        ? "bg-[#5FA8A0]/15 text-[#5FA8A0] font-semibold"
-                        : "text-[#8B94A1] hover:text-[#E6E8EB]"
+                        ? "bg-[#4F9D83]/15 text-[#4F9D83] font-semibold"
+                        : "text-[#8A867E] hover:text-[#EDEBE6]"
                     }`}
                   >
                     {cat}
@@ -721,22 +718,22 @@ export default function SupportPage() {
                 return (
                   <div
                     key={idx}
-                    className="border border-[#1E2530] rounded-xl bg-[#0B0D10] overflow-hidden transition-all"
+                    className="border border-[#2E2E30] rounded-xl bg-[#121212]/60 overflow-hidden transition-colors"
                   >
                     <button
                       onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                      className="w-full p-3.5 flex items-center justify-between text-left text-xs sm:text-sm font-semibold text-[#E6E8EB] hover:text-[#5FA8A0] transition-colors"
+                      className="w-full p-3.5 flex items-center justify-between text-left text-xs sm:text-sm font-medium text-[#EDEBE6] hover:text-[#4F9D83] transition-colors cursor-pointer"
                     >
                       <span>{faq.question}</span>
                       {isOpen ? (
-                        <ChevronUp className="w-4 h-4 text-[#8B94A1] shrink-0 ml-2" />
+                        <ChevronUp className="w-4 h-4 text-[#8A867E] shrink-0 ml-2" />
                       ) : (
-                        <ChevronDown className="w-4 h-4 text-[#8B94A1] shrink-0 ml-2" />
+                        <ChevronDown className="w-4 h-4 text-[#8A867E] shrink-0 ml-2" />
                       )}
                     </button>
 
                     {isOpen && (
-                      <div className="p-3.5 pt-1 text-xs text-[#8B94A1] border-t border-[#1E2530] leading-relaxed bg-[#111317]">
+                      <div className="p-3.5 pt-1 text-xs text-[#8A867E] border-t border-[#2E2E30] leading-relaxed bg-[#1A1A1B]">
                         {faq.answer}
                       </div>
                     )}
@@ -744,7 +741,7 @@ export default function SupportPage() {
                 );
               })}
             </div>
-          </Card>
+          </div>
         </div>
       )}
     </motion.div>
