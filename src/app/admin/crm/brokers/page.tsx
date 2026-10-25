@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Edit2, ShieldOff, ShieldAlert, Eye } from "lucide-react";
@@ -73,7 +75,7 @@ export default function BrokersPage() {
       
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to create broker");
+        throw new Error(getErrorMessage(data) || "Failed to create broker");
       }
       
       setIsModalOpen(false);

@@ -24,6 +24,8 @@ import {
   ArrowRight,
   Info,
 } from "lucide-react";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
+import { toast } from "@/lib/notifications/toast";
 
 export interface UserProfileData {
   id: string;
@@ -84,11 +86,13 @@ export function AccountProfileSettings({ portalTheme = "admin" }: AccountProfile
     setError(null);
     try {
       const res = await fetch("/api/v1/me/profile");
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to load account profile");
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
+        setError(parsed.errorMessage || "Failed to load account profile");
+        return;
       }
-      if (data.profile) {
+      const data = parsed.data || parsed.raw;
+      if (data?.profile) {
         setProfile(data.profile);
         setFormData({
           name: data.profile.name || "",
@@ -97,8 +101,8 @@ export function AccountProfileSettings({ portalTheme = "admin" }: AccountProfile
           emergencyContact: data.profile.emergencyContact || "",
         });
       }
-    } catch (err: any) {
-      setError(err?.message || "An error occurred while fetching your account details.");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -202,17 +206,25 @@ export function AccountProfileSettings({ portalTheme = "admin" }: AccountProfile
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to update profile information");
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to update profile information";
+        setError(msg);
+        toast.error(msg);
+        return;
       }
 
+      const data = parsed.data || parsed.raw;
       setProfile((prev) => (prev ? { ...prev, ...data.profile } : null));
-      setSuccessMessage("Profile information updated successfully.");
+      const successMsg = "Profile information updated successfully.";
+      setSuccessMessage(successMsg);
+      toast.success(successMsg);
       setIsEditing(false);
       setHasUnsavedChanges(false);
-    } catch (err: any) {
-      setError(err?.message || "An error occurred while saving your profile changes.");
+    } catch (err: unknown) {
+      const cleanErr = getErrorMessage(err);
+      setError(cleanErr);
+      toast.error(cleanErr);
     } finally {
       setSavingProfile(false);
     }
@@ -249,12 +261,18 @@ export function AccountProfileSettings({ portalTheme = "admin" }: AccountProfile
         body: JSON.stringify({ newEmail: emailToValidate }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to initiate email change request");
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to initiate email change request";
+        setEmailInputError(msg);
+        toast.error(msg);
+        return;
       }
 
-      setSuccessMessage(data.message || `Verification link sent to ${emailToValidate}`);
+      const data = parsed.data || parsed.raw;
+      const successMsg = data.message || `Verification link sent to ${emailToValidate}`;
+      setSuccessMessage(successMsg);
+      toast.success(successMsg);
       setShowEmailModal(false);
       setNewEmailInput("");
 
@@ -271,8 +289,10 @@ export function AccountProfileSettings({ portalTheme = "admin" }: AccountProfile
             }
           : null
       );
-    } catch (err: any) {
-      setEmailInputError(err?.message || "An error occurred while requesting email change");
+    } catch (err: unknown) {
+      const cleanErr = getErrorMessage(err);
+      setEmailInputError(cleanErr);
+      toast.error(cleanErr);
     } finally {
       setRequestingEmailChange(false);
     }
@@ -293,15 +313,22 @@ export function AccountProfileSettings({ portalTheme = "admin" }: AccountProfile
         method: "POST",
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to cancel pending email change");
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to cancel pending email change";
+        setError(msg);
+        toast.error(msg);
+        return;
       }
 
-      setSuccessMessage("Pending email change request has been cancelled.");
+      const successMsg = "Pending email change request has been cancelled.";
+      setSuccessMessage(successMsg);
+      toast.success(successMsg);
       setProfile((prev) => (prev ? { ...prev, pendingEmailChange: null } : null));
-    } catch (err: any) {
-      setError(err?.message || "Failed to cancel pending email change");
+    } catch (err: unknown) {
+      const cleanErr = getErrorMessage(err);
+      setError(cleanErr);
+      toast.error(cleanErr);
     } finally {
       setCancellingEmailChange(false);
     }

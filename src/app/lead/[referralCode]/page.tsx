@@ -6,6 +6,8 @@ import Image from "next/image";
 import { CheckCircle2, ChevronRight, ChevronLeft, Check } from "lucide-react";
 import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
 import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
+import { toast } from "@/lib/notifications/toast";
 
 type FormState = {
   name: string;
@@ -145,17 +147,26 @@ export default function LeadFormPage() {
         }),
       });
 
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || d.message || "Failed to submit enquiry. Please try again.");
+      const parsed = await parseApiResponse(res);
+
+      if (!parsed.ok) {
+        setRecaptchaResetCount((c) => c + 1);
+        setRecaptchaToken("");
+        const msg = parsed.errorMessage || "Failed to submit enquiry. Please try again.";
+        setError(msg);
+        toast.error(msg);
+        return;
       }
 
       setIsSuccess(true);
+      toast.success("Enquiry submitted successfully! A solution architect will contact you shortly.");
       window.scrollTo(0, 0);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+    } catch (err: unknown) {
       setRecaptchaResetCount((c) => c + 1);
       setRecaptchaToken("");
+      const cleanErr = getErrorMessage(err);
+      setError(cleanErr);
+      toast.error(cleanErr);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState, useCallback } from "react";
 import { Search, Plus, X, RefreshCw, AlertCircle, CheckCircle2, Building2, User } from "lucide-react";
 import Link from "next/link";
@@ -61,7 +63,7 @@ export default function ClientsPage() {
         body: JSON.stringify(addForm),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create client.");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to create client.");
       setIsAddOpen(false);
       setFeedback({ type: "success", message: `Client ${data.data.clientCode} created successfully.` });
       fetchClients();

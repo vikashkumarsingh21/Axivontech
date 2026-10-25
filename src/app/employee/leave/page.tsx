@@ -15,6 +15,8 @@ import { PageHeader } from "@/components/employee/PageHeader";
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
 import { StatusBadge } from "@/components/employee/StatusBadge";
 import { EpButton } from "@/components/employee/EpButton";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
+import { toast } from "@/lib/notifications/toast";
 
 interface LeaveRequestItem {
   id: string;
@@ -49,12 +51,19 @@ export default function LeavePage() {
     try {
       setLoading(true);
       const res = await fetch("/api/v1/employee/leave");
-      const data = await res.json();
-      if (data.success && Array.isArray(data.requests)) {
+      const parsed = await parseApiResponse(res);
+      const data = parsed.data || parsed.raw;
+      if (parsed.ok && data?.success && Array.isArray(data.requests)) {
         setRequests(data.requests);
+      } else if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to fetch leave requests.";
+        setActionError(msg);
+        toast.error(msg);
       }
-    } catch {
-      setActionError("Failed to fetch leave requests.");
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err);
+      setActionError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -80,12 +89,16 @@ export default function LeavePage() {
     setActionSuccess(null);
 
     if (!form.start || !form.end || !form.reason.trim()) {
-      setActionError("Please provide start date, end date, and reason.");
+      const msg = "Please provide start date, end date, and reason.";
+      setActionError(msg);
+      toast.warning(msg);
       return;
     }
 
     if (new Date(form.start) > new Date(form.end)) {
-      setActionError("End date cannot be earlier than start date.");
+      const msg = "End date cannot be earlier than start date.";
+      setActionError(msg);
+      toast.warning(msg);
       return;
     }
 
@@ -102,17 +115,24 @@ export default function LeavePage() {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to submit leave request.");
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to submit leave request.";
+        setActionError(msg);
+        toast.error(msg);
+        return;
       }
 
-      setActionSuccess("Leave request submitted successfully for approval.");
+      const successMsg = "Leave request submitted successfully for approval.";
+      setActionSuccess(successMsg);
+      toast.success(successMsg);
       setTimeout(() => setActionSuccess(null), 4000);
       setForm({ type: "SICK", start: "", end: "", reason: "" });
       loadData();
-    } catch (err: any) {
-      setActionError(err.message || "An error occurred while submitting.");
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err);
+      setActionError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -129,16 +149,23 @@ export default function LeavePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ requestId, action: "CANCEL" }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to cancel leave request.");
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to cancel leave request.";
+        setActionError(msg);
+        toast.error(msg);
+        return;
       }
 
-      setActionSuccess("Leave request cancelled successfully.");
+      const successMsg = "Leave request cancelled successfully.";
+      setActionSuccess(successMsg);
+      toast.success(successMsg);
       setTimeout(() => setActionSuccess(null), 3000);
       loadData();
-    } catch (err: any) {
-      setActionError(err.message || "Could not cancel request.");
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err);
+      setActionError(msg);
+      toast.error(msg);
     } finally {
       setCancellingId(null);
     }

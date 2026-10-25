@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -66,7 +68,7 @@ export default function EmployeeProfilePage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to load profile");
+        throw new Error(getErrorMessage(data) || "Failed to load profile");
       }
 
       if (data.profile) {
@@ -150,7 +152,7 @@ export default function EmployeeProfilePage() {
           });
           setFieldErrors(detailMap);
         }
-        throw new Error(data.error || "Failed to update profile");
+        throw new Error(getErrorMessage(data) || "Failed to update profile");
       }
 
       setSuccess("Profile information updated successfully.");

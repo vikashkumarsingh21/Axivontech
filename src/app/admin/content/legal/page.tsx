@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
@@ -246,7 +248,7 @@ export default function AdminLegalCmsPage() {
           setSavingPolicy(false);
           return;
         }
-        throw new Error(data.error || "Failed to save policy.");
+        throw new Error(getErrorMessage(data) || "Failed to save policy.");
       }
 
       setShowPolicyModal(false);

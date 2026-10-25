@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -105,7 +108,7 @@ export default function BlogManagementPage() {
 
   const handleSave = async () => {
     if (!form.title?.trim() || !form.contentHtml?.trim()) {
-      alert("Title and Article Content are required.");
+      toast.warning("Title and Article Content are required.");
       return;
     }
     setSaving(true);
@@ -133,7 +136,7 @@ export default function BlogManagementPage() {
       setShowModal(false);
       fetchArticles();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSaving(false);
     }

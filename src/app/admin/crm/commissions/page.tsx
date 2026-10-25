@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import {
   Check,
@@ -93,11 +96,11 @@ export default function AdminCommissions() {
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Action failed.");
+        throw new Error(getErrorMessage(data) || "Action failed.");
       }
       fetchCommissions();
     } catch (err: any) {
-      alert(err.message || "Failed to perform action.");
+      toast.error(getErrorMessage(err));
     } finally {
       setActionLoading(false);
     }
@@ -127,7 +130,7 @@ export default function AdminCommissions() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to mark as paid.");
+        throw new Error(getErrorMessage(data) || "Failed to mark as paid.");
       }
 
       setSettlingCommission(null);
@@ -164,7 +167,7 @@ export default function AdminCommissions() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to reject payout request.");
+        throw new Error(getErrorMessage(data) || "Failed to reject payout request.");
       }
 
       setRejectingCommission(null);

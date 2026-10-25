@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Lock, ShieldCheck, ArrowRight, AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
 
 function ClientActivationContent() {
   const router = useRouter();
@@ -48,14 +49,15 @@ function ClientActivationContent() {
         body: JSON.stringify({ token, newPassword: password }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to activate client account. The token may be expired or already used.");
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
+        setError(parsed.errorMessage || "Failed to activate client account. The token may be expired or already used.");
+        return;
       }
 
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred during account activation.");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }

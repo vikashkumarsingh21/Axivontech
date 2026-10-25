@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -238,7 +240,7 @@ export default function BrokerOnboardingPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to update profile details");
+        throw new Error(getErrorMessage(json) || "Failed to update profile details");
       }
 
       setCompletedSteps((prev) => ({ ...prev, 1: true }));
@@ -307,7 +309,7 @@ export default function BrokerOnboardingPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to update payout details");
+        throw new Error(getErrorMessage(json) || "Failed to update payout details");
       }
 
       setCompletedSteps((prev) => ({ ...prev, 2: true }));
@@ -359,7 +361,7 @@ export default function BrokerOnboardingPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to save KYC credentials");
+        throw new Error(getErrorMessage(json) || "Failed to save KYC credentials");
       }
 
       setCompletedSteps((prev) => ({ ...prev, 3: true }));
@@ -393,7 +395,7 @@ export default function BrokerOnboardingPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to record terms agreement");
+        throw new Error(getErrorMessage(json) || "Failed to record terms agreement");
       }
 
       setCompletedSteps((prev) => ({ ...prev, 4: true }));
@@ -421,7 +423,7 @@ export default function BrokerOnboardingPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to generate referral links");
+        throw new Error(getErrorMessage(json) || "Failed to generate referral links");
       }
 
       const data = json.data;

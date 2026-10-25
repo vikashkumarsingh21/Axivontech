@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Search, Plus, X, Edit2, CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
+import { toast } from "@/lib/notifications/toast";
 
 interface Employee {
   id: string;
@@ -77,17 +79,23 @@ export default function EmployeesPage() {
       params.set("limit", "10");
 
       const res = await fetch(`/api/v1/admin/employees?${params.toString()}`);
-      const data = await res.json();
+      const parsed = await parseApiResponse(res);
 
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to load employees");
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to load employees";
+        setFeedback({ type: "error", message: msg });
+        toast.error(msg);
+        return;
       }
 
-      setEmployees(data.data || []);
-      setTotalPages(data.meta?.pages || 1);
-      setTotalRecords(data.meta?.total || 0);
-    } catch (err: any) {
-      setFeedback({ type: "error", message: err.message || "Failed to connect to server" });
+      const data = parsed.data || parsed.raw;
+      setEmployees(data?.data || []);
+      setTotalPages(data?.meta?.pages || 1);
+      setTotalRecords(data?.meta?.total || 0);
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err);
+      setFeedback({ type: "error", message: msg });
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -144,17 +152,25 @@ export default function EmployeesPage() {
         body: JSON.stringify(addForm),
       });
 
-      const data = await res.json();
+      const parsed = await parseApiResponse(res);
 
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to create employee");
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to create employee";
+        setFormError(msg);
+        toast.error(msg);
+        return;
       }
 
+      const data = parsed.data || parsed.raw;
       setIsAddOpen(false);
-      setFeedback({ type: "success", message: `Employee "${data.data.name}" created successfully!` });
+      const successMsg = `Employee "${data?.data?.name || addForm.name}" created successfully!`;
+      setFeedback({ type: "success", message: successMsg });
+      toast.success(successMsg);
       fetchEmployees();
-    } catch (err: any) {
-      setFormError(err.message || "An unexpected error occurred");
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err);
+      setFormError(msg);
+      toast.error(msg);
     } finally {
       setFormLoading(false);
     }
@@ -190,17 +206,25 @@ export default function EmployeesPage() {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const parsed = await parseApiResponse(res);
 
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to update employee");
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to update employee";
+        setFormError(msg);
+        toast.error(msg);
+        return;
       }
 
+      const data = parsed.data || parsed.raw;
       setEditingEmployee(null);
-      setFeedback({ type: "success", message: `Employee "${data.data.name}" updated successfully!` });
+      const successMsg = `Employee "${data?.data?.name || editForm.name}" updated successfully!`;
+      setFeedback({ type: "success", message: successMsg });
+      toast.success(successMsg);
       fetchEmployees();
-    } catch (err: any) {
-      setFormError(err.message || "An unexpected error occurred");
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err);
+      setFormError(msg);
+      toast.error(msg);
     } finally {
       setFormLoading(false);
     }
@@ -815,15 +839,22 @@ export default function EmployeesPage() {
                       const res = await fetch(`/api/v1/admin/employees/${deletingEmployee.id}`, {
                         method: "DELETE",
                       });
-                      const data = await res.json();
-                      if (!res.ok) {
-                        throw new Error(data.error || "Failed to delete employee");
+                      const parsed = await parseApiResponse(res);
+                      if (!parsed.ok) {
+                        const msg = parsed.errorMessage || "Failed to delete employee";
+                        setFeedback({ type: "error", message: msg });
+                        toast.error(msg);
+                        return;
                       }
                       setDeletingEmployee(null);
-                      setFeedback({ type: "success", message: data.message || "User permanently deleted." });
+                      const successMsg = parsed.data?.message || parsed.raw?.message || "User permanently deleted.";
+                      setFeedback({ type: "success", message: successMsg });
+                      toast.success(successMsg);
                       fetchEmployees();
-                    } catch (err: any) {
-                      setFeedback({ type: "error", message: err.message || "Deletion failed" });
+                    } catch (err: unknown) {
+                      const msg = getErrorMessage(err);
+                      setFeedback({ type: "error", message: msg });
+                      toast.error(msg);
                       setDeletingEmployee(null);
                     } finally {
                       setDeleteLoading(false);

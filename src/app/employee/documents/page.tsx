@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
@@ -70,7 +72,7 @@ export default function DocumentsPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to acknowledge document");
+        throw new Error(getErrorMessage(data) || "Failed to acknowledge document");
       }
       setDocs((prev) =>
         prev.map((d) => (d.id === docId ? { ...d, isAcknowledged: true } : d))

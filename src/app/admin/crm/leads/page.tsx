@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState, useCallback } from "react";
 import { Search, Plus, X, RefreshCw, AlertCircle, CheckCircle2, UserPlus, Filter, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import Link from "next/link";
@@ -100,7 +102,7 @@ export default function LeadsPage() {
         body: JSON.stringify(addForm),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create lead.");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to create lead.");
 
       setIsAddOpen(false);
       setFeedback({ type: "success", message: `Lead ${data.data.leadCode} created successfully.` });

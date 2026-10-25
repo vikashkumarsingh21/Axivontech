@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
@@ -769,7 +772,7 @@ export default function BrokerDashboardPage() {
                 size="sm"
                 onClick={() => {
                   navigator.clipboard.writeText(shareText);
-                  alert("Template copied to clipboard!");
+                  toast.success("Template copied to clipboard!");
                 }}
                 icon={<Copy className="w-3.5 h-3.5" />}
               >

@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import {
@@ -246,7 +248,7 @@ export default function BrokerCommissionsPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || json.message || "Failed to submit payout request.");
+        throw new Error(getErrorMessage(json) || "Failed to submit payout request.");
       }
 
       setPayoutSuccess("Payout request recorded! Axivon Accounts SLA is 48 business hours.");

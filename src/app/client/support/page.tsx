@@ -19,6 +19,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
+import { toast } from "@/lib/notifications/toast";
 
 interface SupportIssue {
   id: string;
@@ -92,7 +94,10 @@ export default function ClientSupportPage() {
 
   const handleCreateTicket = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!subject.trim() || !message.trim()) return;
+    if (!subject.trim() || !message.trim()) {
+      toast.warning("Please provide a subject and detailed message.");
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -107,18 +112,22 @@ export default function ClientSupportPage() {
         }),
       });
 
-      if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.error || "Failed to submit support inquiry");
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to submit support inquiry";
+        toast.error(msg);
+        return;
       }
 
       setSubmitSuccess(true);
+      toast.success("Support ticket submitted successfully. Our engineering team has been notified.");
       setSubject("");
       setMessage("");
       setShowCreateForm(false);
       fetchSupportData();
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      const cleanErr = getErrorMessage(err);
+      toast.error(cleanErr);
     } finally {
       setSubmitting(false);
     }

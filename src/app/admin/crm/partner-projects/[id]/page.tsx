@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -43,10 +46,10 @@ export default function AdminPartnerProjectDetailPage() {
         method: "POST",
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to resend activation link");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to resend activation link");
       setActivationMsg(data.message || "Activation email successfully dispatched to client.");
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setResendingActivation(false);
     }
@@ -56,7 +59,7 @@ export default function AdminPartnerProjectDetailPage() {
     try {
       const res = await fetch(`/api/v1/admin/partner-projects/${params.id}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to fetch project");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to fetch project");
       setProject(data.data);
     } catch (err: any) {
       setError(err.message);
@@ -91,7 +94,7 @@ export default function AdminPartnerProjectDetailPage() {
       setContractForm({ name: "", description: "", fileUrl: "" });
       fetchProject();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     }
     setSendingContract(false);
   };
@@ -112,7 +115,7 @@ export default function AdminPartnerProjectDetailPage() {
       setRejectionReason("");
       fetchProject();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -132,7 +135,7 @@ export default function AdminPartnerProjectDetailPage() {
       setRejectionReason("");
       fetchProject();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -144,7 +147,7 @@ export default function AdminPartnerProjectDetailPage() {
         method: "POST",
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Delivery failed");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Delivery failed");
       setActionMessage({ type: "success", text: "Project delivered successfully and official delivery report generated." });
       fetchProject();
     } catch (err: any) {
@@ -162,7 +165,7 @@ export default function AdminPartnerProjectDetailPage() {
         method: "POST",
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Completion failed");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Completion failed");
       setActionMessage({ type: "success", text: "Project marked as COMPLETED successfully." });
       fetchProject();
     } catch (err: any) {
@@ -180,7 +183,7 @@ export default function AdminPartnerProjectDetailPage() {
         method: "POST",
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to generate delivery report");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to generate delivery report");
       setActionMessage({ type: "success", text: "Verified delivery report compiled and published." });
       fetchProject();
     } catch (err: any) {
@@ -200,7 +203,7 @@ export default function AdminPartnerProjectDetailPage() {
         body: JSON.stringify({ qaStatus: newStatus }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update QA status");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to update QA status");
       setActionMessage({ type: "success", text: `QA status successfully updated to ${newStatus}.` });
       fetchProject();
     } catch (err: any) {

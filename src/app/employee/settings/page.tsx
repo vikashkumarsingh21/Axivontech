@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { PageHeader } from "@/components/employee/PageHeader";
@@ -99,7 +101,7 @@ export default function EmployeeSettingsPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to save settings on server");
+        throw new Error(getErrorMessage(data) || "Failed to save settings on server");
       }
 
       // Save to localStorage

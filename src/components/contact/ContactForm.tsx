@@ -28,6 +28,8 @@ import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWi
 import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
 import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 import { CONTACT_CONFIG, getWhatsAppUrl, getPhoneTelLink, getEmailMailtoLink } from "@/config/contact";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
+import { toast } from "@/lib/notifications/toast";
 
 interface FormData {
   service: string;
@@ -308,18 +310,24 @@ export default function ContactForm() {
         body: JSON.stringify(payload),
       });
 
-      const responseData = await response.json().catch(() => ({}));
+      const parsed = await parseApiResponse(response);
 
-      if (!response.ok) {
+      if (!parsed.ok) {
         turnstileRef.current?.reset();
         setCaptchaToken("");
         setRecaptchaToken("");
         setRecaptchaResetCount((prev) => prev + 1);
-        throw new Error(responseData.error || responseData.message || "Submission failed. Please check your inputs.");
+        setStatus("error");
+        const msg = parsed.errorMessage || "Submission failed. Please check your inputs.";
+        setErrorMsg(msg);
+        toast.error(msg);
+        return;
       }
 
+      const responseData = parsed.data || parsed.raw;
       setAssignedLeadCode(responseData.leadCode || null);
       setStatus("success");
+      toast.success("Inquiry submitted successfully! Our solutions team will contact you shortly.");
 
       // Track confirmed conversion event without PII
       trackLeadSubmission({
@@ -328,11 +336,13 @@ export default function ContactForm() {
         timeline: formData.timeline,
         budget: formData.budget,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       turnstileRef.current?.reset();
       setCaptchaToken("");
       setStatus("error");
-      setErrorMsg(err?.message || "Something went wrong submitting your request. Please try again or email us directly.");
+      const cleanErr = getErrorMessage(err);
+      setErrorMsg(cleanErr);
+      toast.error(cleanErr);
     }
   };
 

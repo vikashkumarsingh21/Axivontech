@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
@@ -76,14 +79,14 @@ export default function AdminPartnerSupportPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to submit reply");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to submit reply");
 
       setReplyText("");
       setReplyStatus("");
       setSelectedTicket(data.ticket);
       fetchTickets();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSubmittingReply(false);
     }

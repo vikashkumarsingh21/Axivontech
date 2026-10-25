@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
@@ -142,7 +144,7 @@ export default function ReportsPage() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to submit work report");
+        throw new Error(getErrorMessage(data) || "Failed to submit work report");
       }
 
       setActionSuccess(

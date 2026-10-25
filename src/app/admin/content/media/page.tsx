@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -90,7 +93,7 @@ export default function MediaLibraryPage() {
 
   const handleRegisterAsset = async () => {
     if (!uploadForm.filename.trim() || !uploadForm.url.trim()) {
-      alert("Filename and URL are required.");
+      toast.warning("Filename and URL are required.");
       return;
     }
     setSaving(true);
@@ -120,7 +123,7 @@ export default function MediaLibraryPage() {
       });
       fetchAssets();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -150,7 +153,7 @@ export default function MediaLibraryPage() {
       setShowUploadModal(false);
       fetchAssets();
     } catch (err: any) {
-      alert(err.message || "Failed to upload file");
+      toast.error(getErrorMessage(err));
     } finally {
       setUploading(false);
     }
@@ -174,7 +177,7 @@ export default function MediaLibraryPage() {
       setEditingAsset(null);
       fetchAssets();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSaving(false);
     }

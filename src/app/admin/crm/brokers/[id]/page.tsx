@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -110,11 +113,11 @@ export default function AdminBrokerDetailPage() {
         body: JSON.stringify({ note: newNote.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to add note");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to add note");
       setNewNote("");
       if (data.notes) setNotes(data.notes);
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSubmittingNote(false);
     }
@@ -130,12 +133,12 @@ export default function AdminBrokerDetailPage() {
         body: JSON.stringify({ action: kycAction, reason: kycRemarks }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to process KYC review");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to process KYC review");
       setKycAction(null);
       setKycRemarks("");
       fetchDossier();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSubmittingKyc(false);
     }
@@ -152,13 +155,13 @@ export default function AdminBrokerDetailPage() {
         body: JSON.stringify({ action: actionModal, reason: actionReason }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to execute action");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to execute action");
       
       setActionResult(data.message || "Action completed successfully");
       setActionReason("");
       fetchDossier();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSubmittingAction(false);
     }
@@ -175,12 +178,12 @@ export default function AdminBrokerDetailPage() {
       });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Failed to update commission rate");
+        throw new Error(getErrorMessage(data) || "Failed to update commission rate");
       }
       setEditingCommission(false);
       fetchDossier();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSavingCommission(false);
     }

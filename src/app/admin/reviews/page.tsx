@@ -1,5 +1,7 @@
 'use client';
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   MessageSquare,
@@ -118,7 +120,7 @@ export default function AdminReviewsPage() {
       
       const data = await res.json();
       
-      if (!res.ok) throw new Error(data.error || 'Failed to fetch reviews');
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to fetch reviews");
       
       setReviews(data.reviews || []);
       if (data.pagination) setPagination(data.pagination);
@@ -162,7 +164,7 @@ export default function AdminReviewsPage() {
       });
       
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to update review');
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to update review");
       
       showToast('Review updated successfully');
       fetchReviews(); // refresh stats
@@ -184,7 +186,7 @@ export default function AdminReviewsPage() {
       });
       
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to delete review');
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to delete review");
       
       showToast('Review deleted successfully');
       fetchReviews(); // refresh stats

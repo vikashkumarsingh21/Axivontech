@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import { Search, Plus, FileText, Star, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -49,7 +51,7 @@ export default function AdminDocumentsPage() {
       if (form.recipientType === "SPECIFIC" && form.brokerProfileId) payload.brokerProfileId = form.brokerProfileId;
       const res = await fetch("/api/v1/admin/partner-documents", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to upload document.");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to upload document.");
       setShowModal(false);
       setForm({ title: "", description: "", fileUrl: "", category: "GENERAL", isImportant: false, expiresAt: "", recipientType: "ALL", brokerProfileId: "" });
       fetchDocs();

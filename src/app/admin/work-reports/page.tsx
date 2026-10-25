@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState, useCallback } from "react";
 import {
   FileText,
@@ -87,7 +89,7 @@ export default function AdminWorkReportsPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Review failed");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Review failed");
       setFeedbackBanner({ type: "success", message: "Work report marked as reviewed." });
       if (selectedReport && selectedReport.id === reportId) {
         setSelectedReport({ ...selectedReport, status: "REVIEWED" });

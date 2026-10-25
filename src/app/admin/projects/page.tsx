@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState, useCallback } from "react";
 import { Plus, X, RefreshCw, Briefcase, Edit2, Trash2, CheckCircle2, AlertCircle } from "lucide-react";
 
@@ -75,7 +77,7 @@ export default function AdminProjectsPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to save project");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to save project");
 
       setIsModalOpen(false);
       setFeedback({
@@ -97,7 +99,7 @@ export default function AdminProjectsPage() {
     try {
       const res = await fetch(`/api/v1/admin/projects/${deletingProject.id}`, { method: "DELETE" });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to delete project");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to delete project");
       setDeletingProject(null);
       setFeedback({ type: "success", message: `Project "${deletingProject.name}" deleted.` });
       loadProjects();

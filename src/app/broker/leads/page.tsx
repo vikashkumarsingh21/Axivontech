@@ -36,6 +36,8 @@ import { BrokerStatusBadge } from "@/components/broker/BrokerStatusBadge";
 import { BrokerSkeletonTable, BrokerSkeletonCard } from "@/components/broker/BrokerSkeleton";
 import { BrokerEmptyState } from "@/components/broker/BrokerEmptyState";
 import { formatCurrencyINR, formatDateIN } from "@/components/broker/BrokerFormatters";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
+import { toast } from "@/lib/notifications/toast";
 
 interface Activity {
   id: string;
@@ -141,16 +143,23 @@ export default function BrokerLeadsPage() {
       params.set("limit", "15");
 
       const res = await fetch(`/api/v1/broker/leads?${params.toString()}`);
-      if (res.ok) {
-        const json = await res.json();
-        setLeads(json.data || []);
-        if (json.pagination) {
-          setTotalLeads(json.pagination.total || 0);
-          setTotalPages(json.pagination.pages || json.pagination.totalPages || 1);
-        }
+      const parsed = await parseApiResponse(res);
+
+      if (!parsed.ok) {
+        toast.error(parsed.errorMessage || "Failed to load leads");
+        return;
       }
-    } catch (err) {
+
+      const json = parsed.data || parsed.raw;
+      setLeads(json?.data || []);
+      if (json?.pagination) {
+        setTotalLeads(json.pagination.total || 0);
+        setTotalPages(json.pagination.pages || json.pagination.totalPages || 1);
+      }
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err);
       console.error("Failed to load leads:", err);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -203,15 +212,22 @@ export default function BrokerLeadsPage() {
         }),
       });
 
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json.error?.message || json.message || "Failed to submit lead");
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to submit lead";
+        setFormError(msg);
+        toast.error(msg);
+        return;
       }
 
-      if (json.warning) {
+      const json = parsed.data || parsed.raw;
+      if (json?.warning) {
         setFormWarning(json.warning);
+        toast.warning(json.warning);
       } else {
-        setFormSuccess(`Lead ${json.leadCode || ""} recorded successfully!`);
+        const successMsg = `Lead ${json?.leadCode || ""} recorded successfully!`;
+        setFormSuccess(successMsg);
+        toast.success(successMsg);
       }
 
       fetchLeads();
@@ -234,8 +250,10 @@ export default function BrokerLeadsPage() {
           message: "",
         });
       }, 1500);
-    } catch (err: any) {
-      setFormError(err.message);
+    } catch (err: unknown) {
+      const msg = getErrorMessage(err);
+      setFormError(msg);
+      toast.error(msg);
     } finally {
       setSubmittingLead(false);
     }

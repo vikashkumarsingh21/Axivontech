@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useRef } from "react";
 import Link from "next/link";
 import {
@@ -122,7 +124,7 @@ export default function PrivacyRequestsClient() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to submit privacy request.");
+        throw new Error(getErrorMessage(data) || "Failed to submit privacy request.");
       }
 
       setSubmittedResult({
@@ -167,7 +169,7 @@ export default function PrivacyRequestsClient() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Request not found.");
+        throw new Error(getErrorMessage(data) || "Request not found.");
       }
 
       setTrackedRecord(data.request);

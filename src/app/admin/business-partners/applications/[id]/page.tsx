@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -70,7 +73,7 @@ export default function ApplicationDetailPage() {
         body: JSON.stringify({ note: newNote.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to add note");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to add note");
       setNewNote("");
       if (data.notes) {
         setNotes(data.notes);
@@ -78,7 +81,7 @@ export default function ApplicationDetailPage() {
         fetchNotes();
       }
     } catch (err: unknown) {
-      alert((err as Error).message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSubmittingNote(false);
     }
@@ -91,7 +94,7 @@ export default function ApplicationDetailPage() {
 
   const handleAction = async () => {
     if ((actionModal === "REJECT" || actionModal === "ON_HOLD" || actionModal === "MORE_INFO") && !actionReason) {
-      return alert("Reason/message is required for this action.");
+      return toast.warning("Reason/message is required for this action.");
     }
 
     try {
@@ -115,7 +118,7 @@ export default function ApplicationDetailPage() {
       setActionReason("");
       fetchApplication();
     } catch (err: unknown) {
-      alert((err as Error).message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSubmittingAction(false);
     }
@@ -123,7 +126,7 @@ export default function ApplicationDetailPage() {
 
   const handleScheduleMeeting = async () => {
     if (!meetingDate || !meetingTime) {
-      alert("Please select date and time");
+      toast.warning("Please select date and time");
       return;
     }
     
@@ -142,7 +145,7 @@ export default function ApplicationDetailPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to schedule meeting");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to schedule meeting");
 
       setMeetingModal(false);
       setMeetingDate("");
@@ -150,7 +153,7 @@ export default function ApplicationDetailPage() {
       setMeetingLocation("");
       fetchApplication();
     } catch (err: unknown) {
-      alert((err as Error).message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSubmittingMeeting(false);
     }
@@ -167,12 +170,12 @@ export default function ApplicationDetailPage() {
         method: "POST",
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || data.message || "Failed to create account");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to create account");
       
-      alert(`Partner Account created successfully!\nPartner ID: ${data.partnerId}\nReferral Code: ${data.referralCode}`);
+      toast.success(`Partner Account created successfully!\nPartner ID: ${data.partnerId}\nReferral Code: ${data.referralCode}`);
       fetchApplication();
     } catch (err: unknown) {
-      alert((err as Error).message);
+      toast.error(getErrorMessage(err));
     } finally {
       setCreatingAccount(false);
     }

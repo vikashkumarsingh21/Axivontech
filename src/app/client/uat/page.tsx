@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -79,7 +82,7 @@ export default function ClientUatPage() {
       }
       fetchUatData();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setApprovingId(null);
     }

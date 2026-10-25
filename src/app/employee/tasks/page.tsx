@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -98,7 +100,7 @@ export default function TasksPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to update status");
+        throw new Error(getErrorMessage(data) || "Failed to update status");
       }
 
       setTasks((prev) =>
@@ -131,7 +133,7 @@ export default function TasksPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to submit comment");
+        throw new Error(getErrorMessage(data) || "Failed to submit comment");
       }
 
       const createdComment: TaskComment = data.comment;

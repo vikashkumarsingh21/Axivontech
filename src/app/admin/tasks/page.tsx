@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState, useCallback } from "react";
 import {
   Plus,
@@ -129,7 +132,7 @@ export default function AdminTasksPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create task");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to create task");
       setIsCreateOpen(false);
       setFeedback({ type: "success", message: `Task "${createForm.title}" assigned successfully!` });
       loadTasks();
@@ -184,12 +187,12 @@ export default function AdminTasksPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update task");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to update task");
       setSelectedTask(data.task);
       setFeedback({ type: "success", message: `Task "${editForm.title}" updated successfully.` });
       loadTasks();
     } catch (err: any) {
-      alert(err.message || "Update failed");
+      toast.error(getErrorMessage(err));
     } finally {
       setEditLoading(false);
     }
@@ -205,7 +208,7 @@ export default function AdminTasksPage() {
       setFeedback({ type: "success", message: "Task deleted successfully." });
       loadTasks();
     } catch (err: any) {
-      alert(err.message || "Failed to delete task");
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -220,7 +223,7 @@ export default function AdminTasksPage() {
         body: JSON.stringify({ content: newComment.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to post comment");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to post comment");
       setNewComment("");
       // Add comment to local list
       setSelectedTask((prev: any) => ({
@@ -228,7 +231,7 @@ export default function AdminTasksPage() {
         comments: [...(prev.comments || []), data.comment],
       }));
     } catch (err: any) {
-      alert(err.message || "Comment failed");
+      toast.error(getErrorMessage(err));
     } finally {
       setCommentLoading(false);
     }

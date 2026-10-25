@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -66,7 +68,7 @@ export default function AboutContentEditor() {
       });
 
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Save failed");
+      if (!res.ok) throw new Error(getErrorMessage(json) || "Save failed");
 
       setFeedback({
         type: "success",

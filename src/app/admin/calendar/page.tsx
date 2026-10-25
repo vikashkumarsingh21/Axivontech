@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
@@ -152,7 +154,7 @@ export default function AdminCalendarPage() {
       const res = await fetch(`/api/v1/admin/calendar?year=${selectedYear}&month=${queryMonth}`);
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to load calendar management data");
+        throw new Error(getErrorMessage(data) || "Failed to load calendar management data");
       }
 
       setHolidays(data.holidays || []);
@@ -358,7 +360,7 @@ export default function AdminCalendarPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Synchronization failed");
+        throw new Error(getErrorMessage(data) || "Synchronization failed");
       }
 
       setActionSuccess(data.message || `Holidays synchronized for ${selectedYear}`);
@@ -382,7 +384,7 @@ export default function AdminCalendarPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to toggle status");
+        throw new Error(getErrorMessage(data) || "Failed to toggle status");
       }
 
       setHolidays((prev) =>
@@ -411,7 +413,7 @@ export default function AdminCalendarPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to save settings");
+        throw new Error(getErrorMessage(data) || "Failed to save settings");
       }
 
       setActionSuccess("Weekly schedule and calendar configuration saved successfully.");
@@ -480,7 +482,7 @@ export default function AdminCalendarPage() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to save holiday");
+        throw new Error(getErrorMessage(data) || "Failed to save holiday");
       }
 
       setShowModal(false);
@@ -507,7 +509,7 @@ export default function AdminCalendarPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to delete holiday");
+        throw new Error(getErrorMessage(data) || "Failed to delete holiday");
       }
 
       setDeleteConfirmId(null);

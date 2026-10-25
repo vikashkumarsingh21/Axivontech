@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -82,7 +85,7 @@ export default function IndustriesManagementPage() {
 
   const handleSave = async () => {
     if (!form.title.trim() || !form.description.trim()) {
-      alert("Title and Description are required.");
+      toast.warning("Title and Description are required.");
       return;
     }
     setSaving(true);
@@ -110,7 +113,7 @@ export default function IndustriesManagementPage() {
       setShowModal(false);
       fetchIndustries();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSaving(false);
     }

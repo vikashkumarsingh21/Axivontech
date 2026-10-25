@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
@@ -123,7 +125,7 @@ export default function AdminCareersSettingsPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update visibility setting.");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to update visibility setting.");
 
       setCareersPageEnabled(newVal);
       if (data.settings?.updatedAt) setUpdatedAt(data.settings.updatedAt);
@@ -155,7 +157,7 @@ export default function AdminCareersSettingsPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to save settings.");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to save settings.");
 
       if (data.settings?.updatedAt) setUpdatedAt(data.settings.updatedAt);
       if (data.settings?.updatedBy) setUpdatedBy(data.settings.updatedBy);

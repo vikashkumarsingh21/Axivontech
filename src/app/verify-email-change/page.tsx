@@ -13,6 +13,8 @@ import {
   ShieldCheck,
   MailCheck,
 } from "lucide-react";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
+import { toast } from "@/lib/notifications/toast";
 
 export default function VerifyEmailChangePage() {
   const searchParams = useSearchParams();
@@ -38,11 +40,13 @@ export default function VerifyEmailChangePage() {
     }
 
     fetch(`/api/v1/auth/email-change/verify?token=${encodeURIComponent(token)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.valid) {
-          setError(data.error || "This verification link is invalid or has expired.");
-          setTokenInfo({ valid: false, error: data.error });
+      .then((res) => parseApiResponse(res))
+      .then((parsed) => {
+        const data = parsed.data || parsed.raw;
+        if (!parsed.ok || !data?.valid) {
+          const msg = parsed.errorMessage || data?.error || "This verification link is invalid or has expired.";
+          setError(msg);
+          setTokenInfo({ valid: false, error: msg });
         } else {
           setTokenInfo({
             valid: true,
@@ -51,8 +55,8 @@ export default function VerifyEmailChangePage() {
           });
         }
       })
-      .catch(() => {
-        setError("Failed to validate verification link. Please check your network connection.");
+      .catch((err) => {
+        setError(getErrorMessage(err));
       })
       .finally(() => {
         setLoading(false);
@@ -72,14 +76,21 @@ export default function VerifyEmailChangePage() {
         body: JSON.stringify({ token }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to verify email change.");
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to verify email change.";
+        setError(msg);
+        toast.error(msg);
+        return;
       }
 
-      setSuccess(data.message || "Email address updated successfully!");
-    } catch (err: any) {
-      setError(err?.message || "An error occurred while verifying your email address.");
+      const successMsg = parsed.data?.message || parsed.raw?.message || "Email address updated successfully!";
+      setSuccess(successMsg);
+      toast.success(successMsg);
+    } catch (err: unknown) {
+      const cleanErr = getErrorMessage(err);
+      setError(cleanErr);
+      toast.error(cleanErr);
     } finally {
       setVerifying(false);
     }

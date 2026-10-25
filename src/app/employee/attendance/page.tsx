@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -135,7 +137,7 @@ export default function AttendancePage() {
         body: JSON.stringify({ action, breakType, notes: "" }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Action failed");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Action failed");
       setSuccessMsg(data.message || "Action updated successfully");
       loadData();
     } catch (e: any) {
@@ -164,7 +166,7 @@ export default function AttendancePage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to submit regularization");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to submit regularization");
 
       setSuccessMsg("Regularization request submitted successfully for review");
       setRegModalOpen(false);

@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -162,7 +165,7 @@ export default function BrokerProjectDetailPage() {
       const res = await fetch(`/api/v1/broker/projects/${projectId}`);
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || json.message || "Failed to fetch project details.");
+        throw new Error(getErrorMessage(json) || "Failed to fetch project details.");
       }
       setProject(json.data);
     } catch (err: any) {
@@ -185,7 +188,7 @@ export default function BrokerProjectDetailPage() {
       if (res.ok && json.data?.fileUrl) {
         window.open(json.data.fileUrl, "_blank");
       } else {
-        alert("Contract document not yet uploaded by Axivon Legal.");
+        toast.warning("Contract document not yet uploaded by Axivon Legal.");
       }
       fetchProject();
     } catch (e) {
@@ -198,11 +201,11 @@ export default function BrokerProjectDetailPage() {
     e.preventDefault();
     if (!project?.contract) return;
     if (!signedFileUrl.trim()) {
-      alert("Please enter the URL or path to the signed PDF document.");
+      toast.warning("Please enter the URL or path to the signed PDF document.");
       return;
     }
     if (!signingConfirmed) {
-      alert("Please confirm the document was duly executed.");
+      toast.warning("Please confirm the document was duly executed.");
       return;
     }
 
@@ -220,7 +223,7 @@ export default function BrokerProjectDetailPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to upload contract");
+        throw new Error(getErrorMessage(json) || "Failed to upload contract");
       }
 
       setIsContractModalOpen(false);
@@ -228,7 +231,7 @@ export default function BrokerProjectDetailPage() {
       setSigningConfirmed(false);
       fetchProject();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setUploadingContract(false);
     }
@@ -239,7 +242,7 @@ export default function BrokerProjectDetailPage() {
     e.preventDefault();
     if (!project?.payment) return;
     if (!amountPaid || !transactionId.trim()) {
-      alert("Please specify the amount and UTR / Transaction Reference ID.");
+      toast.warning("Please specify the amount and UTR / Transaction Reference ID.");
       return;
     }
 
@@ -259,7 +262,7 @@ export default function BrokerProjectDetailPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to submit payment proof");
+        throw new Error(getErrorMessage(json) || "Failed to submit payment proof");
       }
 
       setIsPaymentModalOpen(false);
@@ -267,7 +270,7 @@ export default function BrokerProjectDetailPage() {
       setTransactionId("");
       fetchProject();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSubmittingPayment(false);
     }
@@ -285,12 +288,12 @@ export default function BrokerProjectDetailPage() {
       });
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to cancel project");
+        throw new Error(getErrorMessage(json) || "Failed to cancel project");
       }
       setIsCancelModalOpen(false);
       fetchProject();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setCancelling(false);
     }

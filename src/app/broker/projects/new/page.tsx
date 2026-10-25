@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -202,7 +204,7 @@ function NewProjectForm() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || json.message || "Failed to submit project.");
+        throw new Error(getErrorMessage(json) || "Failed to submit project.");
       }
 
       // Clear draft after successful creation

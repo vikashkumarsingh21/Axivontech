@@ -24,6 +24,8 @@ import {
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
 import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
+import { toast } from "@/lib/notifications/toast";
 
 interface ApplicationFormData {
   fullName: string;
@@ -174,7 +176,7 @@ export default function CareerApplication({
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "File upload failed.");
+        throw new Error(getErrorMessage(data) || "File upload failed.");
       }
 
       setForm((prev) => ({
@@ -265,16 +267,20 @@ export default function CareerApplication({
         }),
       });
 
-      const data = await response.json();
+      const parsed = await parseApiResponse(response);
 
-      if (!response.ok || !data.success) {
+      if (!parsed.ok) {
         turnstileRef.current?.reset();
         setCaptchaToken("");
         setRecaptchaResetCount((prev) => prev + 1);
-        throw new Error(data.message || "Failed to submit application. Please try again.");
+        const msg = parsed.errorMessage || "Failed to submit application. Please try again.";
+        setErrorMessage(msg);
+        toast.error(msg);
+        return;
       }
 
       setSuccess(true);
+      toast.success("Application submitted successfully! Our recruiting team will review your profile.");
       setForm({
         fullName: "",
         email: "",
@@ -291,14 +297,13 @@ export default function CareerApplication({
         coverLetter: "",
       });
       setUploadSuccess(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       turnstileRef.current?.reset();
       setCaptchaToken("");
-      console.error("[Career Application Form]", err);
-      setErrorMessage(
-        err.message ||
-          "Submission failed. Please check your internet connection or email us directly at info@axivontech.in."
-      );
+      const cleanErr = getErrorMessage(err);
+      console.error("[Career Application Form]", cleanErr);
+      setErrorMessage(cleanErr);
+      toast.error(cleanErr);
     } finally {
       setLoading(false);
     }

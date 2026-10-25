@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -110,7 +113,7 @@ export default function ServicesManagementPage() {
 
   const handleSave = async () => {
     if (!form.title.trim() || !form.shortDescription.trim()) {
-      alert("Title and Short Description are required.");
+      toast.warning("Title and Short Description are required.");
       return;
     }
     setSaving(true);
@@ -139,7 +142,7 @@ export default function ServicesManagementPage() {
       fetchServices();
       setFeedback({ type: "success", message: "Service saved successfully." });
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSaving(false);
     }

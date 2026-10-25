@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect } from "react";
 import { Building2, Smartphone, Save } from "lucide-react";
 
@@ -75,7 +77,7 @@ export default function AdminPaymentSettingsPage() {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to save settings");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to save settings");
       setSuccess(`${type} settings saved successfully.`);
       
       // Update local state to reflect updatedBy

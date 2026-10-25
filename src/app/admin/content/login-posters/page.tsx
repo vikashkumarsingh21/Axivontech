@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -254,7 +257,7 @@ export default function LoginPostersPage() {
       setDeleteConfirm(null);
       fetchPosters();
     } catch (e: any) {
-      alert(e.message || "Failed to delete poster.");
+      toast.error(getErrorMessage(e));
     } finally {
       setDeleting(false);
     }

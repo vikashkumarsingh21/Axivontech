@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
@@ -38,7 +40,7 @@ export default function UserDetailPage() {
     try {
       const res = await fetch(`/api/v1/executive/people/${id}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(getErrorMessage(data));
       setUser(data.data);
       setEmailForm(data.data.email);
       setRoleForm(data.data.userRoles?.[0]?.role?.name || "EMPLOYEE");
@@ -68,7 +70,7 @@ export default function UserDetailPage() {
           body: JSON.stringify(payload),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
+        if (!res.ok) throw new Error(getErrorMessage(data));
         setSuccess(data.message);
         fetchUser();
       }
@@ -79,7 +81,7 @@ export default function UserDetailPage() {
           body: JSON.stringify({ roleName: roleForm }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
+        if (!res.ok) throw new Error(getErrorMessage(data));
         setSuccess(data.message);
         fetchUser();
       }
@@ -90,7 +92,7 @@ export default function UserDetailPage() {
           body: JSON.stringify(passwordForm),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
+        if (!res.ok) throw new Error(getErrorMessage(data));
         setSuccess(data.message);
         setPasswordForm({ newPassword: "", confirmPassword: "" });
       }

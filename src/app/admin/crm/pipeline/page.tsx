@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState } from "react";
 import { DollarSign, CheckCircle, XCircle, Plus, RefreshCw, AlertCircle, TrendingUp } from "lucide-react";
 
@@ -44,7 +46,7 @@ export default function PipelinePage() {
         body: JSON.stringify({ stage: newStage }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to change stage.");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to change stage.");
       setFeedback({ type: "success", message: `Opportunity moved to ${newStage}` });
       loadPipeline();
     } catch (err: any) {
@@ -59,7 +61,7 @@ export default function PipelinePage() {
         headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to mark as Won.");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to mark as Won.");
       setFeedback({ type: "success", message: "Deal marked as Closed Won successfully." });
       loadPipeline();
     } catch (err: any) {
@@ -77,7 +79,7 @@ export default function PipelinePage() {
         body: JSON.stringify({ lossReason }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to mark as Lost.");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to mark as Lost.");
       setLossModalOpp(null);
       setLossReason("");
       setFeedback({ type: "success", message: "Deal marked as Closed Lost." });

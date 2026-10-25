@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useRef } from "react";
 import { Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
@@ -85,7 +87,7 @@ export function LeadCapture({ onComplete, onCancel }: LeadCaptureProps) {
         turnstileRef.current?.reset();
         setCaptchaToken("");
         setRecaptchaResetCount((prev) => prev + 1);
-        setError(data.error || "Failed to submit request. Please try again.");
+        setError(getErrorMessage(data) || "Failed to submit request. Please try again.");
       }
     } catch {
       turnstileRef.current?.reset();

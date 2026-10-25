@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -133,7 +136,7 @@ export default function AdminApplicationsPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update review.");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to update review.");
 
       // Update state
       setSelectedApp(data.application);
@@ -143,7 +146,7 @@ export default function AdminApplicationsPage() {
       setNotesSavedSuccess(true);
       setTimeout(() => setNotesSavedSuccess(false), 3000);
     } catch (e: any) {
-      alert("Failed: " + e.message);
+      toast.error("Failed: " + getErrorMessage(e));
     } finally {
       setSavingNotes(false);
     }
@@ -161,7 +164,7 @@ export default function AdminApplicationsPage() {
         fetchApplications();
       }
     } catch (e: any) {
-      alert("Failed to delete application: " + e.message);
+      toast.error("Failed to delete application: " + getErrorMessage(e));
     } finally {
       setDeleting(false);
     }

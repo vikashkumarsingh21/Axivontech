@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import {
@@ -142,7 +145,7 @@ export default function ClientProjectWorkspacePage({
       setUatSuccess(true);
       fetchProject();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setApprovingUat(false);
     }
@@ -172,7 +175,7 @@ export default function ClientProjectWorkspacePage({
       setSupportSubject("");
       setSupportMessage("");
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSubmittingSupport(false);
     }

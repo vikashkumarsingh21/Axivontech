@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -223,7 +226,7 @@ export default function AdminCareersPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to save job posting.");
+        throw new Error(getErrorMessage(data) || "Failed to save job posting.");
       }
 
       setShowModal(false);
@@ -262,7 +265,7 @@ export default function AdminCareersPage() {
         fetchData();
       }
     } catch (e: any) {
-      alert("Delete failed: " + e.message);
+      toast.error("Delete failed: " + getErrorMessage(e));
     } finally {
       setDeleting(false);
     }

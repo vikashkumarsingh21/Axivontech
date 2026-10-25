@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -79,7 +82,7 @@ export default function FaqsManagementPage() {
 
   const handleSave = async () => {
     if (!form.question.trim() || !form.answer.trim()) {
-      alert("Question and Answer are required.");
+      toast.warning("Question and Answer are required.");
       return;
     }
     setSaving(true);
@@ -107,7 +110,7 @@ export default function FaqsManagementPage() {
       setShowModal(false);
       fetchFaqs();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSaving(false);
     }

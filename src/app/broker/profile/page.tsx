@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import {
@@ -156,7 +158,7 @@ export default function BrokerProfilePage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to update profile settings.");
+        throw new Error(getErrorMessage(json) || "Failed to update profile settings.");
       }
 
       setGlobalSuccess("Partner profile updated successfully.");
@@ -208,7 +210,7 @@ export default function BrokerProfilePage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to update password.");
+        throw new Error(getErrorMessage(json) || "Failed to update password.");
       }
 
       setPasswordSuccess("Security password changed successfully.");

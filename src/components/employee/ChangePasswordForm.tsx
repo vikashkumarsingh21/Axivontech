@@ -4,6 +4,8 @@ import { useState, useRef } from "react";
 import { EpButton } from "@/components/employee/EpButton";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
+import { toast } from "@/lib/notifications/toast";
 
 export function ChangePasswordForm() {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,20 +40,27 @@ export function ChangePasswordForm() {
         body: JSON.stringify({ ...formData, captchaToken }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
         turnstileRef.current?.reset();
         setCaptchaToken("");
-        throw new Error(data.error || "Failed to change password");
+        const msg = parsed.errorMessage || "Failed to change password";
+        setError(msg);
+        toast.error(msg);
+        return;
       }
 
-      setSuccess(data.message || "Password changed successfully");
+      const msg = parsed.data?.message || parsed.raw?.message || "Password changed successfully";
+      setSuccess(msg);
+      toast.success(msg);
       setFormData({ currentPassword: "", newPassword: "", confirmPassword: "" });
       setTimeout(() => setIsOpen(false), 3000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       turnstileRef.current?.reset();
       setCaptchaToken("");
-      setError(err.message || "Failed to change password");
+      const cleanErr = getErrorMessage(err);
+      setError(cleanErr);
+      toast.error(cleanErr);
     } finally {
       setLoading(false);
     }

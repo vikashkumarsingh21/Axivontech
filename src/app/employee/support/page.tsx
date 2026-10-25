@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { PageHeader } from "@/components/employee/PageHeader";
@@ -177,7 +179,7 @@ export default function SupportPage() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to log support ticket.");
+        throw new Error(getErrorMessage(data) || "Failed to log support ticket.");
       }
 
       setSuccessMsg(`Your inquiry has been registered as ${data.ticket?.ticketNumber || "ticket"}.`);

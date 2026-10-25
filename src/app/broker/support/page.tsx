@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "@/lib/notifications/toast";
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import React, { useState, useEffect, useCallback } from "react";
 import {
   LifeBuoy,
@@ -136,7 +139,7 @@ export default function BrokerSupportPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to submit ticket");
+        throw new Error(getErrorMessage(json) || "Failed to submit ticket");
       }
 
       setIsNewModalOpen(false);
@@ -165,14 +168,14 @@ export default function BrokerSupportPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || "Failed to post reply");
+        throw new Error(getErrorMessage(json) || "Failed to post reply");
       }
 
       setReplyText("");
       handleSelectTicket(selectedTicket);
       fetchTickets();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(getErrorMessage(err));
     } finally {
       setSendingReply(false);
     }

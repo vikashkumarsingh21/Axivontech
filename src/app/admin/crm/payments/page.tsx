@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, ChevronRight, CreditCard } from "lucide-react";
@@ -20,7 +22,7 @@ export default function AdminPaymentsPage() {
       
       const res = await fetch(`/api/v1/admin/partner-payments?${params}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to fetch payments");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to fetch payments");
       setPayments(data.data || []);
     } catch (err: any) {
       setError(err.message);

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle, XCircle } from "lucide-react";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
 
 function PartnerActivationContent() {
   const router = useRouter();
@@ -43,16 +44,17 @@ function PartnerActivationContent() {
         body: JSON.stringify({ token, password }),
       });
 
-      const data = await res.json();
+      const parsed = await parseApiResponse(res);
       
-      if (!res.ok) {
-        throw new Error(data.error || data.message || "Failed to activate account");
+      if (!parsed.ok) {
+        setError(parsed.errorMessage || "Failed to activate account");
+        return;
       }
 
       setSuccess(true);
-      setPartnerDetails(data);
+      setPartnerDetails(parsed.data || parsed.raw);
     } catch (err: unknown) {
-      setError((err as Error).message);
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }

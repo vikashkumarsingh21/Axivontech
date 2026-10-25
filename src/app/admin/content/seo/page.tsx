@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -64,7 +66,7 @@ export default function SeoSettingsPage() {
       });
 
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Failed to update SEO settings");
+      if (!res.ok) throw new Error(getErrorMessage(json) || "Failed to update SEO settings");
 
       setFeedback({
         type: "success",

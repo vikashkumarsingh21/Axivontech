@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState } from "react";
 import { Clock, CheckCircle2, AlertTriangle, Plus, RefreshCw, X, Calendar, Phone, Mail, MessageSquare } from "lucide-react";
 
@@ -39,7 +41,7 @@ export default function FollowUpsPage() {
         body: JSON.stringify({ completionNotes }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to complete follow-up.");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to complete follow-up.");
       setCompleteModalId(null);
       setCompletionNotes("");
       setFeedback({ type: "success", message: "Follow-up marked as completed!" });

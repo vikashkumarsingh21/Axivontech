@@ -1,5 +1,7 @@
 "use client";
 
+import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
+
 import { useEffect, useState, useCallback } from "react";
 import {
   CheckCircle,
@@ -85,7 +87,7 @@ export default function AdminLeavePage() {
         headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Approval failed");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Approval failed");
       setFeedback({ type: "success", message: "Leave request approved successfully." });
       loadLeaves();
     } catch (e: any) {
@@ -111,7 +113,7 @@ export default function AdminLeavePage() {
         body: JSON.stringify({ reason: rejectReason.trim() || undefined }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Rejection failed");
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Rejection failed");
       setFeedback({ type: "success", message: "Leave request rejected." });
       setRejectModalItem(null);
       loadLeaves();

@@ -7,6 +7,8 @@ import { trackPartnerApplication } from "@/lib/analytics";
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 import { RequiredPolicyAcknowledgement } from "@/components/legal/RequiredPolicyAcknowledgement";
 import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
+import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
+import { toast } from "@/lib/notifications/toast";
 
 export default function PartnerApplicationForm() {
   const [step, setStep] = useState(1);
@@ -158,27 +160,17 @@ export default function PartnerApplicationForm() {
         body: JSON.stringify(payload)
       });
 
-      const data = await res.json();
-      if (!res.ok) {
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
         turnstileRef.current?.reset();
         setCaptchaToken("");
-        let errorMessage = data.message || data.error || "Failed to submit application";
-        
-        // If there are specific validation details from Zod, append the first one
-        if (data.details) {
-          const detailKeys = Object.keys(data.details).filter(k => k !== "_errors");
-          if (detailKeys.length > 0) {
-            const firstKey = detailKeys[0];
-            const fieldError = data.details[firstKey]?._errors?.[0];
-            if (fieldError) {
-              errorMessage = `${errorMessage}: ${firstKey} - ${fieldError}`;
-            }
-          }
-        }
-        
-        throw new Error(errorMessage);
+        const msg = parsed.errorMessage || "Failed to submit application";
+        setError(msg);
+        toast.error(msg);
+        return;
       }
 
+      const data = parsed.data || parsed.raw;
       const createdApp = data.application || data.data;
       if (createdApp?.applicationId) {
         setSubmittedAppId(createdApp.applicationId);
@@ -186,6 +178,7 @@ export default function PartnerApplicationForm() {
       }
       setStatusEmail(formData.email);
       setIsSubmitted(true);
+      toast.success("Application submitted successfully!");
       trackPartnerApplication({
         businessType: formData.occupation,
         experienceLevel: formData.yearsOfExperience,
@@ -193,7 +186,9 @@ export default function PartnerApplicationForm() {
     } catch (err: unknown) {
       turnstileRef.current?.reset();
       setCaptchaToken("");
-      setError((err as Error).message || "An error occurred during submission. Please try again.");
+      const cleanErr = getErrorMessage(err);
+      setError(cleanErr);
+      toast.error(cleanErr);
     } finally {
       setIsSubmitting(false);
     }
@@ -210,13 +205,19 @@ export default function PartnerApplicationForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ applicationId: statusAppId, email: statusEmail }),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message || data.error?.message || "Failed to check status");
+      const parsed = await parseApiResponse(res);
+      if (!parsed.ok) {
+        const msg = parsed.errorMessage || "Failed to check status";
+        setStatusError(msg);
+        toast.error(msg);
+        return;
       }
+      const data = parsed.data || parsed.raw;
       setCheckedStatus(data.application);
-    } catch (err: any) {
-      setStatusError(err.message || "Could not retrieve status");
+    } catch (err: unknown) {
+      const cleanErr = getErrorMessage(err);
+      setStatusError(cleanErr);
+      toast.error(cleanErr);
     } finally {
       setStatusChecking(false);
     }
