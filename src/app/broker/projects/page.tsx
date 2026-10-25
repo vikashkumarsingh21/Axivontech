@@ -1,169 +1,345 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { Search, ChevronRight, Briefcase } from "lucide-react";
+import {
+  Search,
+  Plus,
+  Briefcase,
+  ChevronRight,
+  ChevronLeft,
+  Calendar,
+  Building,
+  User,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  FileText,
+  DollarSign,
+  TrendingUp,
+} from "lucide-react";
+import { BrokerPageHeader } from "@/components/broker/BrokerPageHeader";
+import { BrokerCard } from "@/components/broker/BrokerCard";
+import { BrokerButton } from "@/components/broker/BrokerButton";
+import { BrokerStatusBadge } from "@/components/broker/BrokerStatusBadge";
+import { BrokerSkeletonTable } from "@/components/broker/BrokerSkeleton";
+import { BrokerEmptyState } from "@/components/broker/BrokerEmptyState";
+import { formatCurrencyINR, formatDateIN } from "@/components/broker/BrokerFormatters";
+
+interface ProjectItem {
+  id: string;
+  projectCode: string;
+  projectName: string;
+  clientName: string;
+  clientEmail: string;
+  companyName: string;
+  requiredService: string;
+  expectedTimeline?: string | null;
+  projectBudget?: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  contract?: {
+    id: string;
+    status: string;
+    contractCode: string;
+  } | null;
+  payment?: {
+    id: string;
+    status: string;
+    advanceAmount?: number | null;
+  } | null;
+  commission?: {
+    id: string;
+    commissionAmount: number;
+    status: string;
+  } | null;
+}
 
 export default function BrokerProjectsPage() {
-  const [projects, setProjects] = useState<any[]>([]);
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
-  const fetchProjects = async () => {
-    setLoading(true);
+  const fetchProjects = useCallback(async () => {
     try {
+      setLoading(true);
       const params = new URLSearchParams();
-      if (search) params.set("search", search);
-      if (statusFilter) params.set("status", statusFilter);
-      
-      const res = await fetch(`/api/v1/broker/projects?${params}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to fetch projects");
-      setProjects(data.data || []);
-    } catch (err: any) {
-      setError(err.message);
+      if (search.trim()) params.set("search", search.trim());
+      if (statusFilter && statusFilter !== "ALL") params.set("status", statusFilter);
+      params.set("page", currentPage.toString());
+      params.set("limit", "15");
+
+      const res = await fetch(`/api/v1/broker/projects?${params.toString()}`);
+      if (res.ok) {
+        const json = await res.json();
+        setProjects(json.data || []);
+        if (json.pagination) {
+          setTotalCount(json.pagination.total || 0);
+          setTotalPages(json.pagination.pages || json.pagination.totalPages || 1);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load projects:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, statusFilter, currentPage]);
 
   useEffect(() => {
     fetchProjects();
-  }, [search, statusFilter]);
+  }, [fetchProjects]);
+
+  const metrics = useMemo(() => {
+    const total = totalCount;
+    const requested = projects.filter((p) => p.status === "PROJECT_REQUESTED" || p.status === "REVIEWING").length;
+    const active = projects.filter(
+      (p) => p.status === "PROJECT_CONFIRMED" || p.status === "IN_PROGRESS" || p.status === "CONTRACT_SIGNED"
+    ).length;
+    const completed = projects.filter((p) => p.status === "COMPLETED").length;
+    return { total, requested, active, completed };
+  }, [projects, totalCount]);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white">My Projects</h1>
-          <p className="text-sm text-gray-400">Manage your confirmed projects and track their progress.</p>
-        </div>
-        <Link
-          href="/broker/projects/new"
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-semibold transition-colors self-start sm:self-auto"
-        >
-          <span>+ Submit Project Referral</span>
-        </Link>
+    <div className="space-y-6 pb-12">
+      {/* Header */}
+      <BrokerPageHeader
+        title="Commercial Projects Pipeline"
+        subtitle="Track submitted client contracts, milestone progress, deliverables, and commission accruals."
+        badge={
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#C2A878]/10 text-[#C2A878] border border-[#C2A878]/25">
+            <Briefcase className="w-3.5 h-3.5" />
+            Contract Lifecycle
+          </span>
+        }
+        actions={
+          <Link href="/broker/projects/new">
+            <BrokerButton variant="primary" size="sm" icon={<Plus className="w-4 h-4" />}>
+              Submit Project Referral
+            </BrokerButton>
+          </Link>
+        }
+      />
+
+      {/* Metrics Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <BrokerCard className="p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#8B94A1]">Total Projects</span>
+            <div className="w-8 h-8 rounded-lg bg-[#171A1F] flex items-center justify-center text-[#C2A878]">
+              <Briefcase className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold font-mono text-[#E6E8EB]">{totalCount}</div>
+          <span className="text-[11px] text-[#566171]">Lifetime client submissions</span>
+        </BrokerCard>
+
+        <BrokerCard className="p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#8B94A1]">Under Review</span>
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+              <Clock className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold font-mono text-amber-400">{metrics.requested}</div>
+          <span className="text-[11px] text-[#566171]">Feasibility & pricing scoping</span>
+        </BrokerCard>
+
+        <BrokerCard className="p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#8B94A1]">Active Engagements</span>
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+              <TrendingUp className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold font-mono text-blue-400">{metrics.active}</div>
+          <span className="text-[11px] text-[#566171]">In engineering or contracting</span>
+        </BrokerCard>
+
+        <BrokerCard className="p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#8B94A1]">Delivered & Closed</span>
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-bold font-mono text-emerald-400">{metrics.completed}</div>
+          <span className="text-[11px] text-[#566171]">Fully settled contracts</span>
+        </BrokerCard>
       </div>
 
-      <div className="bg-[#111] border border-white/10 rounded-xl overflow-hidden">
-        <div className="p-4 border-b border-white/10 flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={15} />
-            <input
-              type="text"
-              placeholder="Search projects..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-[#0d0d0d] border border-white/10 rounded-md py-2 pl-9 pr-3 text-sm text-white focus:outline-none focus:border-red-500/50"
-            />
-          </div>
+      {/* Filter Toolbar */}
+      <div className="p-4 rounded-xl border border-[#22262D] bg-[#111317] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#566171]" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="Search by code, title, client, company..."
+            className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] placeholder-[#566171] focus:outline-none focus:border-[#C2A878]"
+          />
+        </div>
+
+        <div className="flex items-center gap-3">
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-[#0d0d0d] border border-white/10 rounded-md py-2 px-3 text-sm text-gray-400 focus:outline-none"
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] focus:outline-none focus:border-[#C2A878]"
           >
-            <option value="">All Statuses</option>
+            <option value="ALL">All Project Statuses</option>
             <option value="PROJECT_REQUESTED">Requested</option>
+            <option value="REVIEWING">Reviewing</option>
+            <option value="PROPOSAL_SENT">Proposal Sent</option>
             <option value="CONTRACT_SENT">Contract Sent</option>
+            <option value="CONTRACT_SIGNED">Contract Signed</option>
             <option value="PAYMENT_PENDING">Payment Pending</option>
             <option value="PROJECT_CONFIRMED">Confirmed</option>
             <option value="IN_PROGRESS">In Progress</option>
             <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+            <option value="REJECTED">Rejected</option>
           </select>
         </div>
+      </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-400">
-            <thead className="bg-[#0d0d0d] text-xs uppercase text-gray-500">
-              <tr>
-                <th className="px-6 py-3">Project</th>
-                <th className="px-6 py-3">Client</th>
-                <th className="px-6 py-3">Service</th>
-                <th className="px-6 py-3">Status</th>
-                <th className="px-6 py-3">Contract</th>
-                <th className="px-6 py-3">Payment</th>
-                <th className="px-6 py-3 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {loading ? (
+      {/* Projects Table */}
+      {loading ? (
+        <BrokerSkeletonTable rows={6} cols={6} />
+      ) : projects.length === 0 ? (
+        <BrokerEmptyState
+          type="projects"
+          title="No Projects Found"
+          description={
+            search || statusFilter !== "ALL"
+              ? "No commercial projects matched your filter settings."
+              : "You haven't submitted any client projects yet. Initiate your first project referral to start earning commissions."
+          }
+          actionLabel="Submit Project Referral"
+          actionHref="/broker/projects/new"
+        />
+      ) : (
+        <BrokerCard noPadding className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-[#0E1013] border-b border-[#1E232B] text-[#8B94A1] uppercase font-mono tracking-wider">
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center">Loading...</td>
+                  <th className="px-5 py-3 font-semibold">Project Code</th>
+                  <th className="px-5 py-3 font-semibold">Project & Service</th>
+                  <th className="px-5 py-3 font-semibold">Client & Company</th>
+                  <th className="px-5 py-3 font-semibold">Project Status</th>
+                  <th className="px-5 py-3 font-semibold">Contract</th>
+                  <th className="px-5 py-3 font-semibold">Payment</th>
+                  <th className="px-5 py-3 font-semibold">Submitted</th>
+                  <th className="px-5 py-3 font-semibold text-right">Actions</th>
                 </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-red-500">{error}</td>
-                </tr>
-              ) : projects.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center">
-                    <div className="flex flex-col items-center justify-center">
-                      <Briefcase size={32} className="text-gray-600 mb-3" />
-                      <p>No confirmed projects found.</p>
-                      <p className="text-xs mt-1">Convert leads to projects from the admin panel.</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                projects.map((project) => (
-                  <tr key={project.id} className="hover:bg-white/5 transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-white">{project.projectName}</div>
-                      <div className="text-xs text-gray-500 font-mono">{project.projectCode}</div>
+              </thead>
+              <tbody className="divide-y divide-[#1E232B] text-[#D0D4DC]">
+                {projects.map((proj) => (
+                  <tr
+                    key={proj.id}
+                    className="hover:bg-[#171A1F]/60 transition-colors group cursor-pointer"
+                  >
+                    <td className="px-5 py-3.5 font-mono text-[#C2A878] font-medium whitespace-nowrap">
+                      <Link href={`/broker/projects/${proj.id}`} className="hover:underline">
+                        {proj.projectCode}
+                      </Link>
                     </td>
-                    <td className="px-6 py-4">
-                      <div>{project.clientName}</div>
-                      <div className="text-xs text-gray-500">{project.companyName}</div>
+
+                    <td className="px-5 py-3.5">
+                      <Link
+                        href={`/broker/projects/${proj.id}`}
+                        className="font-semibold text-[#E6E8EB] group-hover:text-[#C2A878] transition-colors block max-w-[200px] truncate"
+                      >
+                        {proj.projectName}
+                      </Link>
+                      <span className="text-[11px] text-[#8B94A1]">{proj.requiredService}</span>
                     </td>
-                    <td className="px-6 py-4">{project.requiredService}</td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 bg-white/5 rounded text-[10px] font-bold text-blue-400">
-                        {project.status.replace(/_/g, " ")}
-                      </span>
+
+                    <td className="px-5 py-3.5">
+                      <div className="text-[#E6E8EB] font-medium">{proj.clientName}</div>
+                      <div className="text-[11px] text-[#566171]">{proj.companyName}</div>
                     </td>
-                    <td className="px-6 py-4">
-                      {project.contract ? (
-                        <span className={`px-2 py-1 rounded text-[10px] font-bold ${
-                          project.contract.status === "VERIFIED" ? "bg-emerald-500/10 text-emerald-400" :
-                          project.contract.status === "REJECTED" ? "bg-red-500/10 text-red-400" :
-                          "bg-amber-500/10 text-amber-400"
-                        }`}>
-                          {project.contract.status}
-                        </span>
+
+                    <td className="px-5 py-3.5">
+                      <BrokerStatusBadge status={proj.status} category="project" />
+                    </td>
+
+                    <td className="px-5 py-3.5">
+                      {proj.contract ? (
+                        <BrokerStatusBadge status={proj.contract.status} category="contract" />
                       ) : (
-                        <span className="text-xs text-gray-600">Pending</span>
+                        <span className="text-[#566171] text-[11px]">—</span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      {project.payment ? (
-                        <span className={`px-2 py-1 rounded text-[10px] font-bold ${
-                          project.payment.status === "VERIFIED" ? "bg-emerald-500/10 text-emerald-400" :
-                          project.payment.status === "REJECTED" ? "bg-red-500/10 text-red-400" :
-                          "bg-amber-500/10 text-amber-400"
-                        }`}>
-                          {project.payment.status}
-                        </span>
+
+                    <td className="px-5 py-3.5">
+                      {proj.payment ? (
+                        <BrokerStatusBadge status={proj.payment.status} category="payment" />
                       ) : (
-                        <span className="text-xs text-gray-600">Pending</span>
+                        <span className="text-[#566171] text-[11px]">—</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <Link href={`/broker/projects/${project.id}`}>
-                        <button className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors">
-                          <ChevronRight size={18} />
-                        </button>
+
+                    <td className="px-5 py-3.5 text-[#8B94A1] whitespace-nowrap">
+                      {formatDateIN(proj.createdAt)}
+                    </td>
+
+                    <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                      <Link
+                        href={`/broker/projects/${proj.id}`}
+                        className="text-xs text-[#C2A878] hover:text-[#D4BC8B] font-medium inline-flex items-center gap-1"
+                      >
+                        <span>Manage</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
                       </Link>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div className="px-5 py-3 border-t border-[#1E232B] bg-[#0E1013] flex items-center justify-between text-xs text-[#8B94A1]">
+              <span>
+                Showing {projects.length} of {totalCount} projects
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={currentPage <= 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="p-1 rounded-md bg-[#171A1F] border border-[#22262D] disabled:opacity-30 hover:text-[#E6E8EB]"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="font-mono text-[#E6E8EB]">
+                  {currentPage} / {totalPages}
+                </span>
+                <button
+                  type="button"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="p-1 rounded-md bg-[#171A1F] border border-[#22262D] disabled:opacity-30 hover:text-[#E6E8EB]"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </BrokerCard>
+      )}
     </div>
   );
 }

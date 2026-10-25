@@ -1,564 +1,1018 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ChevronLeft, FileText, CheckCircle, CreditCard, Download, Upload, Copy, AlertCircle, Building2, Smartphone } from "lucide-react";
 import Link from "next/link";
-import { ErrorState } from "@/components/ui/ErrorState";
+import {
+  ChevronLeft,
+  Briefcase,
+  FileText,
+  CreditCard,
+  Download,
+  Upload,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Building,
+  User,
+  ExternalLink,
+  ShieldAlert,
+  ShieldCheck,
+  Check,
+  Copy,
+  Calendar,
+  Layers,
+  ArrowRight,
+  DollarSign,
+  AlertTriangle,
+  X,
+} from "lucide-react";
+import { BrokerPageHeader } from "@/components/broker/BrokerPageHeader";
+import { BrokerCard } from "@/components/broker/BrokerCard";
+import { BrokerButton } from "@/components/broker/BrokerButton";
+import { BrokerStatusBadge } from "@/components/broker/BrokerStatusBadge";
+import { BrokerSkeletonDetail } from "@/components/broker/BrokerSkeleton";
+import { formatCurrencyINR, formatDateIN } from "@/components/broker/BrokerFormatters";
+
+interface ProjectDetail {
+  id: string;
+  projectCode: string;
+  projectName: string;
+  requiredService: string;
+  detailedRequirement: string;
+  expectedTimeline: string;
+  projectBudget: string;
+  additionalRequirements?: string | null;
+  status: string;
+  rejectionReason?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  // Client & Company
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  clientWhatsapp?: string | null;
+  clientDesignation?: string | null;
+  companyName: string;
+  industry: string;
+  city: string;
+  state: string;
+  country: string;
+  website?: string | null;
+  // Contract
+  contract?: {
+    id: string;
+    status: string;
+    contractFileUrl?: string | null;
+    versions?: Array<{
+      id: string;
+      versionNumber: number;
+      status: string;
+      contractFileUrl?: string | null;
+      signedFileUrl?: string | null;
+      sentAt?: string | null;
+      signedAt?: string | null;
+    }>;
+  } | null;
+  // Payment
+  payment?: {
+    id: string;
+    projectPrice: number;
+    advancePercentage: number;
+    advanceAmount: number;
+    remainingAmount: number;
+    currency: string;
+    paymentMethod?: string | null;
+    amountPaid?: number | null;
+    transactionId?: string | null;
+    proofFileUrl?: string | null;
+    status: string;
+    submittedAt?: string | null;
+    verifiedAt?: string | null;
+    rejectionReason?: string | null;
+  } | null;
+  // Commission
+  commission?: {
+    id: string;
+    projectValue: number;
+    commissionType: string;
+    commissionRate: number;
+    commissionAmount: number;
+    status: string;
+    paidAt?: string | null;
+    payoutReference?: string | null;
+  } | null;
+  // Milestones
+  milestones?: Array<{
+    id: string;
+    title: string;
+    description?: string | null;
+    status: string;
+    targetDate?: string | null;
+    completionDate?: string | null;
+    order: number;
+  }>;
+  // Documents
+  documents?: Array<{
+    id: string;
+    title: string;
+    category: string;
+    fileUrl: string;
+    createdAt: string;
+  }>;
+}
 
 export default function BrokerProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const [project, setProject] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("overview");
+  const projectId = params.id as string;
 
-  // Contract state
+  const [project, setProject] = useState<ProjectDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"overview" | "milestones" | "contract" | "payment">("overview");
+
+  // Contract Upload Modal
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
   const [signedFileUrl, setSignedFileUrl] = useState("");
-  const [stampFileUrl, setStampFileUrl] = useState("");
   const [signingConfirmed, setSigningConfirmed] = useState(false);
   const [uploadingContract, setUploadingContract] = useState(false);
 
-  // Payment state
-  const [paymentMethod, setPaymentMethod] = useState<"BANK" | "UPI" | "">("");
+  // Payment Submit Modal
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"BANK" | "UPI">("BANK");
   const [amountPaid, setAmountPaid] = useState("");
   const [transactionId, setTransactionId] = useState("");
   const [proofFileUrl, setProofFileUrl] = useState("");
   const [additionalNotes, setAdditionalNotes] = useState("");
   const [submittingPayment, setSubmittingPayment] = useState(false);
 
-  const fetchProject = async () => {
-    if (!params.id || params.id === "new") {
+  // Cancel Project Modal
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelling, setCancelling] = useState(false);
+
+  const fetchProject = useCallback(async () => {
+    if (!projectId || projectId === "new") {
       router.replace("/broker/projects/new");
       return;
     }
     try {
-      const res = await fetch(`/api/v1/broker/projects/${params.id}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to fetch project");
-      setProject(data.data);
+      setLoading(true);
+      const res = await fetch(`/api/v1/broker/projects/${projectId}`);
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error?.message || json.message || "Failed to fetch project details.");
+      }
+      setProject(json.data);
     } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId, router]);
 
   useEffect(() => {
-    if (params.id === "new") {
-      router.replace("/broker/projects/new");
-      return;
-    }
     fetchProject();
-  }, [params.id]);
+  }, [fetchProject]);
 
+  // Handle Secure Contract Download
   const handleDownloadContract = async () => {
     if (!project?.contract) return;
-    
-    // Open in new tab
-    window.open(project.contract.contractFileUrl, "_blank");
-
-    // Track download if it was just SENT
-    if (project.contract.status === "SENT") {
-      try {
-        await fetch(`/api/v1/broker/contracts/${project.contract.id}/download`, {
-          method: "POST",
-        });
-        fetchProject(); // refresh status
-      } catch (e) {
-        console.error("Failed to mark contract as downloaded", e);
+    try {
+      const res = await fetch(`/api/v1/broker/contracts/${project.contract.id}/download`);
+      const json = await res.json();
+      if (res.ok && json.data?.fileUrl) {
+        window.open(json.data.fileUrl, "_blank");
+      } else {
+        alert("Contract document not yet uploaded by Axivon Legal.");
       }
+      fetchProject();
+    } catch (e) {
+      console.error("Contract download error", e);
     }
   };
 
-  const submitContract = async (e: React.FormEvent) => {
+  // Submit Signed Contract
+  const handleUploadContract = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!signedFileUrl) return alert("Please provide the signed contract file URL.");
-    if (!signingConfirmed) return alert("Please confirm that the contract is signed.");
+    if (!project?.contract) return;
+    if (!signedFileUrl.trim()) {
+      alert("Please enter the URL or path to the signed PDF document.");
+      return;
+    }
+    if (!signingConfirmed) {
+      alert("Please confirm the document was duly executed.");
+      return;
+    }
 
-    setUploadingContract(true);
     try {
+      setUploadingContract(true);
       const res = await fetch(`/api/v1/broker/contracts/${project.contract.id}/upload`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          signedFileUrl,
-          stampFileUrl,
-          signingConfirmed,
+          signedFileUrl: signedFileUrl.trim(),
+          signingConfirmed: true,
+          notes: "Uploaded by partner via portal",
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to upload contract");
-      alert("Contract submitted successfully!");
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error?.message || "Failed to upload contract");
+      }
+
+      setIsContractModalOpen(false);
+      setSignedFileUrl("");
+      setSigningConfirmed(false);
       fetchProject();
     } catch (err: any) {
       alert(err.message);
+    } finally {
+      setUploadingContract(false);
     }
-    setUploadingContract(false);
   };
 
-  const submitPayment = async (e: React.FormEvent) => {
+  // Submit Payment Proof
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!paymentMethod) return alert("Please select a payment method.");
-    if (!amountPaid || !transactionId || !proofFileUrl) return alert("Please fill all required payment fields.");
+    if (!project?.payment) return;
+    if (!amountPaid || !transactionId.trim()) {
+      alert("Please specify the amount and UTR / Transaction Reference ID.");
+      return;
+    }
 
-    setSubmittingPayment(true);
     try {
+      setSubmittingPayment(true);
       const res = await fetch(`/api/v1/broker/payments/${project.payment.id}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           paymentMethod,
-          amountPaid,
-          transactionId,
-          proofFileUrl,
-          additionalNotes,
+          amountPaid: Number(amountPaid.replace(/[^0-9.]/g, "")),
+          transactionId: transactionId.trim(),
+          proofFileUrl: proofFileUrl.trim() || undefined,
+          additionalNotes: additionalNotes.trim() || undefined,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to submit payment");
-      alert("Payment proof submitted successfully!");
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error?.message || "Failed to submit payment proof");
+      }
+
+      setIsPaymentModalOpen(false);
+      setAmountPaid("");
+      setTransactionId("");
       fetchProject();
     } catch (err: any) {
       alert(err.message);
+    } finally {
+      setSubmittingPayment(false);
     }
-    setSubmittingPayment(false);
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert("Copied to clipboard!");
+  // Cancel Project
+  const handleCancelProject = async () => {
+    if (!project) return;
+    try {
+      setCancelling(true);
+      const res = await fetch(`/api/v1/broker/projects/${project.id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cancelReason: cancelReason.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error?.message || "Failed to cancel project");
+      }
+      setIsCancelModalOpen(false);
+      fetchProject();
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setCancelling(false);
+    }
   };
 
-  if (loading) return <div className="p-8 text-center text-gray-500">Loading project...</div>;
-  if (error || !project) {
+  if (loading) {
     return (
-      <div className="p-6 max-w-5xl mx-auto">
-        <ErrorState
-          title="Project Not Available"
-          message={error || "Project not found or access denied."}
-          onRetry={fetchProject}
-          backHref="/broker/projects"
-          backLabel="Back to Projects"
-        />
+      <div className="max-w-6xl mx-auto space-y-6">
+        <BrokerSkeletonDetail />
       </div>
     );
   }
 
-  const tabs = [
-    { id: "overview", label: "Overview" },
-    { id: "contract", label: "Contract" },
-    { id: "payment", label: "Payment" },
-    { id: "timeline", label: "Timeline" },
-  ];
+  if (error || !project) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
+        <div className="w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 mx-auto flex items-center justify-center">
+          <AlertCircle className="w-6 h-6" />
+        </div>
+        <h2 className="text-lg font-bold text-[#E6E8EB]">Unable to Load Project</h2>
+        <p className="text-xs text-[#8B94A1]">{error || "Project was not found or access is unauthorized."}</p>
+        <Link href="/broker/projects">
+          <BrokerButton variant="secondary" size="sm">
+            Back to Projects
+          </BrokerButton>
+        </Link>
+      </div>
+    );
+  }
+
+  const canCancel = project.status === "PROJECT_REQUESTED" || project.status === "PENDING_REVIEW";
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <button onClick={() => router.back()} className="p-2 bg-[#111] border border-white/10 rounded-md hover:bg-white/5">
-          <ChevronLeft size={20} className="text-gray-400" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            {project.projectName}
-            <span className="text-sm px-2 py-1 bg-white/10 text-white rounded font-mono">{project.projectCode}</span>
-          </h1>
-          <p className="text-sm text-gray-400">{project.clientName} | {project.companyName}</p>
-        </div>
-      </div>
-
-      <div className="flex gap-4 border-b border-white/10 overflow-x-auto">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 font-medium text-sm whitespace-nowrap border-b-2 transition-colors ${
-              activeTab === tab.id ? "border-red-500 text-red-500" : "border-transparent text-gray-400 hover:text-white"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="bg-[#111] border border-white/10 rounded-xl overflow-hidden min-h-[400px]">
-        {activeTab === "overview" && (
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-white/10 pb-2">Project Details</h3>
-                <dl className="grid grid-cols-3 gap-y-4 text-sm">
-                  <dt className="text-gray-500">Service</dt><dd className="col-span-2 text-white">{project.requiredService}</dd>
-                  <dt className="text-gray-500">Budget</dt><dd className="col-span-2 text-white">{project.projectBudget}</dd>
-                  <dt className="text-gray-500">Timeline</dt><dd className="col-span-2 text-white">{project.expectedTimeline}</dd>
-                  <dt className="text-gray-500">Status</dt><dd className="col-span-2 font-bold text-blue-400">{project.status.replace(/_/g, " ")}</dd>
-                </dl>
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-white/10 pb-2">Client Details</h3>
-                <dl className="grid grid-cols-3 gap-y-4 text-sm">
-                  <dt className="text-gray-500">Name</dt><dd className="col-span-2 text-white">{project.clientName}</dd>
-                  <dt className="text-gray-500">Email</dt><dd className="col-span-2 text-white">{project.clientEmail}</dd>
-                  <dt className="text-gray-500">Phone</dt><dd className="col-span-2 text-white">{project.clientPhone}</dd>
-                  <dt className="text-gray-500">Company</dt><dd className="col-span-2 text-white">{project.companyName}</dd>
-                </dl>
-              </div>
-            </div>
-            
-            <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-5">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-                <AlertCircle size={16} className="text-blue-400" /> Next Steps
-              </h3>
-              
-              <div className="space-y-4">
-                <div className={`p-3 rounded-lg border ${!project.contract ? "bg-white/5 border-white/10 opacity-50" : project.contract.status === "VERIFIED" ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-blue-500/10 border-blue-500/20 text-blue-400"}`}>
-                  <div className="font-medium text-sm">1. Sign Contract</div>
-                  <p className="text-xs mt-1 opacity-80">
-                    {!project.contract ? "Waiting for admin to prepare contract." : 
-                     project.contract.status === "VERIFIED" ? "Contract signed and verified." :
-                     "Download, sign, and upload the contract."}
-                  </p>
-                </div>
-                
-                <div className={`p-3 rounded-lg border ${!project.payment ? "bg-white/5 border-white/10 opacity-50" : project.payment.status === "VERIFIED" ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-blue-500/10 border-blue-500/20 text-blue-400"}`}>
-                  <div className="font-medium text-sm">2. Advance Payment</div>
-                  <p className="text-xs mt-1 opacity-80">
-                    {!project.payment ? "Waiting for contract verification." :
-                     project.payment.status === "VERIFIED" ? "Payment verified." :
-                     "Submit the 40% advance payment proof."}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "contract" && (
-          <div className="p-6">
-            {!project.contract ? (
-              <div className="text-center py-12">
-                <FileText size={48} className="mx-auto text-gray-600 mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">Contract Pending</h3>
-                <p className="text-sm text-gray-400 max-w-md mx-auto">
-                  Axivon Technologies is currently preparing the contract for this project. You will be notified once it is ready for download.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-8">
-                <div className="flex items-center justify-between p-5 bg-white/5 border border-white/10 rounded-xl">
-                  <div>
-                    <h3 className="font-bold text-white text-lg">{project.contract.contractName}</h3>
-                    <p className="text-sm text-gray-400 mt-1">Status: <span className="font-medium text-white">{project.contract.status}</span></p>
-                  </div>
-                  <button
-                    onClick={handleDownloadContract}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium"
-                  >
-                    <Download size={18} /> Download Contract PDF
-                  </button>
-                </div>
-
-                {project.contract.status === "REJECTED" && (
-                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-                    <h4 className="text-red-400 font-bold mb-1">Contract Rejected</h4>
-                    <p className="text-red-300 text-sm">Reason: {project.contract.rejectionReason}</p>
-                    <p className="text-red-300 text-sm mt-2">Please fix the issues and re-upload the contract.</p>
-                  </div>
-                )}
-
-                {(project.contract.status === "SENT" || project.contract.status === "DOWNLOADED" || project.contract.status === "REJECTED") ? (
-                  <form onSubmit={submitContract} className="bg-[#1a1a1a] border border-white/10 rounded-xl p-6 space-y-6">
-                    <h4 className="font-bold text-white text-md border-b border-white/10 pb-2">Upload Signed Contract</h4>
-                    <p className="text-sm text-gray-400">
-                      After the client has reviewed and signed the contract, upload the scanned PDF copy here.
-                    </p>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Signed Contract PDF URL *</label>
-                      <input
-                        required
-                        type="url"
-                        value={signedFileUrl}
-                        onChange={(e) => setSignedFileUrl(e.target.value)}
-                        placeholder="https://..."
-                        className="w-full bg-[#0d0d0d] border border-white/10 rounded-md p-3 text-white text-sm focus:border-red-500/50 focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Company Stamp Image URL (Optional)</label>
-                      <input
-                        type="url"
-                        value={stampFileUrl}
-                        onChange={(e) => setStampFileUrl(e.target.value)}
-                        placeholder="https://..."
-                        className="w-full bg-[#0d0d0d] border border-white/10 rounded-md p-3 text-white text-sm focus:border-red-500/50 focus:outline-none"
-                      />
-                    </div>
-
-                    <label className="flex items-start gap-3 cursor-pointer p-4 bg-white/5 rounded-lg border border-white/10">
-                      <input
-                        required
-                        type="checkbox"
-                        checked={signingConfirmed}
-                        onChange={(e) => setSigningConfirmed(e.target.checked)}
-                        className="mt-1"
-                      />
-                      <div className="text-sm text-gray-300">
-                        <span className="font-medium text-white block mb-1">I confirm this contract has been officially signed.</span>
-                        I have verified that the client has reviewed all terms and applied their signature to the physical or digital document.
-                      </div>
-                    </label>
-
-                    <div className="flex justify-end">
-                      <button
-                        type="submit"
-                        disabled={uploadingContract || !signingConfirmed}
-                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-md transition-colors disabled:opacity-50"
-                      >
-                        <Upload size={18} /> {uploadingContract ? "Uploading..." : "Submit Signed Contract"}
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded-xl flex items-center justify-center flex-col text-center">
-                    <CheckCircle size={48} className="text-emerald-500 mb-4" />
-                    <h4 className="text-lg font-bold text-white mb-2">
-                      {project.contract.status === "VERIFIED" ? "Contract Verified" : "Contract Under Review"}
-                    </h4>
-                    <p className="text-sm text-gray-400">
-                      {project.contract.status === "VERIFIED" 
-                        ? "The signed contract has been verified by the administration. You can now proceed to payment."
-                        : "The signed contract has been submitted and is currently being reviewed by the administration."}
-                    </p>
-                  </div>
-                )}
-              </div>
+    <div className="space-y-6 pb-12 max-w-6xl mx-auto">
+      {/* Page Header */}
+      <BrokerPageHeader
+        title={project.projectName}
+        subtitle={`${project.clientName} (${project.companyName})`}
+        backHref="/broker/projects"
+        badge={<BrokerStatusBadge status={project.status} category="project" />}
+        actions={
+          <div className="flex items-center gap-2">
+            {canCancel && (
+              <BrokerButton
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsCancelModalOpen(true)}
+                className="text-rose-400 hover:text-rose-300 hover:bg-rose-500/10"
+              >
+                Cancel Referral
+              </BrokerButton>
             )}
+            <span className="font-mono text-xs px-2.5 py-1 rounded-md bg-[#171A1F] border border-[#22262D] text-[#C2A878]">
+              {project.projectCode}
+            </span>
           </div>
-        )}
+        }
+      />
 
-        {activeTab === "payment" && (
-          <div className="p-6">
-            {!project.payment ? (
-              <div className="text-center py-12">
-                <CreditCard size={48} className="mx-auto text-gray-600 mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">Payment Not Ready</h3>
-                <p className="text-sm text-gray-400 max-w-md mx-auto">
-                  The payment request will be generated once the contract has been signed and verified.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="p-5 bg-[#1a1a1a] rounded-xl border border-white/10">
-                    <p className="text-sm text-gray-500 mb-1">Project Price</p>
-                    <p className="text-xl font-bold text-white">{project.payment.currency} {project.payment.projectPrice.toLocaleString()}</p>
-                  </div>
-                  <div className="p-5 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                    <p className="text-sm text-blue-400 mb-1">Advance Required ({project.payment.advancePercentage}%)</p>
-                    <p className="text-2xl font-bold text-white">{project.payment.currency} {project.payment.advanceAmount.toLocaleString()}</p>
-                  </div>
-                  <div className="p-5 bg-[#1a1a1a] rounded-xl border border-white/10">
-                    <p className="text-sm text-gray-500 mb-1">Remaining</p>
-                    <p className="text-xl font-bold text-gray-400">{project.payment.currency} {project.payment.remainingAmount.toLocaleString()}</p>
-                  </div>
+      {/* Rejection Alert */}
+      {project.status === "REJECTED" && (
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs space-y-1">
+          <div className="flex items-center gap-2 font-bold">
+            <ShieldAlert className="w-4 h-4" />
+            <span>Referral Rejected</span>
+          </div>
+          <p className="text-[#D0D4DC] leading-relaxed">
+            {project.rejectionReason ||
+              "This project submission was not accepted during technical or compliance feasibility review."}
+          </p>
+        </div>
+      )}
+
+      {/* Tabs Navigation */}
+      <div className="flex items-center gap-1 border-b border-[#1E232B] pb-px">
+        {[
+          { key: "overview", label: "Overview & Commercials", icon: Briefcase },
+          { key: "milestones", label: "Milestones & Delivery", icon: Layers },
+          { key: "contract", label: "Contract & SLA", icon: FileText },
+          { key: "payment", label: "Payments & Invoices", icon: CreditCard },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.key;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key as any)}
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all ${
+                isActive
+                  ? "border-[#C2A878] text-[#C2A878] bg-[#171A1F]/30"
+                  : "border-transparent text-[#8B94A1] hover:text-[#E6E8EB] hover:border-[#2C313A]"
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* TAB 1: OVERVIEW */}
+      {activeTab === "overview" && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left: Client & Project Scope */}
+          <div className="lg:col-span-8 space-y-6">
+            <BrokerCard title="Project Technical Scope" subtitle={project.requiredService}>
+              <div className="space-y-4 text-xs">
+                <div>
+                  <span className="text-[#8B94A1] block mb-1">Requirement Statement:</span>
+                  <p className="text-[#D0D4DC] bg-[#0E1013] p-3 rounded-lg border border-[#22262D] leading-relaxed whitespace-pre-line">
+                    {project.detailedRequirement}
+                  </p>
                 </div>
 
-                {(project.payment.status === "PENDING" || project.payment.status === "REJECTED") ? (
-                  <>
-                    {project.payment.status === "REJECTED" && (
-                      <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg mb-6">
-                        <h4 className="text-red-400 font-bold mb-1">Payment Proof Rejected</h4>
-                        <p className="text-red-300 text-sm">Reason: {project.payment.rejectionReason}</p>
-                        <p className="text-red-300 text-sm mt-2">Please verify the UTR and upload the correct payment screenshot.</p>
+                {project.additionalRequirements && (
+                  <div>
+                    <span className="text-[#8B94A1] block mb-1">Additional Specifications:</span>
+                    <p className="text-[#D0D4DC] bg-[#0E1013] p-3 rounded-lg border border-[#22262D] leading-relaxed">
+                      {project.additionalRequirements}
+                    </p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+                  <div className="p-3 rounded-lg bg-[#171A1F] border border-[#22262D]">
+                    <span className="text-[#8B94A1] text-[11px] block">Expected Timeline</span>
+                    <span className="text-[#E6E8EB] font-semibold mt-1 block">{project.expectedTimeline}</span>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-[#171A1F] border border-[#22262D]">
+                    <span className="text-[#8B94A1] text-[11px] block">Proposed Budget</span>
+                    <span className="font-mono text-emerald-400 font-bold mt-1 block">
+                      {formatCurrencyINR(Number(project.projectBudget.replace(/[^0-9]/g, "")) || 0)}
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-[#171A1F] border border-[#22262D]">
+                    <span className="text-[#8B94A1] text-[11px] block">Submission Date</span>
+                    <span className="text-[#E6E8EB] font-semibold mt-1 block">
+                      {formatDateIN(project.createdAt)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </BrokerCard>
+
+            <BrokerCard title="Client Enterprise Details" subtitle={project.companyName}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <span className="text-[#8B94A1] block">Primary Contact:</span>
+                  <span className="text-[#E6E8EB] font-semibold mt-0.5 block">{project.clientName}</span>
+                  {project.clientDesignation && (
+                    <span className="text-[11px] text-[#566171]">{project.clientDesignation}</span>
+                  )}
+                </div>
+
+                <div>
+                  <span className="text-[#8B94A1] block">Email:</span>
+                  <a href={`mailto:${project.clientEmail}`} className="text-[#C2A878] hover:underline font-mono">
+                    {project.clientEmail}
+                  </a>
+                </div>
+
+                <div>
+                  <span className="text-[#8B94A1] block">Phone:</span>
+                  <a href={`tel:${project.clientPhone}`} className="text-[#E6E8EB] hover:underline">
+                    {project.clientPhone}
+                  </a>
+                </div>
+
+                <div>
+                  <span className="text-[#8B94A1] block">Location:</span>
+                  <span className="text-[#E6E8EB]">
+                    {project.city}, {project.state}, {project.country}
+                  </span>
+                </div>
+
+                {project.website && (
+                  <div className="sm:col-span-2">
+                    <span className="text-[#8B94A1] block">Website:</span>
+                    <a
+                      href={project.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#C2A878] hover:underline inline-flex items-center gap-1"
+                    >
+                      <span>{project.website}</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                )}
+              </div>
+            </BrokerCard>
+          </div>
+
+          {/* Right: Partner Commission & Commercial Card */}
+          <div className="lg:col-span-4 space-y-6">
+            <BrokerCard title="Partner Commission Ledger" subtitle="10% Referral Tier">
+              <div className="space-y-4 text-xs">
+                {project.commission ? (
+                  <div className="space-y-3">
+                    <div className="p-3.5 rounded-xl bg-[#0E1013] border border-[#22262D] space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-[#8B94A1]">Project Valuation:</span>
+                        <span className="font-mono font-semibold text-[#E6E8EB]">
+                          {formatCurrencyINR(project.commission.projectValue)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-[#8B94A1]">Commission Rate:</span>
+                        <span className="font-mono text-[#C2A878] font-bold">
+                          {project.commission.commissionRate}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between border-t border-[#1E232B] pt-2">
+                        <span className="text-[#8B94A1]">Gross Commission:</span>
+                        <span className="font-mono text-emerald-400 font-bold">
+                          {formatCurrencyINR(project.commission.commissionAmount)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-[#171A1F] border border-[#22262D]">
+                      <span className="text-[#8B94A1]">Payout Status:</span>
+                      <BrokerStatusBadge status={project.commission.status} category="commission" />
+                    </div>
+
+                    {project.commission.paidAt && (
+                      <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs">
+                        Settled on {formatDateIN(project.commission.paidAt)}.
+                        {project.commission.payoutReference && (
+                          <span className="block font-mono text-[11px] mt-0.5">
+                            Ref: {project.commission.payoutReference}
+                          </span>
+                        )}
                       </div>
                     )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Payment Instructions */}
-                      <div className="bg-[#1a1a1a] border border-white/10 rounded-xl overflow-hidden">
-                        <div className="p-4 border-b border-white/10 bg-black/20">
-                          <h4 className="font-bold text-white">Payment Instructions</h4>
-                        </div>
-                        <div className="p-5 space-y-6">
-                          {/* BANK */}
-                          {project.payment.paymentSettingsSnapshot?.bank && (
-                            <div>
-                              <div className="flex items-center gap-2 mb-3 text-blue-400 font-medium">
-                                <Building2 size={18} /> Bank Transfer
-                              </div>
-                              <div className="bg-black/30 p-3 rounded-lg text-sm space-y-2 border border-white/5">
-                                <div className="flex justify-between"><span className="text-gray-500">Bank Name</span> <span className="text-white font-medium">{project.payment.paymentSettingsSnapshot.bank.bankName}</span></div>
-                                <div className="flex justify-between"><span className="text-gray-500">Account Name</span> <span className="text-white font-medium">{project.payment.paymentSettingsSnapshot.bank.accountHolderName}</span></div>
-                                <div className="flex justify-between items-center">
-                                  <span className="text-gray-500">Account No.</span> 
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-white font-mono font-bold">{project.payment.paymentSettingsSnapshot.bank.accountNumber}</span>
-                                    <button onClick={() => copyToClipboard(project.payment.paymentSettingsSnapshot.bank.accountNumber)} className="text-gray-500 hover:text-white"><Copy size={14}/></button>
-                                  </div>
-                                </div>
-                                <div className="flex justify-between"><span className="text-gray-500">IFSC</span> <span className="text-white font-medium">{project.payment.paymentSettingsSnapshot.bank.ifscCode}</span></div>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* UPI */}
-                          {project.payment.paymentSettingsSnapshot?.upi && (
-                            <div>
-                              <div className="flex items-center gap-2 mb-3 text-purple-400 font-medium">
-                                <Smartphone size={18} /> UPI Transfer
-                              </div>
-                              <div className="bg-black/30 p-4 rounded-lg text-sm border border-white/5 text-center space-y-3">
-                                {project.payment.paymentSettingsSnapshot.upi.qrCodeUrl && (
-                                  <img src={project.payment.paymentSettingsSnapshot.upi.qrCodeUrl} alt="UPI QR Code" className="max-w-[150px] mx-auto rounded" />
-                                )}
-                                <div className="flex items-center justify-center gap-2 mt-2">
-                                  <span className="text-white font-mono font-bold text-base">{project.payment.paymentSettingsSnapshot.upi.upiId}</span>
-                                  <button onClick={() => copyToClipboard(project.payment.paymentSettingsSnapshot.upi.upiId)} className="text-gray-500 hover:text-white"><Copy size={16}/></button>
-                                </div>
-                                <div className="text-gray-500">{project.payment.paymentSettingsSnapshot.upi.upiName}</div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Submission Form */}
-                      <form onSubmit={submitPayment} className="bg-[#1a1a1a] border border-white/10 rounded-xl p-5 space-y-4">
-                        <h4 className="font-bold text-white border-b border-white/10 pb-2 mb-4">Submit Payment Proof</h4>
-                        
-                        <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">Payment Method *</label>
-                          <div className="grid grid-cols-2 gap-3">
-                            <label className={`border rounded-lg p-3 cursor-pointer transition-colors ${paymentMethod === 'BANK' ? 'border-blue-500 bg-blue-500/10' : 'border-white/10 hover:border-white/30'}`}>
-                              <input type="radio" name="method" className="hidden" checked={paymentMethod === 'BANK'} onChange={() => setPaymentMethod('BANK')} />
-                              <div className="font-medium text-white text-center text-sm flex items-center justify-center gap-2"><Building2 size={16}/> Bank</div>
-                            </label>
-                            <label className={`border rounded-lg p-3 cursor-pointer transition-colors ${paymentMethod === 'UPI' ? 'border-purple-500 bg-purple-500/10' : 'border-white/10 hover:border-white/30'}`}>
-                              <input type="radio" name="method" className="hidden" checked={paymentMethod === 'UPI'} onChange={() => setPaymentMethod('UPI')} />
-                              <div className="font-medium text-white text-center text-sm flex items-center justify-center gap-2"><Smartphone size={16}/> UPI</div>
-                            </label>
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">Amount Paid *</label>
-                          <input required type="number" step="0.01" value={amountPaid} onChange={e => setAmountPaid(e.target.value)} placeholder={project.payment.advanceAmount.toString()} className="w-full bg-[#0d0d0d] border border-white/10 rounded-md p-2 text-white text-sm focus:border-red-500/50" />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">Transaction ID / UTR *</label>
-                          <input required type="text" value={transactionId} onChange={e => setTransactionId(e.target.value)} className="w-full bg-[#0d0d0d] border border-white/10 rounded-md p-2 text-white text-sm font-mono focus:border-red-500/50" />
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">Payment Screenshot URL *</label>
-                          <input required type="url" value={proofFileUrl} onChange={e => setProofFileUrl(e.target.value)} placeholder="https://..." className="w-full bg-[#0d0d0d] border border-white/10 rounded-md p-2 text-white text-sm focus:border-red-500/50" />
-                        </div>
-
-                        <div className="pt-2">
-                          <button type="submit" disabled={submittingPayment} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition-colors text-sm font-medium disabled:opacity-50">
-                            {submittingPayment ? "Submitting..." : "Submit Payment Proof"}
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                  </>
+                  </div>
                 ) : (
-                  <div className="p-6 bg-[#1a1a1a] border border-white/10 rounded-xl flex items-center justify-center flex-col text-center">
-                    <CheckCircle size={48} className="text-emerald-500 mb-4" />
-                    <h4 className="text-lg font-bold text-white mb-2">
-                      {project.payment.status === "VERIFIED" ? "Payment Verified & Project Confirmed" : "Payment Under Review"}
-                    </h4>
-                    <p className="text-sm text-gray-400">
-                      {project.payment.status === "VERIFIED" 
-                        ? "Your advance payment has been successfully verified. Project execution has officially started."
-                        : "Your payment proof has been submitted and is currently being verified by the administration."}
-                    </p>
+                  <div className="p-4 rounded-xl bg-[#0E1013] border border-[#22262D] space-y-2 text-center">
+                    <span className="text-xs text-[#8B94A1] block">
+                      Commission accrual unlocks upon contract signing and advance milestone settlement.
+                    </span>
+                    <span className="font-mono text-sm font-bold text-[#C2A878] block">
+                      Est. 10% ({formatCurrencyINR(Math.round(Number(project.projectBudget.replace(/[^0-9]/g, "")) * 0.1 || 0))})
+                    </span>
                   </div>
                 )}
               </div>
-            )}
-          </div>
-        )}
+            </BrokerCard>
 
-        {activeTab === "timeline" && (
-          <div className="p-6 max-w-2xl mx-auto py-10">
-            {/* Same timeline component as Admin, slightly simplified */}
-            <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/20 before:to-transparent">
-              <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-black shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
-                  <CheckCircle className="text-white w-5 h-5" />
-                </div>
-                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl bg-white/5 border border-white/10 shadow">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-bold text-white text-sm">Project Requested</h3>
-                    <span className="text-xs text-gray-500">{new Date(project.createdAt).toLocaleDateString()}</span>
+            <div className="p-4 rounded-xl border border-[#22262D] bg-[#0E1013] text-xs text-[#8B94A1] space-y-2">
+              <div className="flex items-center gap-2 text-[#E6E8EB] font-medium">
+                <ShieldCheck className="w-4 h-4 text-[#C2A878]" />
+                <span>Broker Protection Guarantee</span>
+              </div>
+              <p className="text-[11px] leading-relaxed">
+                Client contract is protected under Axivon Non-Circumvention Policy. Commissions are disbursed
+                within 48 hours of cleared client invoice.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: MILESTONES */}
+      {activeTab === "milestones" && (
+        <BrokerCard title="Project Milestones & Delivery Schedule" subtitle="Deliverable progression pipeline">
+          {project.milestones && project.milestones.length > 0 ? (
+            <div className="space-y-4">
+              {project.milestones.map((m, idx) => (
+                <div
+                  key={m.id}
+                  className="p-4 rounded-xl bg-[#171A1F] border border-[#22262D] flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-[#C2A878]/15 text-[#C2A878] flex items-center justify-center font-mono text-[10px] font-bold">
+                        {idx + 1}
+                      </span>
+                      <h4 className="text-xs font-bold text-[#E6E8EB]">{m.title}</h4>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#0E1013] border border-[#22262D] text-[#8B94A1]">
+                        {m.status}
+                      </span>
+                    </div>
+                    {m.description && <p className="text-xs text-[#8B94A1] pl-7">{m.description}</p>}
                   </div>
+
+                  <div className="text-xs text-[#8B94A1] sm:text-right pl-7 sm:pl-0 shrink-0">
+                    {m.targetDate && <div>Target: {formatDateIN(m.targetDate)}</div>}
+                    {m.completionDate && (
+                      <div className="text-emerald-400 font-medium">
+                        Completed: {formatDateIN(m.completionDate)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center text-xs text-[#8B94A1] space-y-2">
+              <Clock className="w-8 h-8 text-[#566171] mx-auto" />
+              <p>Milestone schedule will be published following contract execution and sprint planning.</p>
+            </div>
+          )}
+        </BrokerCard>
+      )}
+
+      {/* TAB 3: CONTRACT */}
+      {activeTab === "contract" && (
+        <BrokerCard title="Commercial Contract & Legal Instruments" subtitle="Master Client Service Agreement">
+          {project.contract ? (
+            <div className="space-y-6 text-xs">
+              <div className="p-4 rounded-xl bg-[#0E1013] border border-[#22262D] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <BrokerStatusBadge status={project.contract.status} category="contract" />
+                    <span className="font-mono text-[#8B94A1]">
+                      Version {project.contract.versions?.[0]?.versionNumber || 1}
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-bold text-[#E6E8EB] mt-1">
+                    Axivon Client Engineering & Service Agreement
+                  </h4>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <BrokerButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleDownloadContract}
+                    icon={<Download className="w-3.5 h-3.5" />}
+                  >
+                    Download Agreement PDF
+                  </BrokerButton>
+
+                  {project.contract.status !== "CONTRACT_SIGNED" && (
+                    <BrokerButton
+                      variant="primary"
+                      size="sm"
+                      onClick={() => setIsContractModalOpen(true)}
+                      icon={<Upload className="w-3.5 h-3.5" />}
+                    >
+                      Upload Signed Copy
+                    </BrokerButton>
+                  )}
                 </div>
               </div>
 
-              {project.contract && (
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-blue-500 bg-black shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
-                    <FileText className="text-blue-500 w-5 h-5" />
-                  </div>
-                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl bg-white/5 border border-white/10 shadow">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-bold text-white text-sm">Contract Sent</h3>
-                      <span className="text-xs text-gray-500">{new Date(project.contract.sentAt).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {project.contract?.signedAt && (
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-emerald-500 bg-black shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
-                    <Upload className="text-emerald-500 w-5 h-5" />
-                  </div>
-                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl bg-white/5 border border-white/10 shadow">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-bold text-white text-sm">Contract Signed</h3>
-                      <span className="text-xs text-gray-500">{new Date(project.contract.signedAt).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {project.payment?.submittedAt && (
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-amber-500 bg-black shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
-                    <CreditCard className="text-amber-500 w-5 h-5" />
-                  </div>
-                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl bg-white/5 border border-white/10 shadow">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-bold text-white text-sm">Payment Submitted</h3>
-                      <span className="text-xs text-gray-500">{new Date(project.payment.submittedAt).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {project.payment?.verifiedAt && (
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-red-500 bg-red-600 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow shadow-red-500/50">
-                    <CheckCircle className="text-white w-5 h-5" />
-                  </div>
-                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl bg-red-950/30 border border-red-500/30 shadow">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-bold text-white text-sm">Project Confirmed</h3>
-                      <span className="text-xs text-gray-500">{new Date(project.payment.verifiedAt).toLocaleDateString()}</span>
-                    </div>
+              {/* Version History Table */}
+              {project.contract.versions && project.contract.versions.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-semibold text-[#8B94A1] mb-2 uppercase tracking-wider">
+                    Contract Audit History
+                  </h4>
+                  <div className="border border-[#22262D] rounded-xl overflow-hidden">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-[#0E1013] border-b border-[#1E232B] text-[#8B94A1]">
+                        <tr>
+                          <th className="px-4 py-2.5">Version</th>
+                          <th className="px-4 py-2.5">Status</th>
+                          <th className="px-4 py-2.5">Dispatched</th>
+                          <th className="px-4 py-2.5">Executed</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#1E232B] text-[#D0D4DC]">
+                        {project.contract.versions.map((ver) => (
+                          <tr key={ver.id}>
+                            <td className="px-4 py-2.5 font-mono">v{ver.versionNumber}.0</td>
+                            <td className="px-4 py-2.5">
+                              <BrokerStatusBadge status={ver.status} category="contract" />
+                            </td>
+                            <td className="px-4 py-2.5 text-[#8B94A1]">
+                              {ver.sentAt ? formatDateIN(ver.sentAt) : "—"}
+                            </td>
+                            <td className="px-4 py-2.5 text-[#8B94A1]">
+                              {ver.signedAt ? formatDateIN(ver.signedAt) : "Pending"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               )}
             </div>
+          ) : (
+            <div className="py-12 text-center text-xs text-[#8B94A1] space-y-2">
+              <FileText className="w-8 h-8 text-[#566171] mx-auto" />
+              <p>Contract drafting in progress. Axivon Legal will attach agreement once requirements are finalized.</p>
+            </div>
+          )}
+        </BrokerCard>
+      )}
+
+      {/* TAB 4: PAYMENTS */}
+      {activeTab === "payment" && (
+        <BrokerCard title="Milestone Payments & Advance Settlement" subtitle="Client invoice and settlement tracking">
+          {project.payment ? (
+            <div className="space-y-6 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl bg-[#0E1013] border border-[#22262D]">
+                  <span className="text-[#8B94A1] block">Contract Total Price</span>
+                  <span className="font-mono text-base font-bold text-[#E6E8EB] mt-1 block">
+                    {formatCurrencyINR(project.payment.projectPrice)}
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-xl bg-[#0E1013] border border-[#22262D]">
+                  <span className="text-[#8B94A1] block">Advance Requirement ({project.payment.advancePercentage}%)</span>
+                  <span className="font-mono text-base font-bold text-[#C2A878] mt-1 block">
+                    {formatCurrencyINR(project.payment.advanceAmount)}
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-xl bg-[#0E1013] border border-[#22262D]">
+                  <span className="text-[#8B94A1] block">Payment Status</span>
+                  <div className="mt-1">
+                    <BrokerStatusBadge status={project.payment.status} category="payment" />
+                  </div>
+                </div>
+              </div>
+
+              {project.payment.status !== "VERIFIED" && (
+                <div className="p-4 rounded-xl bg-[#171A1F] border border-[#22262D] flex items-center justify-between">
+                  <div>
+                    <h5 className="font-semibold text-[#E6E8EB]">Submit Client Payment Slip</h5>
+                    <p className="text-[#8B94A1] text-[11px] mt-0.5">
+                      Upload bank transfer UTR or UPI confirmation screenshot for verification.
+                    </p>
+                  </div>
+                  <BrokerButton
+                    variant="primary"
+                    size="sm"
+                    onClick={() => {
+                      setAmountPaid(project.payment?.advanceAmount?.toString() || "");
+                      setIsPaymentModalOpen(true);
+                    }}
+                    icon={<CreditCard className="w-3.5 h-3.5" />}
+                  >
+                    Submit Proof
+                  </BrokerButton>
+                </div>
+              )}
+
+              {project.payment.transactionId && (
+                <div className="p-4 rounded-xl bg-[#0E1013] border border-[#22262D] space-y-1.5">
+                  <span className="font-semibold text-[#8B94A1] block">Last Submitted Transaction:</span>
+                  <div className="flex justify-between">
+                    <span className="text-[#8B94A1]">UTR Reference:</span>
+                    <span className="font-mono font-medium text-[#E6E8EB]">
+                      {project.payment.transactionId}
+                    </span>
+                  </div>
+                  {project.payment.amountPaid && (
+                    <div className="flex justify-between">
+                      <span className="text-[#8B94A1]">Amount:</span>
+                      <span className="font-mono text-emerald-400 font-bold">
+                        {formatCurrencyINR(project.payment.amountPaid)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="py-12 text-center text-xs text-[#8B94A1] space-y-2">
+              <CreditCard className="w-8 h-8 text-[#566171] mx-auto" />
+              <p>Payment schedule is created upon execution of the master service contract.</p>
+            </div>
+          )}
+        </BrokerCard>
+      )}
+
+      {/* UPLOAD CONTRACT MODAL */}
+      {isContractModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4">
+            <div
+              className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity"
+              onClick={() => setIsContractModalOpen(false)}
+            />
+
+            <div className="relative bg-[#111317] border border-[#22262D] rounded-xl max-w-md w-full p-6 text-xs text-[#E6E8EB] space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-[#1E232B] pb-3">
+                <h3 className="text-sm font-bold">Submit Signed Contract Copy</h3>
+                <button
+                  onClick={() => setIsContractModalOpen(false)}
+                  className="p-1 rounded text-[#8B94A1] hover:text-[#E6E8EB]"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <form onSubmit={handleUploadContract} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-[#8B94A1] mb-1">
+                    Signed Document Link / File Path <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={signedFileUrl}
+                    onChange={(e) => setSignedFileUrl(e.target.value)}
+                    placeholder="https://.../signed-contract.pdf or /uploads/..."
+                    className="w-full px-3 py-2 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] placeholder-[#566171] focus:outline-none focus:border-[#C2A878]"
+                  />
+                  <p className="text-[11px] text-[#566171] mt-1">
+                    Must be in PDF format with signature & company stamp.
+                  </p>
+                </div>
+
+                <label className="flex items-start gap-2.5 p-3 rounded-lg bg-[#0E1013] border border-[#22262D] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={signingConfirmed}
+                    onChange={(e) => setSigningConfirmed(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-[#22262D] text-[#C2A878] accent-[#C2A878]"
+                  />
+                  <span className="text-[11px] text-[#D0D4DC] leading-relaxed">
+                    I confirm that the client has duly executed this agreement and the attached document is
+                    accurate.
+                  </span>
+                </label>
+
+                <div className="pt-2 flex items-center justify-end gap-2 border-t border-[#1E232B]">
+                  <BrokerButton
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsContractModalOpen(false)}
+                  >
+                    Cancel
+                  </BrokerButton>
+                  <BrokerButton
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    loading={uploadingContract}
+                    disabled={!signingConfirmed}
+                  >
+                    Submit for Review
+                  </BrokerButton>
+                </div>
+              </form>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* SUBMIT PAYMENT PROOF MODAL */}
+      {isPaymentModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4">
+            <div
+              className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity"
+              onClick={() => setIsPaymentModalOpen(false)}
+            />
+
+            <div className="relative bg-[#111317] border border-[#22262D] rounded-xl max-w-md w-full p-6 text-xs text-[#E6E8EB] space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-[#1E232B] pb-3">
+                <h3 className="text-sm font-bold">Submit Advance Payment Proof</h3>
+                <button
+                  onClick={() => setIsPaymentModalOpen(false)}
+                  className="p-1 rounded text-[#8B94A1] hover:text-[#E6E8EB]"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <form onSubmit={handlePaymentSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-[#8B94A1] mb-1">
+                    Transfer Method
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("BANK")}
+                      className={`p-2 rounded-lg border text-xs font-medium ${
+                        paymentMethod === "BANK"
+                          ? "bg-[#C2A878]/15 border-[#C2A878] text-[#E6E8EB]"
+                          : "bg-[#171A1F] border-[#22262D] text-[#8B94A1]"
+                      }`}
+                    >
+                      Bank Transfer (NEFT/RTGS)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("UPI")}
+                      className={`p-2 rounded-lg border text-xs font-medium ${
+                        paymentMethod === "UPI"
+                          ? "bg-[#C2A878]/15 border-[#C2A878] text-[#E6E8EB]"
+                          : "bg-[#171A1F] border-[#22262D] text-[#8B94A1]"
+                      }`}
+                    >
+                      UPI Transfer
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-[#8B94A1] mb-1">
+                    Amount Paid (INR) <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={amountPaid}
+                    onChange={(e) => setAmountPaid(e.target.value)}
+                    placeholder="e.g. 200000"
+                    className="w-full px-3 py-2 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] font-mono focus:outline-none focus:border-[#C2A878]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-[#8B94A1] mb-1">
+                    UTR / Bank Transaction Reference ID <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={transactionId}
+                    onChange={(e) => setTransactionId(e.target.value)}
+                    placeholder="e.g. HDFC202610240019283"
+                    className="w-full px-3 py-2 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] font-mono focus:outline-none focus:border-[#C2A878]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-[#8B94A1] mb-1">
+                    Proof Slip Link / Screenshot URL
+                  </label>
+                  <input
+                    type="text"
+                    value={proofFileUrl}
+                    onChange={(e) => setProofFileUrl(e.target.value)}
+                    placeholder="https://... or /uploads/..."
+                    className="w-full px-3 py-2 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] placeholder-[#566171] focus:outline-none focus:border-[#C2A878]"
+                  />
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-2 border-t border-[#1E232B]">
+                  <BrokerButton
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsPaymentModalOpen(false)}
+                  >
+                    Cancel
+                  </BrokerButton>
+                  <BrokerButton
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    loading={submittingPayment}
+                  >
+                    Submit Proof for Clearance
+                  </BrokerButton>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CANCEL PROJECT MODAL */}
+      {isCancelModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4">
+            <div
+              className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity"
+              onClick={() => setIsCancelModalOpen(false)}
+            />
+
+            <div className="relative bg-[#111317] border border-[#22262D] rounded-xl max-w-md w-full p-6 text-xs text-[#E6E8EB] space-y-4 shadow-2xl">
+              <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+                <AlertTriangle className="w-5 h-5" />
+                <span>Cancel Project Referral?</span>
+              </div>
+              <p className="text-[#8B94A1] leading-relaxed">
+                Are you sure you want to cancel referral <strong>{project.projectCode}</strong>? This
+                action can only be performed while the project is in the initial review phase.
+              </p>
+
+              <div>
+                <label className="block text-xs font-medium text-[#8B94A1] mb-1">
+                  Cancellation Reason (Optional)
+                </label>
+                <textarea
+                  rows={2}
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="e.g. Client decided to postpone or change scope..."
+                  className="w-full px-3 py-2 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] placeholder-[#566171] focus:outline-none"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-[#1E232B]">
+                <BrokerButton
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsCancelModalOpen(false)}
+                >
+                  Keep Active
+                </BrokerButton>
+                <BrokerButton
+                  type="button"
+                  variant="danger"
+                  size="sm"
+                  loading={cancelling}
+                  onClick={handleCancelProject}
+                >
+                  Confirm Cancellation
+                </BrokerButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
