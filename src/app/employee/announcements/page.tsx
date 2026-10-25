@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Megaphone,
   Calendar,
@@ -10,7 +10,6 @@ import {
   ChevronRight,
   X,
   Tag,
-  CheckCircle2,
 } from "lucide-react";
 import { PageHeader } from "@/components/employee/PageHeader";
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
@@ -115,7 +114,7 @@ export default function AnnouncementsPage() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="space-y-6 max-w-7xl"
+      className="space-y-6 max-w-7xl pb-12"
     >
       {/* Header */}
       <PageHeader
@@ -135,15 +134,15 @@ export default function AnnouncementsPage() {
       />
 
       {/* Search & Priority Filter Bar */}
-      <div className="p-4 bg-[#111317] border border-[#1E2530] rounded-xl space-y-3">
+      <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-3">
         <div className="relative">
-          <Search className="w-4 h-4 text-[#566171] absolute left-3 top-3 pointer-events-none" />
+          <Search className="w-4 h-4 text-[#8A867E] absolute left-3 top-3 pointer-events-none" />
           <input
             type="text"
             placeholder="Search announcements by title or content..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-[#0F1215] border border-[#1E2530] rounded-lg text-xs text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0]"
+            className="w-full pl-9 pr-3 py-2 bg-[#232324] border border-[#2E2E30] rounded-lg text-xs text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
           />
         </div>
 
@@ -161,8 +160,8 @@ export default function AnnouncementsPage() {
               onClick={() => setSelectedPriority(tab.id)}
               className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors cursor-pointer text-xs ${
                 selectedPriority === tab.id
-                  ? "bg-[var(--ep-accent-soft)] text-[#5FA8A0] border border-[var(--ep-accent-border)] font-semibold"
-                  : "bg-[#0F1215] text-[#8B94A1] hover:text-[#E6E8EB] border border-[#1E2530]"
+                  ? "bg-[#4F9D83]/15 text-[#4F9D83] border border-[#4F9D83]/30 font-semibold"
+                  : "bg-[#232324] text-[#8A867E] hover:text-[#EDEBE6] border border-[#2E2E30]"
               }`}
             >
               {tab.label}
@@ -179,10 +178,10 @@ export default function AnnouncementsPage() {
           ))}
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="p-12 text-center bg-[#111317] border border-[#1E2530] rounded-xl space-y-2">
-          <Megaphone className="w-10 h-10 text-[#566171] mx-auto" />
-          <h3 className="text-base font-semibold text-[#E6E8EB]">No announcements found</h3>
-          <p className="text-xs text-[#566171]">
+        <div className="p-12 text-center bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-2">
+          <Megaphone className="w-10 h-10 text-[#8A867E] mx-auto" />
+          <h3 className="text-base font-semibold text-[#EDEBE6]">No announcements found</h3>
+          <p className="text-xs text-[#8A867E]">
             {searchQuery || selectedPriority !== "ALL"
               ? "No broadcasts match your query."
               : "There are no active company broadcasts at this time."}
@@ -194,14 +193,14 @@ export default function AnnouncementsPage() {
             <div
               key={a.id}
               onClick={() => handleOpenAnnouncement(a)}
-              className="p-5 bg-[#111317] border border-[#1E2530] rounded-xl hover:border-[#22262D] transition-all cursor-pointer space-y-3 relative group"
+              className="p-5 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl hover:border-[#3A3A3D] transition-colors cursor-pointer space-y-3 relative group"
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 <div className="space-y-1.5 min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Unread indicator dot */}
                     {!a.isRead && (
-                      <span className="w-2 h-2 rounded-full bg-[#5FA8A0] ring-4 ring-[#5FA8A0]/10 shrink-0" />
+                      <span className="w-2 h-2 rounded-full bg-[#4F9D83] ring-4 ring-[#4F9D83]/20 shrink-0" />
                     )}
 
                     {a.priority && a.priority !== "NORMAL" && (
@@ -210,13 +209,13 @@ export default function AnnouncementsPage() {
                       </StatusBadge>
                     )}
                     {a.category && (
-                      <span className="text-[11px] text-[#8B94A1] bg-[#0F1215] border border-[#1E2530] px-2 py-0.5 rounded flex items-center gap-1 font-semibold">
-                        <Tag className="w-3 h-3 text-[#5FA8A0]" />
+                      <span className="text-[11px] text-[#B3AFA6] bg-[#232324] border border-[#2E2E30] px-2 py-0.5 rounded flex items-center gap-1 font-medium">
+                        <Tag className="w-3 h-3 text-[#4F9D83]" />
                         {a.category}
                       </span>
                     )}
-                    <span className="text-[11px] text-[#566171] flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
+                    <span className="text-[11px] text-[#8A867E] flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-[#8A867E]" />
                       {new Date(a.publishAt).toLocaleDateString(undefined, {
                         month: "short",
                         day: "numeric",
@@ -225,24 +224,24 @@ export default function AnnouncementsPage() {
                     </span>
                   </div>
 
-                  <h3 className={`text-base font-semibold transition-colors ${!a.isRead ? "text-[#E6E8EB] font-bold" : "text-[#8B94A1]"} group-hover:text-[#5FA8A0]`}>
+                  <h3 className={`text-base font-medium transition-colors ${!a.isRead ? "text-[#EDEBE6] font-semibold" : "text-[#B3AFA6]"} group-hover:text-[#4F9D83]`}>
                     {a.title}
                   </h3>
                 </div>
 
-                <div className="flex items-center gap-1 text-xs text-[#566171] group-hover:text-[#5FA8A0] transition-colors shrink-0">
+                <div className="flex items-center gap-1 text-xs text-[#8A867E] group-hover:text-[#4F9D83] transition-colors shrink-0">
                   <span>Read details</span>
                   <ChevronRight className="w-4 h-4" />
                 </div>
               </div>
 
-              <p className="text-xs sm:text-sm text-[#8B94A1] line-clamp-3 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#8A867E] line-clamp-3 leading-relaxed">
                 {a.content}
               </p>
 
               {a.createdBy && (
-                <div className="pt-2 border-t border-[#1E2530] flex items-center gap-2 text-[11px] text-[#566171]">
-                  <User className="w-3.5 h-3.5 text-[#566171]" />
+                <div className="pt-2 border-t border-[#2E2E30] flex items-center gap-2 text-[11px] text-[#8A867E]">
+                  <User className="w-3.5 h-3.5 text-[#8A867E]" />
                   <span>Published by {a.createdBy.name}</span>
                 </div>
               )}
@@ -253,9 +252,9 @@ export default function AnnouncementsPage() {
 
       {/* Reader Modal */}
       {activeAnnouncement && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#111317] border border-[#1E2530] rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-            <div className="p-5 border-b border-[#1E2530] flex items-start justify-between gap-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-[#1A1A1B] border border-[#2E2E30] rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div className="p-5 border-b border-[#2E2E30] bg-[#121212] flex items-start justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   {activeAnnouncement.priority && (
@@ -264,15 +263,15 @@ export default function AnnouncementsPage() {
                     </StatusBadge>
                   )}
                   {activeAnnouncement.category && (
-                    <span className="text-[10px] text-[#8B94A1] bg-[#0F1215] border border-[#1E2530] px-2 py-0.5 rounded font-semibold">
+                    <span className="text-[10px] text-[#B3AFA6] bg-[#232324] border border-[#2E2E30] px-2 py-0.5 rounded font-medium">
                       {activeAnnouncement.category}
                     </span>
                   )}
                 </div>
-                <h2 className="text-lg font-bold text-[#E6E8EB] mt-1">
+                <h2 className="text-lg font-semibold text-[#EDEBE6] mt-1">
                   {activeAnnouncement.title}
                 </h2>
-                <div className="text-xs text-[#566171] flex items-center gap-3 pt-0.5">
+                <div className="text-xs text-[#8A867E] flex items-center gap-3 pt-0.5">
                   <span>
                     Published: {new Date(activeAnnouncement.publishAt).toLocaleDateString()}
                   </span>
@@ -283,17 +282,17 @@ export default function AnnouncementsPage() {
               </div>
               <button
                 onClick={() => setActiveAnnouncement(null)}
-                className="p-1.5 rounded-lg text-[#566171] hover:text-[#E6E8EB] hover:bg-[#171A1F] cursor-pointer transition-colors"
+                className="p-1.5 rounded-lg text-[#8A867E] hover:text-[#EDEBE6] hover:bg-[#232324] cursor-pointer transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-4 flex-1 text-sm text-[#E6E8EB] leading-relaxed whitespace-pre-wrap">
+            <div className="p-6 overflow-y-auto space-y-4 flex-1 text-sm text-[#EDEBE6] leading-relaxed whitespace-pre-wrap">
               {activeAnnouncement.content}
             </div>
 
-            <div className="p-4 border-t border-[#1E2530] bg-[#0F1215] flex justify-end">
+            <div className="p-4 border-t border-[#2E2E30] bg-[#121212] flex justify-end">
               <EpButton
                 variant="secondary"
                 size="sm"
