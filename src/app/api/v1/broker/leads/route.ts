@@ -106,3 +106,5 @@ export async function GET(req: NextRequest) {
     return handleApiError(error);
   }
 }
+
+export { POST } from "./create/route";
