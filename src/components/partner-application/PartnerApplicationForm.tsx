@@ -193,7 +193,7 @@ export default function PartnerApplicationForm() {
         <p className="text-gray-400 mb-8 max-w-md mx-auto">
           Thank you for applying to the AXIVON Business Partner Program. We have received your application and will review it shortly.
         </p>
-        <Link href="/business-partner" className="text-[#e8a064] hover:text-white transition-colors">
+        <Link href="/business-partner" className="text-[#C2A878] hover:text-white transition-colors">
           Return to Program Overview
         </Link>
       </div>
@@ -208,7 +208,7 @@ export default function PartnerApplicationForm() {
           <div key={s} className="flex flex-col items-center gap-2">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
               step === s 
-                ? "bg-[#e8a064] text-[#0a0a0a]" 
+                ? "bg-[#C2A878] text-[#0a0a0a]" 
                 : step > s 
                   ? "bg-green-500/20 text-green-500" 
                   : "bg-white/5 text-gray-500"
@@ -236,27 +236,27 @@ export default function PartnerApplicationForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Full Name *</label>
-                <input type="text" value={formData.fullName} onChange={(e) => updateForm("fullName", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+                <input type="text" value={formData.fullName} onChange={(e) => updateForm("fullName", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Email Address *</label>
-                <input type="email" value={formData.email} onChange={(e) => updateForm("email", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+                <input type="email" value={formData.email} onChange={(e) => updateForm("email", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Phone Number *</label>
-                <input type="tel" value={formData.phone} onChange={(e) => updateForm("phone", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+                <input type="tel" value={formData.phone} onChange={(e) => updateForm("phone", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Country *</label>
-                <input type="text" value={formData.country} onChange={(e) => updateForm("country", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+                <input type="text" value={formData.country} onChange={(e) => updateForm("country", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">State / Province</label>
-                <input type="text" value={formData.state} onChange={(e) => updateForm("state", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+                <input type="text" value={formData.state} onChange={(e) => updateForm("state", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">City / Location *</label>
-                <input type="text" value={formData.city} onChange={(e) => updateForm("city", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+                <input type="text" value={formData.city} onChange={(e) => updateForm("city", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
               </div>
             </div>
           </div>
@@ -267,7 +267,7 @@ export default function PartnerApplicationForm() {
             <h3 className="text-xl font-medium text-white mb-6">Professional Background</h3>
             <div>
               <label className="block text-sm text-gray-400 mb-1">Current Occupation *</label>
-              <select value={formData.occupation} onChange={(e) => updateForm("occupation", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]">
+              <select value={formData.occupation} onChange={(e) => updateForm("occupation", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]">
                 <option value="">Select Occupation...</option>
                 <option value="Entrepreneur">Entrepreneur</option>
                 <option value="Freelancer">Freelancer</option>
@@ -281,20 +281,20 @@ export default function PartnerApplicationForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Current Work / Organization</label>
-                <input type="text" value={formData.currentWork} onChange={(e) => updateForm("currentWork", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+                <input type="text" value={formData.currentWork} onChange={(e) => updateForm("currentWork", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Years of Experience</label>
-                <input type="number" min="0" value={formData.yearsOfExperience} onChange={(e) => updateForm("yearsOfExperience", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+                <input type="number" min="0" value={formData.yearsOfExperience} onChange={(e) => updateForm("yearsOfExperience", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
               </div>
             </div>
             <div>
               <label className="block text-sm text-gray-400 mb-1">Relevant Experience</label>
-              <textarea rows={3} value={formData.relevantExperience} onChange={(e) => updateForm("relevantExperience", e.target.value)} placeholder="Tell us about your professional/business experience..." className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+              <textarea rows={3} value={formData.relevantExperience} onChange={(e) => updateForm("relevantExperience", e.target.value)} placeholder="Tell us about your professional/business experience..." className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
             </div>
             <div>
               <label className="block text-sm text-gray-400 mb-1">Client / Business Network</label>
-              <textarea rows={3} value={formData.clientNetwork} onChange={(e) => updateForm("clientNetwork", e.target.value)} placeholder="What type of businesses or networks do you have access to?" className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+              <textarea rows={3} value={formData.clientNetwork} onChange={(e) => updateForm("clientNetwork", e.target.value)} placeholder="What type of businesses or networks do you have access to?" className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
             </div>
           </div>
         )}
@@ -304,7 +304,7 @@ export default function PartnerApplicationForm() {
             <h3 className="text-xl font-medium text-white mb-2">Education Details</h3>
             
             <div className="p-4 border border-white/10 bg-[#111]">
-              <h4 className="text-sm font-semibold text-[#e8a064] mb-4">10th Standard (Mandatory)</h4>
+              <h4 className="text-sm font-semibold text-[#C2A878] mb-4">10th Standard (Mandatory)</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input type="text" placeholder="School / Institution *" value={formData.edu10thSchool} onChange={(e) => updateForm("edu10thSchool", e.target.value)} className="w-full bg-[#0a0a0a] border border-white/10 p-2 text-sm text-white" />
                 <input type="text" placeholder="Board *" value={formData.edu10thBoard} onChange={(e) => updateForm("edu10thBoard", e.target.value)} className="w-full bg-[#0a0a0a] border border-white/10 p-2 text-sm text-white" />
@@ -341,15 +341,15 @@ export default function PartnerApplicationForm() {
             <h3 className="text-xl font-medium text-white mb-6">Partnership Motivation</h3>
             <div>
               <label className="block text-sm text-gray-400 mb-1">Why do you want to become an AXIVON Business Partner? *</label>
-              <textarea rows={4} maxLength={2000} value={formData.motivation} onChange={(e) => updateForm("motivation", e.target.value)} placeholder="Tell us why you are interested..." className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+              <textarea rows={4} maxLength={2000} value={formData.motivation} onChange={(e) => updateForm("motivation", e.target.value)} placeholder="Tell us why you are interested..." className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
             </div>
             <div>
               <label className="block text-sm text-gray-400 mb-1">How can you contribute?</label>
-              <textarea rows={3} maxLength={2000} value={formData.contribution} onChange={(e) => updateForm("contribution", e.target.value)} placeholder="What value do you bring to the partnership?" className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+              <textarea rows={3} maxLength={2000} value={formData.contribution} onChange={(e) => updateForm("contribution", e.target.value)} placeholder="What value do you bring to the partnership?" className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
             </div>
             <div>
               <label className="block text-sm text-gray-400 mb-1">Additional Information (Optional)</label>
-              <textarea rows={2} maxLength={2000} value={formData.additionalInfo} onChange={(e) => updateForm("additionalInfo", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#e8a064]" />
+              <textarea rows={2} maxLength={2000} value={formData.additionalInfo} onChange={(e) => updateForm("additionalInfo", e.target.value)} className="w-full bg-[#111] border border-white/10 p-3 text-white focus:outline-none focus:border-[#C2A878]" />
             </div>
           </div>
         )}
@@ -431,7 +431,7 @@ export default function PartnerApplicationForm() {
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="flex items-center gap-2 bg-[#e8a064] text-[#0a0a0a] px-8 py-2 text-sm font-semibold rounded-sm hover:bg-white transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 bg-[#C2A878] text-[#0a0a0a] px-8 py-2 text-sm font-semibold rounded-sm hover:bg-white transition-colors disabled:opacity-50"
           >
             {isSubmitting ? "Submitting..." : "Submit Application"}
           </button>

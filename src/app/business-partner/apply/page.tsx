@@ -11,7 +11,7 @@ import PartnerApplicationForm from "@/components/partner-application/PartnerAppl
 
 export default function BusinessPartnerApplyPage() {
   return (
-    <main className="bg-[#0a0a0a] text-white selection:bg-[#e8a064] selection:text-[#0a0a0a] min-h-screen font-sans flex flex-col items-center justify-center p-6 py-20">
+    <main className="bg-[#0a0a0a] text-white selection:bg-[#C2A878] selection:text-[#0a0a0a] min-h-screen font-sans flex flex-col items-center justify-center p-6 py-20">
       
       <div className="max-w-3xl w-full border border-white/10 bg-[#0e0e0e] rounded-sm p-6 md:p-10 shadow-2xl">
         <Link href="/business-partner" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium mb-8">

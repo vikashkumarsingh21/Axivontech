@@ -46,20 +46,20 @@ export const metadata: Metadata = {
 
 export default function BusinessPartnerPage() {
   return (
-    <main className="bg-[#0a0a0a] text-white selection:bg-[#e8a064] selection:text-[#0a0a0a] min-h-screen font-sans">
+    <main className="bg-[#0a0a0a] text-white selection:bg-[#C2A878] selection:text-[#0a0a0a] min-h-screen font-sans">
       
       {/* 01 — HERO */}
       <section className="relative w-full min-h-[85vh] flex items-center pt-24 pb-16 overflow-hidden border-b border-white/[0.05]">
         <div className="absolute inset-0 z-0 bg-[#0a0a0a]">
           {/* Subtle background element */}
-          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-[#e8a064]/5 rounded-full blur-[120px]" />
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-[#C2A878]/5 rounded-full blur-[120px]" />
           <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-blue-900/10 rounded-full blur-[100px]" />
         </div>
 
         <div className="container relative z-10 mx-auto px-6 lg:px-12">
           <div className="max-w-4xl">
-            <p className="text-[#e8a064] font-mono font-semibold tracking-widest text-xs uppercase mb-6 flex items-center gap-3">
-              <span className="w-8 h-px bg-[#e8a064]/50" />
+            <p className="text-[#C2A878] font-mono font-semibold tracking-widest text-xs uppercase mb-6 flex items-center gap-3">
+              <span className="w-8 h-px bg-[#C2A878]/50" />
               AXIVON Partner Ecosystem
             </p>
             <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-heading font-extrabold leading-[1.08] tracking-tight mb-8 text-balance">
@@ -72,7 +72,7 @@ export default function BusinessPartnerPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
               <Link
                 href="/business-partner/apply"
-                className="bg-[#e8a064] text-[#1a1a1a] px-8 py-4 rounded-xl font-semibold tracking-tight hover:bg-white transition-colors duration-300 shadow-lg shadow-[#e8a064]/20"
+                className="bg-[#C2A878] text-[#1a1a1a] px-8 py-4 rounded-xl font-semibold tracking-tight hover:bg-white transition-colors duration-300 shadow-lg shadow-[#C2A878]/20"
               >
                 Become a Partner
               </Link>
@@ -92,7 +92,7 @@ export default function BusinessPartnerPage() {
         <div className="container mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
             <div className="lg:col-span-4">
-              <h2 className="text-[#e8a064] font-mono font-semibold tracking-widest text-xs uppercase mb-4 sticky top-32">
+              <h2 className="text-[#C2A878] font-mono font-semibold tracking-widest text-xs uppercase mb-4 sticky top-32">
                 Program Overview
               </h2>
             </div>
@@ -117,7 +117,7 @@ export default function BusinessPartnerPage() {
                   "Receive applicable commission according to AXIVON's Partner Commission Policy"
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-[#e8a064] shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-[#C2A878] shrink-0 mt-0.5" />
                     <span className="text-[#A7B0BC] font-normal leading-relaxed">{item}</span>
                   </div>
                 ))}
@@ -133,7 +133,7 @@ export default function BusinessPartnerPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24">
             
             <div>
-              <h2 className="text-[#e8a064] font-mono font-semibold tracking-widest text-xs uppercase mb-4">
+              <h2 className="text-[#C2A878] font-mono font-semibold tracking-widest text-xs uppercase mb-4">
                 Our Purpose
               </h2>
               <h3 className="text-3xl font-heading font-bold leading-snug mb-6 text-[#F3F5F7]">
@@ -142,7 +142,7 @@ export default function BusinessPartnerPage() {
               <p className="text-[#A7B0BC] font-normal leading-relaxed mb-8 text-pretty">
                 We believe in the power of local business networks, professional connections, and entrepreneurial communities. The program exists to expand technology adoption through trusted relationships.
               </p>
-              <div className="bg-[#151A21] p-6 border-l-2 border-[#e8a064] rounded-r-xl">
+              <div className="bg-[#151A21] p-6 border-l-2 border-[#C2A878] rounded-r-xl">
                 <p className="text-lg text-[#F3F5F7] font-heading font-medium italic">
                   "You bring the connection. AXIVON brings the technology expertise."
                 </p>
@@ -150,7 +150,7 @@ export default function BusinessPartnerPage() {
             </div>
 
             <div>
-              <h2 className="text-[#e8a064] font-mono font-semibold tracking-widest text-xs uppercase mb-4">
+              <h2 className="text-[#C2A878] font-mono font-semibold tracking-widest text-xs uppercase mb-4">
                 Eligibility
               </h2>
               <h3 className="text-3xl font-heading font-bold leading-snug mb-6 text-[#F3F5F7]">
@@ -184,7 +184,7 @@ export default function BusinessPartnerPage() {
       <section id="how-it-works" className="py-14 sm:py-20 lg:py-32 border-b border-white/[0.05] bg-[#0e0e0e]">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-[#e8a064] font-mono font-semibold tracking-widest text-xs uppercase mb-4">
+            <h2 className="text-[#C2A878] font-mono font-semibold tracking-widest text-xs uppercase mb-4">
               Your Role
             </h2>
             <h3 className="text-3xl md:text-5xl font-heading font-bold leading-tight text-[#F3F5F7]">
@@ -193,50 +193,50 @@ export default function BusinessPartnerPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div className="space-y-4 border border-white/5 bg-[#111] p-8 rounded-2xl hover:border-[#e8a064]/30 transition-colors">
-              <span className="text-[#e8a064] font-mono text-sm font-bold tracking-widest block mb-2">01 — Identify</span>
+            <div className="space-y-4 border border-white/5 bg-[#111] p-8 rounded-2xl hover:border-[#C2A878]/30 transition-colors">
+              <span className="text-[#C2A878] font-mono text-sm font-bold tracking-widest block mb-2">01 — Identify</span>
               <h4 className="text-xl font-heading font-semibold text-[#F3F5F7]">Identify</h4>
               <p className="text-[#A7B0BC] text-sm leading-relaxed text-pretty">
                 Identify businesses or organizations that may need technology solutions.
               </p>
             </div>
-            <div className="space-y-4 border border-white/5 bg-[#111] p-8 rounded-2xl hover:border-[#e8a064]/30 transition-colors">
-              <span className="text-[#e8a064] font-mono text-sm font-bold tracking-widest block mb-2">02 — Introduce</span>
+            <div className="space-y-4 border border-white/5 bg-[#111] p-8 rounded-2xl hover:border-[#C2A878]/30 transition-colors">
+              <span className="text-[#C2A878] font-mono text-sm font-bold tracking-widest block mb-2">02 — Introduce</span>
               <h4 className="text-xl font-heading font-semibold text-[#F3F5F7]">Introduce</h4>
               <p className="text-[#A7B0BC] text-sm leading-relaxed text-pretty">
                 Introduce the relevant opportunity to AXIVON.
               </p>
             </div>
-            <div className="space-y-4 border border-white/5 bg-[#111] p-8 rounded-2xl hover:border-[#e8a064]/30 transition-colors">
-              <span className="text-[#e8a064] font-mono text-sm font-bold tracking-widest block mb-2">03 — Refer</span>
+            <div className="space-y-4 border border-white/5 bg-[#111] p-8 rounded-2xl hover:border-[#C2A878]/30 transition-colors">
+              <span className="text-[#C2A878] font-mono text-sm font-bold tracking-widest block mb-2">03 — Refer</span>
               <h4 className="text-xl font-heading font-semibold text-[#F3F5F7]">Refer</h4>
               <p className="text-[#A7B0BC] text-sm leading-relaxed text-pretty">
                 Submit the required lead information through the AXIVON referral system.
               </p>
             </div>
-            <div className="space-y-4 border border-white/5 bg-[#111] p-8 rounded-2xl hover:border-[#e8a064]/30 transition-colors">
-              <span className="text-[#e8a064] font-mono text-sm font-bold tracking-widest block mb-2">04 — Connect</span>
+            <div className="space-y-4 border border-white/5 bg-[#111] p-8 rounded-2xl hover:border-[#C2A878]/30 transition-colors">
+              <span className="text-[#C2A878] font-mono text-sm font-bold tracking-widest block mb-2">04 — Connect</span>
               <h4 className="text-xl font-heading font-semibold text-[#F3F5F7]">Connect</h4>
               <p className="text-[#A7B0BC] text-sm leading-relaxed text-pretty">
                 Coordinate with AXIVON when client communication or meetings are required.
               </p>
             </div>
             <div className="space-y-4 border border-white/5 bg-[#111] p-8 rounded-sm">
-              <span className="text-[#e8a064] font-mono text-xl block mb-2">05 — Support Qualification</span>
+              <span className="text-[#C2A878] font-mono text-xl block mb-2">05 — Support Qualification</span>
               <h4 className="text-xl font-medium">Support Qualification</h4>
               <p className="text-gray-400 text-sm font-light leading-relaxed">
                 Help provide relevant context about the opportunity when appropriate.
               </p>
             </div>
             <div className="space-y-4 border border-white/5 bg-[#111] p-8 rounded-sm">
-              <span className="text-[#e8a064] font-mono text-xl block mb-2">06 — Track</span>
+              <span className="text-[#C2A878] font-mono text-xl block mb-2">06 — Track</span>
               <h4 className="text-xl font-medium">Track</h4>
               <p className="text-gray-400 text-sm font-light leading-relaxed">
                 Use the partner ecosystem to follow the progress of eligible referrals/projects.
               </p>
             </div>
             <div className="space-y-4 border border-white/5 bg-[#111] p-8 rounded-sm md:col-span-2 lg:col-span-3">
-              <span className="text-[#e8a064] font-mono text-xl block mb-2">07 — Grow</span>
+              <span className="text-[#C2A878] font-mono text-xl block mb-2">07 — Grow</span>
               <h4 className="text-xl font-medium">Grow</h4>
               <p className="text-gray-400 text-sm font-light leading-relaxed">
                 Build a long-term relationship with AXIVON through genuine business opportunities.
@@ -245,7 +245,7 @@ export default function BusinessPartnerPage() {
           </div>
           
           <div className="max-w-4xl mx-auto mt-20 p-8 border border-white/10 bg-[#0a0a0a]">
-            <h4 className="text-xl font-medium mb-6 flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-[#e8a064]" /> Partner Responsibility Boundaries</h4>
+            <h4 className="text-xl font-medium mb-6 flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-[#C2A878]" /> Partner Responsibility Boundaries</h4>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-400 text-sm font-light">
               <li>• Provide genuine information</li>
               <li>• Respect client privacy</li>
@@ -264,7 +264,7 @@ export default function BusinessPartnerPage() {
         <div className="container mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
             <div className="lg:col-span-4">
-              <h2 className="text-[#e8a064] font-mono font-semibold tracking-widest text-xs uppercase mb-4 sticky top-32">
+              <h2 className="text-[#C2A878] font-mono font-semibold tracking-widest text-xs uppercase mb-4 sticky top-32">
                 Partner Benefits
               </h2>
             </div>
@@ -315,7 +315,7 @@ export default function BusinessPartnerPage() {
             
             {/* Partnership Lifecycle Timeline */}
             <div>
-              <h2 className="text-[#e8a064] font-mono font-semibold tracking-widest text-xs uppercase mb-6">
+              <h2 className="text-[#C2A878] font-mono font-semibold tracking-widest text-xs uppercase mb-6">
                 The Lifecycle
               </h2>
               <h3 className="text-3xl font-heading font-bold mb-10 text-[#F3F5F7]">Partnership Process</h3>
@@ -335,7 +335,7 @@ export default function BusinessPartnerPage() {
                   "Commission / Payout"
                 ].map((step, idx) => (
                   <div key={idx} className="relative pl-8">
-                    <span className={`absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-[#0e0e0e] border-2 ${idx < 5 ? 'border-[#e8a064]' : 'border-white/20'}`} />
+                    <span className={`absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-[#0e0e0e] border-2 ${idx < 5 ? 'border-[#C2A878]' : 'border-white/20'}`} />
                     <h4 className="text-base text-[#A7B0BC] font-medium">{step}</h4>
                   </div>
                 ))}
@@ -344,30 +344,30 @@ export default function BusinessPartnerPage() {
 
             {/* How Referrals Work */}
             <div>
-              <h2 className="text-[#e8a064] font-mono font-semibold tracking-widest text-xs uppercase mb-6">
+              <h2 className="text-[#C2A878] font-mono font-semibold tracking-widest text-xs uppercase mb-6">
                 The Mechanism
               </h2>
               <h3 className="text-3xl font-heading font-bold mb-10 text-[#F3F5F7]">How Referrals Work</h3>
               
               <div className="space-y-8">
                 <div>
-                  <h4 className="text-lg font-heading font-semibold mb-2 text-[#F3F5F7]"><span className="text-[#e8a064] font-mono mr-2">Step 1:</span> Identify</h4>
+                  <h4 className="text-lg font-heading font-semibold mb-2 text-[#F3F5F7]"><span className="text-[#C2A878] font-mono mr-2">Step 1:</span> Identify</h4>
                   <p className="text-[#A7B0BC] text-sm leading-relaxed text-pretty">Identify a potential client with a real technology need.</p>
                 </div>
                 <div>
-                  <h4 className="text-lg font-heading font-semibold mb-2 text-[#F3F5F7]"><span className="text-[#e8a064] font-mono mr-2">Step 2:</span> Submit</h4>
+                  <h4 className="text-lg font-heading font-semibold mb-2 text-[#F3F5F7]"><span className="text-[#C2A878] font-mono mr-2">Step 2:</span> Submit</h4>
                   <p className="text-[#A7B0BC] text-sm leading-relaxed text-pretty">Share/submit the opportunity through AXIVON's partner system.</p>
                 </div>
                 <div>
-                  <h4 className="text-lg font-heading font-semibold mb-2 text-[#F3F5F7]"><span className="text-[#e8a064] font-mono mr-2">Step 3:</span> Connect</h4>
+                  <h4 className="text-lg font-heading font-semibold mb-2 text-[#F3F5F7]"><span className="text-[#C2A878] font-mono mr-2">Step 3:</span> Connect</h4>
                   <p className="text-[#A7B0BC] text-sm leading-relaxed text-pretty">AXIVON reviews the submission and contacts/coordinates with the client.</p>
                 </div>
                 <div>
-                  <h4 className="text-lg font-heading font-semibold mb-2 text-[#F3F5F7]"><span className="text-[#e8a064] font-mono mr-2">Step 4:</span> Qualify</h4>
+                  <h4 className="text-lg font-heading font-semibold mb-2 text-[#F3F5F7]"><span className="text-[#C2A878] font-mono mr-2">Step 4:</span> Qualify</h4>
                   <p className="text-[#A7B0BC] text-sm leading-relaxed text-pretty">If qualified, the opportunity can move toward a confirmed project.</p>
                 </div>
                 <div>
-                  <h4 className="text-lg font-heading font-semibold mb-2 text-[#F3F5F7]"><span className="text-[#e8a064] font-mono mr-2">Step 5:</span> Execute</h4>
+                  <h4 className="text-lg font-heading font-semibold mb-2 text-[#F3F5F7]"><span className="text-[#C2A878] font-mono mr-2">Step 5:</span> Execute</h4>
                   <p className="text-[#A7B0BC] text-sm leading-relaxed text-pretty">Project, contract, payment and commission processes follow AXIVON's applicable policies.</p>
                 </div>
               </div>
@@ -382,7 +382,7 @@ export default function BusinessPartnerPage() {
         <div className="container mx-auto px-6 lg:px-12">
           
           <div className="mb-24">
-            <h2 className="text-[#e8a064] font-mono font-semibold tracking-widest text-xs uppercase mb-6 text-center">
+            <h2 className="text-[#C2A878] font-mono font-semibold tracking-widest text-xs uppercase mb-6 text-center">
               Our Capabilities
             </h2>
             <h3 className="text-3xl md:text-4xl font-heading font-bold leading-tight text-center max-w-3xl mx-auto mb-16 text-[#F3F5F7] text-balance">
@@ -404,8 +404,8 @@ export default function BusinessPartnerPage() {
                 { name: "Chatbot Development", icon: Cpu },
                 { name: "Business Automation", icon: Briefcase }
               ].map((service, i) => (
-                <div key={i} className="flex flex-col items-center justify-center p-6 bg-[#111] border border-white/5 rounded-2xl text-center hover:border-[#e8a064]/30 transition-colors">
-                  <service.icon className="w-8 h-8 text-[#e8a064] mb-4" />
+                <div key={i} className="flex flex-col items-center justify-center p-6 bg-[#111] border border-white/5 rounded-2xl text-center hover:border-[#C2A878]/30 transition-colors">
+                  <service.icon className="w-8 h-8 text-[#C2A878] mb-4" />
                   <span className="text-[#A7B0BC] font-medium text-sm">{service.name}</span>
                 </div>
               ))}
@@ -413,7 +413,7 @@ export default function BusinessPartnerPage() {
           </div>
 
           <div>
-            <h2 className="text-[#e8a064] font-mono font-semibold tracking-widest text-xs uppercase mb-6 text-center">
+            <h2 className="text-[#C2A878] font-mono font-semibold tracking-widest text-xs uppercase mb-6 text-center">
               Target Markets
             </h2>
             <h3 className="text-3xl md:text-4xl font-heading font-bold leading-tight text-center max-w-3xl mx-auto mb-16 text-[#F3F5F7] text-balance">
@@ -435,7 +435,7 @@ export default function BusinessPartnerPage() {
                 { name: "Other Businesses", icon: Briefcase }
               ].map((ind, i) => (
                 <div key={i} className="flex items-center gap-3 p-4 bg-[#111] border border-white/5 rounded-xl hover:border-white/10 transition-colors">
-                  <ind.icon className="w-4 h-4 text-[#e8a064]" />
+                  <ind.icon className="w-4 h-4 text-[#C2A878]" />
                   <span className="text-[#A7B0BC] font-medium text-sm">{ind.name}</span>
                 </div>
               ))}
@@ -450,7 +450,7 @@ export default function BusinessPartnerPage() {
         <div className="container mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
             <div className="lg:col-span-4">
-              <h2 className="text-[#e8a064] font-mono font-semibold tracking-widest text-xs uppercase mb-4 sticky top-32">
+              <h2 className="text-[#C2A878] font-mono font-semibold tracking-widest text-xs uppercase mb-4 sticky top-32">
                 Frequently Asked
               </h2>
             </div>
@@ -507,7 +507,7 @@ export default function BusinessPartnerPage() {
                 }
               ].map((faq, i) => (
                 <details key={i} className="group border-b border-white/10 pb-4 [&_summary::-webkit-details-marker]:hidden">
-                  <summary className="flex cursor-pointer items-center justify-between py-4 text-lg font-heading font-semibold text-[#F3F5F7] hover:text-[#e8a064] transition-colors">
+                  <summary className="flex cursor-pointer items-center justify-between py-4 text-lg font-heading font-semibold text-[#F3F5F7] hover:text-[#C2A878] transition-colors">
                     {faq.q}
                     <span className="transition duration-300 group-open:-rotate-180 text-[#7E8997]">
                       <ChevronDown className="w-5 h-5" />
@@ -525,7 +525,7 @@ export default function BusinessPartnerPage() {
       </section>
 
       {/* BP-0105 — APPLICATION CTA & POLICY LINKS */}
-      <section className="py-20 sm:py-24 lg:py-32 bg-[#e8a064] text-[#0a0a0a]">
+      <section className="py-20 sm:py-24 lg:py-32 bg-[#C2A878] text-[#0a0a0a]">
         <div className="container mx-auto px-6 lg:px-12 text-center">
           <h2 className="text-4xl md:text-5xl font-heading font-extrabold mb-8 max-w-3xl mx-auto leading-tight text-balance">
             Ready to build opportunities with AXIVON Technologies?

@@ -68,14 +68,14 @@ function PartnerActivationContent() {
           
           <div className="bg-[#0a0a0a] p-4 rounded-sm border border-white/5 mb-6 text-left">
             <p className="text-sm text-gray-500 mb-1">Partner ID</p>
-            <p className="text-lg font-mono text-[#e8a064] mb-4">{partnerDetails.partnerId}</p>
+            <p className="text-lg font-mono text-[#C2A878] mb-4">{partnerDetails.partnerId}</p>
             
             <p className="text-sm text-gray-500 mb-1">Referral Code</p>
             <div className="flex items-center justify-between bg-[#1a1a1a] p-2 rounded border border-white/10 mb-4">
               <p className="font-mono text-white text-sm">{partnerDetails.referralCode}</p>
               <button 
                 onClick={() => navigator.clipboard.writeText(partnerDetails.referralCode)}
-                className="text-xs text-[#e8a064] hover:text-white"
+                className="text-xs text-[#C2A878] hover:text-white"
               >
                 Copy
               </button>
@@ -88,7 +88,7 @@ function PartnerActivationContent() {
               </p>
               <button 
                 onClick={() => navigator.clipboard.writeText(typeof window !== "undefined" ? `${window.location.origin}/project/start/${partnerDetails.referralCode}` : "")}
-                className="text-xs text-[#e8a064] hover:text-white shrink-0 ml-2"
+                className="text-xs text-[#C2A878] hover:text-white shrink-0 ml-2"
               >
                 Copy
               </button>
@@ -115,7 +115,7 @@ function PartnerActivationContent() {
 
           <button
             onClick={() => router.push("/login")}
-            className="w-full bg-[#e8a064] text-black font-semibold py-3 rounded-sm hover:bg-white transition-colors"
+            className="w-full bg-[#C2A878] text-black font-semibold py-3 rounded-sm hover:bg-white transition-colors"
           >
             Go to Partner Dashboard
           </button>
@@ -148,7 +148,7 @@ function PartnerActivationContent() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#0a0a0a] border border-white/10 p-3 text-white text-sm focus:outline-none focus:border-[#e8a064]"
+                className="w-full bg-[#0a0a0a] border border-white/10 p-3 text-white text-sm focus:outline-none focus:border-[#C2A878]"
                 placeholder="Minimum 8 characters"
               />
             </div>
@@ -160,7 +160,7 @@ function PartnerActivationContent() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full bg-[#0a0a0a] border border-white/10 p-3 text-white text-sm focus:outline-none focus:border-[#e8a064]"
+                className="w-full bg-[#0a0a0a] border border-white/10 p-3 text-white text-sm focus:outline-none focus:border-[#C2A878]"
                 placeholder="Confirm your new password"
               />
             </div>
@@ -168,7 +168,7 @@ function PartnerActivationContent() {
             <button
               type="submit"
               disabled={loading || !token}
-              className="w-full bg-[#e8a064] text-black font-semibold py-3 mt-4 rounded-sm hover:bg-white transition-colors disabled:opacity-50"
+              className="w-full bg-[#C2A878] text-black font-semibold py-3 mt-4 rounded-sm hover:bg-white transition-colors disabled:opacity-50"
             >
               {loading ? "Activating..." : "Activate & Set Password"}
             </button>
