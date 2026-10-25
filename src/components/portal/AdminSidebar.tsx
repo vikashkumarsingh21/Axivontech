@@ -95,6 +95,7 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
         { name: "Partner Documents", href: "/admin/crm/documents", icon: FolderOpen },
         { name: "Payment Verification", href: "/admin/crm/payments", icon: DollarSign },
         { name: "Commissions", href: "/admin/crm/commissions", icon: CreditCard },
+        { name: "Partner Support", href: "/admin/crm/support", icon: HelpCircle },
       ]
     },
     {

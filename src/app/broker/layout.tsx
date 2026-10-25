@@ -29,7 +29,11 @@ export default function BrokerLayout({ children }: { children: React.ReactNode }
   const checkProfile = useCallback(async () => {
     try {
       const res = await fetch("/api/v1/broker/profile");
-      if (res.status === 401 || res.status === 403) {
+      if (res.status === 403) {
+        router.push("/login?error=account_suspended");
+        return;
+      }
+      if (res.status === 401) {
         router.push("/login");
         return;
       }

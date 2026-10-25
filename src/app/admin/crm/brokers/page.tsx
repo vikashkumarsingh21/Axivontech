@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, Edit2, ShieldOff, ShieldAlert } from "lucide-react";
+import Link from "next/link";
+import { Plus, Search, Edit2, ShieldOff, ShieldAlert, Eye } from "lucide-react";
 
 export default function BrokersPage() {
   const [brokers, setBrokers] = useState<any[]>([]);
@@ -143,8 +144,16 @@ export default function BrokersPage() {
                 brokers.map((broker) => (
                   <tr key={broker.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-white">{broker.name}</div>
-                      <div className="text-xs">{broker.brokerProfile?.companyName || "N/A"}</div>
+                      <Link
+                        href={`/admin/crm/brokers/${broker.id}`}
+                        className="font-medium text-white hover:text-red-400 transition-colors block"
+                      >
+                        {broker.name}
+                      </Link>
+                      <div className="text-xs text-gray-400">{broker.brokerProfile?.companyName || "N/A"}</div>
+                      {broker.brokerProfile?.partnerId && (
+                        <div className="text-[10px] font-mono text-[#C2A878] mt-0.5">{broker.brokerProfile.partnerId}</div>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>{broker.email}</div>
@@ -163,11 +172,15 @@ export default function BrokersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
-                      <button className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors" title="Edit">
-                        <Edit2 size={16} />
-                      </button>
+                      <Link
+                        href={`/admin/crm/brokers/${broker.id}`}
+                        className="inline-flex p-1 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors align-middle"
+                        title="View Dossier"
+                      >
+                        <Eye size={16} />
+                      </Link>
                       <button 
-                        className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-red-400 transition-colors" 
+                        className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-red-400 transition-colors align-middle" 
                         title="Toggle Status"
                         onClick={() => toggleStatus(broker.id, broker.status)}
                       >

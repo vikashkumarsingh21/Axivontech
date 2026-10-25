@@ -62,6 +62,8 @@ export async function GET(req: Request) {
           createdAt: true,
           brokerProfile: {
             select: {
+              id: true,
+              partnerId: true,
               referralCode: true,
               companyName: true,
               designation: true,

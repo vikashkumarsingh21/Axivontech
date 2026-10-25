@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { 
   ChevronLeft, FileText, CheckCircle, XCircle, CreditCard, Send, 
   Upload, RefreshCw, Briefcase, Download, Star, ShieldCheck, 
@@ -21,6 +22,10 @@ export default function AdminPartnerProjectDetailPage() {
   const [contractForm, setContractForm] = useState({ name: "", description: "", fileUrl: "" });
   const [sendingContract, setSendingContract] = useState(false);
 
+  // Client Activation State
+  const [resendingActivation, setResendingActivation] = useState(false);
+  const [activationMsg, setActivationMsg] = useState<string | null>(null);
+
   // Rejection Modals
   const [rejectContractModal, setRejectContractModal] = useState(false);
   const [rejectPaymentModal, setRejectPaymentModal] = useState(false);
@@ -29,6 +34,23 @@ export default function AdminPartnerProjectDetailPage() {
   // Delivery, Report & QA action states
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const handleResendActivation = async () => {
+    try {
+      setResendingActivation(true);
+      setActivationMsg(null);
+      const res = await fetch(`/api/v1/admin/partner-projects/${params.id}/resend-client-activation`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to resend activation link");
+      setActivationMsg(data.message || "Activation email successfully dispatched to client.");
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setResendingActivation(false);
+    }
+  };
 
   const fetchProject = async () => {
     try {
@@ -263,6 +285,22 @@ export default function AdminPartnerProjectDetailPage() {
                   <dt className="text-gray-500">Phone</dt><dd className="col-span-2 text-white">{project.clientPhone}</dd>
                   {project.clientWhatsapp && <><dt className="text-gray-500">WhatsApp</dt><dd className="col-span-2 text-green-400">{project.clientWhatsapp}</dd></>}
                 </dl>
+                
+                <div className="mt-4 pt-3 border-t border-white/5 space-y-2">
+                  <button
+                    type="button"
+                    onClick={handleResendActivation}
+                    disabled={resendingActivation}
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-xs font-semibold border border-blue-500/30 transition-colors w-full disabled:opacity-50"
+                  >
+                    <Send size={13} /> {resendingActivation ? "Dispatching..." : "Resend Client Activation Email"}
+                  </button>
+                  {activationMsg && (
+                    <p className="text-[11px] text-green-400 text-center bg-green-500/10 p-2 rounded border border-green-500/20">
+                      {activationMsg}
+                    </p>
+                  )}
+                </div>
               </div>
               <div>
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-white/10 pb-2">Company Details</h3>
@@ -278,7 +316,15 @@ export default function AdminPartnerProjectDetailPage() {
                 {project.brokerProfile?.user ? (
                   <dl className="grid grid-cols-3 gap-y-4 text-sm">
                     <dt className="text-gray-500">Channel</dt><dd className="col-span-2 text-amber-400 font-semibold">Broker Referral</dd>
-                    <dt className="text-gray-500">Broker</dt><dd className="col-span-2 text-white">{project.brokerProfile.user.name}</dd>
+                    <dt className="text-gray-500">Broker</dt>
+                    <dd className="col-span-2 text-white">
+                      <Link
+                        href={`/admin/crm/brokers/${project.brokerProfile.user.id || project.brokerProfileId}`}
+                        className="text-red-400 hover:text-white font-semibold underline transition-colors"
+                      >
+                        {project.brokerProfile.user.name} →
+                      </Link>
+                    </dd>
                     <dt className="text-gray-500">Email</dt><dd className="col-span-2 text-white">{project.brokerProfile.user.email}</dd>
                   </dl>
                 ) : (

@@ -60,10 +60,22 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
         throw new ApiError(400, "Project contract must be VERIFIED before payment can be verified.");
       }
 
-      // COMMISSION CALCULATION (only for broker-referred projects)
+      // COMMISSION CALCULATION (supports broker custom rate override or active global rule)
+      const extSetting = brokerProfileId
+        ? await db.organizationSetting.findUnique({
+            where: { key: `broker_ext:${brokerProfileId}` },
+          })
+        : null;
+      const customRate = (extSetting?.value as any)?.customCommissionRate;
+
       const activeRule = await db.commissionRule.findFirst({ where: { isActive: true } });
       let commAmount = 0;
-      if (activeRule && brokerProfileId) {
+      let effectiveRate = activeRule?.type === "PERCENTAGE" ? activeRule.value : null;
+
+      if (customRate != null && Number(customRate) > 0) {
+        effectiveRate = Number(customRate);
+        commAmount = Math.round(((payment.projectPrice * effectiveRate) / 100) * 100) / 100;
+      } else if (activeRule && brokerProfileId) {
         if (activeRule.type === "PERCENTAGE") {
           commAmount = Math.round(((payment.projectPrice * activeRule.value) / 100) * 100) / 100;
         } else {
@@ -112,8 +124,8 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
                 brokerProfileId: brokerProfileId,
                 commissionRuleId: activeRule.id,
                 projectValue: payment.projectPrice,
-                commissionType: activeRule.type,
-                commissionRate: activeRule.type === "PERCENTAGE" ? activeRule.value : null,
+                commissionType: activeRule ? activeRule.type : "PERCENTAGE",
+                commissionRate: effectiveRate,
                 commissionAmount: commAmount,
                 status: "ELIGIBLE",
                 eligibleAt: new Date(),

@@ -27,12 +27,15 @@ export default function LoginPage() {
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // Check URL parameters for logout notice safely
+  // Check URL parameters for logout or error notice safely
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       if (params.get("logged_out") === "1" || params.get("logout") === "true") {
         setLoggedOutNotice(true);
+      }
+      if (params.get("error") === "account_suspended") {
+        setError("Your partner account has been suspended. Please contact AXIVON administration (admin@axivon.com) for assistance.");
       }
     }
   }, []);
