@@ -4,10 +4,10 @@ import { db } from "@/lib/db";
 import { requireBroker, apiSuccess, handleApiError, ApiError } from "@/lib/api/broker";
 
 const saveDraftSchema = z.object({
-  draftType: z.enum(["PROJECT", "LEAD"], {
-    errorMap: () => ({ message: "draftType must be 'PROJECT' or 'LEAD'." }),
+  draftType: z.string().refine((val) => val === "PROJECT" || val === "LEAD", {
+    message: "draftType must be 'PROJECT' or 'LEAD'.",
   }),
-  data: z.record(z.unknown()),
+  data: z.record(z.string(), z.unknown()),
   title: z.string().optional().default("Untitled Draft"),
 });
 
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const validated = saveDraftSchema.safeParse(body);
     if (!validated.success) {
-      throw new ApiError(400, validated.error.errors[0]?.message || "Invalid draft payload.");
+      throw new ApiError(400, validated.error.issues[0]?.message || "Invalid draft payload.");
     }
 
     const { draftType, data, title } = validated.data;
@@ -69,7 +69,6 @@ export async function POST(req: NextRequest) {
       create: {
         key: settingKey,
         value: drafts,
-        description: `Draft forms for broker ${brokerProfile.id}`,
       },
       update: {
         value: drafts,

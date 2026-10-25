@@ -65,7 +65,7 @@ async function handleContractDownload(
     contractId: contract.id,
     versionId: targetVersion.id,
     versionNumber: targetVersion.versionNumber,
-    contractName: contract.contractName,
+    contractName: targetVersion.contractName,
     projectCode: contract.partnerProject.projectCode,
     fileUrl: targetVersion.contractFileUrl,
     status: targetVersion.status === "SENT" ? "DOWNLOADED" : targetVersion.status,

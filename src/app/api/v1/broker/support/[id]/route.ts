@@ -51,7 +51,7 @@ export async function POST(
     const body = await req.json().catch(() => ({}));
     const validated = replySchema.safeParse(body);
     if (!validated.success) {
-      throw new ApiError(400, validated.error.errors[0]?.message || "Invalid reply");
+      throw new ApiError(400, validated.error.issues[0]?.message || "Invalid reply");
     }
 
     const { message } = validated.data;

@@ -26,7 +26,6 @@ export async function GET(
               select: {
                 id: true,
                 status: true,
-                contractName: true,
               },
             },
           },

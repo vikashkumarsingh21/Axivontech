@@ -35,12 +35,12 @@ export async function GET(req: NextRequest) {
         where: {
           OR: [
             { ownerId: userId },
-            ...(referralCode ? [{ notes: { contains: `[Referral: ${referralCode}]` } }] : []),
+            ...(referralCode ? [{ qualificationNotes: { contains: `[Referral: ${referralCode}]` } }] : []),
           ],
         },
         select: {
           id: true,
-          fullName: true,
+          name: true,
           companyName: true,
           status: true,
           createdAt: true,
@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
           partnerProject: { brokerProfileId: brokerId },
           status: { in: ["SENT", "DOWNLOADED"] },
         },
-        select: { id: true, contractName: true, status: true, partnerProjectId: true },
+        select: { id: true, status: true, partnerProjectId: true },
       }),
       db.partnerPayment.findMany({
         where: {

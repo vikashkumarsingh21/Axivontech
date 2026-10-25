@@ -232,12 +232,13 @@ export async function GET(req: Request) {
         meetings: {
           select: {
             id: true,
-            title: true,
-            meetingUrl: true,
-            scheduledAt: true,
+            meetingDate: true,
+            durationMinutes: true,
+            meetingType: true,
+            locationOrLink: true,
             status: true,
           },
-          orderBy: { scheduledAt: "desc" },
+          orderBy: { meetingDate: "desc" },
         },
       },
     });

@@ -22,18 +22,14 @@ export async function GET(req: NextRequest) {
     }
 
     if (search) {
-      where.OR = [
-        { contractName: { contains: search, mode: "insensitive" } },
-        {
-          partnerProject: {
-            OR: [
-              { projectCode: { contains: search, mode: "insensitive" } },
-              { clientName: { contains: search, mode: "insensitive" } },
-              { companyName: { contains: search, mode: "insensitive" } },
-            ],
-          },
-        },
-      ];
+      where.partnerProject = {
+        OR: [
+          { projectCode: { contains: search, mode: "insensitive" } },
+          { projectName: { contains: search, mode: "insensitive" } },
+          { clientName: { contains: search, mode: "insensitive" } },
+          { companyName: { contains: search, mode: "insensitive" } },
+        ],
+      };
     }
 
     const [contracts, totalCount] = await Promise.all([
@@ -66,7 +62,7 @@ export async function GET(req: NextRequest) {
       const latestVersion = c.versions[0] || null;
       return {
         id: c.id,
-        contractName: c.contractName,
+        contractName: latestVersion?.contractName || c.partnerProject?.projectName || "Partner Contract",
         status: c.status,
         projectId: c.partnerProjectId,
         projectCode: c.partnerProject?.projectCode,

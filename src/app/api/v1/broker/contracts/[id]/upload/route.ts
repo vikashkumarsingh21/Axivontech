@@ -40,12 +40,12 @@ export async function POST(
     const { brokerProfile, session } = await requireBroker(req);
 
     // Rate limit: max 10 submissions per 60s
-    await checkRateLimit(req, "contract-upload", 10, 60);
+    checkRateLimit(req, "contract-upload", 10, 60);
 
     const body = await req.json().catch(() => ({}));
     const validated = uploadContractSchema.safeParse(body);
     if (!validated.success) {
-      throw new ApiError(400, validated.error.errors[0]?.message || "Invalid input");
+      throw new ApiError(400, validated.error.issues[0]?.message || "Invalid input");
     }
 
     const { versionId, signedFileUrl, signedStorageKey, stampFileUrl, stampStorageKey, notes } =

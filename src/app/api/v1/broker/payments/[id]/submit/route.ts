@@ -13,9 +13,7 @@ import {
 } from "@/lib/api/broker";
 
 const submitPaymentSchema = z.object({
-  paymentMethod: z.enum(["BANK", "UPI"], {
-    errorMap: () => ({ message: "Payment method must be 'BANK' or 'UPI'." }),
-  }),
+  paymentMethod: z.enum(["BANK", "UPI"]),
   amountPaid: z.coerce.number().positive("Amount paid must be greater than 0."),
   transactionId: z
     .string()
@@ -37,12 +35,12 @@ export async function POST(
     const { brokerProfile, session } = await requireBroker(req);
 
     // Rate limit: max 10 submissions per 60s
-    await checkRateLimit(req, "payment-submit", 10, 60);
+    checkRateLimit(req, "payment-submit", 10, 60);
 
     const body = await req.json().catch(() => ({}));
     const validated = submitPaymentSchema.safeParse(body);
     if (!validated.success) {
-      throw new ApiError(400, validated.error.errors[0]?.message || "Invalid input data");
+      throw new ApiError(400, validated.error.issues[0]?.message || "Invalid input data");
     }
 
     const {

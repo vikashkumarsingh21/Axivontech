@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const commissions = await db.commission.findMany({
       where: { brokerProfileId: brokerId },
       include: {
-        partnerProject: { select: { projectType: true, serviceType: true, status: true } },
+        partnerProject: { select: { requiredService: true, status: true } },
       },
     });
 
@@ -43,10 +43,7 @@ export async function GET(req: NextRequest) {
       }
 
       // Track service types
-      const sType =
-        (c.partnerProject as any)?.serviceType ||
-        (c.partnerProject as any)?.projectType ||
-        "CUSTOM_DEVELOPMENT";
+      const sType = c.partnerProject?.requiredService || "CUSTOM_DEVELOPMENT";
 
       if (!serviceTypeMap[sType]) {
         serviceTypeMap[sType] = { serviceType: sType, count: 0, totalEarned: 0 };
@@ -61,23 +58,11 @@ export async function GET(req: NextRequest) {
     const [leadsCount, qualifiedLeadsCount, totalProjects, confirmedProjects, completedProjects] =
       await Promise.all([
         db.lead.count({
-          where: {
-            OR: [
-              { ownerId: userId },
-              ...(brokerProfile.referralCode
-                ? [{ notes: { contains: `[Referral: ${brokerProfile.referralCode}]` } }]
-                : []),
-            ],
-          },
+          where: { ownerId: userId },
         }),
         db.lead.count({
           where: {
-            OR: [
-              { ownerId: userId },
-              ...(brokerProfile.referralCode
-                ? [{ notes: { contains: `[Referral: ${brokerProfile.referralCode}]` } }]
-                : []),
-            ],
+            ownerId: userId,
             status: { in: ["QUALIFIED", "PROPOSAL_SENT", "CONVERTED"] },
           },
         }),

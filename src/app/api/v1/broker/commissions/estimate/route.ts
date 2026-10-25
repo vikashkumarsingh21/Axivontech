@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const validated = estimateSchema.safeParse(body);
     if (!validated.success) {
-      throw new ApiError(400, validated.error.errors[0]?.message || "Invalid input");
+      throw new ApiError(400, validated.error.issues[0]?.message || "Invalid input");
     }
 
     const { budget, serviceType } = validated.data;

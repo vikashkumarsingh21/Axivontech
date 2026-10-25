@@ -51,7 +51,6 @@ export async function POST(
         create: {
           key: settingKey,
           value: currentMap,
-          description: `Document read history for broker ${brokerProfile.id}`,
         },
         update: {
           value: currentMap,

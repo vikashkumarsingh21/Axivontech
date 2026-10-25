@@ -33,12 +33,12 @@ export async function POST(req: NextRequest) {
     const { brokerProfile, session } = await requireBroker(req);
 
     // Rate limit: max 5 payout requests per 60s
-    await checkRateLimit(req, "payout-request", 5, 60);
+    checkRateLimit(req, "payout-request", 5, 60);
 
     const body = await req.json().catch(() => ({}));
     const validated = payoutRequestSchema.safeParse(body);
     if (!validated.success) {
-      throw new ApiError(400, validated.error.errors[0]?.message || "Invalid payout request.");
+      throw new ApiError(400, validated.error.issues[0]?.message || "Invalid payout request.");
     }
 
     const { commissionId, notes } = validated.data;
