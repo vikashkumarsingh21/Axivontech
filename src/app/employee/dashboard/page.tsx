@@ -2,22 +2,18 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import {
   Clock,
   CheckCircle2,
   FileText,
-  AlertCircle,
   ArrowRight,
   Coffee,
   Calendar,
   Megaphone,
-  Briefcase,
-  ShieldCheck,
   PlusCircle,
   HelpCircle,
   FolderOpen,
-  Sparkles,
   Zap,
 } from "lucide-react";
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
@@ -112,16 +108,16 @@ export default function EmployeeDashboard() {
 
   if (loading) {
     return (
-      <div className="space-y-6 sm:space-y-8 animate-pulse">
+      <div className="space-y-6 sm:space-y-8 animate-pulse pb-12">
         {/* Header skeleton */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#2E2E30]">
           <div className="space-y-2">
-            <div className="h-8 w-64 bg-slate-900 border border-slate-800 rounded-xl" />
-            <div className="h-4 w-80 bg-slate-900/60 border border-slate-800/60 rounded-lg" />
+            <div className="h-8 w-64 bg-[#1A1A1B] border border-[#2E2E30] rounded-lg" />
+            <div className="h-4 w-80 bg-[#1A1A1B]/70 border border-[#2E2E30]/70 rounded-md" />
           </div>
           <div className="flex gap-2.5">
-            <div className="h-10 w-32 bg-slate-900 border border-slate-800 rounded-xl" />
-            <div className="h-10 w-32 bg-slate-900 border border-slate-800 rounded-xl" />
+            <div className="h-10 w-32 bg-[#1A1A1B] border border-[#2E2E30] rounded-lg" />
+            <div className="h-10 w-32 bg-[#1A1A1B] border border-[#2E2E30] rounded-lg" />
           </div>
         </div>
 
@@ -135,12 +131,12 @@ export default function EmployeeDashboard() {
         {/* 2-col content skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <div className="h-72 rounded-2xl bg-slate-900/80 border border-slate-800/80" />
-            <div className="h-44 rounded-2xl bg-slate-900/80 border border-slate-800/80" />
+            <div className="h-72 rounded-xl bg-[#1A1A1B] border border-[#2E2E30]" />
+            <div className="h-44 rounded-xl bg-[#1A1A1B] border border-[#2E2E30]" />
           </div>
           <div className="space-y-6">
-            <div className="h-48 rounded-2xl bg-slate-900/80 border border-slate-800/80" />
-            <div className="h-64 rounded-2xl bg-slate-900/80 border border-slate-800/80" />
+            <div className="h-48 rounded-xl bg-[#1A1A1B] border border-[#2E2E30]" />
+            <div className="h-64 rounded-xl bg-[#1A1A1B] border border-[#2E2E30]" />
           </div>
         </div>
       </div>
@@ -150,7 +146,6 @@ export default function EmployeeDashboard() {
   const attendance = data?.attendance;
   const isCheckedIn = attendance?.checkInAt && !attendance?.checkOutAt;
   const isCheckedOut = attendance?.checkInAt && attendance?.checkOutAt;
-  const isOnBreak = attendance?.isOnBreak;
   const taskStats = data?.taskStats || { total: 0, active: 0, completed: 0, overdue: 0, dueToday: 0 };
   const hasReportToday = data?.hasReportToday;
 
@@ -159,14 +154,14 @@ export default function EmployeeDashboard() {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.08,
+        staggerChildren: 0.06,
       },
     },
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 12 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.3 } },
   };
 
   return (
@@ -174,49 +169,46 @@ export default function EmployeeDashboard() {
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="space-y-6 sm:space-y-8 relative"
+      className="space-y-6 sm:space-y-8 relative pb-12"
     >
-      {/* ── Ambient Glow Background Effect ─────────────────────────── */}
-      <div className="pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 w-[720px] h-[320px] bg-gradient-to-b from-indigo-500/12 via-sky-500/6 to-transparent blur-3xl opacity-70 -z-10" />
-
       {/* ── 1. Personalized Greeting & Header ───────────────────────── */}
       <motion.div
         variants={itemVariants}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800/80"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#2E2E30]"
       >
         <div className="space-y-1.5">
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight font-heading text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-slate-200 to-indigo-200">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#EDEBE6]">
               {mounted ? greeting : "Hello"}, {user?.name?.split(" ")[0] || "Team Member"}
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-300 border border-indigo-500/25 shadow-xs">
-              <Zap className="w-3 h-3 text-indigo-400" />
-              <span>{user?.department || "Axivon Engineering"}</span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#232324] text-[#B3AFA6] border border-[#2E2E30]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4F9D83]" />
+              <span>{user?.department || "Engineering"}</span>
             </span>
             {isCheckedIn && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 shadow-xs">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#5FAE7E]/10 text-[#5FAE7E] border border-[#5FAE7E]/30">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5FAE7E] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#5FAE7E]"></span>
                 </span>
                 <span>Active Shift</span>
               </span>
             )}
           </div>
-          <p className="text-xs sm:text-sm text-slate-400">
-            {mounted ? dateStr : ""} • Daily workspace overview, tasks schedule & team updates.
+          <p className="text-xs sm:text-sm text-[#8A867E]">
+            {mounted ? dateStr : ""} • Daily workspace overview, deliverables & team updates.
           </p>
         </div>
 
         {/* Centralized Action Buttons in Header */}
         <div className="flex items-center gap-2.5 shrink-0">
           <Link href="/employee/attendance">
-            <EpButton variant="primary" size="md" icon={<Clock className="w-3.5 h-3.5" />}>
+            <EpButton variant="primary" size="md" icon={<Clock className="w-4 h-4" />}>
               My Attendance
             </EpButton>
           </Link>
           <Link href="/employee/work-reports">
-            <EpButton variant="secondary" size="md" icon={<FileText className="w-3.5 h-3.5 text-indigo-400" />}>
+            <EpButton variant="secondary" size="md" icon={<FileText className="w-4 h-4 text-[#4F9D83]" />}>
               Work Report
             </EpButton>
           </Link>
@@ -231,25 +223,23 @@ export default function EmployeeDashboard() {
         {/* Card 1: Attendance Today */}
         <motion.div
           variants={itemVariants}
-          whileHover={{ y: -3, transition: { duration: 0.2 } }}
-          className="p-5 rounded-2xl bg-slate-900/70 backdrop-blur-xl border border-slate-800/80 hover:border-sky-500/40 hover:shadow-lg hover:shadow-sky-500/5 transition-all duration-300 flex flex-col justify-between gap-3 group relative overflow-hidden"
+          className="p-5 rounded-xl bg-[#1A1A1B] border border-[#2E2E30] hover:border-[#3A3A3D] transition-all duration-200 flex flex-col justify-between gap-3 group"
         >
-          <div className="absolute top-0 right-0 w-24 h-24 bg-sky-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-sky-500/10 transition-colors" />
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Today's Punch</span>
-            <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/25 flex items-center justify-center text-sky-400 shadow-sm shadow-sky-500/10">
+          <div className="flex items-center justify-between text-[#8A867E]">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8A867E]">Today's Shift</span>
+            <div className="w-8 h-8 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#4F9D83]">
               <Clock className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold text-slate-100 font-heading">
+            <div className="text-xl sm:text-2xl font-semibold text-[#EDEBE6]">
               {isCheckedIn
                 ? `In • ${formatTime(attendance.checkInAt)}`
                 : isCheckedOut
                 ? "Shift Completed"
                 : "Not Checked In"}
             </div>
-            <p className="text-xs text-slate-400 mt-1 font-mono">
+            <p className="text-xs text-[#B3AFA6] mt-1 font-mono">
               {isCheckedIn
                 ? `Live worked: ${formatMinutes(attendance.netMinutes || attendance.grossMinutes || 0)}`
                 : isCheckedOut
@@ -259,73 +249,69 @@ export default function EmployeeDashboard() {
           </div>
           <Link
             href="/employee/attendance"
-            className="text-xs font-semibold text-sky-400 hover:text-sky-300 inline-flex items-center gap-1.5 pt-1 transition-colors group-hover:translate-x-0.5"
+            className="text-xs font-medium text-[#4F9D83] hover:text-[#5BB094] inline-flex items-center gap-1.5 pt-1 transition-colors"
           >
             <span>View Attendance Log</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </motion.div>
 
         {/* Card 2: Assigned Tasks */}
         <motion.div
           variants={itemVariants}
-          whileHover={{ y: -3, transition: { duration: 0.2 } }}
-          className="p-5 rounded-2xl bg-slate-900/70 backdrop-blur-xl border border-slate-800/80 hover:border-indigo-500/40 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 flex flex-col justify-between gap-3 group relative overflow-hidden"
+          className="p-5 rounded-xl bg-[#1A1A1B] border border-[#2E2E30] hover:border-[#3A3A3D] transition-all duration-200 flex flex-col justify-between gap-3 group"
         >
-          <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-colors" />
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Assigned Tasks</span>
-            <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center text-indigo-400 shadow-sm shadow-indigo-500/10">
+          <div className="flex items-center justify-between text-[#8A867E]">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8A867E]">Assigned Tasks</span>
+            <div className="w-8 h-8 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#4F9D83]">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold text-slate-100 font-heading">
+            <div className="text-xl sm:text-2xl font-semibold text-[#EDEBE6]">
               {taskStats.active} Active
             </div>
             <div className="flex items-center gap-2 mt-1 text-xs">
               {taskStats.overdue > 0 && (
-                <span className="text-rose-400 font-semibold bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/25">
+                <span className="text-[#C46A62] font-semibold bg-[#C46A62]/10 px-1.5 py-0.5 rounded border border-[#C46A62]/25">
                   {taskStats.overdue} overdue
                 </span>
               )}
               {taskStats.dueToday > 0 && (
-                <span className="text-amber-400 font-semibold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/25">
+                <span className="text-[#C9A15B] font-semibold bg-[#C9A15B]/10 px-1.5 py-0.5 rounded border border-[#C9A15B]/25">
                   {taskStats.dueToday} due today
                 </span>
               )}
               {taskStats.overdue === 0 && taskStats.dueToday === 0 && (
-                <span className="text-slate-400">All deliverables on track</span>
+                <span className="text-[#8A867E]">All deliverables on track</span>
               )}
             </div>
           </div>
           <Link
             href="/employee/tasks"
-            className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1.5 pt-1 transition-colors group-hover:translate-x-0.5"
+            className="text-xs font-medium text-[#4F9D83] hover:text-[#5BB094] inline-flex items-center gap-1.5 pt-1 transition-colors"
           >
             <span>Open Tasks Board</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </motion.div>
 
         {/* Card 3: Today's Work Report */}
         <motion.div
           variants={itemVariants}
-          whileHover={{ y: -3, transition: { duration: 0.2 } }}
-          className="p-5 rounded-2xl bg-slate-900/70 backdrop-blur-xl border border-slate-800/80 hover:border-amber-500/40 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300 flex flex-col justify-between gap-3 group relative overflow-hidden"
+          className="p-5 rounded-xl bg-[#1A1A1B] border border-[#2E2E30] hover:border-[#3A3A3D] transition-all duration-200 flex flex-col justify-between gap-3 group"
         >
-          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/10 transition-colors" />
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Daily Work Report</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 shadow-sm shadow-amber-500/10">
+          <div className="flex items-center justify-between text-[#8A867E]">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8A867E]">Daily Work Report</span>
+            <div className="w-8 h-8 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#4F9D83]">
               <FileText className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold text-slate-100 font-heading">
+            <div className="text-xl sm:text-2xl font-semibold text-[#EDEBE6]">
               {hasReportToday ? "Submitted" : "Pending EOD"}
             </div>
-            <p className="text-xs text-slate-400 mt-1 line-clamp-1">
+            <p className="text-xs text-[#B3AFA6] mt-1 line-clamp-1">
               {hasReportToday
                 ? `Logged: ${data.todayWorkReport.summary}`
                 : "Required before ending shift"}
@@ -333,46 +319,44 @@ export default function EmployeeDashboard() {
           </div>
           <Link
             href="/employee/work-reports"
-            className="text-xs font-semibold text-amber-400 hover:text-amber-300 inline-flex items-center gap-1.5 pt-1 transition-colors group-hover:translate-x-0.5"
+            className="text-xs font-medium text-[#4F9D83] hover:text-[#5BB094] inline-flex items-center gap-1.5 pt-1 transition-colors"
           >
             <span>{hasReportToday ? "Review / Edit Report" : "Submit Daily Report"}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </motion.div>
 
         {/* Card 4: Leave & Time Off */}
         <motion.div
           variants={itemVariants}
-          whileHover={{ y: -3, transition: { duration: 0.2 } }}
-          className="p-5 rounded-2xl bg-slate-900/70 backdrop-blur-xl border border-slate-800/80 hover:border-violet-500/40 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300 flex flex-col justify-between gap-3 group relative overflow-hidden"
+          className="p-5 rounded-xl bg-[#1A1A1B] border border-[#2E2E30] hover:border-[#3A3A3D] transition-all duration-200 flex flex-col justify-between gap-3 group"
         >
-          <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-violet-500/10 transition-colors" />
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Leave & Time Off</span>
-            <div className="w-8 h-8 rounded-xl bg-violet-500/10 border border-violet-500/25 flex items-center justify-center text-violet-400 shadow-sm shadow-violet-500/10">
+          <div className="flex items-center justify-between text-[#8A867E]">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8A867E]">Leave & Time Off</span>
+            <div className="w-8 h-8 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#8E9AAF]">
               <Coffee className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-xl sm:text-2xl font-bold text-slate-100 font-heading">
+            <div className="text-xl sm:text-2xl font-semibold text-[#EDEBE6]">
               {data?.leaveStats?.upcomingApproved
                 ? "Approved Upcoming"
                 : data?.leaveStats?.pendingCount > 0
                 ? `${data.leaveStats.pendingCount} Pending`
                 : "No Leave Active"}
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#B3AFA6] mt-1">
               {data?.leaveStats?.upcomingApproved
                 ? `From ${new Date(data.leaveStats.upcomingApproved.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
-                : "Quota ready for requests"}
+                : "Leave balance ready"}
             </p>
           </div>
           <Link
             href="/employee/leave"
-            className="text-xs font-semibold text-violet-400 hover:text-violet-300 inline-flex items-center gap-1.5 pt-1 transition-colors group-hover:translate-x-0.5"
+            className="text-xs font-medium text-[#4F9D83] hover:text-[#5BB094] inline-flex items-center gap-1.5 pt-1 transition-colors"
           >
             <span>Manage Leave</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </motion.div>
       </motion.div>
@@ -384,78 +368,78 @@ export default function EmployeeDashboard() {
           {/* Priority Task Watchlist */}
           <motion.div
             variants={itemVariants}
-            className="p-5 sm:p-6 rounded-2xl bg-slate-900/70 backdrop-blur-xl border border-slate-800/80 space-y-4 shadow-sm"
+            className="p-5 sm:p-6 rounded-xl bg-[#1A1A1B] border border-[#2E2E30] space-y-4"
           >
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2.5 font-heading">
-                  <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center text-indigo-400">
+                <h2 className="text-base sm:text-lg font-semibold text-[#EDEBE6] flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#4F9D83]">
                     <CheckCircle2 className="w-4 h-4" />
                   </div>
                   <span>Tasks Due Today & In Progress</span>
                 </h2>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-[#8A867E] mt-1">
                   Deliverables requiring completion or active engineering focus today.
                 </p>
               </div>
               <Link
                 href="/employee/tasks"
-                className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1 transition-colors"
+                className="text-xs font-medium text-[#4F9D83] hover:text-[#5BB094] inline-flex items-center gap-1 transition-colors"
               >
                 <span>All Tasks ({taskStats.total})</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {data?.recentTasks?.length > 0 ? (
                 data.recentTasks.map((t: any) => {
                   const isDone = t.status === "COMPLETED";
                   return (
                     <div
                       key={t.id}
-                      className="p-3.5 rounded-xl border border-slate-800/80 bg-slate-900/50 hover:bg-slate-800/40 hover:border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all duration-200 group"
+                      className="p-3.5 rounded-lg border border-[#2E2E30] bg-[#121212]/50 hover:bg-[#232324]/50 hover:border-[#3A3A3D] flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors group"
                     >
                       <div className="space-y-1.5 min-w-0 flex-1">
                         <div className="flex items-center gap-2.5">
                           <button
                             onClick={() => handleTaskStatus(t.id, isDone ? "TODO" : "COMPLETED")}
                             disabled={togglingTaskId === t.id}
-                            className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all shrink-0 cursor-pointer ${
+                            className={`w-5 h-5 rounded border flex items-center justify-center transition-all shrink-0 cursor-pointer ${
                               isDone
-                                ? "bg-gradient-to-tr from-emerald-600 to-emerald-400 border-emerald-500 text-white shadow-xs shadow-emerald-500/30"
-                                : "border-slate-700 hover:border-indigo-400 hover:bg-indigo-500/10"
+                                ? "bg-[#4F9D83] border-[#4F9D83] text-[#0F1A16]"
+                                : "border-[#3A3A3D] hover:border-[#4F9D83] hover:bg-[#4F9D83]/10"
                             }`}
                             aria-label={`Toggle task completion: ${t.title}`}
                           >
                             {isDone && <CheckCircle2 className="w-3.5 h-3.5 stroke-[3]" />}
                           </button>
                           <span
-                            className={`text-sm font-semibold truncate transition-all ${
-                              isDone ? "line-through text-slate-500" : "text-slate-100 group-hover:text-indigo-200"
+                            className={`text-sm font-medium truncate transition-colors ${
+                              isDone ? "line-through text-[#8A867E]" : "text-[#EDEBE6] group-hover:text-[#EDEBE6]"
                             }`}
                           >
                             {t.title}
                           </span>
                         </div>
-                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 pl-7">
+                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#8A867E] pl-7">
                           {t.project?.name && (
-                            <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700/80 font-medium">
+                            <span className="px-2 py-0.5 rounded bg-[#232324] text-[#B3AFA6] border border-[#2E2E30] font-medium">
                               {t.project.name}
                             </span>
                           )}
                           <span
-                            className={`px-2 py-0.5 rounded-md font-semibold ${
+                            className={`px-2 py-0.5 rounded font-medium ${
                               t.priority === "URGENT" || t.priority === "HIGH"
-                                ? "bg-rose-500/10 text-rose-400 border border-rose-500/25"
-                                : "bg-slate-800 text-slate-400"
+                                ? "bg-[#C46A62]/10 text-[#C46A62] border border-[#C46A62]/25"
+                                : "bg-[#232324] text-[#8A867E]"
                             }`}
                           >
                             {t.priority}
                           </span>
                           {t.dueDate && (
-                            <span className="flex items-center gap-1.5 text-slate-400">
-                              <Calendar className="w-3 h-3 text-slate-500" />
+                            <span className="flex items-center gap-1.5 text-[#8A867E]">
+                              <Calendar className="w-3 h-3 text-[#8A867E]" />
                               Due: {new Date(t.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                             </span>
                           )}
@@ -464,14 +448,14 @@ export default function EmployeeDashboard() {
 
                       <div className="flex items-center gap-2 pl-7 sm:pl-0 shrink-0">
                         <span
-                          className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                          className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded border ${
                             t.status === "COMPLETED"
-                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25 shadow-xs"
+                              ? "bg-[#5FAE7E]/10 text-[#5FAE7E] border-[#5FAE7E]/25"
                               : t.status === "IN_PROGRESS"
-                              ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/25 shadow-xs"
+                              ? "bg-[#4F9D83]/10 text-[#4F9D83] border-[#4F9D83]/25"
                               : t.status === "BLOCKED"
-                              ? "bg-rose-500/10 text-rose-400 border-rose-500/25 shadow-xs"
-                              : "bg-slate-800/80 text-slate-300 border-slate-700"
+                              ? "bg-[#C46A62]/10 text-[#C46A62] border-[#C46A62]/25"
+                              : "bg-[#232324] text-[#B3AFA6] border-[#2E2E30]"
                           }`}
                         >
                           {t.status.replace("_", " ")}
@@ -481,7 +465,7 @@ export default function EmployeeDashboard() {
                   );
                 })
               ) : (
-                <div className="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-800 rounded-xl bg-slate-900/30">
+                <div className="p-8 text-center text-xs text-[#8A867E] border border-dashed border-[#2E2E30] rounded-lg bg-[#121212]/30">
                   No active tasks assigned. Great work staying ahead of schedule!
                 </div>
               )}
@@ -491,20 +475,20 @@ export default function EmployeeDashboard() {
           {/* Quick Work Report Summary Card */}
           <motion.div
             variants={itemVariants}
-            className="p-5 sm:p-6 rounded-2xl bg-slate-900/70 backdrop-blur-xl border border-slate-800/80 space-y-3.5 shadow-sm"
+            className="p-5 sm:p-6 rounded-xl bg-[#1A1A1B] border border-[#2E2E30] space-y-3.5"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-slate-100 flex items-center gap-2.5 font-heading">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400">
+              <h2 className="text-base font-semibold text-[#EDEBE6] flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#4F9D83]">
                   <FileText className="w-4 h-4" />
                 </div>
                 <span>Today's Work Summary</span>
               </h2>
               <span
-                className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                className={`text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded border ${
                   hasReportToday
-                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25 shadow-xs"
-                    : "bg-amber-500/10 text-amber-400 border-amber-500/25 shadow-xs"
+                    ? "bg-[#5FAE7E]/10 text-[#5FAE7E] border-[#5FAE7E]/25"
+                    : "bg-[#C9A15B]/10 text-[#C9A15B] border-[#C9A15B]/25"
                 }`}
               >
                 {hasReportToday ? "REPORT SUBMITTED" : "PENDING SUBMISSION"}
@@ -512,20 +496,20 @@ export default function EmployeeDashboard() {
             </div>
 
             {hasReportToday ? (
-              <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80 space-y-2">
+              <div className="p-4 rounded-lg bg-[#121212]/60 border border-[#2E2E30] space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-200">{data.todayWorkReport.summary}</span>
-                  <span className="text-slate-400 font-mono">
+                  <span className="font-medium text-[#EDEBE6]">{data.todayWorkReport.summary}</span>
+                  <span className="text-[#8A867E] font-mono">
                     {data.todayWorkReport.hoursWorked ?? (user?.requiredDailyMinutes ? Math.round(user.requiredDailyMinutes / 60) : 8)} hrs logged
                   </span>
                 </div>
-                <p className="text-xs text-slate-400 line-clamp-2">
+                <p className="text-xs text-[#B3AFA6] line-clamp-2">
                   {data.todayWorkReport.workPerformed}
                 </p>
                 <div className="pt-2 flex justify-end">
                   <Link
                     href="/employee/work-reports"
-                    className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1.5 transition-colors"
+                    className="text-xs font-medium text-[#4F9D83] hover:text-[#5BB094] flex items-center gap-1.5 transition-colors"
                   >
                     <span>Update Today's Report</span>
                     <ArrowRight className="w-3 h-3" />
@@ -533,8 +517,8 @@ export default function EmployeeDashboard() {
                 </div>
               </div>
             ) : (
-              <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
-                <div className="text-xs text-slate-400">
+              <div className="p-4 rounded-lg bg-[#121212]/60 border border-[#2E2E30] flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+                <div className="text-xs text-[#8A867E]">
                   You have not submitted a work report for today yet. Logging your daily progress helps keep team deliverables aligned.
                 </div>
                 <Link href="/employee/work-reports">
@@ -552,46 +536,46 @@ export default function EmployeeDashboard() {
           {/* Quick Shortcuts */}
           <motion.div
             variants={itemVariants}
-            className="p-5 sm:p-6 rounded-2xl bg-slate-900/70 backdrop-blur-xl border border-slate-800/80 space-y-3.5 shadow-sm"
+            className="p-5 sm:p-6 rounded-xl bg-[#1A1A1B] border border-[#2E2E30] space-y-3.5"
           >
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8A867E]">
               Quick Actions
             </h3>
             <div className="grid grid-cols-2 gap-2.5">
               <Link
                 href="/employee/attendance"
-                className="p-3.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 hover:border-sky-500/40 transition-all duration-200 flex flex-col gap-1 text-left group"
+                className="p-3.5 rounded-lg bg-[#121212]/60 hover:bg-[#232324] border border-[#2E2E30] hover:border-[#4F9D83]/40 transition-colors flex flex-col gap-1 text-left group"
               >
-                <Clock className="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-semibold text-slate-200">Attendance</span>
-                <span className="text-[10px] text-slate-400">Punches & breaks</span>
+                <Clock className="w-4 h-4 text-[#4F9D83] group-hover:scale-105 transition-transform" />
+                <span className="text-xs font-medium text-[#EDEBE6]">Attendance</span>
+                <span className="text-[10px] text-[#8A867E]">Punches & breaks</span>
               </Link>
 
               <Link
                 href="/employee/calendar"
-                className="p-3.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 hover:border-indigo-500/40 transition-all duration-200 flex flex-col gap-1 text-left group"
+                className="p-3.5 rounded-lg bg-[#121212]/60 hover:bg-[#232324] border border-[#2E2E30] hover:border-[#4F9D83]/40 transition-colors flex flex-col gap-1 text-left group"
               >
-                <Calendar className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-semibold text-slate-200">Calendar</span>
-                <span className="text-[10px] text-slate-400">Schedule & off</span>
+                <Calendar className="w-4 h-4 text-[#4F9D83] group-hover:scale-105 transition-transform" />
+                <span className="text-xs font-medium text-[#EDEBE6]">Calendar</span>
+                <span className="text-[10px] text-[#8A867E]">Schedule & holidays</span>
               </Link>
 
               <Link
                 href="/employee/documents"
-                className="p-3.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 hover:border-violet-500/40 transition-all duration-200 flex flex-col gap-1 text-left group"
+                className="p-3.5 rounded-lg bg-[#121212]/60 hover:bg-[#232324] border border-[#2E2E30] hover:border-[#4F9D83]/40 transition-colors flex flex-col gap-1 text-left group"
               >
-                <FolderOpen className="w-4 h-4 text-violet-400 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-semibold text-slate-200">Documents</span>
-                <span className="text-[10px] text-slate-400">Policies & files</span>
+                <FolderOpen className="w-4 h-4 text-[#4F9D83] group-hover:scale-105 transition-transform" />
+                <span className="text-xs font-medium text-[#EDEBE6]">Documents</span>
+                <span className="text-[10px] text-[#8A867E]">Policies & files</span>
               </Link>
 
               <Link
                 href="/employee/support"
-                className="p-3.5 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 hover:border-amber-500/40 transition-all duration-200 flex flex-col gap-1 text-left group"
+                className="p-3.5 rounded-lg bg-[#121212]/60 hover:bg-[#232324] border border-[#2E2E30] hover:border-[#4F9D83]/40 transition-colors flex flex-col gap-1 text-left group"
               >
-                <HelpCircle className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-semibold text-slate-200">Support</span>
-                <span className="text-[10px] text-slate-400">Tickets & FAQs</span>
+                <HelpCircle className="w-4 h-4 text-[#4F9D83] group-hover:scale-105 transition-transform" />
+                <span className="text-xs font-medium text-[#EDEBE6]">Support</span>
+                <span className="text-[10px] text-[#8A867E]">Tickets & FAQs</span>
               </Link>
             </div>
           </motion.div>
@@ -599,14 +583,14 @@ export default function EmployeeDashboard() {
           {/* Recent Company Announcements */}
           <motion.div
             variants={itemVariants}
-            className="p-5 sm:p-6 rounded-2xl bg-slate-900/70 backdrop-blur-xl border border-slate-800/80 space-y-3.5 shadow-sm"
+            className="p-5 sm:p-6 rounded-xl bg-[#1A1A1B] border border-[#2E2E30] space-y-3.5"
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                <Megaphone className="w-3.5 h-3.5 text-indigo-400" />
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8A867E] flex items-center gap-2">
+                <Megaphone className="w-3.5 h-3.5 text-[#4F9D83]" />
                 <span>Announcements</span>
               </h3>
-              <Link href="/employee/announcements" className="text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 hover:underline">
+              <Link href="/employee/announcements" className="text-[11px] font-medium text-[#4F9D83] hover:text-[#5BB094] hover:underline">
                 View all
               </Link>
             </div>
@@ -617,30 +601,30 @@ export default function EmployeeDashboard() {
                   <Link
                     key={ann.id}
                     href="/employee/announcements"
-                    className="block p-3.5 rounded-xl bg-slate-900/50 hover:bg-slate-800/70 border border-slate-800/80 hover:border-slate-700 transition-all duration-200 group"
+                    className="block p-3.5 rounded-lg bg-[#121212]/60 hover:bg-[#232324] border border-[#2E2E30] hover:border-[#3A3A3D] transition-colors group"
                   >
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className="text-xs font-semibold text-slate-200 group-hover:text-indigo-300 transition-colors truncate">
+                      <span className="text-xs font-medium text-[#EDEBE6] group-hover:text-[#4F9D83] transition-colors truncate">
                         {ann.title}
                       </span>
                       <span
-                        className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                        className={`text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${
                           ann.priority === "URGENT" || ann.priority === "HIGH"
-                            ? "bg-rose-500/10 text-rose-400 border border-rose-500/25"
-                            : "bg-slate-800 text-slate-400"
+                            ? "bg-[#C46A62]/10 text-[#C46A62] border border-[#C46A62]/25"
+                            : "bg-[#232324] text-[#8A867E]"
                         }`}
                       >
                         {ann.priority}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-400 line-clamp-2">{ann.content}</p>
-                    <span className="text-[10px] text-slate-500 block mt-1.5 font-mono">
+                    <p className="text-[11px] text-[#8A867E] line-clamp-2">{ann.content}</p>
+                    <span className="text-[10px] text-[#8A867E]/80 block mt-1.5 font-mono">
                       {new Date(ann.publishAt).toLocaleDateString()}
                     </span>
                   </Link>
                 ))
               ) : (
-                <div className="p-5 text-center text-xs text-slate-400 border border-dashed border-slate-800 rounded-xl bg-slate-900/30">
+                <div className="p-5 text-center text-xs text-[#8A867E] border border-dashed border-[#2E2E30] rounded-lg bg-[#121212]/30">
                   No new announcements.
                 </div>
               )}
