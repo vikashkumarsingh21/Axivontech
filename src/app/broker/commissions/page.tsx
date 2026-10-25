@@ -1,23 +1,38 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import Link from "next/link";
 import {
-  IndianRupee,
+  DollarSign,
   Clock,
-  CheckCircle,
-  Wallet,
-  ArrowUpRight,
-  Building,
-  Smartphone,
-  AlertCircle,
-  X,
-  Loader2,
-  FileText,
-  ShieldCheck,
   CheckCircle2,
+  AlertCircle,
+  Download,
+  Calculator,
+  ArrowRight,
+  ChevronRight,
+  ChevronLeft,
+  Search,
+  Filter,
+  CreditCard,
+  Building,
+  ShieldCheck,
+  Check,
+  X,
+  FileText,
+  Sparkles,
+  TrendingUp,
+  Receipt,
   HelpCircle,
+  AlertTriangle,
 } from "lucide-react";
-import { ErrorState } from "@/components/ui/ErrorState";
+import { BrokerPageHeader } from "@/components/broker/BrokerPageHeader";
+import { BrokerCard } from "@/components/broker/BrokerCard";
+import { BrokerButton } from "@/components/broker/BrokerButton";
+import { BrokerStatusBadge } from "@/components/broker/BrokerStatusBadge";
+import { BrokerSkeletonTable } from "@/components/broker/BrokerSkeleton";
+import { BrokerEmptyState } from "@/components/broker/BrokerEmptyState";
+import { formatCurrencyINR, formatDateIN } from "@/components/broker/BrokerFormatters";
 
 interface Commission {
   id: string;
@@ -40,26 +55,65 @@ interface Commission {
   rejectionReason: string | null;
   createdAt: string;
   updatedAt: string;
-  partnerProject?: { projectCode: string; projectName: string };
-  commissionRule?: { name: string; type: string; value: number };
+  partnerProject?: {
+    projectCode: string;
+    projectName: string;
+    clientName?: string;
+    companyName?: string;
+    status?: string;
+  };
+  commissionRule?: {
+    name: string;
+    type: string;
+    value: number;
+  };
 }
 
-interface CommissionStats {
-  total: number;
+interface SummaryStats {
+  totalEarned: number;
+  pending: number;
   eligible: number;
   requested: number;
   processing: number;
   paid: number;
+  thisMonth: number;
 }
 
-export default function BrokerCommissions() {
+export default function BrokerCommissionsPage() {
   const [commissions, setCommissions] = useState<Commission[]>([]);
-  const [stats, setStats] = useState<CommissionStats>({ total: 0, eligible: 0, requested: 0, processing: 0, paid: 0 });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [summary, setSummary] = useState<SummaryStats>({
+    totalEarned: 0,
+    pending: 0,
+    eligible: 0,
+    requested: 0,
+    processing: 0,
+    paid: 0,
+    thisMonth: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
-  // Payout Request Modal
+  // Estimator Widget State
+  const [showEstimator, setShowEstimator] = useState(false);
+  const [estimateBudget, setEstimateBudget] = useState("500000");
+  const [estimateService, setEstimateService] = useState("CUSTOM_SOFTWARE");
+  const [estimateResult, setEstimateResult] = useState<{
+    grossCommission: number;
+    tdsRate: number;
+    tdsAmount: number;
+    netPayout: number;
+  } | null>(null);
+  const [calculatingEstimate, setCalculatingEstimate] = useState(false);
+
+  // Detail Drawer State
   const [selectedCommission, setSelectedCommission] = useState<Commission | null>(null);
+
+  // Payout Request Modal State
+  const [payoutTarget, setPayoutTarget] = useState<Commission | null>(null);
   const [payoutMethod, setPayoutMethod] = useState<"BANK_TRANSFER" | "UPI">("BANK_TRANSFER");
   const [bankDetails, setBankDetails] = useState({
     accountHolder: "",
@@ -69,83 +123,98 @@ export default function BrokerCommissions() {
     bankName: "",
   });
   const [upiId, setUpiId] = useState("");
-  const [notes, setNotes] = useState("");
+  const [payoutNotes, setPayoutNotes] = useState("");
   const [submittingPayout, setSubmittingPayout] = useState(false);
-  const [modalError, setModalError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  // Settlement Details Modal
-  const [settledCommission, setSettledCommission] = useState<Commission | null>(null);
+  const [payoutError, setPayoutError] = useState<string | null>(null);
+  const [payoutSuccess, setPayoutSuccess] = useState<string | null>(null);
 
   const fetchCommissions = useCallback(async () => {
     try {
-      setIsLoading(true);
-      setError(null);
-      const res = await fetch("/api/v1/broker/commissions");
-      if (!res.ok) throw new Error("Failed to load commissions data");
-      const d = await res.json();
-      setCommissions(d.data || []);
-      setStats({
-        total: d.stats?.total || 0,
-        eligible: d.stats?.eligible || 0,
-        requested: d.stats?.requested || 0,
-        processing: d.stats?.processing || 0,
-        paid: d.stats?.paid || 0,
-      });
-    } catch (e: any) {
-      setError(e.message || "An unexpected error occurred");
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (search.trim()) params.set("search", search.trim());
+      if (statusFilter && statusFilter !== "ALL") params.set("status", statusFilter);
+      params.set("page", currentPage.toString());
+      params.set("limit", "15");
+
+      const res = await fetch(`/api/v1/broker/commissions?${params.toString()}`);
+      if (res.ok) {
+        const json = await res.json();
+        const data = json.data;
+        setCommissions(data.commissions || []);
+        if (data.summary) {
+          setSummary(data.summary);
+        }
+        if (data.pagination) {
+          setTotalCount(data.pagination.total || 0);
+          setTotalPages(data.pagination.totalPages || 1);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load commissions:", e);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  }, []);
+  }, [search, statusFilter, currentPage]);
 
   useEffect(() => {
     fetchCommissions();
   }, [fetchCommissions]);
 
-  const openPayoutModal = (comm: Commission) => {
-    setSelectedCommission(comm);
-    setModalError(null);
-    setSuccessMessage(null);
-    setPayoutMethod("BANK_TRANSFER");
-    setBankDetails({
-      accountHolder: "",
-      accountNumber: "",
-      confirmAccountNumber: "",
-      ifsc: "",
-      bankName: "",
-    });
-    setUpiId("");
-    setNotes("");
+  // Live Commission Estimator calculation
+  const runEstimator = useCallback(async (budgetStr: string, serviceStr: string) => {
+    const num = Number(budgetStr.replace(/[^0-9]/g, ""));
+    if (!num || num <= 0) return;
+    try {
+      setCalculatingEstimate(true);
+      const res = await fetch("/api/v1/broker/commissions/estimate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ budget: num, serviceType: serviceStr }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setEstimateResult(json.data?.calculation || null);
+      }
+    } catch (e) {
+      console.error("Estimator error", e);
+    } finally {
+      setCalculatingEstimate(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showEstimator) {
+      runEstimator(estimateBudget, estimateService);
+    }
+  }, [showEstimator, estimateBudget, estimateService, runEstimator]);
+
+  // Handle Export CSV
+  const handleExportCsv = () => {
+    const params = new URLSearchParams();
+    if (statusFilter !== "ALL") params.set("status", statusFilter);
+    window.open(`/api/v1/broker/commissions/export?${params.toString()}`, "_blank");
   };
 
-  const handlePayoutSubmit = async (e: React.FormEvent) => {
+  // Submit Payout Request
+  const handleRequestPayout = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedCommission) return;
-
-    setModalError(null);
+    if (!payoutTarget) return;
+    setPayoutError(null);
 
     let payoutDetailsPayload: any = {};
     if (payoutMethod === "BANK_TRANSFER") {
-      if (!bankDetails.accountHolder.trim()) {
-        setModalError("Please enter account holder name.");
-        return;
-      }
-      if (!bankDetails.accountNumber.trim()) {
-        setModalError("Please enter bank account number.");
+      if (!bankDetails.accountHolder.trim() || !bankDetails.accountNumber.trim()) {
+        setPayoutError("Account holder name and account number are required.");
         return;
       }
       if (bankDetails.accountNumber !== bankDetails.confirmAccountNumber) {
-        setModalError("Account numbers do not match.");
-        return;
-      }
-      if (!bankDetails.ifsc.trim()) {
-        setModalError("Please enter bank IFSC code.");
+        setPayoutError("Account numbers do not match.");
         return;
       }
       const ifscClean = bankDetails.ifsc.trim().toUpperCase();
       if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifscClean)) {
-        setModalError("Invalid IFSC code format (e.g. HDFC0001234).");
+        setPayoutError("Invalid IFSC code format (e.g. HDFC0001234).");
         return;
       }
       payoutDetailsPayload = {
@@ -156,12 +225,10 @@ export default function BrokerCommissions() {
       };
     } else {
       if (!upiId.trim() || !upiId.includes("@")) {
-        setModalError("Please enter a valid UPI ID (e.g., username@okhdfcbank).");
+        setPayoutError("Valid UPI ID is required (e.g. name@bank).");
         return;
       }
-      payoutDetailsPayload = {
-        upiId: upiId.trim(),
-      };
+      payoutDetailsPayload = { upiId: upiId.trim() };
     }
 
     try {
@@ -170,534 +237,766 @@ export default function BrokerCommissions() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          commissionId: selectedCommission.id,
+          commissionId: payoutTarget.id,
           payoutMethod,
           payoutDetails: payoutDetailsPayload,
-          notes: notes.trim() || undefined,
+          notes: payoutNotes.trim() || undefined,
         }),
       });
 
-      const data = await res.json();
+      const json = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to submit payout request.");
+        throw new Error(json.error?.message || json.message || "Failed to submit payout request.");
       }
 
-      setSuccessMessage("Payout request submitted successfully! Axivon Finance SLA is 48 business hours.");
+      setPayoutSuccess("Payout request recorded! Axivon Accounts SLA is 48 business hours.");
       fetchCommissions();
       setTimeout(() => {
-        setSelectedCommission(null);
+        setPayoutTarget(null);
+        setPayoutSuccess(null);
       }, 2000);
     } catch (err: any) {
-      setModalError(err.message || "Failed to submit payout request.");
+      setPayoutError(err.message);
     } finally {
       setSubmittingPayout(false);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-[500px] flex flex-col items-center justify-center p-8 space-y-4">
-        <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
-        <p className="text-gray-400 text-sm">Loading verified commissions & payouts...</p>
-      </div>
-    );
-  }
-
-  if (error && commissions.length === 0) {
-    return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <ErrorState
-          title="Failed to Load Commissions"
-          message={error}
-          onRetry={fetchCommissions}
-          backHref="/broker/dashboard"
-          backLabel="Back to Dashboard"
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Page Title & Payout SLA Notice */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Commission & Payout Management</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            Track referral earnings, submit payout requests, and monitor 48h settlement SLAs.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3.5 py-2 rounded-xl text-xs font-semibold">
-          <Clock className="w-4 h-4 shrink-0 text-emerald-400" />
-          <span>Payout SLA: 48 Business Hours from Request</span>
-        </div>
-      </div>
-
-      {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-[#111] p-5 rounded-xl border border-white/10">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0">
-              <IndianRupee className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-400">Total Generated</p>
-              <h3 className="text-xl font-bold text-white mt-0.5">₹{stats.total.toLocaleString()}</h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-[#111] p-5 rounded-xl border border-white/10">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
-              <Wallet className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-400">Ready for Payout</p>
-              <h3 className="text-xl font-bold text-amber-400 mt-0.5">₹{stats.eligible.toLocaleString()}</h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-[#111] p-5 rounded-xl border border-white/10">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0">
-              <Clock className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-400">In 48h Review</p>
-              <h3 className="text-xl font-bold text-indigo-400 mt-0.5">₹{(stats.requested + stats.processing).toLocaleString()}</h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-[#111] p-5 rounded-xl border border-white/10">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
-              <CheckCircle className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-400">Settled & Paid</p>
-              <h3 className="text-xl font-bold text-emerald-400 mt-0.5">₹{stats.paid.toLocaleString()}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Commission Ledger Table */}
-      <div className="bg-[#111] rounded-xl border border-white/10 overflow-hidden">
-        <div className="p-5 border-b border-white/10 flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-bold text-white">Commission & Payout History</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Verified commission records earned on referred client contracts.</p>
-          </div>
-          <button
-            onClick={fetchCommissions}
-            className="text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 transition"
-          >
-            Refresh
-          </button>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-white/[0.03] text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              <tr>
-                <th className="p-4">Project</th>
-                <th className="p-4">Contract Value</th>
-                <th className="p-4">Commission</th>
-                <th className="p-4">Status & SLA</th>
-                <th className="p-4">Dates</th>
-                <th className="p-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5 text-gray-300">
-              {commissions.map((comm) => {
-                const isEligible = comm.status === "ELIGIBLE" || comm.status === "REJECTED";
-                const isRequested = comm.status === "REQUESTED";
-                const isProcessing = comm.status === "PROCESSING" || comm.status === "APPROVED";
-                const isPaid = comm.status === "PAID";
-
-                return (
-                  <tr key={comm.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="p-4">
-                      <div className="font-semibold text-white">{comm.partnerProject?.projectName || "Direct Project"}</div>
-                      <div className="text-xs text-gray-500 font-mono mt-0.5">{comm.partnerProject?.projectCode}</div>
-                    </td>
-
-                    <td className="p-4">
-                      <div className="font-medium text-gray-200">₹{comm.projectValue?.toLocaleString()}</div>
-                      <div className="text-xs text-gray-500">
-                        {comm.commissionRule?.name || "Standard Rule"} ({comm.commissionRate || 10}%)
-                      </div>
-                    </td>
-
-                    <td className="p-4">
-                      <div className="text-base font-bold text-emerald-400">
-                        ₹{comm.commissionAmount?.toLocaleString()}
-                      </div>
-                    </td>
-
-                    <td className="p-4">
-                      <div className="space-y-1">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
-                            isPaid
-                              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                              : isProcessing
-                              ? "bg-indigo-500/10 border-indigo-500/20 text-indigo-400"
-                              : isRequested
-                              ? "bg-blue-500/10 border-blue-500/20 text-blue-400"
-                              : comm.status === "ELIGIBLE"
-                              ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
-                              : comm.status === "REJECTED"
-                              ? "bg-red-500/10 border-red-500/20 text-red-400"
-                              : "bg-gray-500/10 border-gray-500/20 text-gray-400"
-                          }`}
-                        >
-                          {isPaid && <CheckCircle2 className="w-3.5 h-3.5" />}
-                          {isRequested && <Clock className="w-3.5 h-3.5" />}
-                          {comm.status === "ELIGIBLE" && "READY FOR PAYOUT"}
-                          {comm.status === "REQUESTED" && "UNDER 48H REVIEW"}
-                          {comm.status === "PROCESSING" && "SETTLEMENT IN PROGRESS"}
-                          {comm.status === "APPROVED" && "SETTLEMENT APPROVED"}
-                          {comm.status === "PAID" && "SETTLED"}
-                          {comm.status === "REJECTED" && "PAYOUT REJECTED"}
-                          {comm.status === "PENDING" && "PENDING VERIFICATION"}
-                        </span>
-
-                        {isRequested && comm.payoutDueAt && (
-                          <div className="text-[11px] text-gray-400 flex items-center gap-1">
-                            <span>SLA Due:</span>
-                            <span className="font-mono text-gray-300">
-                              {new Date(comm.payoutDueAt).toLocaleDateString()} {new Date(comm.payoutDueAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                            </span>
-                          </div>
-                        )}
-
-                        {comm.status === "REJECTED" && comm.rejectionReason && (
-                          <div className="text-[11px] text-red-400 font-medium">
-                            Reason: {comm.rejectionReason}
-                          </div>
-                        )}
-                      </div>
-                    </td>
-
-                    <td className="p-4 text-xs text-gray-400">
-                      <div>Earned: {new Date(comm.createdAt).toLocaleDateString()}</div>
-                      {comm.paidAt && (
-                        <div className="text-emerald-400 mt-0.5">
-                          Paid: {new Date(comm.paidAt).toLocaleDateString()}
-                        </div>
-                      )}
-                    </td>
-
-                    <td className="p-4 text-right">
-                      {isEligible && (
-                        <button
-                          onClick={() => openPayoutModal(comm)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-sm"
-                        >
-                          <span>Request Payout</span>
-                          <ArrowUpRight className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-
-                      {isPaid && (
-                        <button
-                          onClick={() => setSettledCommission(comm)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium border border-white/10 transition"
-                        >
-                          <FileText className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>View Settlement</span>
-                        </button>
-                      )}
-
-                      {(isRequested || isProcessing) && (
-                        <span className="text-xs text-gray-500 italic">Processing under 48h SLA</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-
-              {commissions.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="p-12 text-center text-gray-500">
-                    <p className="text-sm">No commission records found.</p>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Commissions become eligible when referred clients execute contracts and advance payments are verified.
-                    </p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Payout Request Modal */}
-      {selectedCommission && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#141414] border border-white/10 rounded-2xl w-full max-w-lg p-6 space-y-5 shadow-2xl relative">
-            <button
-              onClick={() => setSelectedCommission(null)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition"
+    <div className="space-y-6 pb-12">
+      {/* Header */}
+      <BrokerPageHeader
+        title="Commission Ledger & Settlements"
+        subtitle="Manage commission accruals, statutory Section 194H TDS compliance, and 48-hour bank disbursements."
+        badge={
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#C2A878]/10 text-[#C2A878] border border-[#C2A878]/25">
+            <DollarSign className="w-3.5 h-3.5" />
+            Guaranteed 10% Yield
+          </span>
+        }
+        actions={
+          <div className="flex items-center gap-2.5">
+            <BrokerButton
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowEstimator(!showEstimator)}
+              icon={<Calculator className="w-3.5 h-3.5" />}
             >
-              <X className="w-5 h-5" />
-            </button>
+              {showEstimator ? "Hide Estimator" : "Commission Estimator"}
+            </BrokerButton>
 
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-2">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Verified Direct Settlement</span>
-              </div>
-              <h2 className="text-xl font-bold text-white">Request Commission Payout</h2>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Eligible Amount: <span className="text-emerald-400 font-bold text-sm">₹{selectedCommission.commissionAmount.toLocaleString()}</span> for {selectedCommission.partnerProject?.projectCode}
-              </p>
+            <BrokerButton
+              variant="secondary"
+              size="sm"
+              onClick={handleExportCsv}
+              icon={<Download className="w-3.5 h-3.5" />}
+            >
+              Export Statement (CSV)
+            </BrokerButton>
+          </div>
+        }
+      />
+
+      {/* 5-Metric Financial Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
+        <BrokerCard className="p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#8B94A1]">Total Settled</span>
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+              <CheckCircle2 className="w-4 h-4" />
             </div>
+          </div>
+          <div className="mt-2 text-xl font-bold font-mono text-emerald-400">
+            {formatCurrencyINR(summary.paid)}
+          </div>
+          <span className="text-[10px] text-[#566171]">Lifetime disbursed payouts</span>
+        </BrokerCard>
 
-            {modalError && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{modalError}</span>
-              </div>
-            )}
+        <BrokerCard className="p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#8B94A1]">Eligible for Payout</span>
+            <div className="w-7 h-7 rounded-lg bg-[#C2A878]/15 flex items-center justify-center text-[#C2A878]">
+              <DollarSign className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-xl font-bold font-mono text-[#C2A878]">
+            {formatCurrencyINR(summary.eligible)}
+          </div>
+          <span className="text-[10px] text-[#566171]">Cleared milestone funds</span>
+        </BrokerCard>
 
-            {successMessage && (
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>{successMessage}</span>
-              </div>
-            )}
+        <BrokerCard className="p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#8B94A1]">In Processing</span>
+            <div className="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+              <Clock className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-xl font-bold font-mono text-blue-400">
+            {formatCurrencyINR(summary.requested + summary.processing)}
+          </div>
+          <span className="text-[10px] text-[#566171]">48h banking SLA queue</span>
+        </BrokerCard>
 
-            <form onSubmit={handlePayoutSubmit} className="space-y-4">
-              {/* Payment Method Selector */}
+        <BrokerCard className="p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#8B94A1]">Pending Delivery</span>
+            <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+              <Clock className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-xl font-bold font-mono text-amber-400">
+            {formatCurrencyINR(summary.pending)}
+          </div>
+          <span className="text-[10px] text-[#566171]">Awaiting client invoice</span>
+        </BrokerCard>
+
+        <BrokerCard className="p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[#8B94A1]">This Month</span>
+            <div className="w-7 h-7 rounded-lg bg-[#171A1F] flex items-center justify-center text-[#C2A878]">
+              <TrendingUp className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-xl font-bold font-mono text-[#E6E8EB]">
+            {formatCurrencyINR(summary.thisMonth)}
+          </div>
+          <span className="text-[10px] text-[#566171]">Current billing cycle</span>
+        </BrokerCard>
+      </div>
+
+      {/* Interactive Commission Estimator Card (Collapsible) */}
+      {showEstimator && (
+        <BrokerCard
+          title="Commission Yield Estimator"
+          subtitle="Model potential partner revenues based on proposed enterprise project budgets."
+          className="animate-fadeIn border-[#C2A878]/30 bg-gradient-to-r from-[#C2A878]/10 via-[#111317] to-[#111317]"
+          action={
+            <button
+              onClick={() => setShowEstimator(false)}
+              className="p-1 rounded text-[#8B94A1] hover:text-[#E6E8EB]"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          }
+        >
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            {/* Inputs */}
+            <div className="md:col-span-5 space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                  Payout Method
+                <label className="block text-xs font-medium text-[#8B94A1] mb-1">
+                  Expected Client Contract Value (INR)
                 </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPayoutMethod("BANK_TRANSFER")}
-                    className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition ${
-                      payoutMethod === "BANK_TRANSFER"
-                        ? "bg-emerald-500/10 border-emerald-500 text-emerald-400"
-                        : "bg-white/[0.02] border-white/10 text-gray-400 hover:text-white"
-                    }`}
-                  >
-                    <Building className="w-4 h-4" />
-                    <span>Bank Transfer (NEFT/IMPS)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setPayoutMethod("UPI")}
-                    className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition ${
-                      payoutMethod === "UPI"
-                        ? "bg-emerald-500/10 border-emerald-500 text-emerald-400"
-                        : "bg-white/[0.02] border-white/10 text-gray-400 hover:text-white"
-                    }`}
-                  >
-                    <Smartphone className="w-4 h-4" />
-                    <span>UPI Transfer</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Bank Details */}
-              {payoutMethod === "BANK_TRANSFER" && (
-                <div className="space-y-3 bg-white/[0.02] p-4 rounded-xl border border-white/5">
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">Account Holder Name *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Ramesh Kumar"
-                      value={bankDetails.accountHolder}
-                      onChange={(e) => setBankDetails({ ...bankDetails, accountHolder: e.target.value })}
-                      className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs text-gray-400 mb-1">Account Number *</label>
-                      <input
-                        type="password"
-                        required
-                        placeholder="••••••••••••"
-                        value={bankDetails.accountNumber}
-                        onChange={(e) => setBankDetails({ ...bankDetails, accountNumber: e.target.value })}
-                        className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-400 mb-1">Confirm Account Number *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Re-enter number"
-                        value={bankDetails.confirmAccountNumber}
-                        onChange={(e) => setBankDetails({ ...bankDetails, confirmAccountNumber: e.target.value })}
-                        className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs text-gray-400 mb-1">IFSC Code *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. HDFC0001234"
-                        value={bankDetails.ifsc}
-                        onChange={(e) => setBankDetails({ ...bankDetails, ifsc: e.target.value.toUpperCase() })}
-                        className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-lg text-sm text-white uppercase placeholder-gray-600 focus:outline-none focus:border-emerald-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-400 mb-1">Bank Name</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. HDFC Bank"
-                        value={bankDetails.bankName}
-                        onChange={(e) => setBankDetails({ ...bankDetails, bankName: e.target.value })}
-                        className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* UPI Option */}
-              {payoutMethod === "UPI" && (
-                <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5 space-y-3">
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">UPI ID (VPA) *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. mobile@okaxis or name@upi"
-                      value={upiId}
-                      onChange={(e) => setUpiId(e.target.value)}
-                      className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Optional Notes */}
-              <div>
-                <label className="block text-xs text-gray-400 mb-1">Payout Notes (Optional)</label>
                 <input
                   type="text"
-                  placeholder="Additional remarks for Axivon Finance"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="w-full px-3 py-2 bg-black/40 border border-white/10 rounded-lg text-sm text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500"
+                  value={estimateBudget}
+                  onChange={(e) => setEstimateBudget(e.target.value)}
+                  placeholder="e.g. 500000"
+                  className="w-full px-3 py-2 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] font-mono focus:outline-none focus:border-[#C2A878]"
                 />
               </div>
 
-              <div className="text-[11px] text-gray-400 bg-white/[0.02] p-3 rounded-lg border border-white/5 flex items-start gap-2">
-                <HelpCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span>
-                  Payouts are settled directly by Axivon Technologies within our guaranteed 48-business-hour SLA upon verification.
-                </span>
+              <div>
+                <label className="block text-xs font-medium text-[#8B94A1] mb-1">Service Type</label>
+                <select
+                  value={estimateService}
+                  onChange={(e) => setEstimateService(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] focus:outline-none focus:border-[#C2A878]"
+                >
+                  <option value="CUSTOM_SOFTWARE">Custom Software Engineering (10%)</option>
+                  <option value="AI_ML">AI & Cloud Automation (10%)</option>
+                  <option value="MOBILE_APP">Mobile App Development (10%)</option>
+                  <option value="DEDICATED_TEAM">Dedicated Engineering Team (10%)</option>
+                </select>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
+              {/* Quick Preset Buttons */}
+              <div className="flex gap-2 pt-1">
+                {["200000", "500000", "1000000", "2500000"].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setEstimateBudget(preset)}
+                    className="px-2 py-1 rounded bg-[#171A1F] hover:bg-[#22262D] text-[10px] font-mono text-[#C2A878] border border-[#22262D] transition-colors"
+                  >
+                    ₹{(Number(preset) / 100000).toFixed(0)}L
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Calculations Breakdown Output */}
+            <div className="md:col-span-7 bg-[#0E1013] p-4 rounded-xl border border-[#22262D]">
+              <span className="text-[11px] font-semibold text-[#8B94A1] uppercase tracking-wider block mb-3">
+                Calculated Commercial Yield
+              </span>
+
+              {estimateResult ? (
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="p-3 rounded-lg bg-[#171A1F] border border-[#22262D]">
+                    <span className="text-[10px] text-[#8B94A1] block">Gross Commission</span>
+                    <span className="text-sm font-bold font-mono text-[#C2A878] mt-1 block">
+                      {formatCurrencyINR(estimateResult.grossCommission)}
+                    </span>
+                    <span className="text-[10px] text-[#566171]">10% Deal Rate</span>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-[#171A1F] border border-[#22262D]">
+                    <span className="text-[10px] text-[#8B94A1] block">Section 194H TDS</span>
+                    <span className="text-sm font-bold font-mono text-amber-400 mt-1 block">
+                      - {formatCurrencyINR(estimateResult.tdsAmount)}
+                    </span>
+                    <span className="text-[10px] text-[#566171]">5% Tax At Source</span>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                    <span className="text-[10px] text-emerald-400 block font-medium">Net Bank Payout</span>
+                    <span className="text-sm font-bold font-mono text-emerald-400 mt-1 block">
+                      {formatCurrencyINR(estimateResult.netPayout)}
+                    </span>
+                    <span className="text-[10px] text-emerald-400/70">Direct NEFT/UPI</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-xs text-[#8B94A1] py-4 text-center">Enter a budget to calculate yield</div>
+              )}
+            </div>
+          </div>
+        </BrokerCard>
+      )}
+
+      {/* Filter Toolbar */}
+      <div className="p-4 rounded-xl border border-[#22262D] bg-[#111317] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#566171]" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="Search by project code, name..."
+            className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] placeholder-[#566171] focus:outline-none focus:border-[#C2A878]"
+          />
+        </div>
+
+        <div className="flex items-center gap-3">
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] focus:outline-none focus:border-[#C2A878]"
+          >
+            <option value="ALL">All Ledger Statuses</option>
+            <option value="ELIGIBLE">Eligible (Available to Withdraw)</option>
+            <option value="REQUESTED">Requested (In Review)</option>
+            <option value="PROCESSING">Processing (Bank Queue)</option>
+            <option value="PAID">Paid / Settled</option>
+            <option value="PENDING">Pending Milestone Settlement</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Commissions Table */}
+      {loading ? (
+        <BrokerSkeletonTable rows={5} cols={6} />
+      ) : commissions.length === 0 ? (
+        <BrokerEmptyState
+          type="commissions"
+          title="No Commission Entries"
+          description={
+            search || statusFilter !== "ALL"
+              ? "No ledger records matched your search query."
+              : "When client referrals reach signed contracts and milestone clearances, your commissions will appear here."
+          }
+          actionLabel="View Projects"
+          actionHref="/broker/projects"
+        />
+      ) : (
+        <BrokerCard noPadding className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-[#0E1013] border-b border-[#1E232B] text-[#8B94A1] uppercase font-mono tracking-wider">
+                <tr>
+                  <th className="px-5 py-3 font-semibold">Project Code</th>
+                  <th className="px-5 py-3 font-semibold">Client Project</th>
+                  <th className="px-5 py-3 font-semibold">Project Value</th>
+                  <th className="px-5 py-3 font-semibold">Commission Rate</th>
+                  <th className="px-5 py-3 font-semibold">Gross Fee</th>
+                  <th className="px-5 py-3 font-semibold">Status</th>
+                  <th className="px-5 py-3 font-semibold">Settlement Ref</th>
+                  <th className="px-5 py-3 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#1E232B] text-[#D0D4DC]">
+                {commissions.map((comm) => (
+                  <tr
+                    key={comm.id}
+                    className="hover:bg-[#171A1F]/60 transition-colors cursor-pointer group"
+                    onClick={() => setSelectedCommission(comm)}
+                  >
+                    <td className="px-5 py-3.5 font-mono text-[#C2A878] font-medium whitespace-nowrap">
+                      {comm.partnerProject?.projectCode || "PRJ-XXXX"}
+                    </td>
+
+                    <td className="px-5 py-3.5">
+                      <div className="font-semibold text-[#E6E8EB] group-hover:text-[#C2A878] transition-colors truncate max-w-[200px]">
+                        {comm.partnerProject?.projectName || "Client Project"}
+                      </div>
+                      <div className="text-[11px] text-[#566171]">{formatDateIN(comm.createdAt)}</div>
+                    </td>
+
+                    <td className="px-5 py-3.5 font-mono text-[#E6E8EB]">
+                      {formatCurrencyINR(comm.projectValue)}
+                    </td>
+
+                    <td className="px-5 py-3.5 font-mono text-[#C2A878] font-bold">
+                      {comm.commissionRate || 10}%
+                    </td>
+
+                    <td className="px-5 py-3.5 font-mono text-emerald-400 font-bold">
+                      {formatCurrencyINR(comm.commissionAmount)}
+                    </td>
+
+                    <td className="px-5 py-3.5">
+                      <BrokerStatusBadge status={comm.status} category="commission" />
+                    </td>
+
+                    <td className="px-5 py-3.5 font-mono text-[11px] text-[#8B94A1] whitespace-nowrap">
+                      {comm.payoutReference || (comm.paidAt ? formatDateIN(comm.paidAt) : "—")}
+                    </td>
+
+                    <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                      {comm.status === "ELIGIBLE" ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPayoutTarget(comm);
+                          }}
+                          className="px-3 py-1.5 rounded-lg bg-[#C2A878] hover:bg-[#D4BC8B] text-[#0A0B0D] font-bold text-xs transition-colors shadow-sm inline-flex items-center gap-1"
+                        >
+                          <span>Request Payout</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedCommission(comm);
+                          }}
+                          className="text-xs text-[#C2A878] hover:text-[#D4BC8B] font-medium inline-flex items-center gap-1"
+                        >
+                          <span>Breakdown</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div className="px-5 py-3 border-t border-[#1E232B] bg-[#0E1013] flex items-center justify-between text-xs text-[#8B94A1]">
+              <span>
+                Showing {commissions.length} of {totalCount} ledger records
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={currentPage <= 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="p-1 rounded-md bg-[#171A1F] border border-[#22262D] disabled:opacity-30 hover:text-[#E6E8EB]"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="font-mono text-[#E6E8EB]">
+                  {currentPage} / {totalPages}
+                </span>
+                <button
+                  type="button"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="p-1 rounded-md bg-[#171A1F] border border-[#22262D] disabled:opacity-30 hover:text-[#E6E8EB]"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </BrokerCard>
+      )}
+
+      {/* COMMISSION DETAIL & TDS DRAWER */}
+      {selectedCommission && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setSelectedCommission(null)}
+          />
+
+          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div className="w-screen max-w-md bg-[#111317] border-l border-[#22262D] text-[#E6E8EB] shadow-2xl flex flex-col">
+              {/* Drawer Header */}
+              <div className="px-6 py-5 border-b border-[#1E232B] flex items-center justify-between bg-[#0E1013]">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-bold text-[#C2A878]">
+                      {selectedCommission.partnerProject?.projectCode || "COMMISSION"}
+                    </span>
+                    <BrokerStatusBadge status={selectedCommission.status} category="commission" />
+                  </div>
+                  <h3 className="text-base font-bold text-[#E6E8EB] mt-1">
+                    Settlement & Tax Certificate
+                  </h3>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => setSelectedCommission(null)}
-                  className="px-4 py-2 text-xs font-semibold text-gray-400 hover:text-white transition"
+                  className="p-1.5 rounded-lg text-[#8B94A1] hover:text-[#E6E8EB] hover:bg-[#171A1F]"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submittingPayout || !!successMessage}
-                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition flex items-center gap-2 shadow-sm"
-                >
-                  {submittingPayout ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Submitting Request...</span>
-                    </>
-                  ) : (
-                    <span>Confirm & Request Payout</span>
-                  )}
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            </form>
+
+              {/* Drawer Body */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 text-xs">
+                {/* Project Info */}
+                <div className="p-3.5 rounded-xl bg-[#171A1F] border border-[#22262D] space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-[#8B94A1]">Project Title:</span>
+                    <span className="font-medium text-[#E6E8EB] truncate max-w-[200px]">
+                      {selectedCommission.partnerProject?.projectName || "Commercial Project"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#8B94A1]">Client Contract Value:</span>
+                    <span className="font-mono font-semibold text-[#E6E8EB]">
+                      {formatCurrencyINR(selectedCommission.projectValue)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#8B94A1]">Partner Fee Rate:</span>
+                    <span className="font-mono font-bold text-[#C2A878]">
+                      {selectedCommission.commissionRate || 10}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Section 194H Tax Breakdown Box */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-semibold text-[#8B94A1] uppercase tracking-wider">
+                    Statutory Tax & Net Payout Calculation
+                  </h4>
+                  <div className="p-4 rounded-xl bg-[#0E1013] border border-[#22262D] space-y-2.5 font-mono">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-[#8B94A1]">Gross Commission:</span>
+                      <span className="font-bold text-[#E6E8EB]">
+                        {formatCurrencyINR(selectedCommission.commissionAmount)}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between text-xs text-amber-400">
+                      <span>Less: 5% Section 194H TDS:</span>
+                      <span>
+                        - {formatCurrencyINR(Math.round(selectedCommission.commissionAmount * 0.05))}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between text-sm font-bold border-t border-[#1E232B] pt-2 text-emerald-400">
+                      <span>Net Disbursement:</span>
+                      <span>
+                        {formatCurrencyINR(
+                          selectedCommission.commissionAmount -
+                            Math.round(selectedCommission.commissionAmount * 0.05)
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-[#566171] leading-relaxed">
+                    Axivon files quarterly TDS returns under Section 194H. Your Form 16A certificate is
+                    issued digitally to your registered partner email.
+                  </p>
+                </div>
+
+                {/* Disbursement Details */}
+                {selectedCommission.paidAt && (
+                  <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 space-y-2">
+                    <span className="font-semibold text-emerald-400 block text-xs">
+                      Cleared & Disbursed
+                    </span>
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-[#8B94A1]">Settlement Date:</span>
+                      <span className="text-[#E6E8EB]">{formatDateIN(selectedCommission.paidAt)}</span>
+                    </div>
+                    {selectedCommission.payoutReference && (
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-[#8B94A1]">Bank UTR Reference:</span>
+                        <span className="font-mono text-[#E6E8EB] font-bold">
+                          {selectedCommission.payoutReference}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Drawer Footer */}
+              <div className="p-4 border-t border-[#1E232B] bg-[#0E1013]">
+                {selectedCommission.status === "ELIGIBLE" ? (
+                  <BrokerButton
+                    variant="primary"
+                    className="w-full"
+                    onClick={() => {
+                      const comm = selectedCommission;
+                      setSelectedCommission(null);
+                      setPayoutTarget(comm);
+                    }}
+                    icon={<ArrowRight className="w-4 h-4" />}
+                  >
+                    Request Payout Now
+                  </BrokerButton>
+                ) : (
+                  <BrokerButton
+                    variant="secondary"
+                    className="w-full"
+                    onClick={() => setSelectedCommission(null)}
+                  >
+                    Close Breakdown
+                  </BrokerButton>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Settlement Details Receipt Modal */}
-      {settledCommission && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#141414] border border-white/10 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl relative">
-            <button
-              onClick={() => setSettledCommission(null)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition"
-            >
-              <X className="w-5 h-5" />
-            </button>
+      {/* REQUEST PAYOUT MODAL */}
+      {payoutTarget && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4">
+            <div
+              className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity"
+              onClick={() => setPayoutTarget(null)}
+            />
 
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
-                <CheckCircle2 className="w-6 h-6" />
+            <div className="relative bg-[#111317] border border-[#22262D] rounded-xl max-w-lg w-full p-6 text-xs text-[#E6E8EB] space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-[#1E232B] pb-3">
+                <div>
+                  <h3 className="text-sm font-bold">Request Commission Disbursement</h3>
+                  <p className="text-[11px] text-[#8B94A1]">
+                    Ref: {payoutTarget.partnerProject?.projectCode || payoutTarget.id}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setPayoutTarget(null)}
+                  className="p-1 rounded text-[#8B94A1] hover:text-[#E6E8EB]"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <div>
-                <h3 className="text-lg font-bold text-white">Settlement Confirmation</h3>
-                <p className="text-xs text-gray-400">Axivon Technologies Official Disbursement</p>
+
+              {payoutError && (
+                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{payoutError}</span>
+                </div>
+              )}
+
+              {payoutSuccess && (
+                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>{payoutSuccess}</span>
+                </div>
+              )}
+
+              {/* Amount Breakdown Summary */}
+              <div className="p-3.5 rounded-xl bg-[#0E1013] border border-[#22262D] space-y-1.5 font-mono">
+                <div className="flex justify-between">
+                  <span className="text-[#8B94A1]">Gross Commission:</span>
+                  <span className="font-bold text-[#E6E8EB]">
+                    {formatCurrencyINR(payoutTarget.commissionAmount)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-amber-400">
+                  <span>Less 5% Section 194H TDS:</span>
+                  <span>- {formatCurrencyINR(Math.round(payoutTarget.commissionAmount * 0.05))}</span>
+                </div>
+                <div className="flex justify-between text-sm font-bold border-t border-[#1E232B] pt-1.5 text-emerald-400">
+                  <span>Net Receivable:</span>
+                  <span>
+                    {formatCurrencyINR(
+                      payoutTarget.commissionAmount - Math.round(payoutTarget.commissionAmount * 0.05)
+                    )}
+                  </span>
+                </div>
               </div>
+
+              <form onSubmit={handleRequestPayout} className="space-y-4">
+                {/* Method Switch */}
+                <div>
+                  <label className="block text-xs font-medium text-[#8B94A1] mb-1.5">
+                    Disbursement Method
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPayoutMethod("BANK_TRANSFER")}
+                      className={`p-2.5 rounded-lg border text-xs font-medium flex items-center justify-center gap-2 ${
+                        payoutMethod === "BANK_TRANSFER"
+                          ? "bg-[#C2A878]/15 border-[#C2A878] text-[#E6E8EB]"
+                          : "bg-[#171A1F] border-[#22262D] text-[#8B94A1]"
+                      }`}
+                    >
+                      <Building className="w-3.5 h-3.5 text-[#C2A878]" />
+                      <span>Bank Account (NEFT)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPayoutMethod("UPI")}
+                      className={`p-2.5 rounded-lg border text-xs font-medium flex items-center justify-center gap-2 ${
+                        payoutMethod === "UPI"
+                          ? "bg-[#C2A878]/15 border-[#C2A878] text-[#E6E8EB]"
+                          : "bg-[#171A1F] border-[#22262D] text-[#8B94A1]"
+                      }`}
+                    >
+                      <CreditCard className="w-3.5 h-3.5 text-[#C2A878]" />
+                      <span>Instant UPI ID</span>
+                    </button>
+                  </div>
+                </div>
+
+                {payoutMethod === "BANK_TRANSFER" ? (
+                  <div className="space-y-2.5">
+                    <div>
+                      <label className="block text-[11px] font-medium text-[#8B94A1] mb-1">
+                        Account Holder Name <span className="text-rose-400">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={bankDetails.accountHolder}
+                        onChange={(e) =>
+                          setBankDetails({ ...bankDetails, accountHolder: e.target.value })
+                        }
+                        placeholder="Jane Doe or Agency LLP"
+                        className="w-full px-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] focus:outline-none focus:border-[#C2A878]"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[11px] font-medium text-[#8B94A1] mb-1">
+                          Account Number <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                          type="password"
+                          required
+                          value={bankDetails.accountNumber}
+                          onChange={(e) =>
+                            setBankDetails({ ...bankDetails, accountNumber: e.target.value })
+                          }
+                          placeholder="••••••••••••"
+                          className="w-full px-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] font-mono focus:outline-none focus:border-[#C2A878]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-medium text-[#8B94A1] mb-1">
+                          Confirm Account <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={bankDetails.confirmAccountNumber}
+                          onChange={(e) =>
+                            setBankDetails({ ...bankDetails, confirmAccountNumber: e.target.value })
+                          }
+                          placeholder="Re-enter account"
+                          className="w-full px-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] font-mono focus:outline-none focus:border-[#C2A878]"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[11px] font-medium text-[#8B94A1] mb-1">
+                          IFSC Code <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={bankDetails.ifsc}
+                          onChange={(e) =>
+                            setBankDetails({ ...bankDetails, ifsc: e.target.value.toUpperCase() })
+                          }
+                          placeholder="HDFC0001234"
+                          maxLength={11}
+                          className="w-full px-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] uppercase font-mono focus:outline-none focus:border-[#C2A878]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-medium text-[#8B94A1] mb-1">
+                          Bank Name
+                        </label>
+                        <input
+                          type="text"
+                          value={bankDetails.bankName}
+                          onChange={(e) =>
+                            setBankDetails({ ...bankDetails, bankName: e.target.value })
+                          }
+                          placeholder="e.g. HDFC Bank"
+                          className="w-full px-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] focus:outline-none focus:border-[#C2A878]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-[11px] font-medium text-[#8B94A1] mb-1">
+                      UPI ID <span className="text-rose-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={upiId}
+                      onChange={(e) => setUpiId(e.target.value)}
+                      placeholder="e.g. username@okhdfcbank"
+                      className="w-full px-3 py-1.5 rounded-lg bg-[#171A1F] border border-[#22262D] text-xs text-[#E6E8EB] font-mono focus:outline-none focus:border-[#C2A878]"
+                    />
+                  </div>
+                )}
+
+                <div className="p-3 rounded-lg bg-[#0E1013] border border-[#22262D] text-[11px] text-[#8B94A1]">
+                  <strong>48h Payout SLA:</strong> Upon submission, Axivon Finance verifies client clearance
+                  and initiates direct transfer within 48 business hours.
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-2 border-t border-[#1E232B]">
+                  <BrokerButton
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPayoutTarget(null)}
+                  >
+                    Cancel
+                  </BrokerButton>
+                  <BrokerButton
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    loading={submittingPayout}
+                    icon={<ArrowRight className="w-3.5 h-3.5" />}
+                  >
+                    Confirm Payout Request
+                  </BrokerButton>
+                </div>
+              </form>
             </div>
-
-            <div className="space-y-3 bg-white/[0.02] p-4 rounded-xl border border-white/5 text-sm">
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="text-xs text-gray-400">Project Reference:</span>
-                <span className="font-mono text-white text-xs">{settledCommission.partnerProject?.projectCode}</span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="text-xs text-gray-400">Disbursed Amount:</span>
-                <span className="font-bold text-emerald-400">₹{settledCommission.commissionAmount.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="text-xs text-gray-400">Settlement UTR / Ref:</span>
-                <span className="font-mono text-white text-xs bg-black/40 px-2 py-0.5 rounded border border-white/10">
-                  {settledCommission.payoutReference || "N/A"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="text-xs text-gray-400">Payout Method:</span>
-                <span className="text-white text-xs">{settledCommission.payoutMethod || "BANK_TRANSFER"}</span>
-              </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-xs text-gray-400">Settlement Date:</span>
-                <span className="text-white text-xs">
-                  {settledCommission.paidAt ? new Date(settledCommission.paidAt).toLocaleString() : "Confirmed"}
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setSettledCommission(null)}
-              className="w-full py-2.5 bg-white/10 hover:bg-white/15 text-white font-semibold text-xs rounded-xl transition"
-            >
-              Close
-            </button>
           </div>
         </div>
       )}
