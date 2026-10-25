@@ -67,9 +67,6 @@ export default function BrokerLayout({ children }: { children: React.ReactNode }
 
         if (!referralCode && !isCurrentPageOpen) {
           router.push("/broker/onboarding");
-        } else if (referralCode && isCompleted && pathname === "/broker/onboarding") {
-          // If onboarding is completely finished, redirect from onboarding to dashboard
-          router.push("/broker/dashboard");
         }
       }
     } catch (error) {

@@ -13,6 +13,8 @@ export function BrokerSkeletonCard({ className = "" }: { className?: string }) {
   );
 }
 
+export const BrokerSkeleton = BrokerSkeletonCard;
+
 export function BrokerSkeletonMetrics({ count = 4 }: { count?: number }) {
   return (
     <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${count} gap-4`}>
