@@ -1,0 +1,86 @@
+[
+  {
+    "test": "login_empty_fields",
+    "passed": true,
+    "text": "Please enter your work email. | Please enter your password.",
+    "screenshot": "login-01-empty-fields.png"
+  },
+  {
+    "test": "login_invalid_email_format",
+    "passed": true,
+    "text": "Please enter a valid work email address.",
+    "screenshot": "login-02-invalid-email-format.png"
+  },
+  {
+    "test": "login_captcha_not_ticked",
+    "passed": true,
+    "text": "Please confirm you are not a robot.",
+    "screenshot": "login-03-captcha-not-ticked.png"
+  },
+  {
+    "test": "login_wrong_password",
+    "passed": true,
+    "text": "Incorrect email or password.",
+    "screenshot": "login-04-wrong-password.png"
+  },
+  {
+    "test": "login_unknown_email",
+    "passed": true,
+    "text": "Incorrect email or password.",
+    "screenshot": "login-05-unknown-email.png"
+  },
+  {
+    "test": "login_suspended_account",
+    "passed": true,
+    "text": "Account is SUSPENDED. Please check your email or contact support.",
+    "screenshot": "login-06-suspended-account.png"
+  },
+  {
+    "test": "login_rate_limited_429",
+    "passed": true,
+    "text": "Too many attempts. Please try again in 30 seconds.",
+    "screenshot": "login-07-rate-limited-429.png"
+  },
+  {
+    "test": "login_expired_session",
+    "passed": true,
+    "text": "Session expired, please sign in again.",
+    "screenshot": "login-08-expired-session.png"
+  },
+  {
+    "test": "login_network_error",
+    "passed": true,
+    "text": "Could not reach the server. Check your connection and try again.",
+    "screenshot": "login-09-network-error.png"
+  },
+  {
+    "test": "portal_contact_form",
+    "passed": true,
+    "screenshot": "portal-01-contact-form.png"
+  },
+  {
+    "test": "portal_partner_apply",
+    "passed": true,
+    "screenshot": "portal-02-partner-apply.png"
+  },
+  {
+    "test": "portal_admin_employees",
+    "passed": true,
+    "screenshot": "portal-03-admin-employees.png"
+  },
+  {
+    "test": "portal_employee_leave",
+    "passed": true,
+    "screenshot": "portal-04-employee-leave.png"
+  },
+  {
+    "test": "portal_broker_leads",
+    "passed": true,
+    "screenshot": "portal-05-broker-leads.png"
+  },
+  {
+    "test": "portal_client_support",
+    "passed": true,
+    "screenshot": "portal-06-client-support.png"
+  }
+]
