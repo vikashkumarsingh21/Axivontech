@@ -81,6 +81,29 @@ Stderr: (empty)
 Status: Clean compilation across all routes and components.
 ```
 
+### 2.5 Production Build & Live Endpoint Verification (`npm run build` & `npm start`)
+```text
+Build Command: npm run build
+Build Engine: Next.js 16.2.9 (Turbopack)
+Build Status: Exit Code 0 (Production build generated successfully)
+
+Runtime Endpoint Verification: scripts/verify-production-endpoints.ts
+=== VERIFYING PRODUCTION LOCALHOST SERVER ===
+[Public] /business-partner/apply -> HTTP 200
+[Public] /login?error=account_suspended -> HTTP 200
+[Public] /lead/AXP-QA-475B0E -> HTTP 200
+[Public] /project/start/AXP-QA-475B0E -> HTTP 200
+[Admin] /admin/crm/brokers -> HTTP 200
+[Admin] /admin/crm/brokers/cmvm28r3v000sua9kxitrwvys (Dossier) -> HTTP 200
+[Admin] /admin/crm/support (Partner Support Desk) -> HTTP 200
+[Admin API] /api/v1/admin/support/brokers -> HTTP 200
+[Broker] /broker/dashboard -> HTTP 200
+[Broker] /broker/profile -> HTTP 200
+[Broker] /broker/support -> HTTP 200
+
+=== PRODUCTION VERIFICATION COMPLETE ===
+```
+
 ---
 
 ## 3. Security & Data Integrity Verification
