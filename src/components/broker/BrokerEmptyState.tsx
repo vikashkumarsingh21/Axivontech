@@ -1,13 +1,25 @@
 import React from "react";
+import Link from "next/link";
 import { FolderOpen, Users, DollarSign, FileText, Bell, Search } from "lucide-react";
+import { BrokerButton } from "./BrokerButton";
 
-export type EmptyStateType = "leads" | "projects" | "commissions" | "documents" | "notifications" | "search" | "general";
+export type EmptyStateType =
+  | "leads"
+  | "projects"
+  | "commissions"
+  | "documents"
+  | "notifications"
+  | "search"
+  | "general";
 
 interface BrokerEmptyStateProps {
   type?: EmptyStateType;
   title: string;
   description: string;
   action?: React.ReactNode;
+  actionLabel?: string;
+  actionHref?: string;
+  onAction?: () => void;
   className?: string;
 }
 
@@ -16,6 +28,9 @@ export function BrokerEmptyState({
   title,
   description,
   action,
+  actionLabel,
+  actionHref,
+  onAction,
   className = "",
 }: BrokerEmptyStateProps) {
   const getIcon = () => {
@@ -38,6 +53,27 @@ export function BrokerEmptyState({
     }
   };
 
+  const renderAction = () => {
+    if (action) return action;
+    if (actionLabel && actionHref) {
+      return (
+        <Link href={actionHref}>
+          <BrokerButton variant="primary" size="sm">
+            {actionLabel}
+          </BrokerButton>
+        </Link>
+      );
+    }
+    if (actionLabel && onAction) {
+      return (
+        <BrokerButton variant="primary" size="sm" onClick={onAction}>
+          {actionLabel}
+        </BrokerButton>
+      );
+    }
+    return null;
+  };
+
   return (
     <div
       className={`rounded-xl border border-[#22262D] bg-[#111317] p-8 md:p-12 text-center flex flex-col items-center justify-center max-w-xl mx-auto my-6 ${className}`}
@@ -57,7 +93,9 @@ export function BrokerEmptyState({
         {description}
       </p>
 
-      {action && <div className="inline-flex items-center justify-center">{action}</div>}
+      {renderAction() && (
+        <div className="inline-flex items-center justify-center">{renderAction()}</div>
+      )}
     </div>
   );
 }
