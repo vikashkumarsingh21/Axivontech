@@ -236,19 +236,19 @@ export default function TasksPage() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="space-y-6 max-w-7xl"
+      className="space-y-6 max-w-7xl pb-12"
     >
       {/* Header */}
       <PageHeader
         title="My Assigned Tasks"
-        subtitle="Track sprints, change task execution status, and coordinate updates on deliverables."
+        subtitle="Track deliverables, update execution status, and record progress updates."
         action={
           <EpButton
             variant="secondary"
             size="sm"
             onClick={loadData}
             loading={loading}
-            icon={<RotateCw className="w-3.5 h-3.5 text-[#5FA8A0]" />}
+            icon={<RotateCw className="w-3.5 h-3.5 text-[#4F9D83]" />}
           >
             Refresh
           </EpButton>
@@ -257,14 +257,14 @@ export default function TasksPage() {
 
       {/* Alerts */}
       {actionSuccess && (
-        <div className="p-3 bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] rounded-xl text-[#5FA8A0] text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 bg-[#4F9D83]/10 border border-[#4F9D83]/25 rounded-xl text-[#4F9D83] text-xs font-semibold flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{actionSuccess}</span>
         </div>
       )}
 
       {actionError && (
-        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 bg-[#C46A62]/10 border border-[#C46A62]/25 rounded-xl text-[#C46A62] text-xs font-semibold flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{actionError}</span>
         </div>
@@ -276,93 +276,93 @@ export default function TasksPage() {
           onClick={() => setSelectedStatus("ALL")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "ALL"
-              ? "bg-[#171A1F] border-[#5FA8A0]/50 shadow-sm"
-              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
+              ? "bg-[#232324] border-[#4F9D83]/50 shadow-sm"
+              : "bg-[#1A1A1B] border-[#2E2E30] hover:border-[#3A3A3D]"
           }`}
         >
-          <div className="text-xs text-[#566171] font-medium">Total Tasks</div>
-          <div className="text-2xl font-bold text-[#E6E8EB] mt-1">{stats.total}</div>
+          <div className="text-xs text-[#8A867E] font-medium">Total Tasks</div>
+          <div className="text-2xl font-semibold text-[#EDEBE6] mt-1">{stats.total}</div>
         </div>
 
         <div
           onClick={() => setSelectedStatus("TODO")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "TODO"
-              ? "bg-[#171A1F] border-[#5FA8A0]/50 shadow-sm"
-              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
+              ? "bg-[#232324] border-[#4F9D83]/50 shadow-sm"
+              : "bg-[#1A1A1B] border-[#2E2E30] hover:border-[#3A3A3D]"
           }`}
         >
-          <div className="text-xs text-[#8B94A1] font-medium">To Do</div>
-          <div className="text-2xl font-bold text-[#E6E8EB] mt-1">{stats.todo}</div>
+          <div className="text-xs text-[#8A867E] font-medium">To Do</div>
+          <div className="text-2xl font-semibold text-[#EDEBE6] mt-1">{stats.todo}</div>
         </div>
 
         <div
           onClick={() => setSelectedStatus("IN_PROGRESS")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "IN_PROGRESS"
-              ? "bg-[#171A1F] border-[#5FA8A0]/50 shadow-sm"
-              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
+              ? "bg-[#232324] border-[#4F9D83]/50 shadow-sm"
+              : "bg-[#1A1A1B] border-[#2E2E30] hover:border-[#3A3A3D]"
           }`}
         >
-          <div className="text-xs text-[#5FA8A0] font-medium">In Progress</div>
-          <div className="text-2xl font-bold text-[#E6E8EB] mt-1">{stats.inProgress}</div>
+          <div className="text-xs text-[#4F9D83] font-medium">In Progress</div>
+          <div className="text-2xl font-semibold text-[#EDEBE6] mt-1">{stats.inProgress}</div>
         </div>
 
         <div
           onClick={() => setSelectedStatus("BLOCKED")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "BLOCKED"
-              ? "bg-[#171A1F] border-red-500/50 shadow-sm"
-              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
+              ? "bg-[#232324] border-[#C46A62]/50 shadow-sm"
+              : "bg-[#1A1A1B] border-[#2E2E30] hover:border-[#3A3A3D]"
           }`}
         >
-          <div className="text-xs text-red-400 font-medium">Blocked</div>
-          <div className="text-2xl font-bold text-[#E6E8EB] mt-1">{stats.blocked}</div>
+          <div className="text-xs text-[#C46A62] font-medium">Blocked</div>
+          <div className="text-2xl font-semibold text-[#EDEBE6] mt-1">{stats.blocked}</div>
         </div>
 
         <div
           onClick={() => setSelectedStatus("COMPLETED")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "COMPLETED"
-              ? "bg-[#171A1F] border-[#34D399]/50 shadow-sm"
-              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
+              ? "bg-[#232324] border-[#5FAE7E]/50 shadow-sm"
+              : "bg-[#1A1A1B] border-[#2E2E30] hover:border-[#3A3A3D]"
           }`}
         >
-          <div className="text-xs text-[#34D399] font-medium">Completed</div>
-          <div className="text-2xl font-bold text-[#E6E8EB] mt-1">{stats.completed}</div>
+          <div className="text-xs text-[#5FAE7E] font-medium">Completed</div>
+          <div className="text-2xl font-semibold text-[#EDEBE6] mt-1">{stats.completed}</div>
         </div>
 
         <div
           onClick={() => setSelectedStatus("OVERDUE")}
           className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
             selectedStatus === "OVERDUE"
-              ? "bg-[#171A1F] border-red-500/60 shadow-sm"
-              : "bg-[#111317] border-[#1E2530] hover:border-[#22262D]"
+              ? "bg-[#232324] border-[#C46A62]/60 shadow-sm"
+              : "bg-[#1A1A1B] border-[#2E2E30] hover:border-[#3A3A3D]"
           }`}
         >
-          <div className="text-xs text-red-400 font-medium flex items-center gap-1">
+          <div className="text-xs text-[#C46A62] font-medium flex items-center gap-1">
             <AlertTriangle className="w-3 h-3" /> Overdue
           </div>
-          <div className="text-2xl font-bold text-red-400 mt-1">{stats.overdue}</div>
+          <div className="text-2xl font-semibold text-[#C46A62] mt-1">{stats.overdue}</div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 bg-[#111317] border border-[#1E2530] rounded-xl space-y-3">
+      <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#566171] absolute left-3 top-3 pointer-events-none" />
+            <Search className="w-4 h-4 text-[#8A867E] absolute left-3 top-3 pointer-events-none" />
             <input
               type="text"
               placeholder="Search tasks by title, project, or description..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 rounded-lg bg-[#0F1215] border border-[#1E2530] text-[#E6E8EB] text-xs placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0]"
+              className="w-full pl-9 pr-8 py-2 rounded-lg bg-[#232324] border border-[#2E2E30] text-[#EDEBE6] text-xs placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-2.5 text-[#566171] hover:text-[#E6E8EB] cursor-pointer"
+                className="absolute right-3 top-2.5 text-[#8A867E] hover:text-[#EDEBE6] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -373,7 +373,7 @@ export default function TasksPage() {
             <select
               value={selectedPriority}
               onChange={(e) => setSelectedPriority(e.target.value)}
-              className="h-9 px-3 bg-[#0F1215] border border-[#1E2530] rounded-lg text-xs text-[#8B94A1] focus:outline-hidden focus:border-[#5FA8A0] cursor-pointer"
+              className="h-9 px-3 bg-[#232324] border border-[#2E2E30] rounded-lg text-xs text-[#B3AFA6] focus:outline-hidden focus:border-[#4F9D83] cursor-pointer"
             >
               <option value="ALL">All Priorities</option>
               <option value="CRITICAL">Critical</option>
@@ -399,8 +399,8 @@ export default function TasksPage() {
               onClick={() => setSelectedStatus(tab.id)}
               className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors cursor-pointer text-xs ${
                 selectedStatus === tab.id
-                  ? "bg-[var(--ep-accent-soft)] text-[#5FA8A0] border border-[var(--ep-accent-border)] font-semibold"
-                  : "bg-[#0F1215] text-[#8B94A1] hover:text-[#E6E8EB] border border-[#1E2530]"
+                  ? "bg-[#4F9D83]/15 text-[#4F9D83] border border-[#4F9D83]/30 font-semibold"
+                  : "bg-[#232324] text-[#8A867E] hover:text-[#EDEBE6] border border-[#2E2E30]"
               }`}
             >
               {tab.label}
@@ -417,10 +417,10 @@ export default function TasksPage() {
           ))}
         </div>
       ) : filteredTasks.length === 0 ? (
-        <div className="p-12 text-center bg-[#111317] border border-[#1E2530] rounded-xl space-y-3">
-          <CheckSquare className="w-10 h-10 text-[#566171] mx-auto" />
-          <h3 className="text-base font-semibold text-[#E6E8EB]">No tasks found</h3>
-          <p className="text-xs text-[#566171] max-w-sm mx-auto">
+        <div className="p-12 text-center bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-3">
+          <CheckSquare className="w-10 h-10 text-[#8A867E] mx-auto" />
+          <h3 className="text-base font-semibold text-[#EDEBE6]">No tasks found</h3>
+          <p className="text-xs text-[#8A867E] max-w-sm mx-auto">
             {searchQuery || selectedStatus !== "ALL" || selectedPriority !== "ALL"
               ? "No tasks match your selected search criteria. Try resetting filters."
               : "You have no assigned tasks. When project leads assign deliverables, they will appear here."}
@@ -455,7 +455,7 @@ export default function TasksPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.15, delay: Math.min(index * 0.03, 0.3) }}
-                  className="p-4 sm:p-5 bg-[#111317] border border-[#1E2530] rounded-xl hover:border-[#22262D] transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+                  className="p-4 sm:p-5 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl hover:border-[#3A3A3D] transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-4"
                 >
                   {/* Left Task Content */}
                   <div
@@ -470,28 +470,28 @@ export default function TasksPage() {
                         {t.priority}
                       </StatusBadge>
                       {t.project && (
-                        <span className="text-[10px] text-[#8B94A1] bg-[#0F1215] border border-[#1E2530] px-2 py-0.5 rounded-md flex items-center gap-1 font-semibold">
-                          <Briefcase className="w-3 h-3 text-[#5FA8A0]" />
+                        <span className="text-[10px] text-[#B3AFA6] bg-[#232324] border border-[#2E2E30] px-2 py-0.5 rounded font-medium flex items-center gap-1">
+                          <Briefcase className="w-3 h-3 text-[#4F9D83]" />
                           {t.project.name}
                         </span>
                       )}
                     </div>
 
-                    <h3 className="text-[#E6E8EB] font-semibold text-sm sm:text-base hover:text-[#5FA8A0] transition-colors">
+                    <h3 className="text-[#EDEBE6] font-medium text-sm sm:text-base hover:text-[#4F9D83] transition-colors">
                       {t.title}
                     </h3>
 
                     {t.description && (
-                      <p className="text-xs text-[#8B94A1] line-clamp-2 max-w-3xl">
+                      <p className="text-xs text-[#8A867E] line-clamp-2 max-w-3xl">
                         {t.description}
                       </p>
                     )}
 
-                    <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-[#566171]">
+                    <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-[#8A867E]">
                       {t.dueDate && (
                         <span
                           className={`flex items-center gap-1.5 ${
-                            isOverdue ? "text-red-400 font-medium" : "text-[#8B94A1]"
+                            isOverdue ? "text-[#C46A62] font-medium" : "text-[#8A867E]"
                           }`}
                         >
                           <Calendar className="w-3.5 h-3.5" />
@@ -500,21 +500,21 @@ export default function TasksPage() {
                         </span>
                       )}
 
-                      <span className="flex items-center gap-1.5 hover:text-[#E6E8EB]">
-                        <MessageSquare className="w-3.5 h-3.5 text-[#566171]" />
+                      <span className="flex items-center gap-1.5 hover:text-[#EDEBE6]">
+                        <MessageSquare className="w-3.5 h-3.5 text-[#8A867E]" />
                         {t.comments?.length || 0} comments
                       </span>
                     </div>
                   </div>
 
                   {/* Right Status Actions */}
-                  <div className="flex items-center gap-2.5 shrink-0 self-end lg:self-center pt-2 lg:pt-0 border-t lg:border-t-0 border-[#1E2530] w-full lg:w-auto justify-between lg:justify-end">
+                  <div className="flex items-center gap-2.5 shrink-0 self-end lg:self-center pt-2 lg:pt-0 border-t lg:border-t-0 border-[#2E2E30] w-full lg:w-auto justify-between lg:justify-end">
                     <div className="flex items-center gap-2">
                       <select
                         value={t.status}
                         disabled={isUpdating}
                         onChange={(e) => updateStatus(t.id, e.target.value)}
-                        className="h-8 px-2.5 bg-[#0F1215] border border-[#1E2530] rounded-lg text-xs text-[#E6E8EB] focus:outline-hidden focus:border-[#5FA8A0] cursor-pointer disabled:opacity-50"
+                        className="h-8 px-2.5 bg-[#232324] border border-[#2E2E30] rounded-lg text-xs text-[#EDEBE6] focus:outline-hidden focus:border-[#4F9D83] cursor-pointer disabled:opacity-50"
                       >
                         <option value="TODO">To Do</option>
                         <option value="IN_PROGRESS">In Progress</option>
@@ -538,7 +538,7 @@ export default function TasksPage() {
 
                     <button
                       onClick={() => setActiveTask(t)}
-                      className="p-1.5 text-[#566171] hover:text-[#E6E8EB] hover:bg-[#171A1F] rounded-lg transition-colors cursor-pointer"
+                      className="p-1.5 text-[#8A867E] hover:text-[#EDEBE6] hover:bg-[#232324] rounded-lg transition-colors cursor-pointer"
                       title="View details and comments"
                     >
                       <ChevronRight className="w-4 h-4" />
@@ -553,10 +553,10 @@ export default function TasksPage() {
 
       {/* Task Details & Comments Modal Drawer */}
       {activeTask && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#111317] border border-[#1E2530] rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-[#1A1A1B] border border-[#2E2E30] rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             {/* Modal Header */}
-            <div className="p-5 border-b border-[#1E2530] flex items-start justify-between gap-4">
+            <div className="p-5 border-b border-[#2E2E30] bg-[#121212] flex items-start justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <StatusBadge variant={getStatusVariant(activeTask.status)}>
@@ -566,16 +566,16 @@ export default function TasksPage() {
                     {activeTask.priority}
                   </StatusBadge>
                   {activeTask.project && (
-                    <span className="text-[10px] text-[#8B94A1] bg-[#0F1215] border border-[#1E2530] px-2 py-0.5 rounded font-semibold">
+                    <span className="text-[10px] text-[#B3AFA6] bg-[#232324] border border-[#2E2E30] px-2 py-0.5 rounded font-medium">
                       {activeTask.project.name}
                     </span>
                   )}
                 </div>
-                <h2 className="text-lg font-bold text-[#E6E8EB] mt-1">{activeTask.title}</h2>
+                <h2 className="text-lg font-semibold text-[#EDEBE6] mt-1">{activeTask.title}</h2>
               </div>
               <button
                 onClick={() => setActiveTask(null)}
-                className="p-1.5 rounded-lg text-[#566171] hover:text-[#E6E8EB] hover:bg-[#171A1F] cursor-pointer transition-colors"
+                className="p-1.5 rounded-lg text-[#8A867E] hover:text-[#EDEBE6] hover:bg-[#232324] cursor-pointer transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -585,26 +585,26 @@ export default function TasksPage() {
             <div className="p-5 overflow-y-auto space-y-6 flex-1 text-sm">
               {/* Description */}
               <div>
-                <h4 className="text-xs font-semibold text-[#566171] uppercase tracking-wider mb-2">
+                <h4 className="text-xs font-semibold text-[#8A867E] uppercase tracking-wider mb-2">
                   Deliverable Description
                 </h4>
-                <div className="p-3.5 bg-[#0F1215] border border-[#1E2530] rounded-xl text-[#E6E8EB] whitespace-pre-wrap leading-relaxed text-xs sm:text-sm">
+                <div className="p-3.5 bg-[#121212]/60 border border-[#2E2E30] rounded-xl text-[#EDEBE6] whitespace-pre-wrap leading-relaxed text-xs sm:text-sm">
                   {activeTask.description || "No specific details provided for this task."}
                 </div>
               </div>
 
               {/* Status Update Control */}
-              <div className="p-3.5 bg-[#171A1F] border border-[#22262D] rounded-xl flex items-center justify-between gap-4">
+              <div className="p-3.5 bg-[#232324] border border-[#2E2E30] rounded-xl flex items-center justify-between gap-4">
                 <div>
-                  <div className="text-xs font-medium text-[#E6E8EB]">Execution Status</div>
-                  <div className="text-[11px] text-[#566171]">
+                  <div className="text-xs font-medium text-[#EDEBE6]">Execution Status</div>
+                  <div className="text-[11px] text-[#8A867E]">
                     Change as work progresses across development phases.
                   </div>
                 </div>
                 <select
                   value={activeTask.status}
                   onChange={(e) => updateStatus(activeTask.id, e.target.value)}
-                  className="h-8 px-2.5 bg-[#0F1215] border border-[#1E2530] rounded-lg text-xs text-[#E6E8EB] focus:outline-hidden focus:border-[#5FA8A0] cursor-pointer"
+                  className="h-8 px-2.5 bg-[#1A1A1B] border border-[#2E2E30] rounded-lg text-xs text-[#EDEBE6] focus:outline-hidden focus:border-[#4F9D83] cursor-pointer"
                 >
                   <option value="TODO">To Do</option>
                   <option value="IN_PROGRESS">In Progress</option>
@@ -615,17 +615,17 @@ export default function TasksPage() {
 
               {/* Metadata row */}
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="p-3 bg-[#0F1215] border border-[#1E2530] rounded-xl">
-                  <div className="text-[#566171] mb-1">Due Date</div>
-                  <div className="font-medium text-[#E6E8EB]">
+                <div className="p-3 bg-[#121212]/60 border border-[#2E2E30] rounded-xl">
+                  <div className="text-[#8A867E] mb-1">Due Date</div>
+                  <div className="font-medium text-[#EDEBE6]">
                     {activeTask.dueDate
                       ? new Date(activeTask.dueDate).toLocaleDateString()
                       : "No deadline specified"}
                   </div>
                 </div>
-                <div className="p-3 bg-[#0F1215] border border-[#1E2530] rounded-xl">
-                  <div className="text-[#566171] mb-1">Created</div>
-                  <div className="font-medium text-[#E6E8EB]">
+                <div className="p-3 bg-[#121212]/60 border border-[#2E2E30] rounded-xl">
+                  <div className="text-[#8A867E] mb-1">Created</div>
+                  <div className="font-medium text-[#EDEBE6]">
                     {new Date(activeTask.createdAt).toLocaleDateString()}
                   </div>
                 </div>
@@ -633,27 +633,27 @@ export default function TasksPage() {
 
               {/* Comments Section */}
               <div className="space-y-3 pt-2">
-                <h4 className="text-xs font-semibold text-[#566171] uppercase tracking-wider flex items-center gap-1.5">
-                  <MessageSquare className="w-3.5 h-3.5 text-[#5FA8A0]" />
+                <h4 className="text-xs font-semibold text-[#8A867E] uppercase tracking-wider flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5 text-[#4F9D83]" />
                   <span>Discussion & Activity Log ({activeTask.comments?.length || 0})</span>
                 </h4>
 
                 <div className="space-y-2.5">
                   {!activeTask.comments || activeTask.comments.length === 0 ? (
-                    <div className="p-4 text-center text-xs text-[#566171] bg-[#0F1215] border border-[#1E2530] rounded-xl">
+                    <div className="p-4 text-center text-xs text-[#8A867E] bg-[#121212]/60 border border-[#2E2E30] rounded-xl">
                       No comments logged yet. Use the input below to record task updates or ask questions.
                     </div>
                   ) : (
                     activeTask.comments.map((c) => (
                       <div
                         key={c.id}
-                        className="p-3 bg-[#0F1215] border border-[#1E2530] rounded-xl space-y-1"
+                        className="p-3 bg-[#121212]/60 border border-[#2E2E30] rounded-xl space-y-1"
                       >
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="font-semibold text-[#5FA8A0]">
+                          <span className="font-semibold text-[#4F9D83]">
                             {c.user?.name || "Team Member"}
                           </span>
-                          <span className="text-[#566171]">
+                          <span className="text-[#8A867E]">
                             {new Date(c.createdAt).toLocaleDateString()}{" "}
                             {new Date(c.createdAt).toLocaleTimeString([], {
                               hour: "2-digit",
@@ -661,7 +661,7 @@ export default function TasksPage() {
                             })}
                           </span>
                         </div>
-                        <p className="text-xs text-[#8B94A1] whitespace-pre-wrap">{c.content}</p>
+                        <p className="text-xs text-[#B3AFA6] whitespace-pre-wrap">{c.content}</p>
                       </div>
                     ))
                   )}
@@ -675,12 +675,12 @@ export default function TasksPage() {
                       placeholder="Add an update or leave a comment on this task..."
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
-                      className="w-full bg-[#0F1215] border border-[#1E2530] rounded-xl p-3 text-xs text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0] resize-none pr-12"
+                      className="w-full bg-[#232324] border border-[#2E2E30] rounded-xl p-3 text-xs text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83] resize-none pr-12"
                     />
                     <button
                       type="submit"
                       disabled={submittingComment || !newComment.trim()}
-                      className="absolute right-2.5 bottom-3.5 p-2 rounded-lg bg-[#5FA8A0] text-[#071918] hover:bg-[#6DB8B0] disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                      className="absolute right-2.5 bottom-3.5 p-2 rounded-lg bg-[#4F9D83] text-[#0F1A16] hover:bg-[#5BB094] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
                       {submittingComment ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -694,7 +694,7 @@ export default function TasksPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-[#1E2530] bg-[#0F1215] flex justify-end">
+            <div className="p-4 border-t border-[#2E2E30] bg-[#121212] flex justify-end">
               <EpButton
                 variant="secondary"
                 size="sm"
