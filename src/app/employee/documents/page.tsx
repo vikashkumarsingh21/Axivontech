@@ -122,39 +122,39 @@ export default function DocumentsPage() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="space-y-6 max-w-7xl"
+      className="space-y-6 max-w-7xl pb-12"
     >
       {/* Header */}
       <PageHeader
         title="Documents & Resources"
-        subtitle="Access verified employee handbooks, onboarding guides, compliance documents, and standard templates."
+        subtitle="Access company handbooks, compliance policies, standard templates, and department guidelines."
       />
 
       {/* Action Messages */}
       {actionSuccess && (
-        <div className="p-3 bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] rounded-xl text-[#5FA8A0] text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 bg-[#4F9D83]/10 border border-[#4F9D83]/25 rounded-xl text-[#4F9D83] text-xs font-semibold flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{actionSuccess}</span>
         </div>
       )}
 
       {actionError && (
-        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-semibold flex items-center gap-2">
+        <div className="p-3 bg-[#C46A62]/10 border border-[#C46A62]/25 rounded-xl text-[#C46A62] text-xs font-semibold flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{actionError}</span>
         </div>
       )}
 
       {/* Filter and Search Bar */}
-      <div className="p-4 bg-[#111317] border border-[#1E2530] rounded-xl space-y-3">
+      <div className="p-4 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-3">
         <div className="relative">
-          <Search className="w-4 h-4 text-[#566171] absolute left-3 top-3 pointer-events-none" />
+          <Search className="w-4 h-4 text-[#8A867E] absolute left-3 top-3 pointer-events-none" />
           <input
             type="text"
             placeholder="Search documents by name, category, or keyword..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-[#0F1215] border border-[#1E2530] rounded-lg text-xs text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0]"
+            className="w-full pl-9 pr-3 py-2 bg-[#232324] border border-[#2E2E30] rounded-lg text-xs text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
           />
         </div>
 
@@ -166,8 +166,8 @@ export default function DocumentsPage() {
               onClick={() => setSelectedCategory(cat)}
               className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors cursor-pointer text-xs ${
                 selectedCategory === cat
-                  ? "bg-[var(--ep-accent-soft)] text-[#5FA8A0] border border-[var(--ep-accent-border)] font-semibold"
-                  : "bg-[#0F1215] text-[#8B94A1] hover:text-[#E6E8EB] border border-[#1E2530]"
+                  ? "bg-[#4F9D83]/15 text-[#4F9D83] border border-[#4F9D83]/30 font-semibold"
+                  : "bg-[#232324] text-[#8A867E] hover:text-[#EDEBE6] border border-[#2E2E30]"
               }`}
             >
               {cat === "ALL" ? "All Categories" : cat.replace("_", " ")}
@@ -184,10 +184,10 @@ export default function DocumentsPage() {
           ))}
         </div>
       ) : filteredDocs.length === 0 ? (
-        <div className="p-12 text-center bg-[#111317] border border-[#1E2530] rounded-xl space-y-2">
-          <FolderOpen className="w-10 h-10 text-[#566171] mx-auto" />
-          <h3 className="text-base font-semibold text-[#E6E8EB]">No documents available</h3>
-          <p className="text-xs text-[#566171]">
+        <div className="p-12 text-center bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-2">
+          <FolderOpen className="w-10 h-10 text-[#8A867E] mx-auto" />
+          <h3 className="text-base font-semibold text-[#EDEBE6]">No documents available</h3>
+          <p className="text-xs text-[#8A867E]">
             {searchQuery || selectedCategory !== "ALL"
               ? "No files matched your criteria."
               : "No organization documents are currently assigned to your department."}
@@ -198,11 +198,11 @@ export default function DocumentsPage() {
           {filteredDocs.map((d) => (
             <div
               key={d.id}
-              className="p-5 bg-[#111317] border border-[#1E2530] rounded-xl hover:border-[#22262D] transition-all flex flex-col justify-between space-y-4"
+              className="p-5 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl hover:border-[#3A3A3D] transition-colors flex flex-col justify-between space-y-4"
             >
               <div className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] flex items-center justify-center text-[#5FA8A0] shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-[#232324] border border-[#2E2E30] flex items-center justify-center text-[#4F9D83] shrink-0">
                     <FileText className="w-5 h-5" />
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -215,22 +215,22 @@ export default function DocumentsPage() {
                         Pending Ack
                       </StatusBadge>
                     )}
-                    <span className="text-[10px] font-semibold text-[#8B94A1] bg-[#171A1F] border border-[#1E2530] px-2 py-0.5 rounded uppercase">
+                    <span className="text-[10px] font-medium text-[#B3AFA6] bg-[#232324] border border-[#2E2E30] px-2 py-0.5 rounded uppercase">
                       {d.category.replace("_", " ")}
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-sm sm:text-base font-semibold text-[#E6E8EB] line-clamp-1">
+                  <h3 className="text-sm sm:text-base font-medium text-[#EDEBE6] line-clamp-1">
                     {d.title}
                   </h3>
                   {d.description && (
-                    <p className="text-xs text-[#8B94A1] line-clamp-2 mt-1">{d.description}</p>
+                    <p className="text-xs text-[#8A867E] line-clamp-2 mt-1">{d.description}</p>
                   )}
                 </div>
 
-                <div className="pt-2 border-t border-[#1E2530] flex items-center justify-between text-[11px] text-[#566171]">
+                <div className="pt-2 border-t border-[#2E2E30] flex items-center justify-between text-[11px] text-[#8A867E]">
                   <span>{formatFileSize(d.fileSize)}</span>
                   <span>{new Date(d.createdAt).toLocaleDateString()}</span>
                 </div>
