@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { EpButton } from "@/components/employee/EpButton";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
 
 export function ChangePasswordForm() {
@@ -13,7 +12,7 @@ export function ChangePasswordForm() {
   const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string>("");
   const turnstileRef = useRef<TurnstileWidgetRef>(null);
-  
+
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -60,25 +59,25 @@ export function ChangePasswordForm() {
 
   if (!isOpen) {
     return (
-      <Button variant="outline" size="sm" onClick={() => setIsOpen(true)}>
+      <EpButton variant="secondary" size="sm" onClick={() => setIsOpen(true)}>
         Change Password
-      </Button>
+      </EpButton>
     );
   }
 
   return (
-    <div className="mt-3 p-4 rounded-lg bg-white/5 border border-white/10 space-y-4">
-      <h4 className="text-sm font-semibold text-white">Change Password</h4>
-      
+    <div className="mt-3 p-4 rounded-xl bg-[#232324] border border-[#2E2E30] space-y-4">
+      <h4 className="text-sm font-semibold text-[#EDEBE6]">Change Password</h4>
+
       {success && (
-        <div className="flex items-center gap-2 p-2 rounded bg-emerald-500/10 text-emerald-400 text-xs">
+        <div className="flex items-center gap-2 p-2.5 rounded-lg bg-[#4F9D83]/10 border border-[#4F9D83]/25 text-[#4F9D83] text-xs">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{success}</span>
         </div>
       )}
-      
+
       {error && (
-        <div className="flex items-center gap-2 p-2 rounded bg-red-500/10 text-red-400 text-xs">
+        <div className="flex items-center gap-2 p-2.5 rounded-lg bg-[#C46A62]/10 border border-[#C46A62]/25 text-[#C46A62] text-xs">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -86,32 +85,35 @@ export function ChangePasswordForm() {
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <label className="block text-xs text-gray-400 mb-1">Current Password</label>
-          <Input 
-            type="password" 
-            required 
+          <label className="block text-xs font-medium text-[#B3AFA6] mb-1">Current Password</label>
+          <input
+            type="password"
+            required
             value={formData.currentPassword}
-            onChange={(e) => setFormData(prev => ({...prev, currentPassword: e.target.value}))}
+            onChange={(e) => setFormData((prev) => ({ ...prev, currentPassword: e.target.value }))}
+            className="w-full bg-[#1A1A1B] border border-[#2E2E30] rounded-lg px-3 py-2 text-xs text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
           />
         </div>
         <div>
-          <label className="block text-xs text-gray-400 mb-1">New Password</label>
-          <Input 
-            type="password" 
+          <label className="block text-xs font-medium text-[#B3AFA6] mb-1">New Password</label>
+          <input
+            type="password"
             required
             minLength={8}
             value={formData.newPassword}
-            onChange={(e) => setFormData(prev => ({...prev, newPassword: e.target.value}))}
+            onChange={(e) => setFormData((prev) => ({ ...prev, newPassword: e.target.value }))}
+            className="w-full bg-[#1A1A1B] border border-[#2E2E30] rounded-lg px-3 py-2 text-xs text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
           />
         </div>
         <div>
-          <label className="block text-xs text-gray-400 mb-1">Confirm New Password</label>
-          <Input 
-            type="password" 
+          <label className="block text-xs font-medium text-[#B3AFA6] mb-1">Confirm New Password</label>
+          <input
+            type="password"
             required
             minLength={8}
             value={formData.confirmPassword}
-            onChange={(e) => setFormData(prev => ({...prev, confirmPassword: e.target.value}))}
+            onChange={(e) => setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+            className="w-full bg-[#1A1A1B] border border-[#2E2E30] rounded-lg px-3 py-2 text-xs text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
           />
         </div>
 
@@ -137,19 +139,23 @@ export function ChangePasswordForm() {
             onError={() => setCaptchaToken("")}
           />
         </div>
-        
+
         <div className="flex items-center justify-end gap-2 pt-2">
-          <Button type="button" variant="ghost" size="sm" onClick={() => {
-            setIsOpen(false);
-            setError(null);
-            setSuccess(null);
-          }}>
+          <EpButton
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              setIsOpen(false);
+              setError(null);
+              setSuccess(null);
+            }}
+          >
             Cancel
-          </Button>
-          <Button type="submit" size="sm" disabled={loading}>
-            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+          </EpButton>
+          <EpButton type="submit" variant="primary" size="sm" loading={loading}>
             Save Password
-          </Button>
+          </EpButton>
         </div>
       </form>
     </div>

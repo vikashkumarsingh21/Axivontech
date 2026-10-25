@@ -3,12 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/employee/PageHeader";
 import { EpButton } from "@/components/employee/EpButton";
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
 import { ChangePasswordForm } from "@/components/employee/ChangePasswordForm";
-import { Input } from "@/components/ui/Input";
 import {
   User,
   Mail,
@@ -171,12 +169,12 @@ export default function EmployeeProfilePage() {
 
   if (loading) {
     return (
-      <div className="space-y-6 max-w-5xl">
-        <SkeletonCard rows={2} />
+      <div className="space-y-6 max-w-5xl pb-12">
+        <SkeletonCard />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <SkeletonCard rows={4} />
+          <SkeletonCard />
           <div className="lg:col-span-2">
-            <SkeletonCard rows={6} />
+            <SkeletonCard />
           </div>
         </div>
       </div>
@@ -188,7 +186,7 @@ export default function EmployeeProfilePage() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="space-y-6 max-w-5xl"
+      className="space-y-6 max-w-5xl pb-12"
     >
       {/* Page Header */}
       <PageHeader
@@ -199,21 +197,21 @@ export default function EmployeeProfilePage() {
 
       {/* Notifications */}
       {success && (
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-[#34D399]/10 border border-[#34D399]/20 text-[#34D399] text-sm">
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-[#4F9D83]/10 border border-[#4F9D83]/25 text-[#4F9D83] text-sm">
           <CheckCircle2 className="w-5 h-5 shrink-0" />
           <span>{success}</span>
         </div>
       )}
 
       {error && (
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-[#F87171]/10 border border-[#F87171]/20 text-[#F87171] text-sm">
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-[#C46A62]/10 border border-[#C46A62]/25 text-[#C46A62] text-sm">
           <AlertCircle className="w-5 h-5 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Profile Overview Card */}
-      <Card className="p-6 md:p-8 bg-[#111317] border-[#1E2530] rounded-2xl relative overflow-hidden">
+      <div className="p-6 md:p-8 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl relative overflow-hidden">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="flex items-center gap-5">
             {profile?.avatarUrl ? (
@@ -221,25 +219,25 @@ export default function EmployeeProfilePage() {
               <img
                 src={profile.avatarUrl}
                 alt={profile.name}
-                className="w-20 h-20 rounded-2xl object-cover border border-[#22262D]"
+                className="w-20 h-20 rounded-xl object-cover border border-[#2E2E30]"
               />
             ) : (
-              <div className="w-20 h-20 rounded-2xl bg-[#5FA8A0]/15 text-[#5FA8A0] border border-[#5FA8A0]/30 flex items-center justify-center font-bold text-2xl shadow-lg">
+              <div className="w-20 h-20 rounded-xl bg-[#232324] text-[#4F9D83] border border-[#2E2E30] flex items-center justify-center font-bold text-2xl shadow-sm">
                 {profile?.name?.charAt(0).toUpperCase() || "E"}
               </div>
             )}
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-xl md:text-2xl font-bold text-[#E6E8EB]">{profile?.name}</h2>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#5FA8A0]/10 text-[#5FA8A0] border border-[#5FA8A0]/20">
+                <h2 className="text-xl md:text-2xl font-semibold text-[#EDEBE6]">{profile?.name}</h2>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#5FAE7E]/10 text-[#5FAE7E] border border-[#5FAE7E]/30">
                   {profile?.status || "ACTIVE"}
                 </span>
               </div>
-              <p className="text-[#8B94A1] text-sm mt-0.5">
+              <p className="text-[#8A867E] text-sm mt-0.5">
                 {profile?.designation} • {profile?.department}
               </p>
-              <p className="text-[#566171] text-xs mt-1">
-                Organization: <span className="text-[#E6E8EB]">{profile?.organizationName}</span>
+              <p className="text-[#8A867E]/80 text-xs mt-1">
+                Organization: <span className="text-[#EDEBE6]">{profile?.organizationName}</span>
               </p>
             </div>
           </div>
@@ -247,74 +245,74 @@ export default function EmployeeProfilePage() {
           <div className="flex flex-wrap gap-2 text-xs">
             <Link
               href="/employee/attendance"
-              className="px-3 py-1.5 rounded-lg bg-[#5FA8A0]/10 border border-[#5FA8A0]/20 text-[#5FA8A0] font-semibold hover:bg-[#5FA8A0]/20 transition-colors flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg bg-[#4F9D83]/10 border border-[#4F9D83]/25 text-[#4F9D83] font-medium hover:bg-[#4F9D83]/20 transition-colors flex items-center gap-1.5"
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>Attendance & Hours</span>
               <ExternalLink className="w-3 h-3 ml-0.5" />
             </Link>
-            <div className="px-3 py-1.5 rounded-lg bg-[#0B0D10] border border-[#1E2530] text-[#8B94A1]">
-              ID: <span className="font-mono text-[#E6E8EB]">{profile?.employeeId}</span>
+            <div className="px-3 py-1.5 rounded-lg bg-[#232324] border border-[#2E2E30] text-[#8A867E]">
+              ID: <span className="font-mono text-[#EDEBE6]">{profile?.employeeId}</span>
             </div>
-            <div className="px-3 py-1.5 rounded-lg bg-[#0B0D10] border border-[#1E2530] text-[#8B94A1]">
-              Role: <span className="font-semibold text-[#5FA8A0]">{profile?.role}</span>
+            <div className="px-3 py-1.5 rounded-lg bg-[#232324] border border-[#2E2E30] text-[#8A867E]">
+              Role: <span className="font-medium text-[#4F9D83]">{profile?.role}</span>
             </div>
           </div>
         </div>
-      </Card>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Organization & Readonly Info */}
         <div className="space-y-6">
-          <Card className="p-6 bg-[#111317] border-[#1E2530] rounded-2xl space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-[#1E2530]">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8B94A1] flex items-center gap-2">
-                <Lock className="w-4 h-4 text-[#566171]" />
+          <div className="p-6 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-[#2E2E30]">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8A867E] flex items-center gap-2">
+                <Lock className="w-4 h-4 text-[#8A867E]" />
                 Employment Details
               </h3>
-              <span className="text-[10px] text-[#8B94A1] bg-[#0B0D10] border border-[#1E2530] px-2 py-0.5 rounded">
+              <span className="text-[10px] text-[#8A867E] bg-[#232324] border border-[#2E2E30] px-2 py-0.5 rounded">
                 Admin Managed
               </span>
             </div>
 
             <div className="space-y-4 text-xs sm:text-sm">
-              <div className="flex items-start gap-3 text-[#8B94A1]">
-                <Mail className="w-4 h-4 text-[#566171] mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3 text-[#8A867E]">
+                <Mail className="w-4 h-4 text-[#8A867E] mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-[11px] text-[#566171]">Work Email</p>
-                  <p className="font-medium text-[#E6E8EB]">{profile?.email}</p>
+                  <p className="text-[11px] text-[#8A867E]">Work Email</p>
+                  <p className="font-medium text-[#EDEBE6]">{profile?.email}</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 text-[#8B94A1]">
-                <Building2 className="w-4 h-4 text-[#566171] mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3 text-[#8A867E]">
+                <Building2 className="w-4 h-4 text-[#8A867E] mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-[11px] text-[#566171]">Department</p>
-                  <p className="font-medium text-[#E6E8EB]">{profile?.department}</p>
+                  <p className="text-[11px] text-[#8A867E]">Department</p>
+                  <p className="font-medium text-[#EDEBE6]">{profile?.department}</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 text-[#8B94A1]">
-                <Briefcase className="w-4 h-4 text-[#566171] mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3 text-[#8A867E]">
+                <Briefcase className="w-4 h-4 text-[#8A867E] mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-[11px] text-[#566171]">Designation</p>
-                  <p className="font-medium text-[#E6E8EB]">{profile?.designation}</p>
+                  <p className="text-[11px] text-[#8A867E]">Designation</p>
+                  <p className="font-medium text-[#EDEBE6]">{profile?.designation}</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 text-[#8B94A1]">
-                <Shield className="w-4 h-4 text-[#566171] mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3 text-[#8A867E]">
+                <Shield className="w-4 h-4 text-[#8A867E] mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-[11px] text-[#566171]">System Role</p>
-                  <p className="font-medium text-[#5FA8A0]">{profile?.role}</p>
+                  <p className="text-[11px] text-[#8A867E]">System Role</p>
+                  <p className="font-medium text-[#4F9D83]">{profile?.role}</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 text-[#8B94A1]">
-                <Calendar className="w-4 h-4 text-[#566171] mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3 text-[#8A867E]">
+                <Calendar className="w-4 h-4 text-[#8A867E] mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-[11px] text-[#566171]">Joining Date</p>
-                  <p className="font-medium text-[#E6E8EB]">
+                  <p className="text-[11px] text-[#8A867E]">Joining Date</p>
+                  <p className="font-medium text-[#EDEBE6]">
                     {profile?.joiningDate
                       ? new Date(profile.joiningDate).toLocaleDateString()
                       : "N/A"}
@@ -322,101 +320,101 @@ export default function EmployeeProfilePage() {
                 </div>
               </div>
             </div>
-          </Card>
+          </div>
 
           {/* Security Card */}
-          <Card className="p-6 bg-[#111317] border-[#1E2530] rounded-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#1E2530]">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8B94A1] flex items-center gap-2">
-                <Lock className="w-4 h-4 text-[#566171]" />
+          <div className="p-6 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#2E2E30]">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8A867E] flex items-center gap-2">
+                <Lock className="w-4 h-4 text-[#8A867E]" />
                 Security
               </h3>
             </div>
             <div className="space-y-4 text-sm">
               <div className="w-full">
-                <p className="text-xs text-[#566171] mb-1">Password</p>
-                <p className="font-mono text-[#E6E8EB] text-lg tracking-widest leading-none mb-3">
+                <p className="text-xs text-[#8A867E] mb-1">Password</p>
+                <p className="font-mono text-[#EDEBE6] text-lg tracking-widest leading-none mb-3">
                   ••••••••
                 </p>
                 <ChangePasswordForm />
               </div>
             </div>
-          </Card>
+          </div>
         </div>
 
         {/* Right Column: Editable Profile Details */}
         <div className="lg:col-span-2">
-          <Card className="p-6 md:p-8 bg-[#111317] border-[#1E2530] rounded-2xl">
-            <h3 className="text-base font-semibold text-[#E6E8EB] mb-1 flex items-center gap-2">
-              <User className="w-5 h-5 text-[#5FA8A0]" />
+          <div className="p-6 md:p-8 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl">
+            <h3 className="text-base font-semibold text-[#EDEBE6] mb-1 flex items-center gap-2">
+              <User className="w-5 h-5 text-[#4F9D83]" />
               Edit Personal Information
             </h3>
-            <p className="text-xs text-[#8B94A1] mb-6">
+            <p className="text-xs text-[#8A867E] mb-6">
               You are authorized to update your personal contact, residential address, and profile photo.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Full Name */}
               <div>
-                <label className="block text-xs font-medium text-[#8B94A1] mb-1.5" htmlFor="name">
-                  Full Name <span className="text-[#F87171]">*</span>
+                <label className="block text-xs font-medium text-[#B3AFA6] mb-1.5" htmlFor="name">
+                  Full Name <span className="text-[#C46A62]">*</span>
                 </label>
-                <Input
+                <input
                   id="name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   placeholder="e.g. John Doe"
                   required
-                  className="bg-[#0B0D10] border-[#1E2530] text-[#E6E8EB] placeholder:text-[#566171] focus-visible:border-[#5FA8A0]"
+                  className="w-full bg-[#232324] border border-[#2E2E30] rounded-lg px-3 py-2 text-xs sm:text-sm text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
                 />
                 {fieldErrors.name && (
-                  <p className="text-xs text-[#F87171] mt-1">{fieldErrors.name}</p>
+                  <p className="text-xs text-[#C46A62] mt-1">{fieldErrors.name}</p>
                 )}
               </div>
 
               {/* Phone & Emergency Contact */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-[#8B94A1] mb-1.5" htmlFor="phone">
+                  <label className="block text-xs font-medium text-[#B3AFA6] mb-1.5" htmlFor="phone">
                     Phone Number
                   </label>
                   <div className="relative">
-                    <Input
+                    <input
                       id="phone"
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => handleInputChange("phone", e.target.value)}
                       placeholder="+91 98765 43210"
-                      className="bg-[#0B0D10] border-[#1E2530] text-[#E6E8EB] placeholder:text-[#566171] focus-visible:border-[#5FA8A0]"
+                      className="w-full bg-[#232324] border border-[#2E2E30] rounded-lg px-3 py-2 text-xs sm:text-sm text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
                     />
-                    <Phone className="w-4 h-4 text-[#566171] absolute right-3 top-2.5 pointer-events-none" />
+                    <Phone className="w-4 h-4 text-[#8A867E] absolute right-3 top-2.5 pointer-events-none" />
                   </div>
                   {fieldErrors.phone && (
-                    <p className="text-xs text-[#F87171] mt-1">{fieldErrors.phone}</p>
+                    <p className="text-xs text-[#C46A62] mt-1">{fieldErrors.phone}</p>
                   )}
                 </div>
 
                 <div>
                   <label
-                    className="block text-xs font-medium text-[#8B94A1] mb-1.5"
+                    className="block text-xs font-medium text-[#B3AFA6] mb-1.5"
                     htmlFor="emergencyContact"
                   >
                     Emergency Contact
                   </label>
                   <div className="relative">
-                    <Input
+                    <input
                       id="emergencyContact"
                       type="text"
                       value={formData.emergencyContact}
                       onChange={(e) => handleInputChange("emergencyContact", e.target.value)}
                       placeholder="Name / Relationship & Phone"
-                      className="bg-[#0B0D10] border-[#1E2530] text-[#E6E8EB] placeholder:text-[#566171] focus-visible:border-[#5FA8A0]"
+                      className="w-full bg-[#232324] border border-[#2E2E30] rounded-lg px-3 py-2 text-xs sm:text-sm text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
                     />
-                    <HeartPulse className="w-4 h-4 text-[#566171] absolute right-3 top-2.5 pointer-events-none" />
+                    <HeartPulse className="w-4 h-4 text-[#8A867E] absolute right-3 top-2.5 pointer-events-none" />
                   </div>
                   {fieldErrors.emergencyContact && (
-                    <p className="text-xs text-[#F87171] mt-1">{fieldErrors.emergencyContact}</p>
+                    <p className="text-xs text-[#C46A62] mt-1">{fieldErrors.emergencyContact}</p>
                   )}
                 </div>
               </div>
@@ -424,23 +422,23 @@ export default function EmployeeProfilePage() {
               {/* Avatar URL */}
               <div>
                 <label
-                  className="block text-xs font-medium text-[#8B94A1] mb-1.5"
+                  className="block text-xs font-medium text-[#B3AFA6] mb-1.5"
                   htmlFor="avatarUrl"
                 >
                   Profile Photo URL
                 </label>
-                <Input
+                <input
                   id="avatarUrl"
                   type="url"
                   value={formData.avatarUrl}
                   onChange={(e) => handleInputChange("avatarUrl", e.target.value)}
                   placeholder="https://example.com/avatar.jpg"
-                  className="bg-[#0B0D10] border-[#1E2530] text-[#E6E8EB] placeholder:text-[#566171] focus-visible:border-[#5FA8A0]"
+                  className="w-full bg-[#232324] border border-[#2E2E30] rounded-lg px-3 py-2 text-xs sm:text-sm text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
                 />
                 {fieldErrors.avatarUrl && (
-                  <p className="text-xs text-[#F87171] mt-1">{fieldErrors.avatarUrl}</p>
+                  <p className="text-xs text-[#C46A62] mt-1">{fieldErrors.avatarUrl}</p>
                 )}
-                <p className="text-[11px] text-[#566171] mt-1">
+                <p className="text-[11px] text-[#8A867E] mt-1">
                   Provide a secure, publicly accessible image URL for your profile avatar.
                 </p>
               </div>
@@ -448,32 +446,32 @@ export default function EmployeeProfilePage() {
               {/* Address */}
               <div>
                 <label
-                  className="block text-xs font-medium text-[#8B94A1] mb-1.5"
+                  className="block text-xs font-medium text-[#B3AFA6] mb-1.5"
                   htmlFor="address"
                 >
                   Residential Address
                 </label>
                 <div className="relative">
-                  <Input
+                  <input
                     id="address"
                     type="text"
                     value={formData.address}
                     onChange={(e) => handleInputChange("address", e.target.value)}
                     placeholder="City, State, Country"
-                    className="bg-[#0B0D10] border-[#1E2530] text-[#E6E8EB] placeholder:text-[#566171] focus-visible:border-[#5FA8A0]"
+                    className="w-full bg-[#232324] border border-[#2E2E30] rounded-lg px-3 py-2 text-xs sm:text-sm text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
                   />
-                  <MapPin className="w-4 h-4 text-[#566171] absolute right-3 top-2.5 pointer-events-none" />
+                  <MapPin className="w-4 h-4 text-[#8A867E] absolute right-3 top-2.5 pointer-events-none" />
                 </div>
                 {fieldErrors.address && (
-                  <p className="text-xs text-[#F87171] mt-1">{fieldErrors.address}</p>
+                  <p className="text-xs text-[#C46A62] mt-1">{fieldErrors.address}</p>
                 )}
               </div>
 
               {/* Submit Button */}
-              <div className="pt-4 border-t border-[#1E2530] flex items-center justify-end gap-3">
+              <div className="pt-4 border-t border-[#2E2E30] flex items-center justify-end gap-3">
                 <EpButton
                   type="button"
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   onClick={fetchProfile}
                   disabled={saving}
@@ -485,14 +483,14 @@ export default function EmployeeProfilePage() {
                   type="submit"
                   variant="primary"
                   size="sm"
-                  isLoading={saving}
+                  loading={saving}
                   className="text-xs h-9 px-4"
                 >
                   Save Changes
                 </EpButton>
               </div>
             </form>
-          </Card>
+          </div>
         </div>
       </div>
     </motion.div>
