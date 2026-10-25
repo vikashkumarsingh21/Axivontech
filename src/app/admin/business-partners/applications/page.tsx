@@ -15,7 +15,7 @@ export default function BusinessPartnerApplicationsPage() {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/v1/admin/business-partner/applications`);
+      const res = await fetch(`/api/v1/admin/business-partner/applications?limit=100`);
       if (!res.ok) throw new Error("Failed to load applications");
       const data = await res.json();
       setApplications(data.applications ?? []);

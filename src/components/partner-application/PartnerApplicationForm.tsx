@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { ChevronRight, ChevronLeft, CheckCircle2 } from "lucide-react";
+import { ChevronRight, ChevronLeft, CheckCircle2, Copy, Check, Search, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { trackPartnerApplication } from "@/lib/analytics";
 import { TurnstileWidget, TurnstileWidgetRef } from "@/components/ui/TurnstileWidget";
@@ -12,6 +12,14 @@ export default function PartnerApplicationForm() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedAppId, setSubmittedAppId] = useState("");
+  const [copiedAppId, setCopiedAppId] = useState(false);
+  const [showStatusChecker, setShowStatusChecker] = useState(false);
+  const [statusEmail, setStatusEmail] = useState("");
+  const [statusAppId, setStatusAppId] = useState("");
+  const [checkedStatus, setCheckedStatus] = useState<any>(null);
+  const [statusChecking, setStatusChecking] = useState(false);
+  const [statusError, setStatusError] = useState("");
   const [error, setError] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
   const [policyAcknowledged, setPolicyAcknowledged] = useState(false);
@@ -171,6 +179,12 @@ export default function PartnerApplicationForm() {
         throw new Error(errorMessage);
       }
 
+      const createdApp = data.application || data.data;
+      if (createdApp?.applicationId) {
+        setSubmittedAppId(createdApp.applicationId);
+        setStatusAppId(createdApp.applicationId);
+      }
+      setStatusEmail(formData.email);
       setIsSubmitted(true);
       trackPartnerApplication({
         businessType: formData.occupation,
@@ -185,17 +199,168 @@ export default function PartnerApplicationForm() {
     }
   };
 
+  const handleCheckStatus = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatusError("");
+    setCheckedStatus(null);
+    try {
+      setStatusChecking(true);
+      const res = await fetch("/api/v1/public/business-partner/applications/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ applicationId: statusAppId, email: statusEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || data.error?.message || "Failed to check status");
+      }
+      setCheckedStatus(data.application);
+    } catch (err: any) {
+      setStatusError(err.message || "Could not retrieve status");
+    } finally {
+      setStatusChecking(false);
+    }
+  };
+
   if (isSubmitted) {
     return (
-      <div className="text-center py-16">
-        <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-6" />
-        <h2 className="text-3xl font-medium text-white mb-4">Application Submitted</h2>
-        <p className="text-gray-400 mb-8 max-w-md mx-auto">
-          Thank you for applying to the AXIVON Business Partner Program. We have received your application and will review it shortly.
-        </p>
-        <Link href="/business-partner" className="text-[#C2A878] hover:text-white transition-colors">
-          Return to Program Overview
-        </Link>
+      <div className="py-8 max-w-lg mx-auto text-center space-y-6 animate-in fade-in duration-300">
+        <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+          <CheckCircle2 className="w-8 h-8" />
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-semibold text-white mb-2">Application Submitted Successfully</h2>
+          <p className="text-gray-400 text-sm leading-relaxed">
+            Thank you for applying to the AXIVON Business Partner Program. We have dispatched a confirmation email to{" "}
+            <strong className="text-white">{statusEmail}</strong>.
+          </p>
+        </div>
+
+        {submittedAppId && (
+          <div className="bg-[#111317] border border-[#22262D] rounded-xl p-4 text-left space-y-2">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-gray-400 block font-medium">
+              Application Reference ID
+            </span>
+            <div className="flex items-center justify-between gap-3 bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2.5">
+              <span className="font-mono text-base font-bold text-[#C2A878] tracking-wider">
+                {submittedAppId}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(submittedAppId);
+                  setCopiedAppId(true);
+                  setTimeout(() => setCopiedAppId(false), 2000);
+                }}
+                className="inline-flex items-center gap-1.5 text-xs font-mono text-gray-400 hover:text-white px-2.5 py-1 rounded bg-white/5 border border-white/10 transition-colors"
+              >
+                {copiedAppId ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedAppId ? "Copied" : "Copy"}
+              </button>
+            </div>
+            <p className="text-[11px] text-gray-500">
+              Save this reference number to check your application review status and schedule partner meetings.
+            </p>
+          </div>
+        )}
+
+        {/* Status Checker Toggle & Card */}
+        <div className="pt-2 text-left">
+          <button
+            type="button"
+            onClick={() => setShowStatusChecker((prev) => !prev)}
+            className="text-xs text-[#C2A878] hover:underline inline-flex items-center gap-1 font-mono mb-3"
+          >
+            <Search className="w-3 h-3" />
+            {showStatusChecker ? "Hide Application Status Checker" : "Check Application Review Status Now"}
+          </button>
+
+          {showStatusChecker && (
+            <form onSubmit={handleCheckStatus} className="bg-[#111317] border border-[#22262D] rounded-xl p-4 space-y-3">
+              <h4 className="text-xs font-semibold text-white flex items-center gap-1.5 font-mono uppercase">
+                <ShieldCheck className="w-4 h-4 text-[#C2A878]" /> Live Status Check
+              </h4>
+              <div className="grid grid-cols-1 gap-2.5 text-xs">
+                <div>
+                  <label className="block text-[11px] text-gray-400 mb-1 font-mono">Application ID</label>
+                  <input
+                    type="text"
+                    value={statusAppId}
+                    onChange={(e) => setStatusAppId(e.target.value)}
+                    required
+                    placeholder="BPA-2026-XXXXXX"
+                    className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-[#C2A878]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-gray-400 mb-1 font-mono">Email Address</label>
+                  <input
+                    type="email"
+                    value={statusEmail}
+                    onChange={(e) => setStatusEmail(e.target.value)}
+                    required
+                    placeholder="partner@example.com"
+                    className="w-full bg-[#0a0a0a] border border-white/10 rounded-lg px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-[#C2A878]"
+                  />
+                </div>
+              </div>
+
+              {statusError && (
+                <p className="text-[11px] text-red-400 font-mono">{statusError}</p>
+              )}
+
+              {checkedStatus && (
+                <div className="bg-[#0a0a0a] border border-white/10 rounded-lg p-3 text-xs space-y-1.5 font-mono">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Current Status:</span>
+                    <span className="px-2 py-0.5 rounded font-bold bg-[#C2A878]/10 text-[#C2A878] border border-[#C2A878]/30">
+                      {checkedStatus.status.replace(/_/g, " ")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-gray-400">Email Verified:</span>
+                    <span className={checkedStatus.emailVerified ? "text-emerald-400" : "text-amber-400"}>
+                      {checkedStatus.emailVerified ? "Verified ✓" : "Pending Verification"}
+                    </span>
+                  </div>
+                  {checkedStatus.decisionReason && (
+                    <p className="text-[11px] text-gray-300 pt-1 border-t border-white/5">
+                      Notes: {checkedStatus.decisionReason}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={statusChecking}
+                className="w-full py-2 rounded-lg bg-[#C2A878] text-[#0a0a0a] text-xs font-semibold hover:bg-[#d8c090] transition-colors disabled:opacity-50"
+              >
+                {statusChecking ? "Verifying..." : "Query Status"}
+              </button>
+            </form>
+          )}
+        </div>
+
+        <div className="pt-4 border-t border-white/10 flex items-center justify-center gap-4">
+          <Link
+            href="/business-partner"
+            className="px-4 py-2 rounded-lg border border-white/10 hover:border-white/20 text-xs text-gray-300 hover:text-white transition-colors"
+          >
+            Return to Program Overview
+          </Link>
+          <button
+            type="button"
+            onClick={() => {
+              setIsSubmitted(false);
+              setStep(1);
+            }}
+            className="text-xs text-[#C2A878] hover:underline font-mono"
+          >
+            Submit Another Application
+          </button>
+        </div>
       </div>
     );
   }

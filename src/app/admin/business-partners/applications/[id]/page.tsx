@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, User, Briefcase, GraduationCap, FileText, Calendar, Clock, ShieldCheck } from "lucide-react";
+import { ArrowLeft, User, Briefcase, GraduationCap, FileText, Calendar, Clock, ShieldCheck, StickyNote, Send } from "lucide-react";
 import { format } from "date-fns";
 
 export default function ApplicationDetailPage() {
@@ -24,6 +24,12 @@ export default function ApplicationDetailPage() {
   const [meetingLocation, setMeetingLocation] = useState("");
   const [submittingMeeting, setSubmittingMeeting] = useState(false);
 
+  // Internal Staff Notes state
+  const [notes, setNotes] = useState<any[]>([]);
+  const [notesLoading, setNotesLoading] = useState(false);
+  const [newNote, setNewNote] = useState("");
+  const [submittingNote, setSubmittingNote] = useState(false);
+
   const fetchApplication = async () => {
     try {
       setLoading(true);
@@ -38,8 +44,49 @@ export default function ApplicationDetailPage() {
     }
   };
 
+  const fetchNotes = async () => {
+    try {
+      setNotesLoading(true);
+      const res = await fetch(`/api/v1/admin/business-partner/applications/${params.id}/notes`);
+      if (res.ok) {
+        const data = await res.json();
+        setNotes(data.notes || []);
+      }
+    } catch (e) {
+      console.error("Failed to fetch internal notes:", e);
+    } finally {
+      setNotesLoading(false);
+    }
+  };
+
+  const handleAddNote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newNote.trim()) return;
+    try {
+      setSubmittingNote(true);
+      const res = await fetch(`/api/v1/admin/business-partner/applications/${params.id}/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ note: newNote.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to add note");
+      setNewNote("");
+      if (data.notes) {
+        setNotes(data.notes);
+      } else {
+        fetchNotes();
+      }
+    } catch (err: unknown) {
+      alert((err as Error).message);
+    } finally {
+      setSubmittingNote(false);
+    }
+  };
+
   useEffect(() => {
     fetchApplication();
+    fetchNotes();
   }, [params.id]);
 
   const handleAction = async () => {
@@ -198,7 +245,7 @@ export default function ApplicationDetailPage() {
             </div>
           </div>
           <Link
-            href="/admin/crm/brokers"
+            href={`/admin/crm/brokers/${app.linkedBroker.id}`}
             className="px-3.5 py-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-xs font-semibold text-white transition-colors text-center"
           >
             View in Broker Directory →
@@ -283,6 +330,61 @@ export default function ApplicationDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Internal Staff Notes */}
+          <div className="bg-[#111] border border-white/5 rounded-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-white flex items-center gap-2 uppercase tracking-wider text-gray-500">
+                <StickyNote className="w-4 h-4 text-[#e8a064]" /> Internal Staff Notes
+              </h3>
+              <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-mono font-medium">
+                Internal Only
+              </span>
+            </div>
+            <p className="text-xs text-gray-400 mb-4">
+              Private notes visible only to admins and reviewers. Never shared with the applicant.
+            </p>
+
+            <form onSubmit={handleAddNote} className="mb-5 space-y-2">
+              <textarea
+                rows={3}
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                placeholder="Add confidential review note or interview summary..."
+                className="w-full bg-[#0a0a0a] border border-white/10 p-2.5 text-xs text-white placeholder-gray-600 rounded-sm focus:outline-none focus:border-[#e8a064] resize-none"
+              />
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={submittingNote || !newNote.trim()}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#e8a064] text-black text-xs font-semibold hover:bg-[#f0c090] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Send className="w-3 h-3" />
+                  {submittingNote ? "Adding..." : "Add Note"}
+                </button>
+              </div>
+            </form>
+
+            <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+              {notesLoading ? (
+                <p className="text-xs text-gray-500 text-center py-2">Loading notes...</p>
+              ) : notes.length > 0 ? (
+                notes.map((n) => (
+                  <div key={n.id} className="p-3 bg-[#0a0a0a] border border-white/5 rounded-sm">
+                    <div className="flex items-center justify-between text-[11px] mb-1.5 text-gray-400">
+                      <span className="font-semibold text-gray-300">{n.authorName}</span>
+                      <span className="font-mono text-[10px] text-gray-500">
+                        {n.createdAt ? format(new Date(n.createdAt), "MMM d, HH:mm") : ""}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-200 whitespace-pre-wrap leading-relaxed">{n.note}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-gray-500 text-center py-2">No internal notes yet.</p>
+              )}
+            </div>
+          </div>
+
           <div className="bg-[#111] border border-white/5 rounded-sm p-6">
             <h3 className="text-sm font-medium text-white mb-4 flex items-center gap-2 uppercase tracking-wider text-gray-500"><Calendar className="w-4 h-4" /> Meetings</h3>
             {app.meetings?.length > 0 ? (
