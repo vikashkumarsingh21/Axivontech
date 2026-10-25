@@ -41,12 +41,12 @@ export function EmployeeNavbar({ onToggleSidebar }: EmployeeNavbarProps) {
 
   return (
     <>
-      <header className="h-16 bg-[#090D16]/90 backdrop-blur-md border-b border-[#1E293B] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 shrink-0 select-none">
+      <header className="h-16 bg-[#0E0E0F]/95 backdrop-blur-md border-b border-[#2E2E30] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 shrink-0 select-none">
         {/* Left: Hamburger (mobile only) + Search */}
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleSidebar}
-            className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer"
+            className="lg:hidden p-2 rounded-lg text-[#8A867E] hover:text-[#EDEBE6] hover:bg-[#232324] transition-colors cursor-pointer"
             aria-label="Toggle sidebar"
           >
             <Menu className="w-5 h-5" />
@@ -55,15 +55,15 @@ export function EmployeeNavbar({ onToggleSidebar }: EmployeeNavbarProps) {
           {/* Search Trigger Button */}
           <button
             onClick={() => setSearchOpen(true)}
-            className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800/80 border border-slate-800 hover:border-indigo-500/40 text-slate-400 text-xs transition-all cursor-pointer shadow-xs group"
+            className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg bg-[#1A1A1B] hover:bg-[#232324] border border-[#2E2E30] hover:border-[#4F9D83]/40 text-[#8A867E] hover:text-[#B3AFA6] text-xs transition-all cursor-pointer shadow-xs group"
           >
-            <Search className="w-3.5 h-3.5 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+            <Search className="w-3.5 h-3.5 text-[#8A867E] group-hover:text-[#4F9D83] transition-colors" />
             <span>Search tasks, announcements, docs...</span>
-            <kbd className="ml-3 px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700/80 text-[10px] font-mono text-slate-400 shadow-2xs">Ctrl+K</kbd>
+            <kbd className="ml-3 px-1.5 py-0.5 rounded bg-[#232324] border border-[#3A3A3D] text-[10px] font-mono text-[#8A867E] shadow-2xs">Ctrl+K</kbd>
           </button>
 
           {/* Page title area on mobile */}
-          <span className="text-sm font-semibold text-slate-200 sm:hidden">
+          <span className="text-sm font-semibold text-[#EDEBE6] sm:hidden">
             Employee Workspace
           </span>
         </div>
@@ -72,7 +72,7 @@ export function EmployeeNavbar({ onToggleSidebar }: EmployeeNavbarProps) {
         <div className="flex items-center gap-2 sm:gap-4">
           <button
             onClick={() => setSearchOpen(true)}
-            className="sm:hidden p-2 text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-slate-800 cursor-pointer"
+            className="sm:hidden p-2 text-[#8A867E] hover:text-[#EDEBE6] transition-colors rounded-lg hover:bg-[#232324] cursor-pointer"
             aria-label="Search"
           >
             <Search className="w-5 h-5" />
@@ -81,26 +81,26 @@ export function EmployeeNavbar({ onToggleSidebar }: EmployeeNavbarProps) {
           {/* Notification Bell */}
           <Link
             href="/employee/notifications"
-            className="relative p-2 text-slate-400 hover:text-white transition-colors rounded-xl hover:bg-slate-800/60"
+            className="relative p-2 text-[#8A867E] hover:text-[#EDEBE6] transition-colors rounded-lg hover:bg-[#232324]"
             aria-label="Notifications"
           >
             <Bell className="w-5 h-5" />
             {unread > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full ring-2 ring-[#090D16] shadow-sm shadow-indigo-500/80 animate-pulse" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#4F9D83] rounded-full ring-2 ring-[#0E0E0F] shadow-xs shadow-[#4F9D83]/60" />
             )}
           </Link>
 
           {/* User Avatar + Name */}
           <Link
             href="/employee/profile"
-            className="flex items-center gap-2.5 pl-3 sm:pl-4 border-l border-slate-800 hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2.5 pl-3 sm:pl-4 border-l border-[#2E2E30] hover:opacity-90 transition-opacity"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-indigo-400 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm shadow-indigo-500/25">
+            <div className="w-8 h-8 rounded-full bg-[#232324] border border-[#2E2E30] text-[#EDEBE6] flex items-center justify-center font-semibold text-xs shrink-0 shadow-xs">
               {initials}
             </div>
             <div className="hidden sm:block text-xs leading-tight">
-              <p className="text-slate-100 font-semibold truncate max-w-[120px]">{userName}</p>
-              <p className="text-indigo-400 text-[11px] font-medium">Employee</p>
+              <p className="text-[#EDEBE6] font-medium truncate max-w-[120px]">{userName}</p>
+              <p className="text-[#B3AFA6] text-[11px]">Employee</p>
             </div>
           </Link>
         </div>

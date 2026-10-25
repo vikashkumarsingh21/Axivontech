@@ -24,11 +24,11 @@ export function EmployeePortalClient({ children }: EmployeePortalClientProps) {
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0B0D10] text-[#F3F5F7]">
+    <div className="flex h-screen overflow-hidden bg-[#121212] text-[#EDEBE6] antialiased">
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-xs lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -42,8 +42,8 @@ export function EmployeePortalClient({ children }: EmployeePortalClientProps) {
       {/* Main Content Area */}
       <div className="flex flex-col flex-1 overflow-hidden min-w-0">
         <EmployeeNavbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)} />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        <main className="flex-1 overflow-y-auto px-4 sm:px-8 lg:px-10 pt-8 pb-28 sm:pb-32">
+          <div className="max-w-7xl mx-auto space-y-8 min-w-0">
             {children}
           </div>
         </main>

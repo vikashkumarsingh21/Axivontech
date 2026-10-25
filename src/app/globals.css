@@ -36,27 +36,49 @@
   --portal-accent-soft:  rgba(16, 185, 129, 0.10);
   --portal-accent-border:rgba(16, 185, 129, 0.25);
 
-  /* ── Employee Portal Accent — Muted Teal ─────────────────────── */
-  --ep-accent: #6366F1;
-  --ep-accent-hover: #818CF8;
-  --ep-accent-dark: #4F46E5;
-  --ep-accent-soft: rgba(99, 102, 241, 0.12);
-  --ep-accent-border: rgba(99, 102, 241, 0.30);
-  --ep-accent-bg: #0F1528;
-  --ep-accent-glow: 0 0 24px rgba(99, 102, 241, 0.25);
+  /* ── Employee Portal Tokens (Option A: Warm Neutral Graphite + Emerald-Sage #4F9D83) ── */
+  --ep-accent:          #4F9D83;
+  --ep-accent-hover:    #5BB094;
+  --ep-accent-pressed:  #418671;
+  --ep-accent-dark:     #418671;
+  --ep-accent-soft:     rgba(79, 157, 131, 0.12);
+  --ep-accent-border:   rgba(79, 157, 131, 0.28);
+  --ep-accent-bg:       #15201C;
+  --ep-accent-btn-text: #0F1A16;
+  --ep-accent-ring:     rgba(79, 157, 131, 0.35);
+  --ep-accent-glow:     0 0 24px rgba(79, 157, 131, 0.20);
   
-  /* ── Employee Portal Surfaces ───────────────────────────────── */
-  --ep-bg: #080C14;
-  --ep-card: #0F172A;
-  --ep-card-hover: #141E34;
-  --ep-raised: #1E293B;
-  --ep-border: #1E293B;
-  --ep-border-2: #334155;
+  /* ── Employee Portal Surfaces (Warm Graphite Base) ── */
+  --ep-bg-page:         #121212;
+  --ep-bg-sidebar:      #0E0E0F;
+  --ep-bg-card:         #1A1A1B;
+  --ep-bg-raised:       #232324;
+  --ep-bg-hover:        #28282A;
   
-  /* ── Employee Portal Text ────────────────────────────────────── */
-  --ep-text-1: #F8FAFC;
-  --ep-text-2: #94A3B8;
-  --ep-text-3: #64748B;
+  --ep-border:          #2E2E30;
+  --ep-border-strong:   #3A3A3D;
+  
+  /* ── Employee Portal Typography Tokens ── */
+  --ep-text-primary:    #EDEBE6;
+  --ep-text-secondary:  #B3AFA6;
+  --ep-text-muted:      #8A867E;
+  --ep-text-placeholder:#7C786F;
+  
+  /* ── Employee Portal Status Indicators ── */
+  --ep-status-success:  #5FAE7E;
+  --ep-status-warning:  #C9A15B;
+  --ep-status-danger:   #C46A62;
+  --ep-status-info:     #8E9AAF;
+
+  /* Backwards compatibility aliases */
+  --ep-bg:              #121212;
+  --ep-card:            #1A1A1B;
+  --ep-card-hover:      #232324;
+  --ep-raised:          #232324;
+  --ep-border-2:        #3A3A3D;
+  --ep-text-1:          #EDEBE6;
+  --ep-text-2:          #B3AFA6;
+  --ep-text-3:          #8A867E;
 
   /* ── Broker / Business Partner Portal (Option 1: Warm Sand / Brass Gold) ── */
   --bp-accent:        #C2A878;
@@ -486,6 +508,140 @@ input:-webkit-autofill:active {
 }
 .leadpilot-theme ::-webkit-scrollbar-thumb:hover {
   background: #747A75;
+}
+
+
+/* ============================================================
+   EMPLOYEE PORTAL — SCOPED THEME ISOLATION
+   Warm Neutral Graphite · Emerald-Sage Accent (#4F9D83)
+   ============================================================ */
+.employee-theme {
+  --ep-accent:          #4F9D83;
+  --ep-accent-hover:    #5BB094;
+  --ep-accent-pressed:  #418671;
+  --ep-accent-dark:     #418671;
+  --ep-accent-soft:     rgba(79, 157, 131, 0.12);
+  --ep-accent-border:   rgba(79, 157, 131, 0.28);
+  --ep-accent-bg:       #15201C;
+  --ep-accent-btn-text: #0F1A16;
+  --ep-accent-ring:     rgba(79, 157, 131, 0.35);
+
+  --ep-bg-page:         #121212;
+  --ep-bg-sidebar:      #0E0E0F;
+  --ep-bg-card:         #1A1A1B;
+  --ep-bg-raised:       #232324;
+  --ep-bg-hover:        #28282A;
+
+  --ep-border:          #2E2E30;
+  --ep-border-strong:   #3A3A3D;
+
+  --ep-text-primary:    #EDEBE6;
+  --ep-text-secondary:  #B3AFA6;
+  --ep-text-muted:      #8A867E;
+  --ep-text-placeholder:#7C786F;
+
+  --ep-status-success:  #5FAE7E;
+  --ep-status-warning:  #C9A15B;
+  --ep-status-danger:   #C46A62;
+  --ep-status-info:     #8E9AAF;
+
+  color-scheme: dark;
+  background-color: var(--ep-bg-page);
+  color: var(--ep-text-primary);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+.employee-theme ::selection {
+  background: rgba(79, 157, 131, 0.25);
+  color: #EDEBE6;
+}
+
+.employee-theme ::placeholder {
+  color: #7C786F !important;
+  font-size: 13px !important;
+}
+
+.employee-theme ::-webkit-scrollbar-track {
+  background: #0E0E0F;
+}
+
+.employee-theme ::-webkit-scrollbar-thumb {
+  background: #3A3A3D;
+  border-radius: 9999px;
+}
+
+.employee-theme ::-webkit-scrollbar-thumb:hover {
+  background: #8A867E;
+}
+
+/* Scoped Employee Portal Component Utilities */
+.employee-theme .ep-card {
+  background-color: #1A1A1B;
+  border: 1px solid #2E2E30;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.employee-theme .ep-card-raised {
+  background-color: #232324;
+  border: 1px solid #2E2E30;
+  border-radius: 12px;
+}
+
+.employee-theme .ep-input {
+  background-color: #232324;
+  border: 1px solid #2E2E30;
+  border-radius: 8px;
+  color: #EDEBE6;
+  font-size: 14px;
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+.employee-theme .ep-input:focus {
+  outline: none;
+  border-color: #4F9D83;
+  box-shadow: 0 0 0 2px rgba(79, 157, 131, 0.35);
+}
+
+.employee-theme .ep-btn-primary {
+  background-color: #4F9D83;
+  color: #0F1A16;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 16px;
+  transition: all 150ms ease-out;
+  cursor: pointer;
+}
+
+.employee-theme .ep-btn-primary:hover {
+  background-color: #5BB094;
+}
+
+.employee-theme .ep-btn-primary:active {
+  background-color: #418671;
+}
+
+.employee-theme .ep-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.employee-theme .ep-btn-secondary {
+  background-color: transparent;
+  border: 1px solid #2E2E30;
+  color: #EDEBE6;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 16px;
+  transition: all 150ms ease-out;
+  cursor: pointer;
+}
+
+.employee-theme .ep-btn-secondary:hover {
+  background-color: #232324;
+  border-color: #3A3A3D;
 }
 
 /* ── Reduced motion ──────────────────────────────────────────── */

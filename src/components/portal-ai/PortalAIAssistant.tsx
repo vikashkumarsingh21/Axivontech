@@ -146,11 +146,16 @@ export function PortalAIAssistant({ portalRole, initialOpen = false }: PortalAIA
     setError(null);
   };
 
+  const isEmployee = portalRole === "EMPLOYEE";
   const isGold = config?.accentColor === "gold";
-  const accentClass = isGold
+  const accentClass = isEmployee
+    ? "text-[#4F9D83] bg-[#4F9D83]/12 border-[#4F9D83]/28"
+    : isGold
     ? "text-[#D6B779] bg-[#D6B779]/10 border-[#D6B779]/20"
     : "text-[#10B981] bg-[#10B981]/10 border-[#10B981]/20";
-  const accentButton = isGold
+  const accentButton = isEmployee
+    ? "bg-[#4F9D83] hover:bg-[#5BB094] text-[#0F1A16] font-semibold"
+    : isGold
     ? "bg-[#D6B779] hover:bg-[#c4a466] text-[#1c1404]"
     : "bg-[#10B981] hover:bg-[#059669] text-[#04130E]";
 
@@ -162,7 +167,11 @@ export function PortalAIAssistant({ portalRole, initialOpen = false }: PortalAIA
           role="dialog"
           aria-modal="true"
           aria-labelledby="portal-ai-title"
-          className="mb-3 flex h-[580px] max-h-[85vh] w-[92vw] sm:w-[420px] flex-col overflow-hidden rounded-2xl border border-[#29313B] bg-[#101318] shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-200"
+          className={`mb-3 flex h-[580px] max-h-[85vh] w-[92vw] sm:w-[420px] flex-col overflow-hidden rounded-2xl border ${
+            isEmployee
+              ? "border-[#2E2E30] bg-[#1A1A1B] text-[#EDEBE6]"
+              : "border-[#29313B] bg-[#101318]"
+          } shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-200`}
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-[#1E2530] bg-[#151A21] px-4 py-3">
@@ -330,7 +339,11 @@ export function PortalAIAssistant({ portalRole, initialOpen = false }: PortalAIA
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Ask copilot about your records or tasks..."
               disabled={loading}
-              className="flex-1 bg-[#101318] border border-[#29313B] rounded-xl px-3 py-2 text-xs text-[#F3F5F7] placeholder-[#566171] focus:outline-none focus:border-[#10B981]/50 disabled:opacity-50"
+              className={`flex-1 border rounded-xl px-3 py-2 text-xs focus:outline-none disabled:opacity-50 ${
+                isEmployee
+                  ? "bg-[#232324] border-[#2E2E30] text-[#EDEBE6] placeholder-[#7C786F] focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]/40"
+                  : "bg-[#101318] border-[#29313B] text-[#F3F5F7] placeholder-[#566171] focus:border-[#10B981]/50"
+              }`}
             />
             <button
               type="submit"
@@ -344,30 +357,43 @@ export function PortalAIAssistant({ portalRole, initialOpen = false }: PortalAIA
         </div>
       )}
 
-      {/* Floating Pill Launcher */}
-      <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-expanded={isOpen}
-        aria-label={isOpen ? "Close Portal Copilot" : "Open Portal Copilot"}
-        className="group flex items-center gap-2.5 rounded-full border border-[#29313B] bg-[#101318] px-3.5 py-2 shadow-2xl transition-all hover:border-[#10B981]/50 hover:bg-[#151A21] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/50"
-      >
-        <div
-          className={`flex h-7 w-7 items-center justify-center rounded-full border ${accentClass}`}
+      {/* Floating Launcher: Compact round button for Employee Portal, pill launcher for other portals */}
+      {isEmployee ? (
+        <button
+          onClick={() => setIsOpen((prev) => !prev)}
+          aria-expanded={isOpen}
+          aria-label={isOpen ? "Close Workplace Assistant" : "Open Workplace Assistant"}
+          title={isOpen ? "Close Workplace Assistant" : "Open Workplace Assistant"}
+          className="group relative flex h-11 w-11 items-center justify-center rounded-full border border-[#2E2E30] bg-[#1A1A1B] text-[#EDEBE6] shadow-xl transition-all hover:border-[#4F9D83]/60 hover:bg-[#232324] hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F9D83]/40 cursor-pointer"
         >
-          <Bot className="h-3.5 w-3.5" />
-        </div>
-        <div className="flex flex-col text-left pr-1">
-          <span className="text-xs font-bold text-[#F3F5F7] tracking-tight group-hover:text-white">
-            {config?.botName || "Axivon Copilot"}
-          </span>
-          <span className="text-[9px] font-mono text-[#7E8997]">
-            {config?.role || "PORTAL AI"}
-          </span>
-        </div>
-        <div className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#1B222B] text-[#7E8997] group-hover:text-[#F3F5F7]">
-          {isOpen ? <ChevronDown className="h-3 w-3" /> : <MessageSquare className="h-3 w-3" />}
-        </div>
-      </button>
+          <Bot className="h-5 w-5 text-[#4F9D83] transition-transform group-hover:scale-110" />
+          <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#4F9D83] ring-2 ring-[#121212]" />
+        </button>
+      ) : (
+        <button
+          onClick={() => setIsOpen((prev) => !prev)}
+          aria-expanded={isOpen}
+          aria-label={isOpen ? "Close Portal Copilot" : "Open Portal Copilot"}
+          className="group flex items-center gap-2.5 rounded-full border border-[#29313B] bg-[#101318] px-3.5 py-2 shadow-2xl transition-all hover:border-[#10B981]/50 hover:bg-[#151A21] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981]/50"
+        >
+          <div
+            className={`flex h-7 w-7 items-center justify-center rounded-full border ${accentClass}`}
+          >
+            <Bot className="h-3.5 w-3.5" />
+          </div>
+          <div className="flex flex-col text-left pr-1">
+            <span className="text-xs font-bold text-[#F3F5F7] tracking-tight group-hover:text-white">
+              {config?.botName || "Axivon Copilot"}
+            </span>
+            <span className="text-[9px] font-mono text-[#7E8997]">
+              {config?.role || "PORTAL AI"}
+            </span>
+          </div>
+          <div className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#1B222B] text-[#7E8997] group-hover:text-[#F3F5F7]">
+            {isOpen ? <ChevronDown className="h-3 w-3" /> : <MessageSquare className="h-3 w-3" />}
+          </div>
+        </button>
+      )}
     </aside>
   );
 }
