@@ -1,0 +1,1754 @@
+[
+  {
+    "file": "src/app/admin/ai/knowledge/page.tsx",
+    "line": 1250,
+    "match": "{formError && <div className=\"text-xs text-red-400 bg-red-950/40 p-2.5 rounded-lg border border-red-500/20\">{formError}</div>}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/analytics/page.tsx",
+    "line": 124,
+    "match": "setError(err.message || \"Failed to load business intelligence\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/admin/analytics/page.tsx",
+    "line": 313,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/business-partners/applications/page.tsx",
+    "line": 65,
+    "match": "{error}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/business-partners/applications/[id]/page.tsx",
+    "line": 73,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to add note\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/business-partners/applications/[id]/page.tsx",
+    "line": 73,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to add note\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/business-partners/applications/[id]/page.tsx",
+    "line": 145,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to schedule meeting\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/business-partners/applications/[id]/page.tsx",
+    "line": 145,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to schedule meeting\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/business-partners/applications/[id]/page.tsx",
+    "line": 170,
+    "match": "if (!res.ok) throw new Error(data.error || data.message || \"Failed to create account\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/business-partners/applications/[id]/page.tsx",
+    "line": 170,
+    "match": "if (!res.ok) throw new Error(data.error || data.message || \"Failed to create account\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/business-partners/applications/[id]/page.tsx",
+    "line": 182,
+    "match": "if (error || !app) return <div className=\"p-8 text-red-500\">Error: {error}</div>;",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 155,
+    "match": "throw new Error(data.error || \"Failed to load calendar management data\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 155,
+    "match": "throw new Error(data.error || \"Failed to load calendar management data\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 361,
+    "match": "throw new Error(data.error || \"Synchronization failed\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 361,
+    "match": "throw new Error(data.error || \"Synchronization failed\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 385,
+    "match": "throw new Error(data.error || \"Failed to toggle status\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 385,
+    "match": "throw new Error(data.error || \"Failed to toggle status\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 414,
+    "match": "throw new Error(data.error || \"Failed to save settings\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 414,
+    "match": "throw new Error(data.error || \"Failed to save settings\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 483,
+    "match": "throw new Error(data.error || \"Failed to save holiday\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 483,
+    "match": "throw new Error(data.error || \"Failed to save holiday\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 510,
+    "match": "throw new Error(data.error || \"Failed to delete holiday\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 510,
+    "match": "throw new Error(data.error || \"Failed to delete holiday\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/careers/applications/page.tsx",
+    "line": 136,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to update review.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/careers/applications/page.tsx",
+    "line": 136,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to update review.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/careers/applications/page.tsx",
+    "line": 281,
+    "match": "{error}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/careers/page.tsx",
+    "line": 226,
+    "match": "throw new Error(data.error || \"Failed to save job posting.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/careers/page.tsx",
+    "line": 226,
+    "match": "throw new Error(data.error || \"Failed to save job posting.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/careers/page.tsx",
+    "line": 444,
+    "match": "{error}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/careers/settings/page.tsx",
+    "line": 126,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to update visibility setting.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/careers/settings/page.tsx",
+    "line": 126,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to update visibility setting.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/careers/settings/page.tsx",
+    "line": 158,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to save settings.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/careers/settings/page.tsx",
+    "line": 158,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to save settings.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/careers/settings/page.tsx",
+    "line": 268,
+    "match": "{error}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/content/about/page.tsx",
+    "line": 69,
+    "match": "if (!res.ok) throw new Error(json.error || \"Save failed\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/content/blog/page.tsx",
+    "line": 136,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/content/demo-projects/page.tsx",
+    "line": 388,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/content/faqs/page.tsx",
+    "line": 110,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/content/homepage/page.tsx",
+    "line": 66,
+    "match": "if (!res.ok) throw new Error(json.error || \"Save failed\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/content/industries/page.tsx",
+    "line": 113,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/content/legal/page.tsx",
+    "line": 249,
+    "match": "throw new Error(data.error || \"Failed to save policy.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/content/legal/page.tsx",
+    "line": 249,
+    "match": "throw new Error(data.error || \"Failed to save policy.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/content/login-posters/page.tsx",
+    "line": 140,
+    "match": "throw new Error(data?.error || data?.message || `Failed to load posters (${res.status})`);",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/content/login-posters/page.tsx",
+    "line": 374,
+    "match": "{error}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/content/media/page.tsx",
+    "line": 123,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/content/media/page.tsx",
+    "line": 153,
+    "match": "alert(err.message || \"Failed to upload file\");",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/content/media/page.tsx",
+    "line": 177,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/content/seo/page.tsx",
+    "line": 67,
+    "match": "if (!res.ok) throw new Error(json.error || \"Failed to update SEO settings\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/content/services/page.tsx",
+    "line": 87,
+    "match": "setError(err.message || \"Failed to load services catalog\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/admin/content/services/page.tsx",
+    "line": 142,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/content/services/page.tsx",
+    "line": 241,
+    "match": "message={error}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/page.tsx",
+    "line": 76,
+    "match": "throw new Error(data.error || \"Failed to create broker\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/page.tsx",
+    "line": 76,
+    "match": "throw new Error(data.error || \"Failed to create broker\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/page.tsx",
+    "line": 87,
+    "match": "setError(err.message);",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/page.tsx",
+    "line": 205,
+    "match": "{error}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 90,
+    "match": "setError(err.message);",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 113,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to add note\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 113,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to add note\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 117,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 133,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to process KYC review\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 133,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to process KYC review\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 138,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 155,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to execute action\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 155,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to execute action\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 161,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 178,
+    "match": "throw new Error(data.error || \"Failed to update commission rate\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 178,
+    "match": "throw new Error(data.error || \"Failed to update commission rate\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 183,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/crm/clients/page.tsx",
+    "line": 64,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to create client.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/clients/page.tsx",
+    "line": 64,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to create client.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/clients/page.tsx",
+    "line": 168,
+    "match": "{formError && <p className=\"text-xs text-red-400\">{formError}</p>}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 96,
+    "match": "throw new Error(data.error || \"Action failed.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 96,
+    "match": "throw new Error(data.error || \"Action failed.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 100,
+    "match": "alert(err.message || \"Failed to perform action.\");",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 130,
+    "match": "throw new Error(data.error || \"Failed to mark as paid.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 130,
+    "match": "throw new Error(data.error || \"Failed to mark as paid.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 167,
+    "match": "throw new Error(data.error || \"Failed to reject payout request.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 167,
+    "match": "throw new Error(data.error || \"Failed to reject payout request.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 233,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/crm/documents/page.tsx",
+    "line": 52,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to upload document.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/documents/page.tsx",
+    "line": 52,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to upload document.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/documents/page.tsx",
+    "line": 148,
+    "match": "{error && <div className=\"bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-md mb-4 text-sm\">{error}</div>}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/crm/follow-ups/page.tsx",
+    "line": 42,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to complete follow-up.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/follow-ups/page.tsx",
+    "line": 42,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to complete follow-up.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/leads/page.tsx",
+    "line": 103,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to create lead.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/leads/page.tsx",
+    "line": 103,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to create lead.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/leads/page.tsx",
+    "line": 427,
+    "match": "<span>{formError}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 46,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to resend activation link\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 46,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to resend activation link\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 49,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 59,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to fetch project\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 59,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to fetch project\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 62,
+    "match": "setError(err.message);",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 94,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 115,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 135,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 147,
+    "match": "if (!res.ok) throw new Error(data.error || \"Delivery failed\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 147,
+    "match": "if (!res.ok) throw new Error(data.error || \"Delivery failed\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 165,
+    "match": "if (!res.ok) throw new Error(data.error || \"Completion failed\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 165,
+    "match": "if (!res.ok) throw new Error(data.error || \"Completion failed\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 183,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to generate delivery report\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 183,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to generate delivery report\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 203,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to update QA status\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 203,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to update QA status\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/payments/page.tsx",
+    "line": 23,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to fetch payments\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/payments/page.tsx",
+    "line": 23,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to fetch payments\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/payments/page.tsx",
+    "line": 26,
+    "match": "setError(err.message);",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/admin/crm/payments/page.tsx",
+    "line": 91,
+    "match": "<td colSpan={7} className=\"px-6 py-10 text-center text-red-500\">{error}</td>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/crm/pipeline/page.tsx",
+    "line": 47,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to change stage.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/pipeline/page.tsx",
+    "line": 47,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to change stage.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/pipeline/page.tsx",
+    "line": 62,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to mark as Won.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/pipeline/page.tsx",
+    "line": 62,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to mark as Won.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/pipeline/page.tsx",
+    "line": 80,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to mark as Lost.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/pipeline/page.tsx",
+    "line": 80,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to mark as Lost.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/support/page.tsx",
+    "line": 79,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to submit reply\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/support/page.tsx",
+    "line": 79,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to submit reply\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/crm/support/page.tsx",
+    "line": 86,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 83,
+    "match": "throw new Error(data.error || \"Failed to load employees\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 83,
+    "match": "throw new Error(data.error || \"Failed to load employees\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 150,
+    "match": "throw new Error(data.error || \"Failed to create employee\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 150,
+    "match": "throw new Error(data.error || \"Failed to create employee\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 196,
+    "match": "throw new Error(data.error || \"Failed to update employee\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 196,
+    "match": "throw new Error(data.error || \"Failed to update employee\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 460,
+    "match": "<span>{formError}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 632,
+    "match": "<span>{formError}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 820,
+    "match": "throw new Error(data.error || \"Failed to delete employee\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 820,
+    "match": "throw new Error(data.error || \"Failed to delete employee\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/leave/page.tsx",
+    "line": 88,
+    "match": "if (!res.ok) throw new Error(data.error || \"Approval failed\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/leave/page.tsx",
+    "line": 88,
+    "match": "if (!res.ok) throw new Error(data.error || \"Approval failed\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/leave/page.tsx",
+    "line": 114,
+    "match": "if (!res.ok) throw new Error(data.error || \"Rejection failed\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/leave/page.tsx",
+    "line": 114,
+    "match": "if (!res.ok) throw new Error(data.error || \"Rejection failed\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/projects/page.tsx",
+    "line": 78,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to save project\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/projects/page.tsx",
+    "line": 78,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to save project\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/projects/page.tsx",
+    "line": 100,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to delete project\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/projects/page.tsx",
+    "line": 100,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to delete project\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/projects/page.tsx",
+    "line": 236,
+    "match": "<AlertCircle className=\"w-4 h-4\" /> {formError}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 121,
+    "match": "if (!res.ok) throw new Error(data.error || 'Failed to fetch reviews');",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 121,
+    "match": "if (!res.ok) throw new Error(data.error || 'Failed to fetch reviews');",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 127,
+    "match": "setError(err.message || 'An error occurred while fetching reviews');",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 165,
+    "match": "if (!res.ok) throw new Error(data.error || 'Failed to update review');",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 165,
+    "match": "if (!res.ok) throw new Error(data.error || 'Failed to update review');",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 187,
+    "match": "if (!res.ok) throw new Error(data.error || 'Failed to delete review');",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 187,
+    "match": "if (!res.ok) throw new Error(data.error || 'Failed to delete review');",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 382,
+    "match": "<p>{error}</p>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/settings/payment/page.tsx",
+    "line": 61,
+    "match": "setError(err.message);",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/admin/settings/payment/page.tsx",
+    "line": 78,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to save settings\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/settings/payment/page.tsx",
+    "line": 78,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to save settings\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/settings/payment/page.tsx",
+    "line": 87,
+    "match": "setError(err.message);",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/admin/settings/payment/page.tsx",
+    "line": 101,
+    "match": "{error && <div className=\"p-4 bg-red-500/10 text-red-400 border border-red-500/20 rounded-md text-sm\">{error}</div>}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 132,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to create task\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 132,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to create task\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 187,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to update task\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 187,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to update task\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 192,
+    "match": "alert(err.message || \"Update failed\");",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 208,
+    "match": "alert(err.message || \"Failed to delete task\");",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 223,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to post comment\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 223,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to post comment\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 231,
+    "match": "alert(err.message || \"Comment failed\");",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/admin/work-reports/page.tsx",
+    "line": 90,
+    "match": "if (!res.ok) throw new Error(data.error || \"Review failed\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/admin/work-reports/page.tsx",
+    "line": 90,
+    "match": "if (!res.ok) throw new Error(data.error || \"Review failed\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/commissions/page.tsx",
+    "line": 249,
+    "match": "throw new Error(json.error?.message || json.message || \"Failed to submit payout request.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/documents/page.tsx",
+    "line": 83,
+    "match": "setError(err.message);",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/broker/leads/page.tsx",
+    "line": 208,
+    "match": "throw new Error(json.error?.message || json.message || \"Failed to submit lead\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/leads/page.tsx",
+    "line": 839,
+    "match": "<span>{formError}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/broker/onboarding/page.tsx",
+    "line": 241,
+    "match": "throw new Error(json.error?.message || \"Failed to update profile details\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/onboarding/page.tsx",
+    "line": 310,
+    "match": "throw new Error(json.error?.message || \"Failed to update payout details\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/onboarding/page.tsx",
+    "line": 362,
+    "match": "throw new Error(json.error?.message || \"Failed to save KYC credentials\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/onboarding/page.tsx",
+    "line": 396,
+    "match": "throw new Error(json.error?.message || \"Failed to record terms agreement\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/onboarding/page.tsx",
+    "line": 424,
+    "match": "throw new Error(json.error?.message || \"Failed to generate referral links\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/profile/page.tsx",
+    "line": 159,
+    "match": "throw new Error(json.error?.message || \"Failed to update profile settings.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/profile/page.tsx",
+    "line": 211,
+    "match": "throw new Error(json.error?.message || \"Failed to update password.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/projects/new/page.tsx",
+    "line": 205,
+    "match": "throw new Error(json.error?.message || json.message || \"Failed to submit project.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/projects/new/page.tsx",
+    "line": 218,
+    "match": "setError(err.message || \"An unexpected error occurred.\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/broker/projects/new/page.tsx",
+    "line": 326,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 165,
+    "match": "throw new Error(json.error?.message || json.message || \"Failed to fetch project details.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 169,
+    "match": "setError(err.message);",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 223,
+    "match": "throw new Error(json.error?.message || \"Failed to upload contract\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 231,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 262,
+    "match": "throw new Error(json.error?.message || \"Failed to submit payment proof\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 270,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 288,
+    "match": "throw new Error(json.error?.message || \"Failed to cancel project\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 293,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/broker/support/page.tsx",
+    "line": 139,
+    "match": "throw new Error(json.error?.message || \"Failed to submit ticket\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/support/page.tsx",
+    "line": 168,
+    "match": "throw new Error(json.error?.message || \"Failed to post reply\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/broker/support/page.tsx",
+    "line": 175,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/broker/support/page.tsx",
+    "line": 433,
+    "match": "<span>{formError}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/business-partner/activate/page.tsx",
+    "line": 49,
+    "match": "throw new Error(data.error || data.message || \"Failed to activate account\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/business-partner/activate/page.tsx",
+    "line": 49,
+    "match": "throw new Error(data.error || data.message || \"Failed to activate account\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/business-partner/activate/page.tsx",
+    "line": 139,
+    "match": "<p className=\"text-sm text-red-400\">{error}</p>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/client/activate/page.tsx",
+    "line": 53,
+    "match": "throw new Error(data.error || \"Failed to activate client account. The token may be expired or already used.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/client/activate/page.tsx",
+    "line": 53,
+    "match": "throw new Error(data.error || \"Failed to activate client account. The token may be expired or already used.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/client/activate/page.tsx",
+    "line": 58,
+    "match": "setError(err.message || \"An unexpected error occurred during account activation.\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/client/activate/page.tsx",
+    "line": 118,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/client/profile/page.tsx",
+    "line": 71,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/client/projects/[id]/page.tsx",
+    "line": 122,
+    "match": "setError(err.message || \"Failed to load project details\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/client/projects/[id]/page.tsx",
+    "line": 145,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/client/projects/[id]/page.tsx",
+    "line": 175,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/client/support/page.tsx",
+    "line": 121,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/client/uat/page.tsx",
+    "line": 82,
+    "match": "alert(err.message);",
+    "category": "data.error rendered in toast or alert"
+  },
+  {
+    "file": "src/app/demo-projects/ecommerce/novacart/login/page.tsx",
+    "line": 102,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/demo-projects/ecommerce/novacart/register/page.tsx",
+    "line": 120,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 88,
+    "match": "throw new Error(data?.error || `Server error (${res.status})`);",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 98,
+    "match": "setError(data?.error || \"Failed to load attendance\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 101,
+    "match": ".catch((err: any) => setError(err.message || \"Failed to load attendance\"))",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 138,
+    "match": "if (!res.ok) throw new Error(data.error || \"Action failed\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 138,
+    "match": "if (!res.ok) throw new Error(data.error || \"Action failed\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 167,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to submit regularization\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 167,
+    "match": "if (!res.ok) throw new Error(data.error || \"Failed to submit regularization\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 282,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/employee/documents/page.tsx",
+    "line": 73,
+    "match": "throw new Error(data.error || \"Failed to acknowledge document\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/documents/page.tsx",
+    "line": 73,
+    "match": "throw new Error(data.error || \"Failed to acknowledge document\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/leave/page.tsx",
+    "line": 107,
+    "match": "throw new Error(data.error || \"Failed to submit leave request.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/leave/page.tsx",
+    "line": 107,
+    "match": "throw new Error(data.error || \"Failed to submit leave request.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/leave/page.tsx",
+    "line": 134,
+    "match": "throw new Error(data.error || \"Failed to cancel leave request.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/leave/page.tsx",
+    "line": 134,
+    "match": "throw new Error(data.error || \"Failed to cancel leave request.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 69,
+    "match": "throw new Error(data.error || \"Failed to load profile\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 69,
+    "match": "throw new Error(data.error || \"Failed to load profile\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 83,
+    "match": "setError(err.message || \"An error occurred while fetching your profile\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 153,
+    "match": "throw new Error(data.error || \"Failed to update profile\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 153,
+    "match": "throw new Error(data.error || \"Failed to update profile\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 164,
+    "match": "setError(err.message || \"Failed to save profile changes\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 209,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/employee/settings/page.tsx",
+    "line": 102,
+    "match": "throw new Error(data.error || \"Failed to save settings on server\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/settings/page.tsx",
+    "line": 102,
+    "match": "throw new Error(data.error || \"Failed to save settings on server\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/settings/page.tsx",
+    "line": 119,
+    "match": "setError(err.message || \"Failed to update preferences\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/employee/settings/page.tsx",
+    "line": 183,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/employee/support/page.tsx",
+    "line": 180,
+    "match": "throw new Error(data.error || \"Failed to log support ticket.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/support/page.tsx",
+    "line": 180,
+    "match": "throw new Error(data.error || \"Failed to log support ticket.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/tasks/page.tsx",
+    "line": 101,
+    "match": "throw new Error(data.error || \"Failed to update status\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/tasks/page.tsx",
+    "line": 101,
+    "match": "throw new Error(data.error || \"Failed to update status\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/tasks/page.tsx",
+    "line": 134,
+    "match": "throw new Error(data.error || \"Failed to submit comment\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/tasks/page.tsx",
+    "line": 134,
+    "match": "throw new Error(data.error || \"Failed to submit comment\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/work-reports/page.tsx",
+    "line": 145,
+    "match": "throw new Error(data.error || \"Failed to submit work report\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/employee/work-reports/page.tsx",
+    "line": 145,
+    "match": "throw new Error(data.error || \"Failed to submit work report\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/executive/dashboard/page.tsx",
+    "line": 22,
+    "match": "setError(err.message);",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/executive/dashboard/page.tsx",
+    "line": 28,
+    "match": "if (error) return <div className=\"text-red-400 p-4\">{error}</div>;",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 41,
+    "match": "if (!res.ok) throw new Error(data.error);",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 41,
+    "match": "if (!res.ok) throw new Error(data.error);",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 46,
+    "match": "setError(err.message || \"Failed to load user\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 71,
+    "match": "if (!res.ok) throw new Error(data.error);",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 71,
+    "match": "if (!res.ok) throw new Error(data.error);",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 82,
+    "match": "if (!res.ok) throw new Error(data.error);",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 82,
+    "match": "if (!res.ok) throw new Error(data.error);",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 93,
+    "match": "if (!res.ok) throw new Error(data.error);",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 93,
+    "match": "if (!res.ok) throw new Error(data.error);",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 98,
+    "match": "setError(err.message || `Failed to update ${type}`);",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 130,
+    "match": "{error && <div className=\"p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-sm\">{error}</div>}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/executive/reports/page.tsx",
+    "line": 39,
+    "match": "setError(err.message);",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/executive/reports/page.tsx",
+    "line": 74,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/lead/[referralCode]/page.tsx",
+    "line": 156,
+    "match": "setError(err.message || \"An unexpected error occurred.\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/lead/[referralCode]/page.tsx",
+    "line": 244,
+    "match": "{error}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/login/page.tsx",
+    "line": 118,
+    "match": "throw new Error(data.error || \"Login failed\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/login/page.tsx",
+    "line": 118,
+    "match": "throw new Error(data.error || \"Login failed\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/login/page.tsx",
+    "line": 126,
+    "match": "setError(err.message || \"An unexpected error occurred.\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/login/page.tsx",
+    "line": 220,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/privacy-requests/PrivacyRequestsClient.tsx",
+    "line": 125,
+    "match": "throw new Error(data.error || \"Failed to submit privacy request.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/privacy-requests/PrivacyRequestsClient.tsx",
+    "line": 125,
+    "match": "throw new Error(data.error || \"Failed to submit privacy request.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/privacy-requests/PrivacyRequestsClient.tsx",
+    "line": 170,
+    "match": "throw new Error(data.error || \"Request not found.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/privacy-requests/PrivacyRequestsClient.tsx",
+    "line": 170,
+    "match": "throw new Error(data.error || \"Request not found.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/project/start/[referralCode]/page.tsx",
+    "line": 157,
+    "match": "setError(data.message || data.error || \"Failed to submit request. Please try again.\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/project/start/[referralCode]/page.tsx",
+    "line": 252,
+    "match": "{error}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/app/verify-email-change/page.tsx",
+    "line": 44,
+    "match": "setError(data.error || \"This verification link is invalid or has expired.\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/app/verify-email-change/page.tsx",
+    "line": 77,
+    "match": "throw new Error(data.error || \"Failed to verify email change.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/app/verify-email-change/page.tsx",
+    "line": 77,
+    "match": "throw new Error(data.error || \"Failed to verify email change.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/app/verify-email-change/page.tsx",
+    "line": 148,
+    "match": "<p className=\"text-xs text-red-400 mt-1 leading-relaxed\">{error}</p>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/components/careers/CareerApplication.tsx",
+    "line": 177,
+    "match": "throw new Error(data.error || \"File upload failed.\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/components/careers/CareerApplication.tsx",
+    "line": 177,
+    "match": "throw new Error(data.error || \"File upload failed.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/components/careers/CareerApplication.tsx",
+    "line": 274,
+    "match": "throw new Error(data.message || \"Failed to submit application. Please try again.\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/components/chatbot/LeadCapture.tsx",
+    "line": 88,
+    "match": "setError(data.error || \"Failed to submit request. Please try again.\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/components/demo-projects/edusmart/EduSmartContact.tsx",
+    "line": 141,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/components/demo-projects/foodiehub/FoodieHubContact.tsx",
+    "line": 160,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/components/employee/ChangePasswordForm.tsx",
+    "line": 45,
+    "match": "throw new Error(data.error || \"Failed to change password\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/components/employee/ChangePasswordForm.tsx",
+    "line": 45,
+    "match": "throw new Error(data.error || \"Failed to change password\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/components/employee/ChangePasswordForm.tsx",
+    "line": 54,
+    "match": "setError(err.message || \"Failed to change password\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/components/employee/ChangePasswordForm.tsx",
+    "line": 82,
+    "match": "<span>{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/components/partner-application/PartnerApplicationForm.tsx",
+    "line": 165,
+    "match": "let errorMessage = data.message || data.error || \"Failed to submit application\";",
+    "category": "data.error directly assigned or checked"
+  },
+  {
+    "file": "src/components/partner-application/PartnerApplicationForm.tsx",
+    "line": 215,
+    "match": "throw new Error(data.message || data.error?.message || \"Failed to check status\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/components/partner-application/PartnerApplicationForm.tsx",
+    "line": 392,
+    "match": "{error}",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 89,
+    "match": "throw new Error(data.error || \"Failed to load account profile\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 89,
+    "match": "throw new Error(data.error || \"Failed to load account profile\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 207,
+    "match": "throw new Error(data.error || \"Failed to update profile information\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 207,
+    "match": "throw new Error(data.error || \"Failed to update profile information\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 254,
+    "match": "throw new Error(data.error || \"Failed to initiate email change request\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 254,
+    "match": "throw new Error(data.error || \"Failed to initiate email change request\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 298,
+    "match": "throw new Error(data.error || \"Failed to cancel pending email change\");",
+    "category": "new Error(data.error)"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 298,
+    "match": "throw new Error(data.error || \"Failed to cancel pending email change\");",
+    "category": "throw new Error(data.error)"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 366,
+    "match": "<span className=\"text-xs font-medium\">{error}</span>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/components/portal-ai/PortalAIAssistant.tsx",
+    "line": 138,
+    "match": "setError(err.message || \"Failed to communicate with assistant.\");",
+    "category": "setError with potential object or data.error"
+  },
+  {
+    "file": "src/components/portal-ai/PortalAIAssistant.tsx",
+    "line": 320,
+    "match": "<p className=\"text-[11px] mt-0.5\">{error}</p>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/components/ui/Input.tsx",
+    "line": 43,
+    "match": "<p className=\"mt-1 text-xs text-red-400 font-medium\">{error}</p>",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/lib/email/service.ts",
+    "line": 33,
+    "match": "throw new Error(`Resend API error: ${response.status} ${err}`);",
+    "category": "JSX rendering {error} or {err}"
+  },
+  {
+    "file": "src/lib/email/service.ts",
+    "line": 51,
+    "match": "throw new Error(`Email Webhook error: ${response.status} ${err}`);",
+    "category": "JSX rendering {error} or {err}"
+  }
+]

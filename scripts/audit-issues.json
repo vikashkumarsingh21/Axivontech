@@ -1,0 +1,1190 @@
+[
+  {
+    "file": "src/app/admin/ai/knowledge/page.tsx",
+    "line": 1250,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "{formError && <div className=\"text-xs text-red-400 bg-red-950/40 p-2.5 rounded-lg border border-red-500/20\">{formError}</div>}"
+  },
+  {
+    "file": "src/app/admin/analytics/page.tsx",
+    "line": 124,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"Failed to load business intelligence\");"
+  },
+  {
+    "file": "src/app/admin/analytics/page.tsx",
+    "line": 313,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/admin/business-partners/applications/[id]/page.tsx",
+    "line": 73,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to add note\");"
+  },
+  {
+    "file": "src/app/admin/business-partners/applications/[id]/page.tsx",
+    "line": 145,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to schedule meeting\");"
+  },
+  {
+    "file": "src/app/admin/business-partners/applications/[id]/page.tsx",
+    "line": 170,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || data.message || \"Failed to create account\");"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 155,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to load calendar management data\");"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 361,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Synchronization failed\");"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 385,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to toggle status\");"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 414,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to save settings\");"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 483,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to save holiday\");"
+  },
+  {
+    "file": "src/app/admin/calendar/page.tsx",
+    "line": 510,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to delete holiday\");"
+  },
+  {
+    "file": "src/app/admin/careers/applications/page.tsx",
+    "line": 83,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(e.message || \"Failed to fetch applications.\");"
+  },
+  {
+    "file": "src/app/admin/careers/applications/page.tsx",
+    "line": 136,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to update review.\");"
+  },
+  {
+    "file": "src/app/admin/careers/page.tsx",
+    "line": 141,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(e.message || \"An error occurred fetching data.\");"
+  },
+  {
+    "file": "src/app/admin/careers/page.tsx",
+    "line": 226,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to save job posting.\");"
+  },
+  {
+    "file": "src/app/admin/careers/settings/page.tsx",
+    "line": 95,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(e.message || \"Failed to load careers settings.\");"
+  },
+  {
+    "file": "src/app/admin/careers/settings/page.tsx",
+    "line": 126,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to update visibility setting.\");"
+  },
+  {
+    "file": "src/app/admin/careers/settings/page.tsx",
+    "line": 136,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(e.message || \"Failed to update visibility setting.\");"
+  },
+  {
+    "file": "src/app/admin/careers/settings/page.tsx",
+    "line": 158,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to save settings.\");"
+  },
+  {
+    "file": "src/app/admin/careers/settings/page.tsx",
+    "line": 166,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(e.message || \"An error occurred saving settings.\");"
+  },
+  {
+    "file": "src/app/admin/content/about/page.tsx",
+    "line": 69,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(json.error || \"Save failed\");"
+  },
+  {
+    "file": "src/app/admin/content/blog/page.tsx",
+    "line": 136,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/content/demo-projects/page.tsx",
+    "line": 104,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(e.message || \"Failed to load demo projects.\");"
+  },
+  {
+    "file": "src/app/admin/content/demo-projects/page.tsx",
+    "line": 388,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/admin/content/faqs/page.tsx",
+    "line": 110,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/content/homepage/page.tsx",
+    "line": 66,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(json.error || \"Save failed\");"
+  },
+  {
+    "file": "src/app/admin/content/industries/page.tsx",
+    "line": 113,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/content/legal/page.tsx",
+    "line": 249,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to save policy.\");"
+  },
+  {
+    "file": "src/app/admin/content/login-posters/page.tsx",
+    "line": 145,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(e.message || \"An unexpected error occurred while loading posters.\");"
+  },
+  {
+    "file": "src/app/admin/content/login-posters/page.tsx",
+    "line": 257,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(e.message || \"Failed to delete poster.\");"
+  },
+  {
+    "file": "src/app/admin/content/media/page.tsx",
+    "line": 123,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/content/media/page.tsx",
+    "line": 153,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message || \"Failed to upload file\");"
+  },
+  {
+    "file": "src/app/admin/content/media/page.tsx",
+    "line": 177,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/content/seo/page.tsx",
+    "line": 67,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(json.error || \"Failed to update SEO settings\");"
+  },
+  {
+    "file": "src/app/admin/content/services/page.tsx",
+    "line": 87,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"Failed to load services catalog\");"
+  },
+  {
+    "file": "src/app/admin/content/services/page.tsx",
+    "line": 142,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/page.tsx",
+    "line": 76,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to create broker\");"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/page.tsx",
+    "line": 87,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 90,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 113,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to add note\");"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 117,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 133,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to process KYC review\");"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 138,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 155,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to execute action\");"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 161,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 178,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to update commission rate\");"
+  },
+  {
+    "file": "src/app/admin/crm/brokers/[id]/page.tsx",
+    "line": 183,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/clients/page.tsx",
+    "line": 64,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to create client.\");"
+  },
+  {
+    "file": "src/app/admin/crm/clients/page.tsx",
+    "line": 168,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "{formError && <p className=\"text-xs text-red-400\">{formError}</p>}"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 76,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(e.message || \"Error loading commissions.\");"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 96,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Action failed.\");"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 100,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message || \"Failed to perform action.\");"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 130,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to mark as paid.\");"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 167,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to reject payout request.\");"
+  },
+  {
+    "file": "src/app/admin/crm/commissions/page.tsx",
+    "line": 233,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/admin/crm/documents/page.tsx",
+    "line": 52,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to upload document.\");"
+  },
+  {
+    "file": "src/app/admin/crm/documents/page.tsx",
+    "line": 148,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "{error && <div className=\"bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-md mb-4 text-sm\">{error}</div>}"
+  },
+  {
+    "file": "src/app/admin/crm/follow-ups/page.tsx",
+    "line": 42,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to complete follow-up.\");"
+  },
+  {
+    "file": "src/app/admin/crm/leads/page.tsx",
+    "line": 103,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to create lead.\");"
+  },
+  {
+    "file": "src/app/admin/crm/leads/page.tsx",
+    "line": 427,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{formError}</span>"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 46,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to resend activation link\");"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 49,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 59,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to fetch project\");"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 62,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 94,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 115,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 135,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 147,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Delivery failed\");"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 165,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Completion failed\");"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 183,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to generate delivery report\");"
+  },
+  {
+    "file": "src/app/admin/crm/partner-projects/[id]/page.tsx",
+    "line": 203,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to update QA status\");"
+  },
+  {
+    "file": "src/app/admin/crm/payments/page.tsx",
+    "line": 23,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to fetch payments\");"
+  },
+  {
+    "file": "src/app/admin/crm/payments/page.tsx",
+    "line": 26,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message);"
+  },
+  {
+    "file": "src/app/admin/crm/pipeline/page.tsx",
+    "line": 47,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to change stage.\");"
+  },
+  {
+    "file": "src/app/admin/crm/pipeline/page.tsx",
+    "line": 62,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to mark as Won.\");"
+  },
+  {
+    "file": "src/app/admin/crm/pipeline/page.tsx",
+    "line": 80,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to mark as Lost.\");"
+  },
+  {
+    "file": "src/app/admin/crm/support/page.tsx",
+    "line": 79,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to submit reply\");"
+  },
+  {
+    "file": "src/app/admin/crm/support/page.tsx",
+    "line": 86,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 83,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to load employees\");"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 150,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to create employee\");"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 196,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to update employee\");"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 460,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{formError}</span>"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 632,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{formError}</span>"
+  },
+  {
+    "file": "src/app/admin/employees/page.tsx",
+    "line": 820,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to delete employee\");"
+  },
+  {
+    "file": "src/app/admin/leave/page.tsx",
+    "line": 88,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Approval failed\");"
+  },
+  {
+    "file": "src/app/admin/leave/page.tsx",
+    "line": 114,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Rejection failed\");"
+  },
+  {
+    "file": "src/app/admin/projects/page.tsx",
+    "line": 78,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to save project\");"
+  },
+  {
+    "file": "src/app/admin/projects/page.tsx",
+    "line": 100,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to delete project\");"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 121,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || 'Failed to fetch reviews');"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 127,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || 'An error occurred while fetching reviews');"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 165,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || 'Failed to update review');"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 187,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || 'Failed to delete review');"
+  },
+  {
+    "file": "src/app/admin/reviews/page.tsx",
+    "line": 382,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<p>{error}</p>"
+  },
+  {
+    "file": "src/app/admin/settings/payment/page.tsx",
+    "line": 61,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message);"
+  },
+  {
+    "file": "src/app/admin/settings/payment/page.tsx",
+    "line": 78,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to save settings\");"
+  },
+  {
+    "file": "src/app/admin/settings/payment/page.tsx",
+    "line": 87,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message);"
+  },
+  {
+    "file": "src/app/admin/settings/payment/page.tsx",
+    "line": 101,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "{error && <div className=\"p-4 bg-red-500/10 text-red-400 border border-red-500/20 rounded-md text-sm\">{error}</div>}"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 132,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to create task\");"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 187,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to update task\");"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 192,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message || \"Update failed\");"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 208,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message || \"Failed to delete task\");"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 223,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to post comment\");"
+  },
+  {
+    "file": "src/app/admin/tasks/page.tsx",
+    "line": 231,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message || \"Comment failed\");"
+  },
+  {
+    "file": "src/app/admin/work-reports/page.tsx",
+    "line": 90,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Review failed\");"
+  },
+  {
+    "file": "src/app/broker/commissions/page.tsx",
+    "line": 249,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || json.message || \"Failed to submit payout request.\");"
+  },
+  {
+    "file": "src/app/broker/documents/page.tsx",
+    "line": 83,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message);"
+  },
+  {
+    "file": "src/app/broker/leads/page.tsx",
+    "line": 208,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || json.message || \"Failed to submit lead\");"
+  },
+  {
+    "file": "src/app/broker/leads/page.tsx",
+    "line": 839,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{formError}</span>"
+  },
+  {
+    "file": "src/app/broker/onboarding/page.tsx",
+    "line": 241,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to update profile details\");"
+  },
+  {
+    "file": "src/app/broker/onboarding/page.tsx",
+    "line": 310,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to update payout details\");"
+  },
+  {
+    "file": "src/app/broker/onboarding/page.tsx",
+    "line": 362,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to save KYC credentials\");"
+  },
+  {
+    "file": "src/app/broker/onboarding/page.tsx",
+    "line": 396,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to record terms agreement\");"
+  },
+  {
+    "file": "src/app/broker/onboarding/page.tsx",
+    "line": 424,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to generate referral links\");"
+  },
+  {
+    "file": "src/app/broker/profile/page.tsx",
+    "line": 159,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to update profile settings.\");"
+  },
+  {
+    "file": "src/app/broker/profile/page.tsx",
+    "line": 211,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to update password.\");"
+  },
+  {
+    "file": "src/app/broker/projects/new/page.tsx",
+    "line": 205,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || json.message || \"Failed to submit project.\");"
+  },
+  {
+    "file": "src/app/broker/projects/new/page.tsx",
+    "line": 218,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"An unexpected error occurred.\");"
+  },
+  {
+    "file": "src/app/broker/projects/new/page.tsx",
+    "line": 326,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 165,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || json.message || \"Failed to fetch project details.\");"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 169,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message);"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 223,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to upload contract\");"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 231,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 262,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to submit payment proof\");"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 270,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 288,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to cancel project\");"
+  },
+  {
+    "file": "src/app/broker/projects/[id]/page.tsx",
+    "line": 293,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/broker/support/page.tsx",
+    "line": 139,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to submit ticket\");"
+  },
+  {
+    "file": "src/app/broker/support/page.tsx",
+    "line": 168,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(json.error?.message || \"Failed to post reply\");"
+  },
+  {
+    "file": "src/app/broker/support/page.tsx",
+    "line": 175,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/broker/support/page.tsx",
+    "line": 433,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{formError}</span>"
+  },
+  {
+    "file": "src/app/business-partner/activate/page.tsx",
+    "line": 49,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || data.message || \"Failed to activate account\");"
+  },
+  {
+    "file": "src/app/business-partner/activate/page.tsx",
+    "line": 139,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<p className=\"text-sm text-red-400\">{error}</p>"
+  },
+  {
+    "file": "src/app/client/activate/page.tsx",
+    "line": 53,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to activate client account. The token may be expired or already used.\");"
+  },
+  {
+    "file": "src/app/client/activate/page.tsx",
+    "line": 58,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"An unexpected error occurred during account activation.\");"
+  },
+  {
+    "file": "src/app/client/activate/page.tsx",
+    "line": 118,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/client/profile/page.tsx",
+    "line": 71,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/client/projects/[id]/page.tsx",
+    "line": 122,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"Failed to load project details\");"
+  },
+  {
+    "file": "src/app/client/projects/[id]/page.tsx",
+    "line": 145,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/client/projects/[id]/page.tsx",
+    "line": 175,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/client/support/page.tsx",
+    "line": 121,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/client/uat/page.tsx",
+    "line": 82,
+    "problem": "alert() used with potentially object-stringified error message",
+    "snippet": "alert(err.message);"
+  },
+  {
+    "file": "src/app/demo-projects/ecommerce/novacart/login/page.tsx",
+    "line": 102,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/demo-projects/ecommerce/novacart/register/page.tsx",
+    "line": 120,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 101,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": ".catch((err: any) => setError(err.message || \"Failed to load attendance\"))"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 138,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Action failed\");"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 142,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(e.message);"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 167,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error || \"Failed to submit regularization\");"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 174,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(e.message);"
+  },
+  {
+    "file": "src/app/employee/attendance/page.tsx",
+    "line": 282,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/employee/documents/page.tsx",
+    "line": 73,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to acknowledge document\");"
+  },
+  {
+    "file": "src/app/employee/leave/page.tsx",
+    "line": 107,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to submit leave request.\");"
+  },
+  {
+    "file": "src/app/employee/leave/page.tsx",
+    "line": 134,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to cancel leave request.\");"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 69,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to load profile\");"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 83,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"An error occurred while fetching your profile\");"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 153,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to update profile\");"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 164,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"Failed to save profile changes\");"
+  },
+  {
+    "file": "src/app/employee/profile/page.tsx",
+    "line": 209,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/employee/settings/page.tsx",
+    "line": 102,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to save settings on server\");"
+  },
+  {
+    "file": "src/app/employee/settings/page.tsx",
+    "line": 119,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"Failed to update preferences\");"
+  },
+  {
+    "file": "src/app/employee/settings/page.tsx",
+    "line": 183,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/employee/support/page.tsx",
+    "line": 180,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to log support ticket.\");"
+  },
+  {
+    "file": "src/app/employee/tasks/page.tsx",
+    "line": 101,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to update status\");"
+  },
+  {
+    "file": "src/app/employee/tasks/page.tsx",
+    "line": 134,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to submit comment\");"
+  },
+  {
+    "file": "src/app/employee/work-reports/page.tsx",
+    "line": 145,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to submit work report\");"
+  },
+  {
+    "file": "src/app/executive/dashboard/page.tsx",
+    "line": 22,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message);"
+  },
+  {
+    "file": "src/app/executive/dashboard/page.tsx",
+    "line": 28,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "if (error) return <div className=\"text-red-400 p-4\">{error}</div>;"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 41,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error);"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 46,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"Failed to load user\");"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 71,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error);"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 82,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error);"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 93,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "if (!res.ok) throw new Error(data.error);"
+  },
+  {
+    "file": "src/app/executive/people/[id]/page.tsx",
+    "line": 130,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "{error && <div className=\"p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-sm\">{error}</div>}"
+  },
+  {
+    "file": "src/app/executive/reports/page.tsx",
+    "line": 39,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message);"
+  },
+  {
+    "file": "src/app/executive/reports/page.tsx",
+    "line": 74,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/lead/[referralCode]/page.tsx",
+    "line": 156,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"An unexpected error occurred.\");"
+  },
+  {
+    "file": "src/app/login/page.tsx",
+    "line": 118,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Login failed\");"
+  },
+  {
+    "file": "src/app/login/page.tsx",
+    "line": 126,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"An unexpected error occurred.\");"
+  },
+  {
+    "file": "src/app/login/page.tsx",
+    "line": 220,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/app/privacy-requests/PrivacyRequestsClient.tsx",
+    "line": 125,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to submit privacy request.\");"
+  },
+  {
+    "file": "src/app/privacy-requests/PrivacyRequestsClient.tsx",
+    "line": 170,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Request not found.\");"
+  },
+  {
+    "file": "src/app/verify-email-change/page.tsx",
+    "line": 44,
+    "problem": "Unsafe setError(data.error): sets state to object if API returns { error: { message } }",
+    "snippet": "setError(data.error || \"This verification link is invalid or has expired.\");"
+  },
+  {
+    "file": "src/app/verify-email-change/page.tsx",
+    "line": 77,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to verify email change.\");"
+  },
+  {
+    "file": "src/app/verify-email-change/page.tsx",
+    "line": 148,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<p className=\"text-xs text-red-400 mt-1 leading-relaxed\">{error}</p>"
+  },
+  {
+    "file": "src/components/careers/CareerApplication.tsx",
+    "line": 177,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"File upload failed.\");"
+  },
+  {
+    "file": "src/components/chatbot/LeadCapture.tsx",
+    "line": 88,
+    "problem": "Unsafe setError(data.error): sets state to object if API returns { error: { message } }",
+    "snippet": "setError(data.error || \"Failed to submit request. Please try again.\");"
+  },
+  {
+    "file": "src/components/demo-projects/edusmart/EduSmartContact.tsx",
+    "line": 141,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/components/demo-projects/foodiehub/FoodieHubContact.tsx",
+    "line": 160,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/components/employee/ChangePasswordForm.tsx",
+    "line": 45,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to change password\");"
+  },
+  {
+    "file": "src/components/employee/ChangePasswordForm.tsx",
+    "line": 54,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"Failed to change password\");"
+  },
+  {
+    "file": "src/components/employee/ChangePasswordForm.tsx",
+    "line": 82,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<span>{error}</span>"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 89,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to load account profile\");"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 207,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to update profile information\");"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 254,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to initiate email change request\");"
+  },
+  {
+    "file": "src/components/portal/AccountProfileSettings.tsx",
+    "line": 298,
+    "problem": "Unsafe new Error(data.error): if API returns { error: { message } }, Error message becomes '[object Object]'",
+    "snippet": "throw new Error(data.error || \"Failed to cancel pending email change\");"
+  },
+  {
+    "file": "src/components/portal-ai/PortalAIAssistant.tsx",
+    "line": 138,
+    "problem": "Potential '[object Object]' if err was constructed via new Error(object)",
+    "snippet": "setError(err.message || \"Failed to communicate with assistant.\");"
+  },
+  {
+    "file": "src/components/portal-ai/PortalAIAssistant.tsx",
+    "line": 320,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<p className=\"text-[11px] mt-0.5\">{error}</p>"
+  },
+  {
+    "file": "src/components/ui/Input.tsx",
+    "line": 43,
+    "problem": "Directly renders error state in JSX without safe string extraction",
+    "snippet": "<p className=\"mt-1 text-xs text-red-400 font-medium\">{error}</p>"
+  }
+]
