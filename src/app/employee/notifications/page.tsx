@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/employee/PageHeader";
 import { EpButton } from "@/components/employee/EpButton";
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
@@ -15,8 +14,6 @@ import {
   ExternalLink,
   AlertTriangle,
   Clock,
-  Sparkles,
-  Info,
 } from "lucide-react";
 
 interface NotificationItem {
@@ -135,11 +132,11 @@ export default function NotificationsPage() {
     switch (type) {
       case "WARNING":
       case "ALERT":
-        return <AlertTriangle className="w-4 h-4 text-amber-400" />;
+        return <AlertTriangle className="w-4 h-4 text-[#C9A15B]" />;
       case "SUCCESS":
-        return <Check className="w-4 h-4 text-[#34D399]" />;
+        return <Check className="w-4 h-4 text-[#5FAE7E]" />;
       default:
-        return <Bell className="w-4 h-4 text-[#5FA8A0]" />;
+        return <Bell className="w-4 h-4 text-[#4F9D83]" />;
     }
   };
 
@@ -148,7 +145,7 @@ export default function NotificationsPage() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="space-y-6 max-w-5xl"
+      className="space-y-6 max-w-5xl pb-12"
     >
       {/* Page Header */}
       <PageHeader
@@ -162,7 +159,7 @@ export default function NotificationsPage() {
                 size="sm"
                 variant="primary"
                 onClick={markAllAsRead}
-                isLoading={markingAll}
+                loading={markingAll}
                 className="text-xs h-8 px-3"
               >
                 <CheckCheck className="w-3.5 h-3.5 mr-1.5" />
@@ -173,10 +170,10 @@ export default function NotificationsPage() {
             {hasReadItems && (
               <EpButton
                 size="sm"
-                variant="outline"
+                variant="secondary"
                 onClick={clearAllRead}
-                isLoading={clearingRead}
-                className="text-xs h-8 px-3 text-[#8B94A1] hover:text-rose-400 hover:border-rose-500/40"
+                loading={clearingRead}
+                className="text-xs h-8 px-3 text-[#8A867E] hover:text-[#C46A62]"
               >
                 <Trash2 className="w-3.5 h-3.5 mr-1.5" />
                 <span>Clear Read</span>
@@ -187,28 +184,28 @@ export default function NotificationsPage() {
       />
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#1E2530] pb-2 text-xs">
+      <div className="flex items-center gap-2 border-b border-[#2E2E30] pb-2 text-xs">
         <button
           onClick={() => setFilterMode("ALL")}
-          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors ${
+          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
             filterMode === "ALL"
-              ? "bg-[#171A1F] text-[#E6E8EB] border border-[#22262D]"
-              : "text-[#8B94A1] hover:text-[#E6E8EB]"
+              ? "bg-[#232324] text-[#EDEBE6] border border-[#2E2E30]"
+              : "text-[#8A867E] hover:text-[#EDEBE6]"
           }`}
         >
           All Notifications ({items.length})
         </button>
         <button
           onClick={() => setFilterMode("UNREAD")}
-          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors flex items-center gap-1.5 ${
+          className={`px-3.5 py-1.5 rounded-lg font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
             filterMode === "UNREAD"
-              ? "bg-[#5FA8A0]/15 text-[#5FA8A0] border border-[#5FA8A0]/30 font-semibold"
-              : "text-[#8B94A1] hover:text-[#E6E8EB]"
+              ? "bg-[#4F9D83]/15 text-[#4F9D83] border border-[#4F9D83]/30 font-semibold"
+              : "text-[#8A867E] hover:text-[#EDEBE6]"
           }`}
         >
           <span>Unread Only</span>
           {unreadCount > 0 && (
-            <span className="w-4 h-4 rounded-full bg-[#5FA8A0] text-[#0B0D10] text-[10px] font-bold flex items-center justify-center">
+            <span className="w-4 h-4 rounded-full bg-[#4F9D83] text-[#0F1A16] text-[10px] font-bold flex items-center justify-center">
               {unreadCount}
             </span>
           )}
@@ -218,22 +215,22 @@ export default function NotificationsPage() {
       {/* Notification List */}
       {loading ? (
         <div className="space-y-3">
-          <SkeletonCard rows={2} />
-          <SkeletonCard rows={2} />
-          <SkeletonCard rows={2} />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
         </div>
       ) : displayedItems.length === 0 ? (
-        <Card className="p-12 text-center bg-[#111317] border-[#1E2530] rounded-2xl space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-[#171A1F] border border-[#22262D] flex items-center justify-center mx-auto text-[#566171]">
+        <div className="p-12 text-center bg-[#1A1A1B] border border-[#2E2E30] rounded-xl space-y-3">
+          <div className="w-12 h-12 rounded-xl bg-[#232324] border border-[#2E2E30] flex items-center justify-center mx-auto text-[#8A867E]">
             <Bell className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-semibold text-[#E6E8EB]">No notifications</h3>
-          <p className="text-xs text-[#8B94A1] max-w-sm mx-auto">
+          <h3 className="text-base font-semibold text-[#EDEBE6]">No notifications</h3>
+          <p className="text-xs text-[#8A867E] max-w-sm mx-auto">
             {filterMode === "UNREAD"
               ? "You are all caught up! There are no unread notifications right now."
               : "No notification records found for your account."}
           </p>
-        </Card>
+        </div>
       ) : (
         <div className="space-y-3">
           <AnimatePresence initial={false}>
@@ -246,20 +243,20 @@ export default function NotificationsPage() {
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.15 }}
               >
-                <Card
-                  className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+                <div
+                  className={`p-4 sm:p-5 rounded-xl border transition-colors ${
                     n.isRead
-                      ? "bg-[#111317] border-[#1E2530]"
-                      : "bg-[#171A1F] border-[#5FA8A0]/30 shadow-xs"
+                      ? "bg-[#1A1A1B] border-[#2E2E30]"
+                      : "bg-[#232324] border-[#4F9D83]/40 shadow-xs"
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                     <div className="flex items-start gap-3 min-w-0 flex-1">
                       <div
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                        className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
                           n.isRead
-                            ? "bg-[#0B0D10] border border-[#1E2530]"
-                            : "bg-[#5FA8A0]/10 border border-[#5FA8A0]/25"
+                            ? "bg-[#121212] border border-[#2E2E30]"
+                            : "bg-[#4F9D83]/10 border border-[#4F9D83]/25"
                         }`}
                       >
                         {getTypeIcon(n.type)}
@@ -268,16 +265,16 @@ export default function NotificationsPage() {
                       <div className="space-y-1 min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           {!n.isRead && (
-                            <span className="w-2 h-2 rounded-full bg-[#5FA8A0] shrink-0" />
+                            <span className="w-2 h-2 rounded-full bg-[#4F9D83] shrink-0" />
                           )}
-                          <h3 className="text-[#E6E8EB] font-semibold text-sm truncate">{n.title}</h3>
+                          <h3 className="text-[#EDEBE6] font-semibold text-sm truncate">{n.title}</h3>
                         </div>
 
-                        <p className="text-xs text-[#8B94A1] leading-relaxed">{n.message}</p>
+                        <p className="text-xs text-[#8A867E] leading-relaxed">{n.message}</p>
 
-                        <div className="flex items-center gap-3 pt-1 text-[11px] text-[#566171]">
-                          <span className="flex items-center gap-1 text-[#8B94A1]">
-                            <Clock className="w-3 h-3 text-[#566171]" />
+                        <div className="flex items-center gap-3 pt-1 text-[11px] text-[#8A867E]">
+                          <span className="flex items-center gap-1 text-[#8A867E]">
+                            <Clock className="w-3 h-3 text-[#8A867E]" />
                             {new Date(n.createdAt).toLocaleDateString()}{" "}
                             {new Date(n.createdAt).toLocaleTimeString([], {
                               hour: "2-digit",
@@ -288,7 +285,7 @@ export default function NotificationsPage() {
                           {n.link && (
                             <Link
                               href={n.link}
-                              className="text-[#5FA8A0] hover:text-[#5FA8A0]/80 flex items-center gap-1 font-medium transition-colors"
+                              className="text-[#4F9D83] hover:text-[#5BB094] flex items-center gap-1 font-medium transition-colors"
                             >
                               <span>Open link</span>
                               <ExternalLink className="w-3 h-3" />
@@ -302,11 +299,11 @@ export default function NotificationsPage() {
                       {!n.isRead && (
                         <EpButton
                           size="sm"
-                          variant="outline"
+                          variant="secondary"
                           onClick={() => markRead(n.id)}
                           className="text-xs h-7 px-2.5"
                         >
-                          <Check className="w-3 h-3 mr-1 text-[#5FA8A0]" />
+                          <Check className="w-3 h-3 mr-1 text-[#4F9D83]" />
                           Mark Read
                         </EpButton>
                       )}
@@ -314,14 +311,14 @@ export default function NotificationsPage() {
                       <button
                         onClick={() => deleteNotification(n.id)}
                         disabled={deletingId === n.id}
-                        className="p-1.5 rounded-lg border border-transparent hover:border-[#22262D] text-[#566171] hover:text-rose-400 hover:bg-[#0B0D10] transition-colors"
+                        className="p-1.5 rounded-lg border border-transparent hover:border-[#2E2E30] text-[#8A867E] hover:text-[#C46A62] hover:bg-[#1A1A1B] transition-colors cursor-pointer"
                         title="Delete notification"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
-                </Card>
+                </div>
               </motion.div>
             ))}
           </AnimatePresence>
