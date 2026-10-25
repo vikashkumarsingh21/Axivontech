@@ -12,6 +12,7 @@ import dynamic from 'next/dynamic';
 import NextTopLoader from 'nextjs-toploader';
 import CookieConsentBanner from "@/components/legal/CookieConsentBanner";
 import CookieSettingsButton from "@/components/legal/CookieSettingsButton";
+import { ToastProvider } from "@/components/notifications/ToastProvider";
 
 const ChatWidget = dynamic(() => import('@/components/chatbot/ChatWidget'));
 const FloatingWhatsAppButton = dynamic(() => import('@/components/conversion/FloatingWhatsAppButton'));
@@ -142,6 +143,7 @@ export default async function RootLayout({
       className={`${inter.variable} ${manrope.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen flex flex-col bg-[#0B0D10] text-[#F3F5F7]">
+        <ToastProvider />
         <NextTopLoader color="#10B981" showSpinner={false} />
         <OrganizationSchema />
         <LocalBusinessSchema />
