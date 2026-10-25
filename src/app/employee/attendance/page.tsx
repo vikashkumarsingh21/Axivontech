@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Loader2,
   CheckCircle2,
   Clock,
   Calendar,
@@ -167,7 +166,7 @@ export default function AttendancePage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to submit regularization");
 
-      setSuccessMsg("Regularization request submitted successfully for Admin review");
+      setSuccessMsg("Regularization request submitted successfully for review");
       setRegModalOpen(false);
       setRegReason("");
       loadData();
@@ -181,28 +180,28 @@ export default function AttendancePage() {
   const statusColor = (status: string) => {
     switch (status) {
       case "COMPLETE":
-        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+        return "bg-[#5FAE7E]/10 text-[#5FAE7E] border-[#5FAE7E]/30";
       case "IN_PROGRESS":
-        return "bg-[var(--ep-accent-soft)] text-[#5FA8A0] border-[var(--ep-accent-border)]";
+        return "bg-[#4F9D83]/10 text-[#4F9D83] border-[#4F9D83]/30";
       case "INCOMPLETE":
-        return "bg-orange-500/10 text-orange-400 border-orange-500/30";
+        return "bg-[#C46A62]/10 text-[#C46A62] border-[#C46A62]/30";
       case "HALF_DAY":
-        return "bg-amber-500/10 text-amber-400 border-amber-500/30";
+        return "bg-[#C9A15B]/10 text-[#C9A15B] border-[#C9A15B]/30";
       case "ON_LEAVE":
-        return "bg-purple-500/10 text-purple-400 border-purple-500/30";
+        return "bg-[#8E9AAF]/10 text-[#8E9AAF] border-[#8E9AAF]/30";
       case "HOLIDAY":
       case "WEEKLY_OFF":
-        return "bg-cyan-500/10 text-cyan-400 border-cyan-500/30";
+        return "bg-[#232324] text-[#B3AFA6] border-[#2E2E30]";
       default:
-        return "bg-[#171A1F] text-[#8B94A1] border-[#22262D]";
+        return "bg-[#232324] text-[#8A867E] border-[#2E2E30]";
     }
   };
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="animate-pulse h-10 bg-[#111317] border border-[#1E2530] rounded-xl w-1/3" />
-        <div className="animate-pulse h-48 bg-[#111317] border border-[#1E2530] rounded-2xl" />
+      <div className="space-y-6 pb-12">
+        <div className="animate-pulse h-10 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl w-1/3" />
+        <div className="animate-pulse h-48 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl" />
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
           {Array.from({ length: 5 }).map((_, i) => (
             <SkeletonCard key={i} />
@@ -223,7 +222,7 @@ export default function AttendancePage() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="space-y-6 sm:space-y-8"
+      className="space-y-6 sm:space-y-8 pb-12"
     >
       {/* ── Page Header ────────────────────────────────────────────── */}
       <PageHeader
@@ -233,7 +232,7 @@ export default function AttendancePage() {
           <EpButton
             variant="secondary"
             size="md"
-            icon={<FileCheck className="w-4 h-4 text-[#5FA8A0]" />}
+            icon={<FileCheck className="w-4 h-4 text-[#4F9D83]" />}
             onClick={() => {
               const yesterday = new Date();
               yesterday.setDate(yesterday.getDate() - 1);
@@ -247,44 +246,44 @@ export default function AttendancePage() {
       />
 
       {/* ── Policy Banner ───────────────────────────────────────────── */}
-      <div className="bg-[#111317] border border-[#1E2530] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-[#1A1A1B] border border-[#2E2E30] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="p-2.5 rounded-xl bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] text-[#5FA8A0] shrink-0">
+          <div className="p-2.5 rounded-lg bg-[#232324] border border-[#2E2E30] text-[#4F9D83] shrink-0">
             <Building2 className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs uppercase tracking-wider text-[#5FA8A0] font-bold">
+              <span className="text-xs uppercase tracking-wider text-[#4F9D83] font-semibold">
                 Daily Work Window
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] bg-[#171A1F] text-[#E6E8EB] font-mono border border-[#22262D]">
+              <span className="px-2 py-0.5 rounded text-[10px] bg-[#232324] text-[#EDEBE6] font-mono border border-[#2E2E30]">
                 {policy?.workWindowStart || "06:00 AM"} → {policy?.workWindowEnd || "11:00 PM"}
               </span>
             </div>
-            <p className="text-xs text-[#8B94A1] mt-0.5">
+            <p className="text-xs text-[#8A867E] mt-0.5">
               Configured company attendance window. Assigned daily target:{" "}
-              <strong className="text-[#E6E8EB]">{formatMinutes(reqMins)}</strong>.
+              <strong className="text-[#EDEBE6]">{formatMinutes(reqMins)}</strong>.
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-[#566171]">
-          <ShieldCheck className="w-4 h-4 text-[#5FA8A0] shrink-0" />
+        <div className="flex items-center gap-2 text-xs text-[#8A867E]">
+          <ShieldCheck className="w-4 h-4 text-[#4F9D83] shrink-0" />
           <span>
-            Grace: <strong className="text-[#8B94A1]">{policy?.graceMinutes || 15}m</strong> • Cutoff:{" "}
-            <strong className="text-[#8B94A1]">{policy?.cutoffTime || "11:00 PM"}</strong>
+            Grace: <strong className="text-[#B3AFA6]">{policy?.graceMinutes || 15}m</strong> • Cutoff:{" "}
+            <strong className="text-[#B3AFA6]">{policy?.cutoffTime || "11:00 PM"}</strong>
           </span>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl flex items-center justify-between gap-3 text-sm">
+        <div className="p-4 bg-[#C46A62]/10 border border-[#C46A62]/25 text-[#C46A62] rounded-xl flex items-center justify-between gap-3 text-sm">
           <div className="flex items-center gap-3">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <span>{error}</span>
           </div>
           <button
             onClick={loadData}
-            className="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 text-xs font-semibold transition-colors shrink-0"
+            className="px-3 py-1.5 rounded-lg bg-[#C46A62]/20 hover:bg-[#C46A62]/30 text-[#EDEBE6] text-xs font-semibold transition-colors shrink-0 cursor-pointer"
           >
             Retry
           </button>
@@ -292,21 +291,21 @@ export default function AttendancePage() {
       )}
 
       {successMsg && (
-        <div className="p-4 bg-[var(--ep-accent-soft)] border border-[var(--ep-accent-border)] text-[#5FA8A0] rounded-xl flex items-center gap-3 text-sm">
+        <div className="p-4 bg-[#4F9D83]/10 border border-[#4F9D83]/25 text-[#4F9D83] rounded-xl flex items-center gap-3 text-sm">
           <CheckCircle2 className="w-5 h-5 shrink-0" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {/* ── Today Live Session Card ─────────────────────────────────── */}
-      <div className="p-6 rounded-xl bg-[#111317] border border-[#1E2530] space-y-6 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1E2530] pb-5">
+      <div className="p-5 sm:p-6 rounded-xl bg-[#1A1A1B] border border-[#2E2E30] space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2E2E30] pb-5">
           <div>
-            <h2 className="text-lg font-bold text-[#E6E8EB] flex items-center gap-2">
-              <Clock className="w-5 h-5 text-[#5FA8A0]" />
+            <h2 className="text-lg font-semibold text-[#EDEBE6] flex items-center gap-2">
+              <Clock className="w-5 h-5 text-[#4F9D83]" />
               <span>Today's Live Punch & Session</span>
             </h2>
-            <p className="text-xs text-[#566171] mt-0.5">
+            <p className="text-xs text-[#8A867E] mt-0.5">
               {new Date().toLocaleDateString("en-US", {
                 weekday: "long",
                 month: "short",
@@ -348,7 +347,7 @@ export default function AttendancePage() {
                 <select
                   value={breakType}
                   onChange={(e) => setBreakType(e.target.value)}
-                  className="bg-[#0F1215] border border-[#1E2530] text-[#E6E8EB] text-xs rounded-xl px-2.5 py-2 focus:outline-hidden focus:border-[#5FA8A0]"
+                  className="bg-[#232324] border border-[#2E2E30] text-[#EDEBE6] text-xs rounded-lg px-2.5 py-2 focus:outline-hidden focus:border-[#4F9D83]"
                 >
                   <option value="LUNCH">Lunch Break</option>
                   <option value="TEA">Tea / Coffee</option>
@@ -359,7 +358,7 @@ export default function AttendancePage() {
                   variant="secondary"
                   size="md"
                   loading={actionLoading}
-                  icon={<Coffee className="w-3.5 h-3.5 text-amber-400" />}
+                  icon={<Coffee className="w-3.5 h-3.5 text-[#C9A15B]" />}
                   onClick={() => handleAction("break-start")}
                 >
                   Take Break
@@ -398,23 +397,23 @@ export default function AttendancePage() {
         {/* Target Progress Bar */}
         <div className="space-y-2">
           <div className="flex justify-between items-center text-xs">
-            <span className="text-[#8B94A1]">
+            <span className="text-[#8A867E]">
               Target Progress ({formatMinutes(netMins)} / {formatMinutes(reqMins)})
             </span>
             <span
               className={`font-semibold ${
-                netMins >= reqMins ? "text-[#5FA8A0]" : "text-[#6DB8B0]"
+                netMins >= reqMins ? "text-[#5FAE7E]" : "text-[#4F9D83]"
               }`}
             >
               {progressPercent}% Completed
             </span>
           </div>
-          <div className="h-2.5 w-full bg-[#0F1215] rounded-full overflow-hidden border border-[#1E2530]">
+          <div className="h-2 w-full bg-[#121212] rounded-full overflow-hidden border border-[#2E2E30]">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 netMins >= reqMins
-                  ? "bg-[#5FA8A0]"
-                  : "bg-gradient-to-r from-[#4A8A83] to-[#5FA8A0]"
+                  ? "bg-[#5FAE7E]"
+                  : "bg-[#4F9D83]"
               }`}
               style={{ width: `${progressPercent}%` }}
             />
@@ -423,68 +422,68 @@ export default function AttendancePage() {
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
-          <div className="p-4 rounded-xl bg-[#0F1215] border border-[#1E2530] space-y-1">
-            <span className="text-[11px] text-[#566171] uppercase tracking-wider font-semibold">
+          <div className="p-4 rounded-lg bg-[#121212]/60 border border-[#2E2E30] space-y-1">
+            <span className="text-[11px] text-[#8A867E] uppercase tracking-wider font-semibold">
               Required Target
             </span>
-            <div className="text-xl font-bold text-[#E6E8EB]">{formatMinutes(reqMins)}</div>
-            <p className="text-[10px] text-[#566171]">Company Standard</p>
+            <div className="text-xl font-semibold text-[#EDEBE6]">{formatMinutes(reqMins)}</div>
+            <p className="text-[10px] text-[#8A867E]">Company Standard</p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#0F1215] border border-[#1E2530] space-y-1">
-            <span className="text-[11px] text-[#566171] uppercase tracking-wider font-semibold">
+          <div className="p-4 rounded-lg bg-[#121212]/60 border border-[#2E2E30] space-y-1">
+            <span className="text-[11px] text-[#8A867E] uppercase tracking-wider font-semibold">
               Net Worked Time
             </span>
-            <div className="text-xl font-bold text-[#5FA8A0] font-mono">
+            <div className="text-xl font-semibold text-[#4F9D83] font-mono">
               {formatMinutes(netMins)}
             </div>
-            <p className="text-[10px] text-[#566171]">Gross - Breaks</p>
+            <p className="text-[10px] text-[#8A867E]">Gross - Breaks</p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#0F1215] border border-[#1E2530] space-y-1">
-            <span className="text-[11px] text-[#566171] uppercase tracking-wider font-semibold">
+          <div className="p-4 rounded-lg bg-[#121212]/60 border border-[#2E2E30] space-y-1">
+            <span className="text-[11px] text-[#8A867E] uppercase tracking-wider font-semibold">
               Break Time
             </span>
-            <div className="text-xl font-bold text-amber-400 font-mono">
+            <div className="text-xl font-semibold text-[#C9A15B] font-mono">
               {formatMinutes(today?.breakMinutes || 0)}
             </div>
-            <p className="text-[10px] text-[#566171]">
+            <p className="text-[10px] text-[#8A867E]">
               {today?.breaks?.length || 0} session(s)
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#0F1215] border border-[#1E2530] space-y-1">
-            <span className="text-[11px] text-[#566171] uppercase tracking-wider font-semibold">
+          <div className="p-4 rounded-lg bg-[#121212]/60 border border-[#2E2E30] space-y-1">
+            <span className="text-[11px] text-[#8A867E] uppercase tracking-wider font-semibold">
               Remaining Target
             </span>
             <div
-              className={`text-xl font-bold font-mono ${
-                isTargetMet ? "text-[#5FA8A0]" : "text-[#FBBF24]"
+              className={`text-xl font-semibold font-mono ${
+                isTargetMet ? "text-[#5FAE7E]" : "text-[#C9A15B]"
               }`}
             >
               {isTargetMet ? "0h 0m (Met)" : formatMinutes(remainingMinutes)}
             </div>
-            <p className="text-[10px] text-[#566171]">Target balance</p>
+            <p className="text-[10px] text-[#8A867E]">Target balance</p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#0F1215] border border-[#1E2530] space-y-1">
-            <span className="text-[11px] text-[#566171] uppercase tracking-wider font-semibold">
+          <div className="p-4 rounded-lg bg-[#121212]/60 border border-[#2E2E30] space-y-1">
+            <span className="text-[11px] text-[#8A867E] uppercase tracking-wider font-semibold">
               Check In / Out
             </span>
-            <div className="text-sm font-semibold text-[#E6E8EB] mt-1 font-mono">
+            <div className="text-sm font-semibold text-[#EDEBE6] mt-1 font-mono">
               {today?.checkInAt ? formatTime(today.checkInAt) : "—"}{" "}
-              <span className="text-[#566171]">→</span>{" "}
+              <span className="text-[#8A867E]">→</span>{" "}
               {today?.checkOutAt ? (
                 formatTime(today.checkOutAt)
               ) : today?.checkInAt ? (
-                <span className="text-[#5FA8A0]">Active</span>
+                <span className="text-[#4F9D83]">Active</span>
               ) : (
                 "—"
               )}
             </div>
-            <p className="text-[10px] text-[#566171]">
+            <p className="text-[10px] text-[#8A867E]">
               {today?.isLate ? (
-                <span className="text-red-400 font-medium">Late Arrival</span>
+                <span className="text-[#C46A62] font-medium">Late Arrival</span>
               ) : (
                 "On-time arrival"
               )}
@@ -494,69 +493,69 @@ export default function AttendancePage() {
       </div>
 
       {/* ── Attendance History Log ──────────────────────────────────── */}
-      <div className="p-6 rounded-xl bg-[#111317] border border-[#1E2530] space-y-4 shadow-xs">
+      <div className="p-5 sm:p-6 rounded-xl bg-[#1A1A1B] border border-[#2E2E30] space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-[#E6E8EB] flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-[#5FA8A0]" />
+          <h2 className="text-lg font-semibold text-[#EDEBE6] flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-[#4F9D83]" />
             <span>Attendance History (Last 60 Days)</span>
           </h2>
-          <span className="text-xs text-[#566171]">{records.length} records</span>
+          <span className="text-xs text-[#8A867E]">{records.length} records</span>
         </div>
 
         {records.length === 0 ? (
-          <div className="text-sm text-[#566171] py-8 text-center border border-dashed border-[#1E2530] rounded-xl bg-[#0F1215]">
+          <div className="text-sm text-[#8A867E] py-8 text-center border border-dashed border-[#2E2E30] rounded-xl bg-[#121212]/50">
             {error ? "Unable to load attendance records due to server error." : "No attendance records found for this period."}
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-[#8B94A1]">
-              <thead className="bg-[#0F1215] text-[11px] text-[#566171] uppercase tracking-wider border-b border-[#1E2530]">
+            <table className="w-full text-left text-xs text-[#B3AFA6]">
+              <thead className="bg-[#121212] text-[11px] text-[#8A867E] uppercase tracking-wider border-b border-[#2E2E30]">
                 <tr>
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4">Check In</th>
-                  <th className="py-3 px-4">Check Out</th>
-                  <th className="py-3 px-4">Gross</th>
-                  <th className="py-3 px-4">Breaks</th>
-                  <th className="py-3 px-4">Net Worked</th>
-                  <th className="py-3 px-4">Daily Target</th>
-                  <th className="py-3 px-4">Shortfall / Overtime</th>
-                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4 font-semibold">Date</th>
+                  <th className="py-3 px-4 font-semibold">Check In</th>
+                  <th className="py-3 px-4 font-semibold">Check Out</th>
+                  <th className="py-3 px-4 font-semibold">Gross</th>
+                  <th className="py-3 px-4 font-semibold">Breaks</th>
+                  <th className="py-3 px-4 font-semibold">Net Worked</th>
+                  <th className="py-3 px-4 font-semibold">Daily Target</th>
+                  <th className="py-3 px-4 font-semibold">Shortfall / Overtime</th>
+                  <th className="py-3 px-4 font-semibold">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#1E2530]">
+              <tbody className="divide-y divide-[#2E2E30]">
                 {records.map((r: any) => (
-                  <tr key={r.id} className="hover:bg-[#171A1F] transition-colors">
-                    <td className="py-3.5 px-4 font-semibold text-[#E6E8EB]">
+                  <tr key={r.id} className="hover:bg-[#232324]/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-[#EDEBE6]">
                       {formatDateStr(r.date)}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-xs">
+                    <td className="py-3.5 px-4 font-mono text-xs text-[#EDEBE6]">
                       {r.checkInAt ? formatTime(r.checkInAt) : "—"}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-xs">
+                    <td className="py-3.5 px-4 font-mono text-xs text-[#EDEBE6]">
                       {r.checkOutAt ? formatTime(r.checkOutAt) : r.checkInAt ? "Active" : "—"}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-[#566171]">
+                    <td className="py-3.5 px-4 font-mono text-[#8A867E]">
                       {formatMinutes(r.grossMinutes || r.workedMinutes)}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-amber-400">
+                    <td className="py-3.5 px-4 font-mono text-[#C9A15B]">
                       {formatMinutes(r.breakMinutes || 0)}
                     </td>
-                    <td className="py-3.5 px-4 text-[#5FA8A0] font-semibold font-mono">
+                    <td className="py-3.5 px-4 text-[#4F9D83] font-semibold font-mono">
                       {formatMinutes(r.workedMinutes)}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-[#566171]">
+                    <td className="py-3.5 px-4 font-mono text-[#8A867E]">
                       {formatMinutes(r.requiredMinutes)}
                     </td>
                     <td
                       className={`py-3.5 px-4 font-semibold font-mono ${
-                        r.differenceMinutes >= 0 ? "text-[#5FA8A0]" : "text-[#F87171]"
+                        r.differenceMinutes >= 0 ? "text-[#5FAE7E]" : "text-[#C46A62]"
                       }`}
                     >
                       {formatMinutes(r.differenceMinutes)}
                     </td>
                     <td className="py-3.5 px-4">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${statusColor(
+                        className={`px-2 py-0.5 rounded text-[10px] font-semibold border uppercase tracking-wider ${statusColor(
                           r.status
                         )}`}
                       >
@@ -573,18 +572,18 @@ export default function AttendancePage() {
 
       {/* ── Regularization Request Modal ────────────────────────────── */}
       {regModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-[#111317] border border-[#1E2530] rounded-xl w-full max-w-lg flex flex-col overflow-hidden shadow-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#1E2530] bg-[#0F1215]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#1A1A1B] border border-[#2E2E30] rounded-xl w-full max-w-lg flex flex-col overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#2E2E30] bg-[#121212]">
               <div className="flex items-center gap-2">
-                <FileCheck className="w-5 h-5 text-[#5FA8A0]" />
-                <h3 className="text-base font-bold text-[#E6E8EB]">
+                <FileCheck className="w-5 h-5 text-[#4F9D83]" />
+                <h3 className="text-base font-semibold text-[#EDEBE6]">
                   Attendance Regularization Request
                 </h3>
               </div>
               <button
                 onClick={() => setRegModalOpen(false)}
-                className="p-1 rounded-lg text-[#566171] hover:text-[#E6E8EB] hover:bg-[#171A1F] transition-colors cursor-pointer"
+                className="p-1 rounded-lg text-[#8A867E] hover:text-[#EDEBE6] hover:bg-[#232324] transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -592,48 +591,48 @@ export default function AttendancePage() {
 
             <form onSubmit={handleRegularizeSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
-                  Target Date <span className="text-red-400">*</span>
+                <label className="block text-xs font-medium text-[#B3AFA6] mb-1.5">
+                  Target Date <span className="text-[#C46A62]">*</span>
                 </label>
                 <input
                   type="date"
                   required
                   value={regDate}
                   onChange={(e) => setRegDate(e.target.value)}
-                  className="w-full bg-[#0F1215] border border-[#1E2530] rounded-xl px-3 py-2 text-sm text-[#E6E8EB] focus:outline-hidden focus:border-[#5FA8A0]"
+                  className="w-full bg-[#232324] border border-[#2E2E30] rounded-lg px-3 py-2 text-sm text-[#EDEBE6] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
-                    Requested Check-In <span className="text-red-400">*</span>
+                  <label className="block text-xs font-medium text-[#B3AFA6] mb-1.5">
+                    Requested Check-In <span className="text-[#C46A62]">*</span>
                   </label>
                   <input
                     type="time"
                     required
                     value={regCheckIn}
                     onChange={(e) => setRegCheckIn(e.target.value)}
-                    className="w-full bg-[#0F1215] border border-[#1E2530] rounded-xl px-3 py-2 text-sm text-[#E6E8EB] focus:outline-hidden focus:border-[#5FA8A0]"
+                    className="w-full bg-[#232324] border border-[#2E2E30] rounded-lg px-3 py-2 text-sm text-[#EDEBE6] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
-                    Requested Check-Out <span className="text-red-400">*</span>
+                  <label className="block text-xs font-medium text-[#B3AFA6] mb-1.5">
+                    Requested Check-Out <span className="text-[#C46A62]">*</span>
                   </label>
                   <input
                     type="time"
                     required
                     value={regCheckOut}
                     onChange={(e) => setRegCheckOut(e.target.value)}
-                    className="w-full bg-[#0F1215] border border-[#1E2530] rounded-xl px-3 py-2 text-sm text-[#E6E8EB] focus:outline-hidden focus:border-[#5FA8A0]"
+                    className="w-full bg-[#232324] border border-[#2E2E30] rounded-lg px-3 py-2 text-sm text-[#EDEBE6] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#8B94A1] mb-1.5">
-                  Reason for Regularization <span className="text-red-400">*</span>
+                <label className="block text-xs font-medium text-[#B3AFA6] mb-1.5">
+                  Reason for Regularization <span className="text-[#C46A62]">*</span>
                 </label>
                 <textarea
                   required
@@ -641,11 +640,11 @@ export default function AttendancePage() {
                   value={regReason}
                   onChange={(e) => setRegReason(e.target.value)}
                   placeholder="Explain why the punch was missed or hours were incomplete (e.g. Client meeting off-site, power outage, technical issue)..."
-                  className="w-full bg-[#0F1215] border border-[#1E2530] rounded-xl px-3 py-2.5 text-xs text-[#E6E8EB] placeholder:text-[#566171] focus:outline-hidden focus:border-[#5FA8A0] resize-none"
+                  className="w-full bg-[#232324] border border-[#2E2E30] rounded-lg px-3 py-2.5 text-xs text-[#EDEBE6] placeholder:text-[#7C786F] focus:outline-hidden focus:border-[#4F9D83] focus:ring-1 focus:ring-[#4F9D83] resize-none"
                 />
               </div>
 
-              <div className="pt-2 flex justify-end gap-3 border-t border-[#1E2530]">
+              <div className="pt-2 flex justify-end gap-3 border-t border-[#2E2E30]">
                 <EpButton
                   type="button"
                   variant="secondary"
