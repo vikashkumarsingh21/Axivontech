@@ -30,6 +30,11 @@ No regressions or breaking issues were detected in backend logic. All data model
 4. **Statutory Tax (Section 194H TDS) Precision:**
    - Verified that all commission payouts and estimations compute standard 5% Section 194H TDS with Form 16A digital certificates.
 
+5. **Dashboard `pendingActions` Object vs Array Contract Reconciliation:**
+   - `BROKER_API_CONTRACT.md` specified `pendingActions: [{ id, type, title, link }]` as an array.
+   - `GET /api/v1/broker/dashboard` returns a summary object: `{ contractsToSignCount, paymentProofsNeededCount, unreadDocumentsCount, unreadNotificationsCount, contracts, payments }`.
+   - The frontend `src/app/broker/dashboard/page.tsx` now incorporates defensive dual-format normalization: if `pendingActions` is an array, it uses it directly; if it is an aggregated object, it synthesizes high-priority, deep-linked actionable alert cards (contracts to sign, pending advance proofs, incomplete onboarding steps, unread documents, and notifications) without throwing `TypeError: pendingActions.map is not a function`.
+
 ---
 
 ## 3. Conclusion

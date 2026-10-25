@@ -33,38 +33,80 @@ import { BrokerErrorState } from "@/components/broker/BrokerErrorState";
 import { BrokerEmptyState } from "@/components/broker/BrokerEmptyState";
 
 interface DashboardData {
-  stats: {
-    leads: { TOTAL: number; NEW?: number; QUALIFIED?: number };
-    projects: { TOTAL: number; PENDING?: number; CONFIRMED?: number };
-    earnings: {
-      totalEarned: number;
-      pending: number;
-      eligible: number;
-      requested: number;
-      paid: number;
-      thisMonth: number;
+  profile?: {
+    id?: string;
+    partnerId?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+    avatarUrl?: string;
+    referralCode?: string;
+    onboardingComplete?: boolean;
+    missingOnboardingSteps?: string[];
+  };
+  stats?: {
+    leads?: {
+      total?: number;
+      active?: number;
+      converted?: number;
+      TOTAL?: number;
+      NEW?: number;
+      QUALIFIED?: number;
+    };
+    projects?: Record<string, number>;
+    earnings?: {
+      totalEarned?: number;
+      pending?: number;
+      eligible?: number;
+      requested?: number;
+      paid?: number;
+      thisMonth?: number;
     };
   };
-  pendingActions: Array<{
-    id: string;
-    type: string;
-    title: string;
-    description?: string;
-    link: string;
-    severity?: "HIGH" | "MEDIUM" | "LOW";
-  }>;
-  referral: {
+  pendingActions?:
+    | Array<{
+        id: string;
+        type: string;
+        title: string;
+        description?: string;
+        link: string;
+        severity?: "HIGH" | "MEDIUM" | "LOW";
+      }>
+    | {
+        contractsToSignCount?: number;
+        paymentProofsNeededCount?: number;
+        unreadDocumentsCount?: number;
+        unreadNotificationsCount?: number;
+        contracts?: any[];
+        payments?: any[];
+      };
+  referral?: {
+    code?: string;
     referralCode?: string;
+    leadReferralUrl?: string | null;
+    projectStartUrl?: string | null;
     totalClicks?: number;
     totalLeads?: number;
+    totalReferredLeads?: number;
     convertedProjects?: number;
+    convertedReferredLeads?: number;
   };
   recentMilestones?: Array<{
     id: string;
     title: string;
     targetDate: string;
-    projectName: string;
-    isCompleted: boolean;
+    projectName?: string;
+    status?: string;
+    isCompleted?: boolean;
+  }>;
+  upcomingMilestones?: Array<{
+    id: string;
+    title: string;
+    targetDate: string;
+    projectName?: string;
+    projectCode?: string;
+    status?: string;
+    isCompleted?: boolean;
   }>;
   recentActivity?: Array<{
     id: string;
@@ -106,10 +148,18 @@ export default function BrokerDashboardPage() {
   const [copiedCode, setCopiedCode] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
-  const referralCode = dashboard?.referral?.referralCode || "";
+  const referralCode =
+    dashboard?.referral?.referralCode ||
+    dashboard?.referral?.code ||
+    dashboard?.profile?.referralCode ||
+    "";
   const origin = typeof window !== "undefined" ? window.location.origin : "https://axivontech.in";
-  const referralLink = `${origin}/lead/${referralCode}`;
-  const projectStartLink = `${origin}/project/start/${referralCode}`;
+  const referralLink =
+    dashboard?.referral?.leadReferralUrl ||
+    (referralCode ? `${origin}/lead/${referralCode}` : `${origin}/business-partner`);
+  const projectStartLink =
+    dashboard?.referral?.projectStartUrl ||
+    (referralCode ? `${origin}/project/start/${referralCode}` : `${origin}/projects/new`);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -127,6 +177,135 @@ export default function BrokerDashboardPage() {
   const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
   const emailUrl = `mailto:?subject=${encodeURIComponent("Enterprise Software Partnership — Axivon Technologies")}&body=${encodeURIComponent(shareText)}`;
 
+  // Defensive earnings normalization
+  const earnings = {
+    totalEarned: dashboard?.stats?.earnings?.totalEarned ?? dashboard?.stats?.earnings?.paid ?? 0,
+    eligible: dashboard?.stats?.earnings?.eligible ?? 0,
+    pending: dashboard?.stats?.earnings?.pending ?? 0,
+    requested: dashboard?.stats?.earnings?.requested ?? 0,
+    paid: dashboard?.stats?.earnings?.paid ?? dashboard?.stats?.earnings?.totalEarned ?? 0,
+    thisMonth: dashboard?.stats?.earnings?.thisMonth ?? 0,
+  };
+
+  // Safe pendingActions normalization (handles both Array and summary Object from API)
+  const pendingActions = React.useMemo(() => {
+    const raw = dashboard?.pendingActions;
+    if (Array.isArray(raw)) {
+      return raw;
+    }
+    if (!raw || typeof raw !== "object") {
+      return [];
+    }
+
+    const items: Array<{
+      id: string;
+      type: string;
+      title: string;
+      description?: string;
+      link: string;
+      severity?: "HIGH" | "MEDIUM" | "LOW";
+    }> = [];
+
+    const contractsCount =
+      raw.contractsToSignCount ?? (Array.isArray(raw.contracts) ? raw.contracts.length : 0);
+    if (contractsCount > 0) {
+      items.push({
+        id: "action-contracts",
+        type: "CONTRACT_SIGN",
+        title: `${contractsCount} Project Contract${contractsCount > 1 ? "s" : ""} Awaiting Review & Signature`,
+        description: "Review contract terms and sign digitally to advance project delivery.",
+        link: "/broker/projects",
+        severity: "HIGH",
+      });
+    }
+
+    const paymentsCount =
+      raw.paymentProofsNeededCount ?? (Array.isArray(raw.payments) ? raw.payments.length : 0);
+    if (paymentsCount > 0) {
+      items.push({
+        id: "action-payments",
+        type: "PAYMENT_PROOF",
+        title: `${paymentsCount} Payment Advance / Proof${paymentsCount > 1 ? "s" : ""} Pending Verification`,
+        description: "Submit or review advance payments to release development milestones.",
+        link: "/broker/projects",
+        severity: "HIGH",
+      });
+    }
+
+    const missingSteps = dashboard?.profile?.missingOnboardingSteps;
+    const isOnboardingComplete = dashboard?.profile?.onboardingComplete;
+    if (isOnboardingComplete === false && Array.isArray(missingSteps) && missingSteps.length > 0) {
+      items.push({
+        id: "action-onboarding",
+        type: "ONBOARDING",
+        title: "Complete Business Partner Onboarding",
+        description: `${missingSteps.length} step(s) pending: ${missingSteps[0]}`,
+        link: "/broker/onboarding",
+        severity: "HIGH",
+      });
+    }
+
+    const unreadDocs = raw.unreadDocumentsCount ?? 0;
+    if (unreadDocs > 0) {
+      items.push({
+        id: "action-docs",
+        type: "DOCUMENT_READ",
+        title: `${unreadDocs} Unread Broadcast Document${unreadDocs > 1 ? "s" : ""}`,
+        description: "Review partner policy and compliance documents in Document Center.",
+        link: "/broker/documents",
+        severity: "MEDIUM",
+      });
+    }
+
+    const unreadNotifs = raw.unreadNotificationsCount ?? 0;
+    if (unreadNotifs > 0) {
+      items.push({
+        id: "action-notifications",
+        type: "NOTIFICATION",
+        title: `${unreadNotifs} Unread Notification${unreadNotifs > 1 ? "s" : ""}`,
+        description: "Check recent system updates, lead status shifts, and commission alerts.",
+        link: "/broker/notifications",
+        severity: "LOW",
+      });
+    }
+
+    return items;
+  }, [dashboard]);
+
+  // Safe Milestones normalization
+  const milestones = React.useMemo(() => {
+    const list = dashboard?.upcomingMilestones || dashboard?.recentMilestones;
+    if (!Array.isArray(list)) return [];
+    return list.map((m) => ({
+      id: m.id,
+      title: m.title,
+      projectName: m.projectName || (m as any).partnerProject?.projectName || "Referred Project",
+      targetDate: m.targetDate,
+      isCompleted: m.status === "COMPLETED" || Boolean(m.isCompleted),
+    }));
+  }, [dashboard]);
+
+  // Safe Activity normalization
+  const recentActivities = React.useMemo(() => {
+    const list = dashboard?.recentActivity;
+    if (!Array.isArray(list)) return [];
+    return list;
+  }, [dashboard]);
+
+  // Safe Monthly Earnings normalization
+  const monthlyEarnings = React.useMemo(() => {
+    const list = analytics?.monthlyEarnings;
+    if (!Array.isArray(list)) return [];
+    return list;
+  }, [analytics]);
+
+  // Safe Conversion Funnel normalization
+  const funnelSteps = React.useMemo(() => {
+    const list = analytics?.funnel;
+    if (!Array.isArray(list)) return [];
+    return list;
+  }, [analytics]);
+
   if (dashLoading) {
     return (
       <div className="space-y-6">
@@ -143,17 +322,6 @@ export default function BrokerDashboardPage() {
   if (dashError) {
     return <BrokerErrorState message={dashError} onRetry={refetchDash} />;
   }
-
-  const earnings = dashboard?.stats?.earnings || {
-    totalEarned: 0,
-    eligible: 0,
-    pending: 0,
-    requested: 0,
-    paid: 0,
-    thisMonth: 0,
-  };
-
-  const pendingActions = dashboard?.pendingActions || [];
 
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
@@ -241,7 +409,7 @@ export default function BrokerDashboardPage() {
             {dashboard?.stats?.projects?.TOTAL || 0}
           </div>
           <div className="text-[11px] text-[#8B94A1] mt-1.5 flex items-center justify-between">
-            <span>In Review: <strong className="text-[#E6E8EB] font-mono">{dashboard?.stats?.projects?.PENDING || 0}</strong></span>
+            <span>In Review: <strong className="text-[#E6E8EB] font-mono">{dashboard?.stats?.projects?.PENDING_REVIEW || dashboard?.stats?.projects?.PENDING || 0}</strong></span>
             <Link href="/broker/projects" className="text-[11px] text-[#8B94A1] hover:text-[#E6E8EB] transition-colors">
               View All →
             </Link>
@@ -255,10 +423,10 @@ export default function BrokerDashboardPage() {
             <Users className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-semibold tracking-tight text-[#E6E8EB] font-mono">
-            {dashboard?.stats?.leads?.TOTAL || 0}
+            {(dashboard?.stats?.leads as any)?.total ?? dashboard?.stats?.leads?.TOTAL ?? 0}
           </div>
           <div className="text-[11px] text-[#8B94A1] mt-1.5 flex items-center justify-between">
-            <span>Qualified: <strong className="text-[#E6E8EB] font-mono">{dashboard?.stats?.leads?.QUALIFIED || 0}</strong></span>
+            <span>Active / Qualified: <strong className="text-[#E6E8EB] font-mono">{(dashboard?.stats?.leads as any)?.active ?? (dashboard?.stats?.leads as any)?.converted ?? dashboard?.stats?.leads?.QUALIFIED ?? 0}</strong></span>
             <Link href="/broker/leads" className="text-[11px] text-[#8B94A1] hover:text-[#E6E8EB] transition-colors">
               Manage Leads →
             </Link>
@@ -284,7 +452,7 @@ export default function BrokerDashboardPage() {
             <div className="h-56 flex items-center justify-center text-xs text-[#8B94A1] animate-pulse">
               Loading 12-month earnings trend...
             </div>
-          ) : !analytics?.monthlyEarnings || analytics.monthlyEarnings.length === 0 ? (
+          ) : monthlyEarnings.length === 0 ? (
             <div className="h-56 flex flex-col items-center justify-center text-xs text-[#8B94A1] text-center p-4">
               <TrendingUp className="w-8 h-8 text-[#566171] mb-2" />
               <span>Earnings data will populate as client milestones complete.</span>
@@ -293,9 +461,9 @@ export default function BrokerDashboardPage() {
             <div className="space-y-4 pt-2">
               {/* Responsive Bar Visualization */}
               <div className="h-48 flex items-end gap-2 md:gap-3 px-2 pt-6 border-b border-[#1E232B]">
-                {analytics.monthlyEarnings.map((item, idx) => {
+                {monthlyEarnings.map((item, idx) => {
                   const maxEarnings = Math.max(
-                    ...analytics.monthlyEarnings.map((m) => m.paid + m.eligible),
+                    ...monthlyEarnings.map((m) => m.paid + m.eligible),
                     10000
                   );
                   const total = item.paid + item.eligible;
@@ -351,13 +519,13 @@ export default function BrokerDashboardPage() {
             <div className="h-56 flex items-center justify-center text-xs text-[#8B94A1] animate-pulse">
               Computing conversion rates...
             </div>
-          ) : !analytics?.funnel || analytics.funnel.length === 0 ? (
+          ) : funnelSteps.length === 0 ? (
             <div className="h-56 flex flex-col items-center justify-center text-xs text-[#8B94A1] text-center p-4">
               <span>Conversion rates calculate automatically as leads progress.</span>
             </div>
           ) : (
             <div className="space-y-3.5 py-1">
-              {analytics.funnel.map((step) => (
+              {funnelSteps.map((step) => (
                 <div key={step.step} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-[#8B94A1] font-medium">{step.label}</span>
@@ -511,13 +679,13 @@ export default function BrokerDashboardPage() {
             </Link>
           }
         >
-          {!dashboard?.recentActivity || dashboard.recentActivity.length === 0 ? (
+          {recentActivities.length === 0 ? (
             <div className="p-6 text-center text-xs text-[#8B94A1]">
               <span>No recorded partner activity yet.</span>
             </div>
           ) : (
             <div className="space-y-4">
-              {dashboard.recentActivity.slice(0, 5).map((act) => (
+              {recentActivities.slice(0, 5).map((act) => (
                 <div key={act.id} className="flex items-start gap-3 text-xs">
                   <div className="w-2 h-2 rounded-full bg-[#C2A878] mt-1.5 shrink-0" />
                   <div className="flex-1 min-w-0">
@@ -542,14 +710,14 @@ export default function BrokerDashboardPage() {
             </Link>
           }
         >
-          {!dashboard?.recentMilestones || dashboard.recentMilestones.length === 0 ? (
+          {milestones.length === 0 ? (
             <div className="p-6 text-center text-xs text-[#8B94A1]">
               <Clock className="w-6 h-6 text-[#566171] mx-auto mb-2" />
               <span>No upcoming milestones scheduled.</span>
             </div>
           ) : (
             <div className="space-y-3">
-              {dashboard.recentMilestones.map((m) => (
+              {milestones.map((m) => (
                 <div key={m.id} className="p-3 rounded-lg border border-[#22262D] bg-[#0E1013] flex items-center justify-between gap-3 text-xs">
                   <div className="min-w-0">
                     <p className="font-semibold text-[#E6E8EB] truncate">{m.title}</p>
