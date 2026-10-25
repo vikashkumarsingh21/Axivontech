@@ -58,6 +58,26 @@
   --ep-text-2: #94A3B8;
   --ep-text-3: #64748B;
 
+  /* ── Broker / Business Partner Portal (Option 1: Warm Sand / Brass Gold) ── */
+  --bp-accent:        #C2A878;
+  --bp-accent-hover:  #D4BE92;
+  --bp-accent-dark:   #A88E5E;
+  --bp-accent-soft:   rgba(194, 168, 120, 0.12);
+  --bp-accent-border: rgba(194, 168, 120, 0.28);
+  --bp-accent-bg:     #1E1A14;
+  
+  --bp-bg-page:       #0A0B0D;
+  --bp-bg-card:       #111317;
+  --bp-bg-raised:     #171A1F;
+  --bp-bg-inset:      #0E1013;
+  
+  --bp-border:        #22262D;
+  --bp-border-2:      #2C313A;
+
+  --bp-text-1:        #E6E8EB;
+  --bp-text-2:        #8B94A1;
+  --bp-text-3:        #566171;
+
   /* ── Secondary — Champagne Gold ──────────────────────────── */
   --gold:           #D6B779;
   --gold-soft:      rgba(214, 183, 121, 0.10);
@@ -121,6 +141,18 @@
   --color-ep-card: #0F172A;
   --color-ep-raised: #1E293B;
   --color-ep-border: #1E293B;
+  --color-bp-accent: #C2A878;
+  --color-bp-accent-hover: #D4BE92;
+  --color-bp-accent-dark: #A88E5E;
+  --color-bp-bg-page: #0A0B0D;
+  --color-bp-bg-card: #111317;
+  --color-bp-bg-raised: #171A1F;
+  --color-bp-bg-inset: #0E1013;
+  --color-bp-border: #22262D;
+  --color-bp-border-2: #2C313A;
+  --color-bp-text-1: #E6E8EB;
+  --color-bp-text-2: #8B94A1;
+  --color-bp-text-3: #566171;
   --font-sans: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-heading: var(--font-manrope), var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Cookie, ShieldCheck, X, Sliders } from "lucide-react";
 import {
   getStoredConsent,
@@ -12,6 +13,7 @@ import {
 import CookiePreferenceModal from "./CookiePreferenceModal";
 
 export default function CookieConsentBanner() {
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,6 +37,13 @@ export default function CookieConsentBanner() {
   }, []);
 
   if (!mounted) return null;
+
+  // Suppress in internal operational portals so bottom actions & pagination are never obstructed
+  const isPortal = pathname?.startsWith("/broker") || 
+                   pathname?.startsWith("/employee") || 
+                   pathname?.startsWith("/admin") || 
+                   pathname?.startsWith("/client");
+  if (isPortal) return null;
 
   const handleAcceptAll = () => {
     acceptAllCookies();
