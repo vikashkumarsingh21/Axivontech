@@ -13,21 +13,21 @@ interface EpButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses = {
   primary:
-    "bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white font-semibold shadow-md shadow-indigo-500/25 active:scale-[0.98] border border-indigo-400/20",
+    "bg-[#4F9D83] hover:bg-[#5BB094] active:bg-[#418671] text-[#0F1A16] font-semibold shadow-xs active:scale-[0.98] border border-[#4F9D83]/30",
   secondary:
-    "bg-[#1E293B] hover:bg-[#283548] border border-[#334155] hover:border-indigo-500/40 text-[#F8FAFC] font-semibold shadow-sm active:scale-[0.98]",
+    "bg-[#232324] hover:bg-[#28282A] border border-[#2E2E30] hover:border-[#3A3A3D] text-[#EDEBE6] font-medium shadow-xs active:scale-[0.98]",
   outline:
-    "bg-transparent hover:bg-indigo-500/10 border border-slate-700/80 hover:border-indigo-500/50 text-slate-300 hover:text-indigo-300 font-medium active:scale-[0.98]",
+    "bg-transparent hover:bg-[#232324] border border-[#2E2E30] hover:border-[#3A3A3D] text-[#EDEBE6] hover:text-[#EDEBE6] font-medium active:scale-[0.98]",
   ghost:
-    "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 font-medium active:scale-[0.98]",
+    "text-[#8A867E] hover:text-[#EDEBE6] hover:bg-[#232324] font-medium active:scale-[0.98]",
   danger:
-    "bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/25 font-semibold active:scale-[0.98]",
+    "bg-[#C46A62]/10 hover:bg-[#C46A62]/20 text-[#C46A62] border border-[#C46A62]/25 font-semibold active:scale-[0.98]",
 };
 
 const sizeClasses = {
   sm: "px-3 py-1.5 text-xs rounded-lg gap-1.5",
-  md: "px-4 py-2 text-xs rounded-xl gap-2",
-  lg: "px-5 py-2.5 text-sm rounded-xl gap-2",
+  md: "px-4 py-2 text-xs rounded-lg gap-2",
+  lg: "px-5 py-2.5 text-sm rounded-lg gap-2",
 };
 
 export function EpButton({
