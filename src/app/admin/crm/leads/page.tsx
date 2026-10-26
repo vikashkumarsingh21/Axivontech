@@ -3,7 +3,7 @@
 import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Search, Plus, X, RefreshCw, AlertCircle, CheckCircle2, UserPlus, Filter, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { Search, Plus, X, RefreshCw, AlertCircle, CheckCircle2, UserPlus, Filter, ChevronLeft, ChevronRight, Download, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 interface Lead {
@@ -49,6 +49,81 @@ export default function LeadsPage() {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState("");
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Lead selection & deletion states
+  const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([]);
+  const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
+  const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+
+  const toggleSelectAll = () => {
+    if (selectedLeadIds.length === leads.length && leads.length > 0) {
+      setSelectedLeadIds([]);
+    } else {
+      setSelectedLeadIds(leads.map((l) => l.id));
+    }
+  };
+
+  const toggleSelectLead = (id: string) => {
+    setSelectedLeadIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleDeleteSingle = async () => {
+    if (!leadToDelete) return;
+    setDeleteLoading(true);
+    setDeleteError("");
+    try {
+      const res = await fetch(`/api/v1/crm/leads/${leadToDelete.id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(getErrorMessage(data) || "Failed to delete lead");
+      }
+      setFeedback({
+        type: "success",
+        message: `Lead ${leadToDelete.leadCode} (${leadToDelete.name}) was successfully deleted.`,
+      });
+      setSelectedLeadIds((prev) => prev.filter((id) => id !== leadToDelete.id));
+      setLeadToDelete(null);
+      fetchLeads();
+    } catch (err: any) {
+      setDeleteError(err.message || "Failed to delete lead");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleDeleteBulk = async () => {
+    if (selectedLeadIds.length === 0) return;
+    setDeleteLoading(true);
+    setDeleteError("");
+    try {
+      const res = await fetch("/api/v1/crm/leads", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ leadIds: selectedLeadIds }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(getErrorMessage(data) || "Failed to delete leads");
+      }
+      setFeedback({
+        type: "success",
+        message: `Successfully deleted ${data.data?.deletedCount || selectedLeadIds.length} lead(s).`,
+      });
+      setSelectedLeadIds([]);
+      setIsBulkDeleteOpen(false);
+      fetchLeads();
+    } catch (err: any) {
+      setDeleteError(err.message || "Failed to delete leads");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   const [addForm, setAddForm] = useState({
     name: "",
@@ -298,11 +373,46 @@ export default function LeadsPage() {
           </div>
         </div>
 
+        {/* Bulk Action Bar */}
+        {selectedLeadIds.length > 0 && (
+          <div className="p-3 bg-red-500/10 border-b border-red-500/20 flex items-center justify-between text-xs text-red-300 px-5">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-white">{selectedLeadIds.length} lead(s) selected</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setSelectedLeadIds([])}
+                className="px-3 py-1.5 rounded-lg border border-white/10 text-gray-300 hover:text-white transition-colors"
+              >
+                Deselect All
+              </button>
+              <button
+                onClick={() => {
+                  setIsBulkDeleteOpen(true);
+                  setDeleteError("");
+                }}
+                className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium inline-flex items-center gap-1.5 shadow-md shadow-red-600/20 transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete Selected ({selectedLeadIds.length})</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Lead Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-400">
             <thead className="bg-[#18181b] text-gray-300 text-xs uppercase font-semibold border-b border-white/10">
               <tr>
+                <th className="px-4 py-3.5 w-10 text-center">
+                  <input
+                    type="checkbox"
+                    checked={leads.length > 0 && selectedLeadIds.length === leads.length}
+                    onChange={toggleSelectAll}
+                    className="rounded border-white/20 bg-white/5 text-red-600 focus:ring-0 focus:outline-none cursor-pointer"
+                  />
+                </th>
                 <th className="px-5 py-3.5">Lead Code</th>
                 <th className="px-5 py-3.5">Contact Name</th>
                 <th className="px-5 py-3.5">Company / Service</th>
@@ -315,7 +425,7 @@ export default function LeadsPage() {
             <tbody className="divide-y divide-white/5">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-gray-500">
+                  <td colSpan={8} className="p-8 text-center text-gray-500">
                     <div className="flex items-center justify-center gap-2">
                       <RefreshCw className="w-4 h-4 animate-spin text-red-500" /> Loading leads...
                     </div>
@@ -323,13 +433,21 @@ export default function LeadsPage() {
                 </tr>
               ) : leads.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-gray-500">
+                  <td colSpan={8} className="p-8 text-center text-gray-500">
                     No leads found matching your criteria.
                   </td>
                 </tr>
               ) : (
                 leads.map((lead) => (
                   <tr key={lead.id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="px-4 py-4 w-10 text-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedLeadIds.includes(lead.id)}
+                        onChange={() => toggleSelectLead(lead.id)}
+                        className="rounded border-white/20 bg-white/5 text-red-600 focus:ring-0 focus:outline-none cursor-pointer"
+                      />
+                    </td>
                     <td className="px-5 py-4 font-mono text-xs text-red-400">
                       <Link href={`/admin/crm/leads/${lead.id}`} className="hover:underline font-semibold">
                         {lead.leadCode}
@@ -371,12 +489,26 @@ export default function LeadsPage() {
                       </span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <Link
-                        href={`/admin/crm/leads/${lead.id}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-white/10 bg-[#1a1a1a] hover:bg-white/10 text-xs font-medium text-white transition-colors"
-                      >
-                        View Detail →
-                      </Link>
+                      <div className="inline-flex items-center gap-2 justify-end">
+                        <Link
+                          href={`/admin/crm/leads/${lead.id}`}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-white/10 bg-[#1a1a1a] hover:bg-white/10 text-xs font-medium text-white transition-colors"
+                        >
+                          View Detail →
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLeadToDelete(lead);
+                            setDeleteError("");
+                          }}
+                          title="Delete Lead"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 text-xs font-medium transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -527,6 +659,158 @@ export default function LeadsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Single Lead Delete Confirmation Modal */}
+      {leadToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-[#141414] border border-white/10 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-white">Delete Lead</h2>
+                  <p className="text-xs text-gray-400">Confirmation required</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!deleteLoading) setLeadToDelete(null);
+                }}
+                className="text-gray-500 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Lead Code:</span>
+                <span className="font-mono font-semibold text-red-400">{leadToDelete.leadCode}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Contact:</span>
+                <span className="text-white font-medium">{leadToDelete.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Email:</span>
+                <span className="text-gray-300">{leadToDelete.email}</span>
+              </div>
+              {leadToDelete.companyName && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Company:</span>
+                  <span className="text-gray-300">{leadToDelete.companyName}</span>
+                </div>
+              )}
+            </div>
+
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Are you sure you want to delete this lead? All associated notes, activities, and follow-ups will be permanently removed. This action cannot be undone.
+            </p>
+
+            {deleteError && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{deleteError}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/10">
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={() => setLeadToDelete(null)}
+                className="px-4 py-2 rounded-xl text-xs text-gray-300 hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={handleDeleteSingle}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-lg shadow-red-600/20"
+              >
+                {deleteLoading ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" /> Yes, Delete Lead
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Modal */}
+      {isBulkDeleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-[#141414] border border-white/10 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-white">Delete {selectedLeadIds.length} Selected Leads</h2>
+                  <p className="text-xs text-gray-400">Bulk delete confirmation</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!deleteLoading) setIsBulkDeleteOpen(false);
+                }}
+                className="text-gray-500 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Are you sure you want to delete <span className="text-white font-semibold">{selectedLeadIds.length} selected lead(s)</span>? This will permanently remove them along with their activities and follow-ups. This action cannot be undone.
+            </p>
+
+            {deleteError && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{deleteError}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/10">
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={() => setIsBulkDeleteOpen(false)}
+                className="px-4 py-2 rounded-xl text-xs text-gray-300 hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={handleDeleteBulk}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-lg shadow-red-600/20"
+              >
+                {deleteLoading ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Deleting {selectedLeadIds.length} Leads...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" /> Yes, Delete Selected Leads
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,11 +1,14 @@
 "use client";
 
+import { getErrorMessage } from "@/lib/errors/client";
 import { useEffect, useState, use } from "react";
 import { 
   Building2, Mail, Phone, Globe, Calendar, UserCheck, CheckCircle2, 
-  Clock, Plus, ArrowLeft, RefreshCw, AlertCircle, Award, UserPlus, FileText, Send, MessageSquare 
+  Clock, Plus, ArrowLeft, RefreshCw, AlertCircle, Award, UserPlus, FileText, Send, MessageSquare,
+  Trash2, X
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -45,6 +48,30 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
     opportunityValue: "",
     opportunityName: "",
   });
+
+  // Delete modal state
+  const router = useRouter();
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+
+  const handleDeleteLead = async () => {
+    setDeleteLoading(true);
+    setDeleteError("");
+    try {
+      const res = await fetch(`/api/v1/crm/leads/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(getErrorMessage(data) || "Failed to delete lead");
+      }
+      router.push("/admin/crm/leads");
+    } catch (err: any) {
+      setDeleteError(err.message || "Failed to delete lead");
+      setDeleteLoading(false);
+    }
+  };
 
   const loadLead = async () => {
     setLoading(true);
@@ -233,14 +260,25 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
           <ArrowLeft className="w-4 h-4" /> Back to Lead Inbox
         </Link>
 
-        {lead.status !== "CONVERTED" && (
+        <div className="flex items-center gap-2">
+          {lead.status !== "CONVERTED" && (
+            <button
+              onClick={() => setIsConvertOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition-all shadow-lg shadow-purple-600/20"
+            >
+              <Award className="w-4 h-4" /> Convert to Client
+            </button>
+          )}
           <button
-            onClick={() => setIsConvertOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition-all shadow-lg shadow-purple-600/20"
+            onClick={() => {
+              setIsDeleteOpen(true);
+              setDeleteError("");
+            }}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-red-600/10 border border-red-500/20 hover:bg-red-600/20 text-red-400 hover:text-red-300 text-sm font-medium transition-all"
           >
-            <Award className="w-4 h-4" /> Convert to Client
+            <Trash2 className="w-4 h-4" /> Delete Lead
           </button>
-        )}
+        </div>
       </div>
 
       {feedback && (
@@ -714,6 +752,92 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
                 <button type="submit" className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-xl font-semibold">Convert Lead</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Delete Confirmation Modal */}
+      {isDeleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-[#141414] border border-white/10 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-white">Delete Lead</h2>
+                  <p className="text-xs text-gray-400">Confirmation required</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!deleteLoading) setIsDeleteOpen(false);
+                }}
+                className="text-gray-500 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Lead Code:</span>
+                <span className="font-mono font-semibold text-red-400">{lead.leadCode}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Contact:</span>
+                <span className="text-white font-medium">{lead.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Email:</span>
+                <span className="text-gray-300">{lead.email}</span>
+              </div>
+              {lead.companyName && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Company:</span>
+                  <span className="text-gray-300">{lead.companyName}</span>
+                </div>
+              )}
+            </div>
+
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Are you sure you want to delete this lead? All associated notes, activities, and follow-ups will be permanently removed. This action cannot be undone.
+            </p>
+
+            {deleteError && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{deleteError}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/10">
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={() => setIsDeleteOpen(false)}
+                className="px-4 py-2 rounded-xl text-xs text-gray-300 hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={handleDeleteLead}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-lg shadow-red-600/20"
+              >
+                {deleteLoading ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" /> Yes, Delete Lead
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

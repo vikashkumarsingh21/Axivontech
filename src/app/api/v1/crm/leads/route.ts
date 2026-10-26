@@ -226,3 +226,69 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function DELETE(req: NextRequest) {
+  try {
+    const userId = req.headers.get("x-user-id");
+    let user;
+    try {
+      user = await requirePermission(userId, "crm.lead.delete");
+    } catch {
+      user = await requirePermission(userId, "crm.lead.update");
+    }
+
+    const body = await req.json().catch(() => ({}));
+    const { leadIds } = body;
+
+    if (!Array.isArray(leadIds) || leadIds.length === 0) {
+      throw new ApiError(400, "leadIds array is required.");
+    }
+
+    if (leadIds.length > 100) {
+      throw new ApiError(400, "Cannot delete more than 100 leads at a time.");
+    }
+
+    const deletedCount = await db.$transaction(async (tx) => {
+      // 1. Delete associated activities, follow-ups, notes, meetings
+      await tx.leadActivity.deleteMany({ where: { leadId: { in: leadIds } } });
+      await tx.followUp.deleteMany({ where: { leadId: { in: leadIds } } });
+      await tx.leadNote.deleteMany({ where: { leadId: { in: leadIds } } });
+      await tx.leadMeeting.deleteMany({ where: { leadId: { in: leadIds } } });
+
+      // 2. Unlink any converted project or opportunity
+      await tx.opportunity.updateMany({
+        where: { leadId: { in: leadIds } },
+        data: { leadId: null },
+      });
+      await tx.partnerProject.updateMany({
+        where: { leadId: { in: leadIds } },
+        data: { leadId: null },
+      });
+
+      // 3. Delete the leads
+      const result = await tx.lead.deleteMany({
+        where: { id: { in: leadIds } },
+      });
+
+      // 4. Record audit log
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          action: "CRM_LEADS_BULK_DELETED",
+          resource: "Lead:bulk",
+          details: { count: result.count, leadIds },
+        },
+      });
+
+      return result.count;
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Successfully deleted ${deletedCount} lead(s).`,
+      data: { deletedCount },
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+

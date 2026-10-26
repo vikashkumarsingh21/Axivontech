@@ -123,3 +123,71 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ [key: s
     return handleApiError(error);
   }
 }
+
+export async function DELETE(req: NextRequest, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
+  try {
+    const { id } = await params;
+    const userId = req.headers.get("x-user-id");
+    let user;
+    try {
+      user = await requirePermission(userId, "crm.lead.delete");
+    } catch {
+      user = await requirePermission(userId, "crm.lead.update");
+    }
+
+    const lead = await db.lead.findUnique({
+      where: { id },
+      select: { id: true, leadCode: true, name: true, email: true, companyName: true },
+    });
+
+    if (!lead) {
+      throw new ApiError(404, "Lead not found");
+    }
+
+    await db.$transaction(async (tx) => {
+      // 1. Delete associated activities, follow-ups, notes, meetings
+      await tx.leadActivity.deleteMany({ where: { leadId: id } });
+      await tx.followUp.deleteMany({ where: { leadId: id } });
+      await tx.leadNote.deleteMany({ where: { leadId: id } });
+      await tx.leadMeeting.deleteMany({ where: { leadId: id } });
+
+      // 2. Unlink any converted project or opportunity
+      await tx.opportunity.updateMany({
+        where: { leadId: id },
+        data: { leadId: null },
+      });
+      await tx.partnerProject.updateMany({
+        where: { leadId: id },
+        data: { leadId: null },
+      });
+
+      // 3. Delete the lead
+      await tx.lead.delete({
+        where: { id },
+      });
+
+      // 4. Record audit log
+      await tx.auditLog.create({
+        data: {
+          userId: user.id,
+          action: "CRM_LEAD_DELETED",
+          resource: `Lead:${id}`,
+          details: {
+            leadCode: lead.leadCode,
+            name: lead.name,
+            email: lead.email,
+            companyName: lead.companyName,
+          },
+        },
+      });
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Lead ${lead.leadCode} (${lead.name}) deleted successfully.`,
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
