@@ -1,15 +1,21 @@
 "use client";
 
 import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
-
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Search, Edit2, ShieldOff, ShieldAlert, Eye } from "lucide-react";
+import { Plus, Search, Edit2, ShieldOff, ShieldAlert, Eye, Download, ChevronDown, FileSpreadsheet } from "lucide-react";
+import { ExportPartnersModal } from "@/components/admin/export/ExportPartnersModal";
 
 export default function BrokersPage() {
   const [brokers, setBrokers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Selection & Export State
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportType, setExportType] = useState<"APPLICATIONS" | "CONFIRMED_PARTNERS">("CONFIRMED_PARTNERS");
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,7 +40,7 @@ export default function BrokersPage() {
       const res = await fetch(`/api/v1/admin/brokers?search=${searchTerm}`);
       if (res.ok) {
         const data = await res.json();
-        setBrokers(data.data);
+        setBrokers(data.data || []);
       }
     } catch (error) {
       console.error(error);
@@ -92,24 +98,88 @@ export default function BrokersPage() {
     }
   };
 
+  const allSelected = brokers.length > 0 && brokers.every((b) => selectedIds.includes(b.id));
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(brokers.map((b) => b.id));
+    }
+  };
+
+  const toggleSelectOne = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white">Brokers / Partners</h1>
           <p className="text-sm text-gray-400">Manage external referral partners.</p>
         </div>
-        <button 
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 flex items-center gap-2 rounded-md transition-colors"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <Plus size={16} /> Add Broker
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Export Dropdown */}
+          <div className="relative">
+            <div className="flex items-center">
+              <button
+                onClick={() => {
+                  setExportType("CONFIRMED_PARTNERS");
+                  setIsExportModalOpen(true);
+                }}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-l-md text-sm font-semibold flex items-center gap-2 transition-colors shadow-sm"
+              >
+                <Download className="w-4 h-4" /> Export (.xlsx)
+              </button>
+              <button
+                onClick={() => setIsExportMenuOpen((prev) => !prev)}
+                className="px-2.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-r-md border-l border-emerald-800 transition-colors"
+              >
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
+
+            {isExportMenuOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-[#161618] border border-white/10 rounded-lg shadow-xl z-20 py-1 text-xs">
+                <button
+                  onClick={() => {
+                    setExportType("CONFIRMED_PARTNERS");
+                    setIsExportMenuOpen(false);
+                    setIsExportModalOpen(true);
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-white/5 flex items-center gap-2 text-gray-200"
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-400" /> Export Confirmed Partners (.xlsx)
+                </button>
+                <button
+                  onClick={() => {
+                    setExportType("APPLICATIONS");
+                    setIsExportMenuOpen(false);
+                    setIsExportModalOpen(true);
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-white/5 flex items-center gap-2 text-gray-200"
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-400" /> Export Applications (.xlsx)
+                </button>
+              </div>
+            )}
+          </div>
+
+          <button 
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 flex items-center gap-2 rounded-md transition-colors text-sm"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Plus size={16} /> Add Broker
+          </button>
+        </div>
       </div>
 
       <div className="bg-[#1a1a1a] border border-white/10 rounded-xl overflow-hidden">
-        <div className="p-4 border-b border-white/10 flex items-center justify-between">
-          <div className="relative w-64">
+        <div className="p-4 border-b border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
             <input
               type="text"
@@ -119,12 +189,35 @@ export default function BrokersPage() {
               className="w-full bg-[#0d0d0d] border border-white/10 rounded-md py-2 pl-9 pr-4 text-sm text-white focus:outline-none focus:border-red-500/50"
             />
           </div>
+
+          {selectedIds.length > 0 && (
+            <div className="text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded border border-emerald-500/20 flex items-center gap-2">
+              <span>{selectedIds.length} partner(s) selected</span>
+              <button
+                onClick={() => {
+                  setExportType("CONFIRMED_PARTNERS");
+                  setIsExportModalOpen(true);
+                }}
+                className="underline font-semibold hover:text-white"
+              >
+                Export Selected
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-400">
             <thead className="bg-[#0d0d0d] text-xs uppercase text-gray-500">
               <tr>
+                <th className="px-4 py-3 w-10">
+                  <input
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={toggleSelectAll}
+                    className="rounded border-white/20 bg-white/5 text-emerald-500 focus:ring-0"
+                  />
+                </th>
                 <th className="px-6 py-3 font-medium">Broker</th>
                 <th className="px-6 py-3 font-medium">Contact</th>
                 <th className="px-6 py-3 font-medium">Referral Code</th>
@@ -136,61 +229,72 @@ export default function BrokersPage() {
             <tbody className="divide-y divide-white/5">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center">Loading...</td>
+                  <td colSpan={7} className="px-6 py-8 text-center">Loading...</td>
                 </tr>
               ) : brokers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center">No brokers found.</td>
+                  <td colSpan={7} className="px-6 py-8 text-center">No brokers found.</td>
                 </tr>
               ) : (
-                brokers.map((broker) => (
-                  <tr key={broker.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Link
-                        href={`/admin/crm/brokers/${broker.id}`}
-                        className="font-medium text-white hover:text-red-400 transition-colors block"
-                      >
-                        {broker.name}
-                      </Link>
-                      <div className="text-xs text-gray-400">{broker.brokerProfile?.companyName || "N/A"}</div>
-                      {broker.brokerProfile?.partnerId && (
-                        <div className="text-[10px] font-mono text-[#C2A878] mt-0.5">{broker.brokerProfile.partnerId}</div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>{broker.email}</div>
-                      <div className="text-xs">{broker.phone || "N/A"}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-mono text-red-400">
-                      {broker.brokerProfile?.referralCode || "Pending Login"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-xs">Leads: {broker._count?.ownedLeads || 0}</div>
-                      <div className="text-xs">Projects: {broker._count?.ownedOpportunities || 0}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-[10px] font-bold rounded-full ${broker.status === 'ACTIVE' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                        {broker.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
-                      <Link
-                        href={`/admin/crm/brokers/${broker.id}`}
-                        className="inline-flex p-1 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors align-middle"
-                        title="View Dossier"
-                      >
-                        <Eye size={16} />
-                      </Link>
-                      <button 
-                        className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-red-400 transition-colors align-middle" 
-                        title="Toggle Status"
-                        onClick={() => toggleStatus(broker.id, broker.status)}
-                      >
-                        {broker.status === 'ACTIVE' ? <ShieldOff size={16} /> : <ShieldAlert size={16} />}
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                brokers.map((broker) => {
+                  const isChecked = selectedIds.includes(broker.id);
+                  return (
+                    <tr key={broker.id} className="hover:bg-white/5 transition-colors">
+                      <td className="px-4 py-4">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => toggleSelectOne(broker.id)}
+                          className="rounded border-white/20 bg-white/5 text-emerald-500 focus:ring-0"
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Link
+                          href={`/admin/crm/brokers/${broker.id}`}
+                          className="font-medium text-white hover:text-red-400 transition-colors block"
+                        >
+                          {broker.name}
+                        </Link>
+                        <div className="text-xs text-gray-400">{broker.brokerProfile?.companyName || "N/A"}</div>
+                        {broker.brokerProfile?.partnerId && (
+                          <div className="text-[10px] font-mono text-[#C2A878] mt-0.5">{broker.brokerProfile.partnerId}</div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>{broker.email}</div>
+                        <div className="text-xs">{broker.phone || "N/A"}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap font-mono text-red-400">
+                        {broker.brokerProfile?.referralCode || "Pending Login"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-xs">Leads: {broker._count?.ownedLeads || 0}</div>
+                        <div className="text-xs">Projects: {broker._count?.ownedOpportunities || 0}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-[10px] font-bold rounded-full ${broker.status === 'ACTIVE' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                          {broker.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
+                        <Link
+                          href={`/admin/crm/brokers/${broker.id}`}
+                          className="inline-flex p-1 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors align-middle"
+                          title="View Dossier"
+                        >
+                          <Eye size={16} />
+                        </Link>
+                        <button 
+                          className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-red-400 transition-colors align-middle" 
+                          title="Toggle Status"
+                          onClick={() => toggleStatus(broker.id, broker.status)}
+                        >
+                          {broker.status === 'ACTIVE' ? <ShieldOff size={16} /> : <ShieldAlert size={16} />}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -277,6 +381,15 @@ export default function BrokersPage() {
           </div>
         </div>
       )}
+
+      {/* Export Modal */}
+      <ExportPartnersModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        initialType={exportType}
+        selectedRowIds={selectedIds}
+        totalTableRowsCount={brokers.length}
+      />
     </div>
   );
 }

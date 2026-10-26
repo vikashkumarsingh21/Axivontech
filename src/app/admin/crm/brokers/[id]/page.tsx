@@ -32,8 +32,10 @@ import {
   RefreshCw,
   ExternalLink,
   Percent,
+  Download,
 } from "lucide-react";
 import { format } from "date-fns";
+import { ExportPartnersModal } from "@/components/admin/export/ExportPartnersModal";
 
 export default function AdminBrokerDetailPage() {
   const params = useParams();
@@ -75,6 +77,7 @@ export default function AdminBrokerDetailPage() {
   const [editingCommission, setEditingCommission] = useState(false);
   const [customRate, setCustomRate] = useState<number | string>("");
   const [savingCommission, setSavingCommission] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   const fetchDossier = async () => {
     try {
@@ -319,6 +322,13 @@ export default function AdminBrokerDetailPage() {
 
           {/* Quick Action Buttons */}
           <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setIsExportModalOpen(true)}
+              className="px-3.5 py-2 rounded-lg bg-emerald-600/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-600/20 text-xs font-semibold transition-colors flex items-center gap-1.5"
+            >
+              <Download className="w-4 h-4" /> Export Dossier (.xlsx)
+            </button>
+
             <button
               onClick={() => {
                 setKycAction("approve");
@@ -1141,6 +1151,13 @@ export default function AdminBrokerDetailPage() {
           </div>
         </div>
       )}
+      {/* Export Single Partner Dossier Modal */}
+      <ExportPartnersModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        initialType="SINGLE_PARTNER"
+        singlePartnerIdOrUserId={brokerId}
+      />
     </div>
   );
 }
