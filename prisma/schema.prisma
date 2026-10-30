@@ -568,10 +568,15 @@ model Attendance {
   earlyExitMinutes     Int?      @default(0)
   isLate               Boolean   @default(false)
   isEarlyExit          Boolean   @default(false)
-  status               String    @default("PRESENT") // PRESENT, HALF_DAY, LATE, NOT_STARTED, IN_PROGRESS, COMPLETE, INCOMPLETE, ABSENT, ON_LEAVE, HOLIDAY, WEEKLY_OFF
-  completionStatus     String    @default("INCOMPLETE") // COMPLETE, INCOMPLETE, ON_LEAVE, HOLIDAY, WEEKLY_OFF, HALF_DAY
+  status               String    @default("PRESENT") // PRESENT, HALF_DAY, LATE, NOT_STARTED, IN_PROGRESS, COMPLETE, INCOMPLETE, ABSENT, ON_LEAVE, HOLIDAY, WEEKLY_OFF, MISSED_CHECKOUT
+  completionStatus     String    @default("INCOMPLETE") // COMPLETE, INCOMPLETE, ON_LEAVE, HOLIDAY, WEEKLY_OFF, HALF_DAY, MISSED_CHECKOUT
   emailAlertSent       Boolean   @default(false)
   notes                String?
+
+  // Stale checkout & regularization tracking
+  autoClosedAt         DateTime?
+  regularizedAt        DateTime?
+  regularizedById      String?
 
   breaks         AttendanceBreak[]
   regularization RegularizationRequest?
@@ -583,6 +588,7 @@ model Attendance {
   @@index([userId])
   @@index([date])
   @@index([status])
+  @@index([status, date])
   @@index([completionStatus])
 }
 
@@ -595,6 +601,8 @@ model AttendanceBreak {
   durationMinutes Int?       @default(0)
   type            String     @default("LUNCH") // LUNCH, TEA, PERSONAL, SHORT_BREAK, OTHER
   notes           String?
+  isAutoClosed    Boolean    @default(false)
+  autoClosedAt    DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -612,6 +620,7 @@ model AttendancePolicy {
   weeklyOffDays             Json? // e.g. [0, 6] (Sunday, Saturday)
   enableIncompleteAlerts    Boolean @default(true)
   allowRemoteRegularization Boolean @default(true)
+  missedCheckoutHoursPolicy String  @default("NOT_COUNTED") // NOT_COUNTED, STANDARD_HOURS, SHIFT_HOURS
   updatedById               String?
 
   createdAt DateTime @default(now())
