@@ -64,6 +64,7 @@ export default function AttendancePage() {
   const [today, setToday] = useState<any>(null);
   const [policy, setPolicy] = useState<any>(null);
   const [records, setRecords] = useState<any[]>([]);
+  const [unregularizedMissed, setUnregularizedMissed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
@@ -96,6 +97,7 @@ export default function AttendancePage() {
           setToday(data.today);
           setPolicy(data.policy);
           setRecords(data.records || []);
+          setUnregularizedMissed(data.unregularizedMissedCheckouts || data.today?.unregularizedMissedCheckouts || []);
         } else {
           setError(data?.error || "Failed to load attendance");
         }
@@ -109,7 +111,16 @@ export default function AttendancePage() {
     const interval = setInterval(() => {
       setToday((prev: any) => {
         if (!prev || !prev.checkInAt || prev.checkOutAt) return prev;
-        const grossMs = Math.max(0, Date.now() - new Date(prev.checkInAt).getTime());
+        // Never allow live ticker to run across past midnight
+        const checkInDate = new Date(prev.checkInAt);
+        const now = new Date();
+        const isSameDay =
+          checkInDate.getFullYear() === now.getFullYear() &&
+          checkInDate.getMonth() === now.getMonth() &&
+          checkInDate.getDate() === now.getDate();
+        if (!isSameDay) return prev;
+
+        const grossMs = Math.max(0, now.getTime() - checkInDate.getTime());
         const grossMins = Math.floor(grossMs / 60000);
         const netMins = Math.max(0, grossMins - (prev.breakMinutes || 0));
         const remMins = Math.max(0, (prev.requiredMinutes || 480) - netMins);
@@ -189,6 +200,8 @@ export default function AttendancePage() {
         return "bg-[#C46A62]/10 text-[#C46A62] border-[#C46A62]/30";
       case "HALF_DAY":
         return "bg-[#C9A15B]/10 text-[#C9A15B] border-[#C9A15B]/30";
+      case "MISSED_CHECKOUT":
+        return "bg-[#C9A15B]/15 text-[#C9A15B] border-[#C9A15B]/40";
       case "ON_LEAVE":
         return "bg-[#8E9AAF]/10 text-[#8E9AAF] border-[#8E9AAF]/30";
       case "HOLIDAY":
@@ -296,6 +309,58 @@ export default function AttendancePage() {
         <div className="p-4 bg-[#4F9D83]/10 border border-[#4F9D83]/25 text-[#4F9D83] rounded-xl flex items-center gap-3 text-sm">
           <CheckCircle2 className="w-5 h-5 shrink-0" />
           <span>{successMsg}</span>
+        </div>
+      )}
+
+      {/* ── Missed Check-Out Alert Banner ──────────────────────────── */}
+      {unregularizedMissed.length > 0 && (
+        <div className="space-y-3">
+          {unregularizedMissed.map((missed: any) => {
+            const missedDateStr = formatDateStr(missed.date);
+            const rawDateStr =
+              typeof missed.date === "string"
+                ? missed.date.split("T")[0]
+                : new Date(missed.date).toISOString().split("T")[0];
+            const checkInTimeStr = missed.checkInAt
+              ? new Date(missed.checkInAt).toLocaleTimeString("en-IN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })
+              : "09:00";
+            return (
+              <div
+                key={missed.id}
+                className="p-4 bg-[#C9A15B]/10 border border-[#C9A15B]/30 text-[#EDEBE6] rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+              >
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-[#C9A15B] shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-[#EDEBE6]">
+                      You did not check out on <span className="text-[#C9A15B]">{missedDateStr}</span>.
+                    </p>
+                    <p className="text-xs text-[#8A867E] mt-0.5">
+                      Request a correction so your hours are counted.
+                    </p>
+                  </div>
+                </div>
+                <EpButton
+                  variant="secondary"
+                  size="sm"
+                  icon={<FileCheck className="w-3.5 h-3.5 text-[#C9A15B]" />}
+                  onClick={() => {
+                    setRegDate(rawDateStr);
+                    setRegCheckIn(checkInTimeStr);
+                    setRegCheckOut("18:00");
+                    setRegReason("Forgot to check out at the end of the day");
+                    setRegModalOpen(true);
+                  }}
+                >
+                  Request correction
+                </EpButton>
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -534,16 +599,28 @@ export default function AttendancePage() {
                       {r.checkInAt ? formatTime(r.checkInAt) : "—"}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-xs text-[#EDEBE6]">
-                      {r.checkOutAt ? formatTime(r.checkOutAt) : r.checkInAt ? "Active" : "—"}
+                      {r.checkOutAt ? (
+                        formatTime(r.checkOutAt)
+                      ) : r.status === "MISSED_CHECKOUT" ? (
+                        <span className="text-[#C9A15B] font-medium">Check-out missed</span>
+                      ) : r.checkInAt ? (
+                        "Active"
+                      ) : (
+                        "—"
+                      )}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-[#8A867E]">
-                      {formatMinutes(r.grossMinutes || r.workedMinutes)}
+                      {r.status === "MISSED_CHECKOUT" ? "—" : formatMinutes(r.grossMinutes || r.workedMinutes)}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-[#C9A15B]">
                       {formatMinutes(r.breakMinutes || 0)}
                     </td>
                     <td className="py-3.5 px-4 text-[#4F9D83] font-semibold font-mono">
-                      {formatMinutes(r.workedMinutes)}
+                      {r.status === "MISSED_CHECKOUT" && (r.workedMinutes === null || r.workedMinutes === undefined) ? (
+                        <span className="text-[#8A867E] font-normal italic">Pending correction</span>
+                      ) : (
+                        formatMinutes(r.workedMinutes)
+                      )}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-[#8A867E]">
                       {formatMinutes(r.requiredMinutes)}
@@ -553,7 +630,9 @@ export default function AttendancePage() {
                         r.differenceMinutes >= 0 ? "text-[#5FAE7E]" : "text-[#C46A62]"
                       }`}
                     >
-                      {formatMinutes(r.differenceMinutes)}
+                      {r.status === "MISSED_CHECKOUT" && (r.differenceMinutes === null || r.differenceMinutes === undefined)
+                        ? "—"
+                        : formatMinutes(r.differenceMinutes)}
                     </td>
                     <td className="py-3.5 px-4">
                       <span
@@ -561,8 +640,51 @@ export default function AttendancePage() {
                           r.status
                         )}`}
                       >
-                        {r.status}
+                        {r.status === "MISSED_CHECKOUT" ? "Check-out pending" : r.status}
                       </span>
+                      {r.status === "MISSED_CHECKOUT" && (
+                        r.regularization ? (
+                          <span
+                            className={`block text-[10px] mt-1 font-medium ${
+                              r.regularization.status === "APPROVED"
+                                ? "text-[#5FAE7E]"
+                                : r.regularization.status === "REJECTED"
+                                ? "text-[#C46A62]"
+                                : "text-[#C9A15B]"
+                            }`}
+                          >
+                            {r.regularization.status === "APPROVED"
+                              ? "Regularized"
+                              : r.regularization.status === "REJECTED"
+                              ? "Correction Rejected"
+                              : "Correction Pending"}
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              const rawDateStr =
+                                typeof r.date === "string"
+                                  ? r.date.split("T")[0]
+                                  : new Date(r.date).toISOString().split("T")[0];
+                              const checkInTimeStr = r.checkInAt
+                                ? new Date(r.checkInAt).toLocaleTimeString("en-IN", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: false,
+                                  })
+                                : "09:00";
+                              setRegDate(rawDateStr);
+                              setRegCheckIn(checkInTimeStr);
+                              setRegCheckOut("18:00");
+                              setRegReason("Forgot to check out at the end of the day");
+                              setRegModalOpen(true);
+                            }}
+                            className="mt-1 block text-[10px] text-[#C9A15B] hover:underline font-semibold cursor-pointer"
+                          >
+                            Request correction →
+                          </button>
+                        )
+                      )}
                     </td>
                   </tr>
                 ))}
