@@ -7,6 +7,7 @@ import {
   getCompanyCalendarDate,
 } from "@/lib/api/foundation";
 import { getLeaveBalancesSummary } from "@/lib/leave/balance";
+import { closeStaleAttendance, getEmployeeUnregularizedMissedCheckouts } from "@/lib/attendance/stale-attendance";
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,6 +16,9 @@ export async function GET(req: NextRequest) {
     const now = new Date();
     const todayStr = getCompanyDateString();
     const today = getCompanyCalendarDate();
+
+    // Lazy close any stale unclosed attendance before loading dashboard
+    await closeStaleAttendance(now, { userId: user.id });
 
     const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
@@ -126,13 +130,21 @@ export async function GET(req: NextRequest) {
       0
     );
 
-    // Prioritize active open attendance session, fallback to today's date match
-    const activeAttendance = attendances.find((r) => !r.checkOutAt && !!r.checkInAt);
+    // Strictly find today's attendance session (never merge past unclosed sessions into today)
     const rawAttendance =
-      activeAttendance ||
       attendances.find((r) => r.date.toISOString().split("T")[0] === todayStr) ||
-      attendances[0] ||
       null;
+
+    // Check for any unregularized missed checkouts
+    const unregularizedMissed = await getEmployeeUnregularizedMissedCheckouts(user.id);
+    const missedCheckoutAlert =
+      unregularizedMissed.length > 0
+        ? {
+            count: unregularizedMissed.length,
+            latestDate: unregularizedMissed[0].date.toISOString().split("T")[0],
+            attendanceId: unregularizedMissed[0].id,
+          }
+        : null;
 
     // Calculate live worked time if session is actively ongoing
     let attendance: any = rawAttendance;
@@ -206,6 +218,7 @@ export async function GET(req: NextRequest) {
       success: true,
       data: {
         attendance,
+        missedCheckoutAlert,
         todayWorkReport,
         hasReportToday: !!todayWorkReport,
         weeklyHoursLogged: Math.round(weeklyHoursLogged * 10) / 10,

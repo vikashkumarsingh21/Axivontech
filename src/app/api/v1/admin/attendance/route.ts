@@ -4,6 +4,7 @@ import { validateActiveUser, hasPermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { AttendanceService } from "@/lib/services/attendance.service";
 import { getUtcCalendarDate, getUtcDayRange } from "@/lib/date-utils";
+import { closeStaleAttendance } from "@/lib/attendance/stale-attendance";
 
 export async function GET(req: NextRequest) {
   try {
@@ -22,6 +23,9 @@ export async function GET(req: NextRequest) {
     if (!isExecutiveOrAdmin && !hasAttPerm) {
       throw new ApiError(403, "Forbidden: Insufficient permissions to view attendance");
     }
+
+    // Lazy close unclosed attendance records from past days
+    await closeStaleAttendance(new Date());
 
     const policy = await AttendanceService.getPolicy();
     const { searchParams } = new URL(req.url);
@@ -284,14 +288,13 @@ export async function GET(req: NextRequest) {
     }
 
     // ─── 3. DAILY COMPANY-WIDE LIVE MONITOR ──────────────────────────────────
-    // Fetch attendance records, today's punches, and active unclosed punches
+    // Fetch attendance records for target date strictly
     const attendances = await db.attendance.findMany({
       where: {
         userId: { in: empIds },
         OR: [
           { date: { gte: startOfDay, lte: endOfDay } },
           { checkInAt: { gte: startOfDay, lte: endOfDay } },
-          { checkOutAt: null },
         ],
       },
       include: {
@@ -300,7 +303,15 @@ export async function GET(req: NextRequest) {
         },
         regularization: true,
       },
-      orderBy: { checkInAt: "desc" },
+    });
+
+    // Count unregularized missed checkouts for company summary
+    const missedCheckoutsCount = await db.attendance.count({
+      where: {
+        userId: { in: empIds },
+        status: "MISSED_CHECKOUT",
+        regularization: null,
+      },
     });
 
     // Check approved leaves for the date
@@ -549,6 +560,7 @@ export async function GET(req: NextRequest) {
         incompleteToday,
         absentToday,
         onLeaveToday,
+        missedCheckouts: missedCheckoutsCount,
       },
     });
   } catch (error: any) {
@@ -571,7 +583,93 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { userId, date, checkInAt, checkOutAt, notes, requiredDailyMinutes } = body;
+    const { action, attendanceId, userId, date, checkInAt, checkOutAt, notes, reason, requiredDailyMinutes } = body;
+
+    // ─── OPTION 1: DIRECT FIX FOR STALE / MISSED CHECKOUT RECORDS ──────────
+    if (action === "DIRECT_FIX" || (attendanceId && checkOutAt && !date && !userId)) {
+      const targetAttId = attendanceId;
+      const targetAttendance = await db.attendance.findUnique({
+        where: { id: targetAttId },
+        include: { breaks: true, user: true },
+      });
+
+      if (!targetAttendance) {
+        throw new ApiError(404, "Attendance record not found");
+      }
+
+      if (!checkOutAt) {
+        throw new ApiError(400, "checkOutAt timestamp is required for direct fix");
+      }
+
+      const policy = await AttendanceService.getPolicy();
+      const reqMins =
+        requiredDailyMinutes ||
+        targetAttendance.requiredDailyMinutes ||
+        targetAttendance.user.requiredDailyMinutes ||
+        policy.defaultRequiredMinutes ||
+        480;
+
+      const calc = AttendanceService.calculateDay({
+        checkInAt: targetAttendance.checkInAt,
+        checkOutAt: new Date(checkOutAt),
+        breaks: targetAttendance.breaks,
+        requiredDailyMinutes: reqMins,
+        policy,
+      });
+
+      let resolvedStatus = "PRESENT";
+      if (calc.isLate) resolvedStatus = "LATE";
+      else if (calc.completionStatus === "HALF_DAY") resolvedStatus = "HALF_DAY";
+      else if (calc.completionStatus === "COMPLETE") resolvedStatus = "PRESENT";
+      else resolvedStatus = "INCOMPLETE";
+
+      const updatedRecord = await db.attendance.update({
+        where: { id: targetAttId },
+        data: {
+          checkOutAt: new Date(checkOutAt),
+          grossMinutes: calc.grossMinutes,
+          breakMinutes: calc.breakMinutes,
+          netMinutes: calc.netMinutes,
+          totalMinutes: calc.netMinutes,
+          remainingMinutes: calc.remainingMinutes,
+          lateMinutes: calc.lateMinutes,
+          earlyExitMinutes: calc.earlyExitMinutes,
+          isLate: calc.isLate,
+          isEarlyExit: calc.isEarlyExit,
+          status: resolvedStatus,
+          completionStatus: calc.completionStatus,
+          notes: notes
+            ? `${notes} (Admin fix: ${reason || "Direct check-out set by Admin"})`
+            : `Admin fix: ${reason || "Direct check-out set by Admin"}`,
+          regularizedAt: new Date(),
+          regularizedById: user.id,
+        },
+      });
+
+      // Create Audit Log
+      await db.auditLog.create({
+        data: {
+          userId: user.id,
+          action: "ATTENDANCE_DIRECT_FIX",
+          resource: `Attendance:${targetAttId}`,
+          details: {
+            targetUserId: targetAttendance.userId,
+            targetDate: targetAttendance.date,
+            previousStatus: targetAttendance.status,
+            resolvedStatus,
+            checkOutAt,
+            reason: reason || notes || "Admin direct adjustment",
+            adminName: user.name,
+          },
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        data: updatedRecord,
+        message: "Attendance record successfully fixed and regularized",
+      });
+    }
 
     if (!userId || !date || !checkInAt) {
       throw new ApiError(400, "userId, date, and checkInAt are required");

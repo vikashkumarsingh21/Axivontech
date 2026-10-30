@@ -3,13 +3,17 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { getExecutiveScope, isDepartmentAllowed } from "@/lib/auth/executive-scope";
 import { handleApiError } from "@/lib/api-error";
-import { getUtcCalendarDate, getUtcDayRange } from "@/lib/date-utils";
+import { getUtcCalendarDate, getUtcDayRange, isSameCalendarDay } from "@/lib/date-utils";
+import { closeStaleAttendance } from "@/lib/attendance/stale-attendance";
 
 export async function GET(req: Request) {
   try {
     const executiveId = req.headers.get("x-user-id");
     await requirePermission(executiveId, "attendance.company.view");
     const scope = await getExecutiveScope(executiveId);
+
+    // Auto-close stale past unclosed records
+    await closeStaleAttendance(new Date());
 
     const { searchParams } = new URL(req.url);
     const dateFilterStr = searchParams.get("date") || undefined;
@@ -104,12 +108,25 @@ export async function GET(req: Request) {
       let workedMins = att.totalMinutes || 0;
       let status = att.status;
 
-      if (!att.checkOutAt) {
-        isWorking = true;
-        currentlyWorking++;
-        const elapsedMs = Math.max(0, Date.now() - new Date(att.checkInAt).getTime());
-        workedMins += Math.floor(elapsedMs / 60000);
-        status = "IN_PROGRESS";
+      if (att.status === "MISSED_CHECKOUT") {
+        isWorking = false;
+        workedMins = 0;
+        status = "MISSED_CHECKOUT";
+      } else if (!att.checkOutAt) {
+        const isToday =
+          isSameCalendarDay(att.date, new Date()) ||
+          (att.checkInAt && isSameCalendarDay(att.checkInAt, new Date()));
+        if (isToday) {
+          isWorking = true;
+          currentlyWorking++;
+          const elapsedMs = Math.max(0, Date.now() - new Date(att.checkInAt).getTime());
+          workedMins += Math.floor(elapsedMs / 60000);
+          status = "IN_PROGRESS";
+        } else {
+          isWorking = false;
+          workedMins = 0;
+          status = "MISSED_CHECKOUT";
+        }
       } else {
         if (workedMins >= reqMins) {
           completedToday++;

@@ -104,12 +104,36 @@ export async function POST(req: NextRequest) {
 
     // If APPROVED, update/create Attendance record atomically
     if (action === "APPROVED") {
+      // Find existing attendance to preserve breaks and check-in if applicable
+      const existingAtt = await db.attendance.findUnique({
+        where: {
+          userId_date: {
+            userId: reg.userId,
+            date: reg.date,
+          },
+        },
+        include: { breaks: true },
+      });
+
       const calc = AttendanceService.calculateDay({
         checkInAt: reg.requestedCheckIn,
         checkOutAt: reg.requestedCheckOut,
+        breaks: existingAtt?.breaks || [],
         requiredDailyMinutes: reqMins,
         policy,
       });
+
+      // Determine final attendance status: LATE, HALF_DAY, PRESENT, or INCOMPLETE
+      let resolvedStatus = "PRESENT";
+      if (calc.isLate) {
+        resolvedStatus = "LATE";
+      } else if (calc.completionStatus === "HALF_DAY") {
+        resolvedStatus = "HALF_DAY";
+      } else if (calc.completionStatus === "COMPLETE") {
+        resolvedStatus = "PRESENT";
+      } else {
+        resolvedStatus = "INCOMPLETE";
+      }
 
       const att = await db.attendance.upsert({
         where: {
@@ -122,7 +146,7 @@ export async function POST(req: NextRequest) {
           checkInAt: reg.requestedCheckIn,
           checkOutAt: reg.requestedCheckOut,
           grossMinutes: calc.grossMinutes,
-          breakMinutes: 0,
+          breakMinutes: calc.breakMinutes,
           netMinutes: calc.netMinutes,
           totalMinutes: calc.netMinutes,
           requiredDailyMinutes: reqMins,
@@ -131,9 +155,11 @@ export async function POST(req: NextRequest) {
           earlyExitMinutes: calc.earlyExitMinutes,
           isLate: calc.isLate,
           isEarlyExit: calc.isEarlyExit,
-          status: calc.completionStatus,
+          status: resolvedStatus,
           completionStatus: calc.completionStatus,
           notes: `Regularized by Admin (${user.name}): ${reg.reason}`,
+          regularizedAt: new Date(),
+          regularizedById: user.id,
         },
         create: {
           userId: reg.userId,
@@ -141,7 +167,7 @@ export async function POST(req: NextRequest) {
           checkInAt: reg.requestedCheckIn,
           checkOutAt: reg.requestedCheckOut,
           grossMinutes: calc.grossMinutes,
-          breakMinutes: 0,
+          breakMinutes: calc.breakMinutes,
           netMinutes: calc.netMinutes,
           totalMinutes: calc.netMinutes,
           requiredDailyMinutes: reqMins,
@@ -150,9 +176,11 @@ export async function POST(req: NextRequest) {
           earlyExitMinutes: calc.earlyExitMinutes,
           isLate: calc.isLate,
           isEarlyExit: calc.isEarlyExit,
-          status: calc.completionStatus,
+          status: resolvedStatus,
           completionStatus: calc.completionStatus,
           notes: `Regularized by Admin (${user.name}): ${reg.reason}`,
+          regularizedAt: new Date(),
+          regularizedById: user.id,
         },
       });
 

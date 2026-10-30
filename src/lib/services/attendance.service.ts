@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { EmailService } from "@/lib/email/service";
 import { NotificationService } from "@/lib/events/bus";
+import { isSameCalendarDay } from "@/lib/date-utils";
 
 export interface AttendancePolicyConfig {
   workWindowStart: string; // e.g. "06:00"
@@ -11,6 +12,7 @@ export interface AttendancePolicyConfig {
   weeklyOffDays: number[]; // [0] = Sunday, [0, 6] = Sun, Sat
   enableIncompleteAlerts: boolean;
   allowRemoteRegularization: boolean;
+  missedCheckoutHoursPolicy?: "NOT_COUNTED" | "STANDARD_HOURS" | "SHIFT_HOURS";
 }
 
 export const DEFAULT_ATTENDANCE_POLICY: AttendancePolicyConfig = {
@@ -22,6 +24,7 @@ export const DEFAULT_ATTENDANCE_POLICY: AttendancePolicyConfig = {
   weeklyOffDays: [0], // Sunday
   enableIncompleteAlerts: true,
   allowRemoteRegularization: true,
+  missedCheckoutHoursPolicy: "NOT_COUNTED",
 };
 
 export interface DailyCalculationResult {
@@ -33,7 +36,7 @@ export interface DailyCalculationResult {
   earlyExitMinutes: number;
   isLate: boolean;
   isEarlyExit: boolean;
-  completionStatus: "COMPLETE" | "INCOMPLETE" | "HALF_DAY" | "ON_LEAVE" | "HOLIDAY" | "WEEKLY_OFF";
+  completionStatus: "COMPLETE" | "INCOMPLETE" | "HALF_DAY" | "ON_LEAVE" | "HOLIDAY" | "WEEKLY_OFF" | "MISSED_CHECKOUT";
   isWorking: boolean;
   isOnBreak: boolean;
   activeBreakStartTime: Date | null;
@@ -64,6 +67,7 @@ export class AttendanceService {
           : DEFAULT_ATTENDANCE_POLICY.weeklyOffDays,
         enableIncompleteAlerts: policy.enableIncompleteAlerts ?? true,
         allowRemoteRegularization: policy.allowRemoteRegularization ?? true,
+        missedCheckoutHoursPolicy: (policy.missedCheckoutHoursPolicy as any) || "NOT_COUNTED",
       };
     } catch {
       return DEFAULT_ATTENDANCE_POLICY;
@@ -82,6 +86,8 @@ export class AttendanceService {
     isLeave?: boolean;
     isHoliday?: boolean;
     isWeeklyOff?: boolean;
+    isMissedCheckout?: boolean;
+    status?: string;
     referenceTime?: Date;
   }): DailyCalculationResult {
     const {
@@ -93,8 +99,27 @@ export class AttendanceService {
       isLeave = false,
       isHoliday = false,
       isWeeklyOff = false,
+      isMissedCheckout = false,
+      status,
       referenceTime = new Date(),
     } = params;
+
+    if (isMissedCheckout || status === "MISSED_CHECKOUT") {
+      return {
+        grossMinutes: 0,
+        breakMinutes: 0,
+        netMinutes: 0,
+        remainingMinutes: requiredDailyMinutes,
+        lateMinutes: 0,
+        earlyExitMinutes: 0,
+        isLate: false,
+        isEarlyExit: false,
+        completionStatus: "MISSED_CHECKOUT",
+        isWorking: false,
+        isOnBreak: false,
+        activeBreakStartTime: null,
+      };
+    }
 
     if (isLeave) {
       return {
@@ -174,18 +199,26 @@ export class AttendanceService {
     if (checkOutAt) {
       effectiveEnd = new Date(checkOutAt);
     } else {
-      // Check if this attendance record is from a past calendar day (> 24 hours elapsed)
-      const elapsedSinceCheckInMs = now.getTime() - checkInDateObj.getTime();
-      if (elapsedSinceCheckInMs > 24 * 60 * 60 * 1000) {
-        isHistoricalUnclosed = true;
-        // Cap historical unclosed session at policy cutoff or end of window on that day
-        const [cutoffH = 23, cutoffM = 0] = (policy?.cutoffTime || DEFAULT_ATTENDANCE_POLICY.cutoffTime).split(":").map(Number);
-        const cappedDate = new Date(checkInDateObj);
-        cappedDate.setUTCHours(cutoffH, cutoffM, 0, 0);
-        effectiveEnd = cappedDate > checkInDateObj ? cappedDate : new Date(checkInDateObj.getTime() + requiredDailyMinutes * 60000);
-      } else {
-        effectiveEnd = now;
+      // Check if session has crossed the calendar midnight boundary
+      const isPastDay = !isSameCalendarDay(checkInDateObj, now) && checkInDateObj.getTime() < now.getTime();
+      if (isPastDay) {
+        // Forgotten check-out from a previous day: time after midnight is never counted
+        return {
+          grossMinutes: 0,
+          breakMinutes: 0,
+          netMinutes: 0,
+          remainingMinutes: requiredDailyMinutes,
+          lateMinutes: 0,
+          earlyExitMinutes: 0,
+          isLate: false,
+          isEarlyExit: false,
+          completionStatus: "MISSED_CHECKOUT",
+          isWorking: false,
+          isOnBreak: false,
+          activeBreakStartTime: null,
+        };
       }
+      effectiveEnd = now;
     }
 
     const grossMs = Math.max(0, effectiveEnd.getTime() - checkInDateObj.getTime());
@@ -243,6 +276,8 @@ export class AttendanceService {
     let completionStatus: DailyCalculationResult["completionStatus"] = "INCOMPLETE";
     if (netMinutes >= requiredDailyMinutes) {
       completionStatus = "COMPLETE";
+    } else if (netMinutes >= Math.floor(requiredDailyMinutes / 2)) {
+      completionStatus = "HALF_DAY";
     } else {
       completionStatus = "INCOMPLETE";
     }

@@ -15,6 +15,7 @@ import {
 } from "@/lib/api/foundation";
 import { AttendanceService } from "@/lib/services/attendance.service";
 import { isSameCalendarDay } from "@/lib/date-utils";
+import { closeStaleAttendance, getEmployeeUnregularizedMissedCheckouts } from "@/lib/attendance/stale-attendance";
 
 const attendanceActionSchema = z.object({
   action: z.enum(["check-in", "check-out", "break-start", "break-end"]),
@@ -35,70 +36,10 @@ export async function GET(req: NextRequest) {
     const todayCalendarDate = getCompanyCalendarDate(now, timezone);
 
     // ─── Auto-close forgotten open sessions from past days ─────────────
-    const forgottenSessions = await db.attendance.findMany({
-      where: {
-        userId: user.id,
-        checkOutAt: null,
-        date: { lt: todayCalendarDate },
-      },
-      include: { breaks: true },
-    });
+    await closeStaleAttendance(now, { userId: user.id });
 
-    for (const session of forgottenSessions) {
-      // Close open breaks
-      for (const b of session.breaks) {
-        if (!b.endTime) {
-          const autoBreakEnd = new Date(new Date(b.startTime).getTime() + 30 * 60000);
-          await db.attendanceBreak.update({
-            where: { id: b.id },
-            data: {
-              endTime: autoBreakEnd,
-              durationMinutes: 30,
-              notes: (b.notes ? b.notes + " " : "") + "[Auto-closed at session cutoff]",
-            },
-          });
-        }
-      }
-
-      // Close session at workWindowEnd or 9 hours after checkin
-      const checkInTime = new Date(session.checkInAt || session.date);
-      const autoCheckOut = new Date(checkInTime.getTime() + requiredMinutes * 60000);
-
-      const updatedBreaks = await db.attendanceBreak.findMany({ where: { attendanceId: session.id } });
-      const calc = AttendanceService.calculateDay({
-        checkInAt: session.checkInAt,
-        checkOutAt: autoCheckOut,
-        breaks: updatedBreaks,
-        requiredDailyMinutes: session.requiredDailyMinutes || requiredMinutes,
-        policy,
-      });
-
-      await db.attendance.update({
-        where: { id: session.id },
-        data: {
-          checkOutAt: autoCheckOut,
-          grossMinutes: calc.grossMinutes,
-          breakMinutes: calc.breakMinutes,
-          netMinutes: calc.netMinutes,
-          totalMinutes: calc.netMinutes,
-          status: "INCOMPLETE",
-          completionStatus: "INCOMPLETE",
-          notes: (session.notes ? session.notes + " " : "") + "[System auto-checkout: missed checkout. Regularization required]",
-        },
-      });
-
-      // Notify employee to regularize missed checkout
-      await db.notification.create({
-        data: {
-          userId: user.id,
-          type: "ATTENDANCE_MISSED_CHECKOUT",
-          title: "Attendance Auto-Closed",
-          message: `Your check-out for ${session.date.toISOString().split("T")[0]} was missed and automatically closed. Please submit an attendance regularization request.`,
-          priority: "HIGH",
-          link: "/employee/attendance",
-        },
-      });
-    }
+    // ─── Fetch unregularized missed checkouts for top alert banner ──────
+    const unregularizedMissedCheckouts = await getEmployeeUnregularizedMissedCheckouts(user.id);
 
     // ─── Fetch 90 days history ──────────────────────────────────────────
     const records = await db.attendance.findMany({
@@ -113,12 +54,10 @@ export async function GET(req: NextRequest) {
       take: 90,
     });
 
-    const activeSession = records.find((r) => !r.checkOutAt && !!r.checkInAt);
-    const todayRecord =
-      activeSession ||
-      records.find(
-        (r) => isSameCalendarDay(r.date, todayCalendarDate) || (r.checkInAt && isSameCalendarDay(r.checkInAt, todayCalendarDate))
-      );
+    const todayRecord = records.find(
+      (r) => isSameCalendarDay(r.date, todayCalendarDate) || (r.checkInAt && isSameCalendarDay(r.checkInAt, todayCalendarDate))
+    );
+    const activeSession = todayRecord && !todayRecord.checkOutAt && !!todayRecord.checkInAt ? todayRecord : null;
 
     // Approved Leave check for today
     let todayLeave = null;
@@ -195,7 +134,9 @@ export async function GET(req: NextRequest) {
     // ─── Format Historical Records & Monthly Summary ───────────────────
     const history = records.map((r) => {
       const reqMins = r.requiredDailyMinutes || requiredMinutes;
-      const isActive = !r.checkOutAt && !!r.checkInAt;
+      const isToday = isSameCalendarDay(r.date, todayCalendarDate) || (r.checkInAt && isSameCalendarDay(r.checkInAt, todayCalendarDate));
+      const isActive = isToday && !r.checkOutAt && !!r.checkInAt;
+      const isMissedCheckout = r.status === "MISSED_CHECKOUT" || (!r.checkOutAt && !isToday);
 
       const rCalc = AttendanceService.calculateDay({
         checkInAt: r.checkInAt,
@@ -204,25 +145,34 @@ export async function GET(req: NextRequest) {
         requiredDailyMinutes: reqMins,
         policy,
         referenceTime: now,
+        isMissedCheckout,
+        status: r.status,
       });
+
+      const displayStatus = isMissedCheckout
+        ? "MISSED_CHECKOUT"
+        : (isActive ? "IN_PROGRESS" : rCalc.completionStatus);
 
       return {
         id: r.id,
         date: r.date,
         checkInAt: r.checkInAt,
         checkOutAt: r.checkOutAt,
-        grossMinutes: rCalc.grossMinutes,
-        breakMinutes: rCalc.breakMinutes,
-        workedMinutes: rCalc.netMinutes,
-        netMinutes: rCalc.netMinutes,
+        grossMinutes: isMissedCheckout ? null : rCalc.grossMinutes,
+        breakMinutes: isMissedCheckout ? 0 : rCalc.breakMinutes,
+        workedMinutes: isMissedCheckout ? null : rCalc.netMinutes,
+        netMinutes: isMissedCheckout ? null : rCalc.netMinutes,
         requiredMinutes: reqMins,
-        remainingMinutes: rCalc.remainingMinutes,
-        differenceMinutes: rCalc.netMinutes - reqMins,
-        status: isActive ? "IN_PROGRESS" : rCalc.completionStatus,
-        completionStatus: rCalc.completionStatus,
-        isLate: rCalc.isLate,
-        lateMinutes: rCalc.lateMinutes,
-        isEarlyExit: rCalc.isEarlyExit,
+        remainingMinutes: isMissedCheckout ? null : rCalc.remainingMinutes,
+        differenceMinutes: isMissedCheckout ? null : (rCalc.netMinutes - reqMins),
+        status: displayStatus,
+        completionStatus: displayStatus,
+        isLate: isMissedCheckout ? false : rCalc.isLate,
+        lateMinutes: isMissedCheckout ? 0 : rCalc.lateMinutes,
+        isEarlyExit: isMissedCheckout ? false : rCalc.isEarlyExit,
+        autoClosedAt: r.autoClosedAt,
+        regularizedAt: r.regularizedAt,
+        regularizedById: r.regularizedById,
         breaks: r.breaks,
         regularization: r.regularization,
         notes: r.notes,
@@ -241,10 +191,16 @@ export async function GET(req: NextRequest) {
     let presentDays = 0;
     let lateDays = 0;
     let halfDays = 0;
+    let missedCheckoutDays = 0;
     let totalWorkedMinutes = 0;
     let totalRequiredMinutes = 0;
 
     for (const r of monthRecords) {
+      if (r.status === "MISSED_CHECKOUT") {
+        missedCheckoutDays += 1;
+        // Unregularized missed check-outs are NOT counted as worked days or shortfalls
+        continue;
+      }
       if (["COMPLETE", "PRESENT", "IN_PROGRESS"].includes(r.status)) presentDays += 1;
       if (r.status === "HALF_DAY") halfDays += 1;
       if (r.isLate) lateDays += 1;
@@ -257,6 +213,7 @@ export async function GET(req: NextRequest) {
       presentDays,
       halfDays,
       lateDays,
+      missedCheckoutDays,
       totalWorkedMinutes,
       totalWorkedHours: parseFloat((totalWorkedMinutes / 60).toFixed(1)),
       totalRequiredMinutes,
@@ -302,6 +259,13 @@ export async function GET(req: NextRequest) {
       records: history,
       monthlySummary,
       live: liveTimer,
+      unregularizedMissedCheckouts: unregularizedMissedCheckouts.map((r) => ({
+        id: r.id,
+        date: r.date,
+        checkInAt: r.checkInAt,
+        autoClosedAt: r.autoClosedAt,
+        regularization: r.regularization,
+      })),
     };
 
     return apiSuccess(responsePayload, undefined, {
@@ -309,6 +273,7 @@ export async function GET(req: NextRequest) {
       today: responsePayload.today,
       records: history,
       summary: monthlySummary,
+      unregularizedMissedCheckouts: responsePayload.unregularizedMissedCheckouts,
     });
   } catch (e) {
     return handleApiError(e);
@@ -333,10 +298,14 @@ export async function POST(req: NextRequest) {
     const now = new Date();
     const todayCalendarDate = getCompanyCalendarDate(now, timezone);
 
-    // 1. Locate active open session (where checkOutAt is null)
+    // Auto-close any stale past days before processing today's mutations
+    await closeStaleAttendance(now, { userId: user.id });
+
+    // 1. Locate today's active open session (where checkOutAt is null strictly for today)
     const activeSession = await db.attendance.findFirst({
       where: {
         userId: user.id,
+        date: todayCalendarDate,
         checkOutAt: null,
       },
       include: {
@@ -349,20 +318,19 @@ export async function POST(req: NextRequest) {
 
     // 2. Locate today's existing attendance record
     const todayRecord =
-      (activeSession && isSameCalendarDay(activeSession.date, todayCalendarDate))
-        ? activeSession
-        : await db.attendance.findFirst({
-            where: {
-              userId: user.id,
-              date: todayCalendarDate,
-            },
-            include: {
-              breaks: {
-                orderBy: { startTime: "asc" },
-              },
-            },
-            orderBy: { checkInAt: "desc" },
-          });
+      activeSession ||
+      (await db.attendance.findFirst({
+        where: {
+          userId: user.id,
+          date: todayCalendarDate,
+        },
+        include: {
+          breaks: {
+            orderBy: { startTime: "asc" },
+          },
+        },
+        orderBy: { checkInAt: "desc" },
+      }));
 
     // ─── ACTION 1: CHECK-IN ────────────────────────────────────────────────
     if (action === "check-in") {
@@ -554,6 +522,25 @@ export async function POST(req: NextRequest) {
     // ─── ACTION 4: CHECK-OUT ───────────────────────────────────────────────
     if (action === "check-out") {
       if (!activeTarget) {
+        // Check if employee is attempting to check out a past closed session
+        const pastStaleSession = await db.attendance.findFirst({
+          where: {
+            userId: user.id,
+            date: { lt: todayCalendarDate },
+            status: "MISSED_CHECKOUT",
+          },
+          orderBy: { date: "desc" },
+        });
+
+        if (pastStaleSession) {
+          throw new ApiError(
+            400,
+            "This day was closed. Please submit a correction request.",
+            undefined,
+            "DAY_ALREADY_CLOSED"
+          );
+        }
+
         throw new ApiError(400, "You are not currently checked in", undefined, "NOT_CHECKED_IN");
       }
 
