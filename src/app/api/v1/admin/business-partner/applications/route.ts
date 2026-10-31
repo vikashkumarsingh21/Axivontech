@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     const status = searchParams.get("status");
     const search = searchParams.get("search");
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20")));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20")));
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
@@ -50,8 +50,54 @@ export async function GET(req: Request) {
       db.businessPartnerApplication.count({ where }),
     ]);
 
+    // Check account status across applications to identify accounts missing usable logins
+    const emails = applications.map((a) => a.email.toLowerCase().trim());
+    const users = await db.user.findMany({
+      where: {
+        email: { in: emails, mode: "insensitive" },
+      },
+      select: {
+        id: true,
+        email: true,
+        status: true,
+        mustChangePassword: true,
+        brokerProfile: {
+          select: {
+            id: true,
+            partnerId: true,
+            referralCode: true,
+          },
+        },
+      },
+    });
+
+    const userMap = new Map(users.map((u) => [u.email.toLowerCase().trim(), u]));
+
+    const enrichedApplications = applications.map((app) => {
+      const u = userMap.get(app.email.toLowerCase().trim());
+      const hasUsableLogin = !!u && u.status === "ACTIVE" && !!u.brokerProfile;
+      return {
+        ...app,
+        hasUsableLogin,
+        linkedUser: u
+          ? {
+              status: u.status,
+              mustChangePassword: u.mustChangePassword,
+              partnerId: u.brokerProfile?.partnerId || null,
+              referralCode: u.brokerProfile?.referralCode || null,
+            }
+          : null,
+      };
+    });
+
     return NextResponse.json(
-      { applications, total, page, limit, pages: Math.ceil(total / limit) },
+      {
+        applications: enrichedApplications,
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+      },
       { status: 200 }
     );
   } catch (err) {

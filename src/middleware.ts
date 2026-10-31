@@ -1,22 +1,16 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose";
-import { normalizeRole, resolveRoleDashboardUrl, canAccessPartnerPortal } from "@/lib/auth/roles";
+import { env } from "./lib/env";
+import {
+  normalizeRole,
+  canAccessPartnerPortal,
+  resolveRoleDashboardUrl,
+} from "./lib/auth/roles";
 
-// Need to duplicate secret resolution for Edge runtime compatibility
-// process.env.SESSION_SECRET is available in Edge middleware if defined in .env
-const rawSecret = process.env.SESSION_SECRET || "";
-if (!rawSecret) {
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("[CRITICAL SECURITY]: SESSION_SECRET must be configured in production.");
-  }
-}
-const secretKey = new TextEncoder().encode(
-  rawSecret || "fallback-dev-session-secret-at-least-32-chars-long"
-);
+const secretKey = new TextEncoder().encode(env.SESSION_SECRET);
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+export async function middleware(req: any) {
+  const pathname = req.nextUrl.pathname;
 
   // Protect /employee and /api/v1/employee routes
   const isEmployeeRoute = pathname.startsWith("/employee");
@@ -48,6 +42,9 @@ export async function middleware(req: NextRequest) {
   // Protect /api/v1/jobs route
   const isJobsApiRoute = pathname.startsWith("/api/v1/jobs");
 
+  // Change password route
+  const isChangePasswordRoute = pathname === "/auth/change-password";
+
   // General authenticated APIs (applicable to all authenticated roles)
   const isGeneralAuthApiRoute =
     pathname.startsWith("/api/v1/me") ||
@@ -71,13 +68,15 @@ export async function middleware(req: NextRequest) {
     isCrmApiRoute ||
     isAnalyticsApiRoute ||
     isGeneralAuthApiRoute;
+
   const isProtectedRoute =
     isEmployeeRoute ||
     isAdminRoute ||
     isExecutiveRoute ||
     isBrokerRoute ||
     isClientRoute ||
-    isCrmRoute;
+    isCrmRoute ||
+    isChangePasswordRoute;
 
   // IMPORTANT: Prevent header spoofing on public routes
   // Next.js passes client headers through. We must strictly control x-user-id.
@@ -103,7 +102,31 @@ export async function middleware(req: NextRequest) {
 
       // Role based checks with canonical role normalization
       const role = normalizeRole(payload.role as string);
-      
+      const mustChangePassword = !!payload.mustChangePassword;
+
+      // ── Forced First-Login Password Change Gate ──
+      if (mustChangePassword) {
+        const isAllowedPasswordChangeApi = pathname === "/api/v1/auth/change-password";
+        const isLogout = pathname === "/api/v1/auth/logout" || pathname === "/logout";
+
+        if (!isChangePasswordRoute && !isAllowedPasswordChangeApi && !isLogout) {
+          if (isProtectedApiRoute) {
+            return NextResponse.json(
+              {
+                error: "PASSWORD_CHANGE_REQUIRED",
+                message: "Password change required before accessing platform features.",
+                mustChangePassword: true,
+              },
+              { status: 403 }
+            );
+          }
+          return NextResponse.redirect(new URL("/auth/change-password", req.url));
+        }
+      } else if (isChangePasswordRoute) {
+        // If password is already changed, send user to their dashboard
+        return NextResponse.redirect(new URL(resolveRoleDashboardUrl(role), req.url));
+      }
+
       const getRoleRedirectUrl = (userRole: string) => {
         return new URL(resolveRoleDashboardUrl(userRole), req.url);
       };
@@ -202,5 +225,6 @@ export const config = {
     "/api/v1/announcements/:path*",
     "/api/v1/portal-ai/:path*",
     "/api/v1/search/:path*",
+    "/auth/change-password",
   ],
 };

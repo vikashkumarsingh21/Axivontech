@@ -7,6 +7,7 @@ import { ROLE_HIERARCHY, normalizeRole } from "@/lib/auth/roles";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
 import { verifyFormProtection } from "@/lib/captcha";
+import crypto from "crypto";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
     const { email, password } = loginSchema.parse(body);
 
     const user = await db.user.findUnique({
-      where: { email },
+      where: { email: email.toLowerCase().trim() },
       include: {
         userRoles: {
           include: {
@@ -79,13 +80,19 @@ export async function POST(req: NextRequest) {
       throw new ApiError(401, "Invalid email or password");
     }
 
-    if (user.status !== "ACTIVE") {
-      throw new ApiError(403, `Account is ${user.status}. Please check your email or contact support.`);
+    if (user.status === "SUSPENDED" || user.status === "INACTIVE") {
+      throw new ApiError(403, `Your account is ${user.status.toLowerCase()}. Please contact AXIVON administration (admin@axivontech.in).`);
     }
 
-    if (user.mustChangePassword) {
-      throw new ApiError(403, "Please complete your account activation and password setup using the link sent to your email.");
+    if (user.status === "PENDING_ACTIVATION") {
+      throw new ApiError(403, "Your account is pending activation. Please use the activation link sent to your email or contact support.");
     }
+
+    if (user.status !== "ACTIVE") {
+      throw new ApiError(403, `Account status is ${user.status}. Please contact support.`);
+    }
+
+    const mustChangePassword = !!user.mustChangePassword;
 
     // Identify primary role for session based on centralized role hierarchy and canonical normalization
     const userRoleNames = user.userRoles.map((ur) => normalizeRole(ur.role.name));
@@ -96,6 +103,7 @@ export async function POST(req: NextRequest) {
       userId: user.id,
       role: role,
       sessionId: crypto.randomUUID(),
+      mustChangePassword,
     });
 
     // Create session record in database
@@ -115,6 +123,10 @@ export async function POST(req: NextRequest) {
         resource: "Auth",
         ipAddress: req.headers.get("x-forwarded-for") || "unknown",
         userAgent: req.headers.get("user-agent"),
+        details: {
+          mustChangePassword,
+          role,
+        },
       },
     });
 
@@ -122,11 +134,16 @@ export async function POST(req: NextRequest) {
     const isHttps = req.nextUrl.protocol === "https:" || req.headers.get("x-forwarded-proto") === "https";
     const isSecure = process.env.NODE_ENV === "production" ? true : isHttps;
     const response = NextResponse.json({
+      success: true,
+      mustChangePassword,
+      redirectUrl: mustChangePassword ? "/auth/change-password" : undefined,
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
         role,
+        status: user.status,
+        mustChangePassword,
       },
     });
 

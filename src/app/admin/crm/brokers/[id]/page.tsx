@@ -33,9 +33,11 @@ import {
   ExternalLink,
   Percent,
   Download,
+  Key,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ExportPartnersModal } from "@/components/admin/export/ExportPartnersModal";
+import { ResetBrokerPasswordModal } from "@/components/admin/partner/ResetBrokerPasswordModal";
 
 export default function AdminBrokerDetailPage() {
   const params = useParams();
@@ -78,6 +80,7 @@ export default function AdminBrokerDetailPage() {
   const [customRate, setCustomRate] = useState<number | string>("");
   const [savingCommission, setSavingCommission] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
 
   const fetchDossier = async () => {
     try {
@@ -337,6 +340,13 @@ export default function AdminBrokerDetailPage() {
               className="px-3.5 py-2 rounded-lg bg-emerald-600/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-600/20 text-xs font-semibold transition-colors flex items-center gap-1.5"
             >
               <ShieldCheck className="w-4 h-4" /> Review KYC
+            </button>
+
+            <button
+              onClick={() => setIsResetPasswordOpen(true)}
+              className="px-3.5 py-2 rounded-lg bg-red-600/10 border border-red-500/30 text-red-400 hover:bg-red-600/20 text-xs font-semibold transition-colors flex items-center gap-1.5"
+            >
+              <Key className="w-4 h-4" /> Reset Password
             </button>
 
             {user.status === "PENDING_ACTIVATION" && (
@@ -1151,6 +1161,17 @@ export default function AdminBrokerDetailPage() {
           </div>
         </div>
       )}
+      {/* Reset Broker Password Modal */}
+      <ResetBrokerPasswordModal
+        isOpen={isResetPasswordOpen}
+        onClose={() => setIsResetPasswordOpen(false)}
+        brokerId={brokerId}
+        brokerEmail={user.email}
+        brokerName={user.name}
+        partnerId={profile.partnerId}
+        referralCode={profile.referralCode}
+      />
+
       {/* Export Single Partner Dossier Modal */}
       <ExportPartnersModal
         isOpen={isExportModalOpen}

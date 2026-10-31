@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Eye, Filter, Download, ChevronDown, FileSpreadsheet } from "lucide-react";
+import { Search, Eye, Filter, Download, ChevronDown, FileSpreadsheet, UserPlus, ShieldAlert } from "lucide-react";
 import { format } from "date-fns";
 import { ExportPartnersModal } from "@/components/admin/export/ExportPartnersModal";
+import { CreatePartnerLoginModal } from "@/components/admin/partner/CreatePartnerLoginModal";
 
 export default function BusinessPartnerApplicationsPage() {
   const [applications, setApplications] = useState<any[]>([]);
@@ -18,6 +19,9 @@ export default function BusinessPartnerApplicationsPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportType, setExportType] = useState<"APPLICATIONS" | "CONFIRMED_PARTNERS">("APPLICATIONS");
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+
+  // Approval & Login Creation Modal State
+  const [selectedAppForLogin, setSelectedAppForLogin] = useState<any | null>(null);
 
   const fetchApplications = async () => {
     try {
@@ -242,17 +246,49 @@ export default function BusinessPartnerApplicationsPage() {
                         {format(new Date(app.createdAt), "MMM d, yyyy")}
                       </td>
                       <td className="p-4">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-sm text-[10px] font-semibold uppercase tracking-wider border ${getStatusColor(app.status)}`}>
-                          {app.status.replace(/_/g, " ")}
-                        </span>
+                        <div className="flex flex-col gap-1 items-start">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-sm text-[10px] font-semibold uppercase tracking-wider border ${getStatusColor(app.status)}`}>
+                            {app.status.replace(/_/g, " ")}
+                          </span>
+                          {app.status === "APPROVED" && !app.hasUsableLogin && (
+                            <span
+                              title="Application approved but partner has no active login credentials yet"
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30"
+                            >
+                              <ShieldAlert className="w-3 h-3 text-amber-400" />
+                              No login yet
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="p-4 text-right">
-                        <Link 
-                          href={`/admin/business-partners/applications/${app.id}`}
-                          className="inline-flex items-center gap-2 text-xs font-medium text-[#e8a064] hover:text-white transition-colors"
-                        >
-                          <Eye className="w-4 h-4" /> View
-                        </Link>
+                        <div className="inline-flex items-center gap-2 justify-end">
+                          {app.status === "APPROVED" && !app.hasUsableLogin && (
+                            <button
+                              onClick={() => setSelectedAppForLogin(app)}
+                              className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 transition-colors"
+                              title="Create Login credentials for approved partner"
+                            >
+                              <UserPlus className="w-3 h-3" />
+                              Create Login
+                            </button>
+                          )}
+                          {app.status !== "APPROVED" && app.status !== "REJECTED" && (
+                            <button
+                              onClick={() => setSelectedAppForLogin(app)}
+                              className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 transition-colors"
+                              title="Approve application and create login credentials"
+                            >
+                              Approve & Login
+                            </button>
+                          )}
+                          <Link 
+                            href={`/admin/business-partners/applications/${app.id}`}
+                            className="inline-flex items-center gap-1 text-xs font-medium text-[#e8a064] hover:text-white px-2 py-1 rounded-md border border-white/10 hover:bg-white/5 transition-colors"
+                          >
+                            <Eye className="w-3.5 h-3.5" /> View
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -270,6 +306,17 @@ export default function BusinessPartnerApplicationsPage() {
         initialType={exportType}
         selectedRowIds={selectedIds}
         totalTableRowsCount={filtered.length}
+      />
+
+      {/* Create Partner Login Modal */}
+      <CreatePartnerLoginModal
+        isOpen={!!selectedAppForLogin}
+        onClose={() => setSelectedAppForLogin(null)}
+        application={selectedAppForLogin}
+        onSuccess={() => {
+          setSelectedAppForLogin(null);
+          fetchApplications();
+        }}
       />
     </div>
   );

@@ -7,6 +7,7 @@ export interface SessionPayload {
   userId: string;
   role: string;
   sessionId: string;
+  mustChangePassword?: boolean;
 }
 
 export async function signSession(payload: SessionPayload): Promise<string> {
@@ -79,4 +80,3 @@ export async function getAuthenticatedSession(req: Request | any): Promise<Sessi
 
   throw new ApiError(401, "Unauthorized: Authentication required: No active session");
 }
-

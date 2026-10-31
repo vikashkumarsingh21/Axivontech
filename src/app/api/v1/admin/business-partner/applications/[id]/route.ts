@@ -66,23 +66,51 @@ export async function GET(
       throw new ApiError(404, "Application not found");
     }
 
-    // Check if a broker/partner profile already exists for this applicant's email
-    const linkedBroker = await db.brokerProfile.findFirst({
+    // Check if a user / broker profile already exists for this applicant's email
+    const linkedUser = await db.user.findFirst({
       where: {
-        user: {
-          email: { equals: application.email, mode: "insensitive" },
-        },
+        email: { equals: application.email, mode: "insensitive" },
       },
       select: {
         id: true,
-        partnerId: true,
-        referralCode: true,
-        companyName: true,
-        createdAt: true,
+        email: true,
+        status: true,
+        passwordHash: true,
+        mustChangePassword: true,
+        brokerProfile: {
+          select: {
+            id: true,
+            partnerId: true,
+            referralCode: true,
+            companyName: true,
+            createdAt: true,
+          },
+        },
       },
     });
 
-    return NextResponse.json({ ...application, linkedBroker }, { status: 200 });
+    const hasUsableLogin = !!(
+      linkedUser &&
+      linkedUser.passwordHash &&
+      (linkedUser.status === "ACTIVE" || linkedUser.status === "PENDING_ACTIVATION")
+    );
+
+    return NextResponse.json(
+      {
+        ...application,
+        linkedBroker: linkedUser?.brokerProfile || null,
+        linkedUser: linkedUser
+          ? {
+              id: linkedUser.id,
+              email: linkedUser.email,
+              status: linkedUser.status,
+              mustChangePassword: linkedUser.mustChangePassword,
+            }
+          : null,
+        hasUsableLogin,
+      },
+      { status: 200 }
+    );
   } catch (err) {
     return handleApiError(err);
   }

@@ -3,14 +3,16 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { JobRunner } from "@/lib/jobs/runner";
-import { hashPassword } from "@/lib/auth/password";
+import { hashPassword, generateStrongPassword, validatePasswordStrength } from "@/lib/auth/password";
 import { z } from "zod";
 import crypto from "crypto";
 
 const actionSchema = z.object({
-  action: z.enum(["resend_activation", "suspend", "reactivate", "reset_password"]),
+  action: z.enum(["resend_activation", "suspend", "deactivate", "reactivate", "reset_password"]),
   reason: z.string().max(1000).optional(),
-  newPassword: z.string().min(8).optional(),
+  mode: z.enum(["DIRECT_PASSWORD", "ACTIVATION_LINK"]).optional(),
+  newPassword: z.string().optional(),
+  mustChangePassword: z.boolean().optional(),
 });
 
 export async function POST(
@@ -25,7 +27,7 @@ export async function POST(
 
     const identifier = params.id;
     const body = await req.json().catch(() => ({}));
-    const { action, reason, newPassword } = actionSchema.parse(body);
+    const { action, reason, mode = "DIRECT_PASSWORD", newPassword, mustChangePassword = true } = actionSchema.parse(body);
 
     const brokerUser = await db.user.findFirst({
       where: {
@@ -40,14 +42,16 @@ export async function POST(
     });
 
     if (!brokerUser || !brokerUser.brokerProfile) {
-      throw new ApiError(404, "Broker not found.");
+      throw new ApiError(404, "Broker account not found.");
     }
 
     const brokerProfile = brokerUser.brokerProfile;
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in";
 
     if (action === "resend_activation") {
       const activationToken = crypto.randomUUID();
-      const updatedUser = await db.user.update({
+      await db.user.update({
         where: { id: brokerUser.id },
         data: {
           activationToken,
@@ -56,8 +60,7 @@ export async function POST(
         },
       });
 
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-      const activationLink = `${appUrl}/business-partner/activate?token=${activationToken}`;
+      const activationLink = `${appUrl}/broker-partner/activate?token=${activationToken}`;
 
       await JobRunner.enqueue("SEND_EMAIL", {
         to: brokerUser.email,
@@ -75,7 +78,7 @@ export async function POST(
           userId: adminId,
           action: "BROKER_ACTIVATION_RESENT",
           resource: `User:${brokerUser.id}`,
-          details: { partnerId: brokerProfile.partnerId, email: brokerUser.email },
+          details: { partnerId: brokerProfile.partnerId, email: brokerUser.email, ip },
         },
       });
 
@@ -86,67 +89,56 @@ export async function POST(
       });
     }
 
-    if (action === "suspend") {
-      await db.user.update({
-        where: { id: brokerUser.id },
-        data: {
-          status: "INACTIVE",
-          inactiveAt: new Date(),
-        },
-      });
+    if (action === "suspend" || action === "deactivate") {
+      const newStatus = action === "suspend" ? "SUSPENDED" : "INACTIVE";
+      await db.$transaction(async (tx) => {
+        await tx.user.update({
+          where: { id: brokerUser.id },
+          data: {
+            status: newStatus,
+            inactiveAt: new Date(),
+          },
+        });
 
-      // Send in-app notification if needed
-      await db.notification.create({
-        data: {
-          userId: brokerUser.id,
-          type: "SYSTEM",
-          title: "Account Suspended",
-          message: reason || "Your business partner account has been temporarily suspended by administration.",
-          link: "/broker/support",
-        },
-      }).catch(() => null);
+        // Invalidate active sessions
+        await tx.session.deleteMany({
+          where: { userId: brokerUser.id },
+        });
 
-      await db.auditLog.create({
-        data: {
-          userId: adminId,
-          action: "BROKER_SUSPENDED",
-          resource: `User:${brokerUser.id}`,
-          details: { reason, partnerId: brokerProfile.partnerId },
-        },
+        await tx.auditLog.create({
+          data: {
+            userId: adminId,
+            action: `BROKER_${action.toUpperCase()}`,
+            resource: `User:${brokerUser.id}`,
+            details: { reason, partnerId: brokerProfile.partnerId, status: newStatus, ip },
+          },
+        });
       });
 
       return NextResponse.json({
         success: true,
-        message: "Broker account has been suspended.",
+        message: `Broker account has been ${action === "suspend" ? "suspended" : "deactivated"}.`,
       });
     }
 
     if (action === "reactivate") {
-      await db.user.update({
-        where: { id: brokerUser.id },
-        data: {
-          status: "ACTIVE",
-          inactiveAt: null,
-        },
-      });
+      await db.$transaction(async (tx) => {
+        await tx.user.update({
+          where: { id: brokerUser.id },
+          data: {
+            status: "ACTIVE",
+            inactiveAt: null,
+          },
+        });
 
-      await db.notification.create({
-        data: {
-          userId: brokerUser.id,
-          type: "SYSTEM",
-          title: "Account Reactivated",
-          message: "Your business partner account has been reactivated. You have full portal access.",
-          link: "/broker/dashboard",
-        },
-      }).catch(() => null);
-
-      await db.auditLog.create({
-        data: {
-          userId: adminId,
-          action: "BROKER_REACTIVATED",
-          resource: `User:${brokerUser.id}`,
-          details: { partnerId: brokerProfile.partnerId },
-        },
+        await tx.auditLog.create({
+          data: {
+            userId: adminId,
+            action: "BROKER_REACTIVATED",
+            resource: `User:${brokerUser.id}`,
+            details: { partnerId: brokerProfile.partnerId, ip },
+          },
+        });
       });
 
       return NextResponse.json({
@@ -156,31 +148,101 @@ export async function POST(
     }
 
     if (action === "reset_password") {
-      const generatedPassword = newPassword || `Axivon@${crypto.randomBytes(3).toString("hex")}`;
-      const hashedPassword = await hashPassword(generatedPassword);
+      if (mode === "ACTIVATION_LINK") {
+        const activationToken = crypto.randomUUID();
+        const placeholderHash = await hashPassword(crypto.randomUUID());
+
+        await db.user.update({
+          where: { id: brokerUser.id },
+          data: {
+            activationToken,
+            passwordHash: placeholderHash,
+            mustChangePassword: true,
+          },
+        });
+
+        const activationLink = `${appUrl}/broker-partner/activate?token=${activationToken}`;
+
+        await JobRunner.enqueue("SEND_EMAIL", {
+          to: brokerUser.email,
+          templateKey: "PARTNER_ACCOUNT_ACTIVATION",
+          variables: {
+            name: brokerUser.name,
+            partnerId: brokerProfile.partnerId || "",
+            referralCode: brokerProfile.referralCode || "",
+            activationLink,
+          },
+        });
+
+        await db.auditLog.create({
+          data: {
+            userId: adminId,
+            action: "BROKER_PASSWORD_RESET_VIA_LINK",
+            resource: `User:${brokerUser.id}`,
+            details: { partnerId: brokerProfile.partnerId, ip },
+          },
+        });
+
+        return NextResponse.json(
+          {
+            success: true,
+            message: `Password reset link sent to ${brokerUser.email}`,
+            activationLink,
+          },
+          {
+            headers: {
+              "Cache-Control": "no-store, no-cache, must-revalidate",
+            },
+          }
+        );
+      }
+
+      // Direct password mode
+      const rawPassword = newPassword?.trim() || generateStrongPassword(14);
+      const validation = validatePasswordStrength(rawPassword);
+      if (!validation.isValid) {
+        throw new ApiError(400, `Password does not meet rules: ${validation.errors.join(" ")}`);
+      }
+
+      const hashedPassword = await hashPassword(rawPassword);
 
       await db.user.update({
         where: { id: brokerUser.id },
         data: {
           passwordHash: hashedPassword,
-          mustChangePassword: true,
+          mustChangePassword,
+          status: "ACTIVE",
         },
       });
 
       await db.auditLog.create({
         data: {
           userId: adminId,
-          action: "BROKER_PASSWORD_RESET",
+          action: "BROKER_PASSWORD_RESET_DIRECT",
           resource: `User:${brokerUser.id}`,
-          details: { partnerId: brokerProfile.partnerId },
+          details: { partnerId: brokerProfile.partnerId, mustChangePassword, ip },
         },
       });
 
-      return NextResponse.json({
-        success: true,
-        message: "Password reset successfully. The partner will be prompted to change it upon login.",
-        temporaryPassword: generatedPassword,
-      });
+      return NextResponse.json(
+        {
+          success: true,
+          message: "Password reset successfully. Credentials ready for distribution.",
+          data: {
+            loginUrl: `${appUrl}/login`,
+            email: brokerUser.email,
+            password: rawPassword,
+            mustChangePassword,
+            partnerId: brokerProfile.partnerId,
+            referralCode: brokerProfile.referralCode,
+          },
+        },
+        {
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+          },
+        }
+      );
     }
 
     throw new ApiError(400, "Unsupported action.");

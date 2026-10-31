@@ -6,7 +6,8 @@ import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, User, Briefcase, GraduationCap, FileText, Calendar, Clock, ShieldCheck, StickyNote, Send } from "lucide-react";
+import { ArrowLeft, User, Briefcase, GraduationCap, FileText, Calendar, Clock, ShieldCheck, StickyNote, Send, UserPlus, AlertCircle, ShieldAlert } from "lucide-react";
+import { CreatePartnerLoginModal } from "@/components/admin/partner/CreatePartnerLoginModal";
 import { format } from "date-fns";
 
 export default function ApplicationDetailPage() {
@@ -18,6 +19,7 @@ export default function ApplicationDetailPage() {
   
   const [actionReason, setActionReason] = useState("");
   const [actionModal, setActionModal] = useState<"APPROVE" | "REJECT" | "ON_HOLD" | "MORE_INFO" | "UNDER_REVIEW" | null>(null);
+  const [isCreateLoginOpen, setIsCreateLoginOpen] = useState(false);
   const [submittingAction, setSubmittingAction] = useState(false);
 
   const [meetingModal, setMeetingModal] = useState(false);
@@ -221,7 +223,7 @@ export default function ApplicationDetailPage() {
               <button onClick={() => setActionModal("MORE_INFO")} className="bg-[#111] border border-white/10 text-white px-4 py-2 rounded-sm text-sm hover:bg-white/5">Request Info</button>
               <button onClick={() => setActionModal("ON_HOLD")} className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 px-4 py-2 rounded-sm text-sm hover:bg-yellow-500/20">Hold</button>
               <button onClick={() => setActionModal("REJECT")} className="bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-2 rounded-sm text-sm hover:bg-red-500/20">Reject</button>
-              <button onClick={() => setActionModal("APPROVE")} className="bg-green-500/10 border border-green-500/30 text-green-500 px-4 py-2 rounded-sm text-sm hover:bg-green-500/20">Approve</button>
+              <button onClick={() => setIsCreateLoginOpen(true)} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-sm text-sm transition-colors flex items-center gap-1.5 shadow-sm"><UserPlus className="w-4 h-4" /> Approve & Create Login</button>
             </>
           )}
           {app.status === "APPROVED" && !app.linkedBroker && (
@@ -235,6 +237,27 @@ export default function ApplicationDetailPage() {
           )}
         </div>
       </div>
+
+      {app.status === "APPROVED" && !app.hasUsableLogin && (
+        <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 text-amber-400" />
+            <div>
+              <p className="font-semibold text-sm text-white">Approved Partner Has No Login Account</p>
+              <p className="text-xs text-amber-300/80">
+                This application is approved, but the partner does not yet have login credentials to sign in to the Broker Portal.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsCreateLoginOpen(true)}
+            className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold text-xs transition-colors shadow-sm text-center flex items-center justify-center gap-1.5 whitespace-nowrap"
+          >
+            <UserPlus className="w-4 h-4" />
+            Create Login Credentials
+          </button>
+        </div>
+      )}
 
       {app.linkedBroker && (
         <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

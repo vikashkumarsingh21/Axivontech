@@ -265,7 +265,12 @@ export default function LoginPage() {
       }
 
       // Success: route based on normalized primary role via centralized resolver
-      router.push(resolveRoleDashboardUrl(parsed.data?.user?.role || "EMPLOYEE"));
+      const responseData = parsed.data as any;
+      if (responseData?.mustChangePassword || responseData?.user?.mustChangePassword) {
+        router.push("/auth/change-password");
+      } else {
+        router.push(resolveRoleDashboardUrl(responseData?.user?.role || "EMPLOYEE"));
+      }
     } catch {
       // Network failure / server offline
       setEmail(activeEmail);

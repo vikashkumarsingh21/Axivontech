@@ -80,3 +80,20 @@ This document logs all critical business, financial, legal, and operational deci
   - **No re-application needed:** All existing active partners retain their active status, Partner IDs (`AXP-...`), and referral links.
   - Existing accepted-terms records remain stored under `termsVersion: "1.0"`.
   - When existing partners next log into the Broker Portal, they will be prompted with a non-blocking toast/modal noting: *"Our referral program has been renamed to Broker Partner Program (Terms v1.1). No changes to your commercial rates."*
+
+---
+
+### 10. Partner Account Provisioning & Credential Security Governance
+* **Decision 1: Password Visibility Policy:**
+  - Admin is presented with the generated or assigned password only once at the moment of approval or reset via a client-memory modal.
+  - Raw passwords are NEVER persisted in plaintext, NEVER returned in subsequent API responses, and NEVER logged in `AuditLog` records.
+  - Once the modal is closed, the password cannot be retrieved again; if forgotten, the Admin must perform a Reset Password.
+* **Decision 2: Direct Password vs. Activation Link:**
+  - System supports both modes. Default is "Generate Strong Password" (14 chars crypto-secure, ambiguous characters excluded).
+  - Admin may toggle to "Send activation link instead" (single-use token, 48-hour expiration) if company policy forbids staff handling partner passwords directly.
+* **Decision 3: Mandatory Password Change on First Login:**
+  - Checkbox "Require password change at first login" defaults to ON.
+  - Newly provisioned partners must set their own secure password immediately upon logging in before accessing any onboarding documents or dashboard metrics.
+* **Decision 4: Treatment of Pre-Existing Approved Applications Without Logins:**
+  - Existing approved applications lacking logins are NOT bulk-mutated blindly via script.
+  - They are flagged in the Admin CRM with an amber `"No login yet"` badge, allowing the Operations / Admin team to review and click `"Create Login"` intentionally.
