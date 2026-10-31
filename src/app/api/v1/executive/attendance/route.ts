@@ -78,6 +78,7 @@ export async function GET(req: Request) {
     let completedToday = 0;
     let incompleteToday = 0;
     let absentToday = 0;
+    let missedCheckouts = 0;
 
     const records = employees.map((emp) => {
       const att = attendanceMap.get(emp.id);
@@ -109,6 +110,7 @@ export async function GET(req: Request) {
       let status = att.status;
 
       if (att.status === "MISSED_CHECKOUT") {
+        missedCheckouts++;
         isWorking = false;
         workedMins = 0;
         status = "MISSED_CHECKOUT";
@@ -123,6 +125,7 @@ export async function GET(req: Request) {
           workedMins += Math.floor(elapsedMs / 60000);
           status = "IN_PROGRESS";
         } else {
+          missedCheckouts++;
           isWorking = false;
           workedMins = 0;
           status = "MISSED_CHECKOUT";
@@ -165,6 +168,7 @@ export async function GET(req: Request) {
         completedToday,
         incompleteToday,
         absentToday,
+        missedCheckouts,
       },
       scope: {
         role: scope.role,

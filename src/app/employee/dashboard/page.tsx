@@ -15,6 +15,7 @@ import {
   HelpCircle,
   FolderOpen,
   Zap,
+  AlertTriangle,
 } from "lucide-react";
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
 import { EpButton } from "@/components/employee/EpButton";
@@ -246,6 +247,23 @@ export default function EmployeeDashboard() {
                 ? `Out at ${formatTime(attendance.checkOutAt)} (${formatMinutes(attendance.netMinutes || attendance.grossMinutes || 0)})`
                 : `Target: ${formatMinutes(user?.requiredDailyMinutes || attendance?.requiredDailyMinutes || 480)}`}
             </p>
+
+            {data?.missedCheckoutAlert && (
+              <Link
+                href="/employee/attendance"
+                className="mt-2.5 flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-[#C9A15B]/10 border border-[#C9A15B]/20 text-[#C9A15B] text-xs hover:bg-[#C9A15B]/20 transition-colors"
+              >
+                <div className="flex items-center gap-1.5 truncate">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-[#C9A15B]" />
+                  <span className="font-medium truncate">
+                    {data.missedCheckoutAlert.count === 1
+                      ? "Check-out pending from previous day"
+                      : `${data.missedCheckoutAlert.count} missed check-outs pending`}
+                  </span>
+                </div>
+                <span className="text-[10px] font-semibold underline shrink-0 ml-1">Fix</span>
+              </Link>
+            )}
           </div>
           <Link
             href="/employee/attendance"

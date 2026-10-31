@@ -21,6 +21,8 @@ import {
   Check,
   Building2,
   Sliders,
+  AlertTriangle,
+  Wrench,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
@@ -61,9 +63,12 @@ function formatDateStr(dateVal: string | Date | null | undefined): string {
 
 const STATUS_COLORS: Record<string, string> = {
   COMPLETE: "bg-green-500/10 text-green-400 border-green-500/20",
+  PRESENT: "bg-green-500/10 text-green-400 border-green-500/20",
   IN_PROGRESS: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   INCOMPLETE: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  LATE: "bg-orange-500/10 text-orange-400 border-orange-500/20",
   HALF_DAY: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  MISSED_CHECKOUT: "bg-amber-500/10 text-amber-400 border-amber-500/20",
   ABSENT: "bg-red-500/10 text-red-400 border-red-500/20",
   ON_LEAVE: "bg-purple-500/10 text-purple-400 border-purple-500/20",
   HOLIDAY: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
@@ -121,6 +126,42 @@ export default function AdminAttendancePage() {
   });
   const [policySaving, setPolicySaving] = useState(false);
   const [policySavedMsg, setPolicySavedMsg] = useState("");
+
+  // Direct Fix Modal state for MISSED_CHECKOUT
+  const [fixModalRecord, setFixModalRecord] = useState<any | null>(null);
+  const [fixCheckOutTime, setFixCheckOutTime] = useState<string>("18:00");
+  const [fixReason, setFixReason] = useState<string>("");
+  const [fixLoading, setFixLoading] = useState<boolean>(false);
+  const [fixError, setFixError] = useState<string>("");
+
+  const handleDirectFixSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fixModalRecord || !fixCheckOutTime) return;
+    setFixLoading(true);
+    setFixError("");
+    try {
+      const sessionDate = new Date(fixModalRecord.date).toISOString().split("T")[0];
+      const fullCheckOutIso = new Date(`${sessionDate}T${fixCheckOutTime}:00`).toISOString();
+      const res = await fetch("/api/v1/admin/attendance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "DIRECT_FIX",
+          attendanceId: fixModalRecord.id,
+          checkOutAt: fullCheckOutIso,
+          reason: fixReason.trim() || "Direct check-out set by Admin",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || data.error?.message || "Failed to fix record");
+      setFixModalRecord(null);
+      await load();
+    } catch (err: any) {
+      setFixError(err.message || "Failed to update record");
+    } finally {
+      setFixLoading(false);
+    }
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -349,7 +390,7 @@ export default function AdminAttendancePage() {
         <div className="space-y-6">
           {/* Summary Stats */}
           {summary && (
-            <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-7 gap-3">
               {[
                 { label: "Total Workforce", value: summary.totalEmployees, icon: Users, color: "text-white", bg: "bg-white/5" },
                 { label: "Working Live", value: summary.currentlyWorking, icon: Clock, color: "text-blue-400", bg: "bg-blue-500/10" },
@@ -357,6 +398,7 @@ export default function AdminAttendancePage() {
                 { label: "Hours Completed", value: summary.completedToday, icon: CheckCircle2, color: "text-green-400", bg: "bg-green-500/10" },
                 { label: "Under Target", value: summary.incompleteToday, icon: AlertCircle, color: "text-orange-400", bg: "bg-orange-500/10" },
                 { label: "Not Checked In", value: summary.absentToday, icon: XCircle, color: "text-red-400", bg: "bg-red-500/10" },
+                { label: "Missed Check-Out", value: summary.missedCheckouts || 0, icon: AlertTriangle, color: "text-amber-400", bg: "bg-amber-500/10" },
               ].map(({ label, value, icon: Icon, color, bg }) => (
                 <div key={label} className="bg-[#111111] border border-white/10 rounded-2xl p-4 flex items-center gap-3">
                   <div className={`p-2.5 rounded-xl ${bg} shrink-0`}>
@@ -428,6 +470,7 @@ export default function AdminAttendancePage() {
                 className="bg-[#1a1a1a] border border-white/10 text-gray-300 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-green-500/50"
               >
                 <option value="">All Statuses</option>
+                <option value="MISSED_CHECKOUT">Missed Check-Out</option>
                 <option value="COMPLETE">Complete</option>
                 <option value="INCOMPLETE">Incomplete</option>
                 <option value="HALF_DAY">Half Day</option>
@@ -499,7 +542,9 @@ export default function AdminAttendancePage() {
                                 <span className="text-gray-600">Not checked in</span>
                               )}
                               <span className="text-gray-600"> → </span>
-                              {r.checkOutAt ? (
+                              {r.status === "MISSED_CHECKOUT" ? (
+                                <span className="text-amber-400 font-semibold">Check-out missed</span>
+                              ) : r.checkOutAt ? (
                                 <span className="text-blue-400 font-semibold">{fmtTime(r.checkOutAt)}</span>
                               ) : r.checkInAt ? (
                                 <span className="text-amber-400 font-semibold">Working</span>
@@ -512,22 +557,26 @@ export default function AdminAttendancePage() {
                             )}
                           </td>
                           <td className="px-5 py-4 font-mono text-xs text-gray-400">
-                            {fmt(r.grossMinutes || worked).replace(/^[+-]/, "")}
+                            {r.status === "MISSED_CHECKOUT" ? "—" : fmt(r.grossMinutes || worked).replace(/^[+-]/, "")}
                           </td>
                           <td className="px-5 py-4 font-mono text-xs text-amber-400">
                             {fmt(r.breakMinutes || 0).replace(/^[+-]/, "")}
                           </td>
                           <td className="px-5 py-4 font-mono text-xs text-white font-bold">
-                            {fmt(worked).replace(/^[+-]/, "")}
+                            {r.status === "MISSED_CHECKOUT" ? "—" : fmt(worked).replace(/^[+-]/, "")}
                           </td>
                           <td className="px-5 py-4 font-mono text-xs text-gray-400">
                             {fmt(req).replace(/^[+-]/, "")}
                           </td>
                           <td className="px-5 py-4 font-mono text-xs font-semibold">
-                            <span className={diff >= 0 ? "text-green-400" : "text-red-400"}>
-                              {diff >= 0 ? "+" : ""}
-                              {fmt(diff)}
-                            </span>
+                            {r.status === "MISSED_CHECKOUT" ? (
+                              <span className="text-gray-500">—</span>
+                            ) : (
+                              <span className={diff >= 0 ? "text-green-400" : "text-red-400"}>
+                                {diff >= 0 ? "+" : ""}
+                                {fmt(diff)}
+                              </span>
+                            )}
                           </td>
                           <td className="px-5 py-4">
                             <span
@@ -535,7 +584,7 @@ export default function AdminAttendancePage() {
                                 STATUS_COLORS[r.status] || "bg-gray-500/10 text-gray-400 border-gray-500/20"
                               }`}
                             >
-                              {r.status}
+                              {r.status === "MISSED_CHECKOUT" ? "Check-out pending" : r.status}
                             </span>
                           </td>
                           <td className="px-5 py-4 text-xs font-mono">
@@ -548,17 +597,39 @@ export default function AdminAttendancePage() {
                             )}
                           </td>
                           <td className="px-5 py-4 text-right">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                viewEmployeeHistory(r);
-                              }}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-white/10 bg-[#1a1a1a] hover:bg-green-600 hover:border-green-600 text-gray-300 hover:text-white text-xs font-medium transition-all"
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                              <span>History</span>
-                              <ChevronRight className="w-3.5 h-3.5" />
-                            </button>
+                            <div className="inline-flex items-center gap-2">
+                              {r.status === "MISSED_CHECKOUT" && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setFixModalRecord(r);
+                                    const defaultOutTime = r.checkInAt
+                                      ? new Date(new Date(r.checkInAt).getTime() + 8 * 3600000).toTimeString().slice(0, 5)
+                                      : "18:00";
+                                    setFixCheckOutTime(defaultOutTime);
+                                    setFixReason("");
+                                    setFixError("");
+                                  }}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold transition-colors"
+                                  title="Directly set check-out time and reason"
+                                >
+                                  <Wrench className="w-3.5 h-3.5" />
+                                  <span>Direct Fix</span>
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  viewEmployeeHistory(r);
+                                }}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-white/10 bg-[#1a1a1a] hover:bg-green-600 hover:border-green-600 text-gray-300 hover:text-white text-xs font-medium transition-all"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>History</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -1187,6 +1258,98 @@ export default function AdminAttendancePage() {
                 Close History
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Direct Fix Modal for MISSED_CHECKOUT */}
+      {fixModalRecord && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#111111] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#161a23]">
+              <div className="flex items-center gap-2">
+                <Wrench className="w-5 h-5 text-amber-400" />
+                <div>
+                  <h3 className="text-sm font-bold text-white">Direct Attendance Fix</h3>
+                  <p className="text-xs text-gray-400">Regularize forgotten check-out</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setFixModalRecord(null)}
+                className="p-1 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleDirectFixSubmit} className="p-6 space-y-4">
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Employee:</span>
+                  <span className="text-white font-medium">{fixModalRecord.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Session Date:</span>
+                  <span className="text-white font-medium">{formatDateStr(fixModalRecord.date)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Check-In Punch:</span>
+                  <span className="text-green-400 font-medium font-mono">{fmtTime(fixModalRecord.checkInAt)}</span>
+                </div>
+              </div>
+
+              {fixError && (
+                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+                  {fixError}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  Check-Out Time (24h format HH:MM)
+                </label>
+                <input
+                  type="time"
+                  required
+                  value={fixCheckOutTime}
+                  onChange={(e) => setFixCheckOutTime(e.target.value)}
+                  className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-green-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  Administrative Reason / Note
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={fixReason}
+                  onChange={(e) => setFixReason(e.target.value)}
+                  placeholder="e.g. Employee forgot to punch out after completing shift at client site"
+                  className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-green-500/50"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setFixModalRecord(null)}
+                  disabled={fixLoading}
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={fixLoading}
+                  className="px-4 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+                >
+                  {fixLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>Save Check-Out</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
