@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Search, Plus, X, Edit2, CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
 import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
 import { toast } from "@/lib/notifications/toast";
+import { AdminTableState } from "@/components/admin/AdminTableState";
 
 interface Employee {
   id: string;
@@ -23,8 +24,10 @@ interface Employee {
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("All");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -71,35 +74,52 @@ export default function EmployeesPage() {
   // Fetch Employees from API
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
+    setFetchError(null);
     try {
       const params = new URLSearchParams();
-      if (search) params.set("search", search);
+      if (search.trim()) params.set("search", search.trim());
       if (statusFilter) params.set("status", statusFilter);
+      if (selectedDepartment && selectedDepartment !== "All") {
+        params.set("department", selectedDepartment);
+      }
       params.set("page", page.toString());
       params.set("limit", "10");
 
       const res = await fetch(`/api/v1/admin/employees?${params.toString()}`);
-      const parsed = await parseApiResponse(res);
+      const parsed = await parseApiResponse<Employee[]>(res);
 
       if (!parsed.ok) {
         const msg = parsed.errorMessage || "Failed to load employees";
+        setFetchError(msg);
         setFeedback({ type: "error", message: msg });
         toast.error(msg);
         return;
       }
 
-      const data = parsed.data || parsed.raw;
-      setEmployees(data?.data || []);
-      setTotalPages(data?.meta?.pages || 1);
-      setTotalRecords(data?.meta?.total || 0);
+      // Defensively extract employee array:
+      // parsed.data from parseApiResponse is raw.data if present, otherwise raw.
+      // If the API returns { data: [...], meta: {...} }, parsed.data is the Array of employees,
+      // and parsed.raw is the full envelope { data: [...], meta: {...} }.
+      const employeeList: Employee[] = Array.isArray(parsed.data)
+        ? parsed.data
+        : (Array.isArray(parsed.raw?.data) ? parsed.raw.data : []);
+
+      const meta = parsed.raw?.meta || (parsed.data as any)?.meta;
+      const total = meta?.total ?? meta?.count ?? employeeList.length;
+      const pages = meta?.totalPages ?? meta?.pages ?? Math.max(1, Math.ceil(total / 10));
+
+      setEmployees(employeeList);
+      setTotalPages(pages);
+      setTotalRecords(total);
     } catch (err: unknown) {
       const msg = getErrorMessage(err);
+      setFetchError(msg);
       setFeedback({ type: "error", message: msg });
       toast.error(msg);
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, page]);
+  }, [search, statusFilter, selectedDepartment, page]);
 
   useEffect(() => {
     fetchEmployees();
@@ -163,7 +183,8 @@ export default function EmployeesPage() {
 
       const data = parsed.data || parsed.raw;
       setIsAddOpen(false);
-      const successMsg = `Employee "${data?.data?.name || addForm.name}" created successfully!`;
+      const createdName = (data as any)?.name || (data as any)?.data?.name || addForm.name;
+      const successMsg = `Employee "${createdName}" created successfully!`;
       setFeedback({ type: "success", message: successMsg });
       toast.success(successMsg);
       fetchEmployees();
@@ -217,7 +238,8 @@ export default function EmployeesPage() {
 
       const data = parsed.data || parsed.raw;
       setEditingEmployee(null);
-      const successMsg = `Employee "${data?.data?.name || editForm.name}" updated successfully!`;
+      const updatedName = (data as any)?.name || (data as any)?.data?.name || editForm.name;
+      const successMsg = `Employee "${updatedName}" updated successfully!`;
       setFeedback({ type: "success", message: successMsg });
       toast.success(successMsg);
       fetchEmployees();
@@ -230,6 +252,17 @@ export default function EmployeesPage() {
     }
   };
 
+  const handleClearFilters = () => {
+    setSearch("");
+    setStatusFilter("");
+    setSelectedDepartment("All");
+    setPage(1);
+  };
+
+  const hasActiveFilters = Boolean(
+    search.trim() || statusFilter || (selectedDepartment && selectedDepartment !== "All")
+  );
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -237,7 +270,7 @@ export default function EmployeesPage() {
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Employees</h1>
           <p className="text-gray-400 mt-1 text-sm">
-            Manage workforce accounts, roles, and status ({totalRecords} total employees)
+            Manage workforce accounts, roles, and status ({loading ? "..." : `${totalRecords} total employees`})
           </p>
         </div>
         <button
@@ -278,11 +311,11 @@ export default function EmployeesPage() {
           <button
             key={dept}
             onClick={() => {
-              setSearch(dept === "All" ? "" : dept);
+              setSelectedDepartment(dept);
               setPage(1);
             }}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors border ${
-              (dept === "All" && !search) || (search.toLowerCase() === dept.toLowerCase())
+              selectedDepartment === dept
                 ? "bg-red-600 border-red-600 text-white shadow-lg shadow-red-600/20"
                 : "bg-[#111111] border-white/10 text-gray-400 hover:text-white hover:border-white/20"
             }`}
@@ -348,21 +381,23 @@ export default function EmployeesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center text-gray-500">
-                    <div className="flex items-center justify-center gap-2">
-                      <RefreshCw className="w-4 h-4 animate-spin text-red-500" />
-                      Loading employee data...
-                    </div>
-                  </td>
-                </tr>
-              ) : employees.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center text-gray-500">
-                    No employees found matching your search.
-                  </td>
-                </tr>
+              {loading || fetchError || employees.length === 0 ? (
+                <AdminTableState
+                  loading={loading}
+                  error={fetchError}
+                  isEmpty={employees.length === 0}
+                  hasActiveFilters={hasActiveFilters}
+                  colSpan={6}
+                  loadingMessage="Loading employee workforce..."
+                  emptyTitle="No employees yet"
+                  emptyDescription="No employee accounts have been created yet. Add your first employee to get started."
+                  searchEmptyTitle="No employees found matching your search."
+                  searchEmptyDescription="No employees matched your current search query or filter selection."
+                  addLabel="Add Employee"
+                  onRetry={() => fetchEmployees()}
+                  onClearFilters={handleClearFilters}
+                  onAdd={openAddModal}
+                />
               ) : (
                 employees.map((emp) => (
                   <tr key={emp.id} className="hover:bg-white/[0.02] transition-colors">

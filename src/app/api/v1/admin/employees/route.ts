@@ -30,18 +30,49 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") || "";
     const statusFilter = searchParams.get("status") || "";
+    const departmentFilter = searchParams.get("department") || "";
+    const roleFilter = searchParams.get("role") || "";
     const includeAdmins = searchParams.get("includeAdmins") === "true";
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.max(1, parseInt(searchParams.get("limit") || "10"));
     const skip = (page - 1) * limit;
 
     const where: any = {};
-    if (!includeAdmins) {
-      where.userRoles = { none: { role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] } } } };
+
+    // Role scoping:
+    // If explicit role is requested, match that role
+    if (roleFilter) {
+      where.userRoles = { some: { role: { name: { equals: roleFilter, mode: "insensitive" } } } };
+    } else if (!includeAdmins) {
+      // Workforce employee view: exclude admins, founders, co-founders, as well as external brokers, partners, and clients
+      where.userRoles = {
+        none: {
+          role: {
+            name: {
+              in: ["ADMIN", "FOUNDER", "CO_FOUNDER", "BROKER", "BUSINESS_PARTNER", "CLIENT"],
+            },
+          },
+        },
+      };
+    } else {
+      // Admin inclusion view (e.g. task assignment dropdowns): include staff and admins, exclude external actors
+      where.userRoles = {
+        none: {
+          role: {
+            name: {
+              in: ["BROKER", "BUSINESS_PARTNER", "CLIENT"],
+            },
+          },
+        },
+      };
     }
 
-    if (statusFilter) {
+    if (statusFilter && statusFilter !== "ALL") {
       where.status = statusFilter;
+    }
+
+    if (departmentFilter && departmentFilter !== "ALL" && departmentFilter.toLowerCase() !== "all") {
+      where.department = { equals: departmentFilter, mode: "insensitive" };
     }
 
     if (search) {
@@ -50,6 +81,8 @@ export async function GET(req: Request) {
         { email: { contains: search, mode: "insensitive" } },
         { employeeId: { contains: search, mode: "insensitive" } },
         { department: { contains: search, mode: "insensitive" } },
+        { designation: { contains: search, mode: "insensitive" } },
+        { userRoles: { some: { role: { name: { contains: search, mode: "insensitive" } } } } },
       ];
     }
 
@@ -92,13 +125,18 @@ export async function GET(req: Request) {
       requiredDailyHours: Number(((emp.requiredDailyMinutes || 480) / 60).toFixed(2)),
     }));
 
+    const totalPages = Math.ceil(total / limit);
+
     return NextResponse.json({
+      success: true,
       data: formattedEmployees,
       meta: {
         total,
+        count: total,
         page,
         limit,
-        pages: Math.ceil(total / limit),
+        pages: totalPages,
+        totalPages,
       },
     });
   } catch (error: any) {
