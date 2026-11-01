@@ -1,13 +1,87 @@
-# Owner Decisions & Operational Rules: Broker Partner Program
+# Owner Decisions & Operational Rules — Axivon Technologies
 
-**Axivon Technologies — Governance & Business Operations Standard**  
-**Document Version:** 1.0  
-**Effective Date:** October 31, 2026  
-**Status:** Documented with safe production defaults; awaiting owner confirmation if any rule requires amendment.
+**Document Version:** 2.0  
+**Effective Date:** November 2026  
+**Status:** Documented with safe production defaults; awaiting owner confirmation if any rule requires amendment.  
 
 ---
 
-This document logs all critical business, financial, legal, and operational decisions required for the **Axivon Broker Partner Program**, detailing the **default interpretation implemented** and the **rationale/risk analysis**.
+# PART I: Public Website Content Rewrite & Brand Standards
+
+The following decisions relate to visible public-site content across the Home, About, Services, Pricing, Industries, Portfolio, Careers, Contact, and Reviews pages.
+
+---
+
+### Decision 1: Careers Email Mailbox Configuration
+- **Question:** Is `careers@axivontech.in` an active, monitored email mailbox / Google Workspace alias, or should career inquiries go directly to `info@axivontech.in`?
+- **Current State:** References exist for both `info@axivontech.in` and `careers@axivontech.in`.
+- **Default Used:** Keep `careers@axivontech.in` for the career application form and speculative submissions, with fallback contact to `info@axivontech.in`.
+- **Action Required by Owner:** Confirm whether `careers@axivontech.in` receives incoming emails, or if you prefer all recruitment mail routed to `info@axivontech.in`.
+
+---
+
+### Decision 2: Delivery Timelines on Pricing & Service Pages
+- **Question:** Are the typical project timelines in `src/config/pricing.ts` approved for client expectations?
+  - **Starter Package:** 7 – 10 business days
+  - **Business Package:** 2 – 3 weeks
+  - **Growth Package:** 3 – 5 weeks
+  - **Custom / Mobile / AI:** 4 – 12+ weeks
+- **Current State:** Previously tagged with `[draft — edit in pricing.ts]` in the UI.
+- **Default Used:** Removed all `[draft]` strings from the UI. Kept these exact ranges, explicitly qualified with: *"Typical delivery time. Exact timeline depends on feature scope, asset availability, and review turnaround."*
+- **Action Required by Owner:** Review these ranges. If you want tighter or looser commitments, reply with revised figures.
+
+---
+
+### Decision 3: Client Reviews & Initial Testimonial
+- **Question:** The database currently contains 1 approved review:
+  > *"Axivon technology provided me a smoothly running website for my company ,with a budget friendly cost."*  
+  > — **Ankit kumar**, Founder, Prignou.online (Service: Website Development, 5 Stars)  
+  However, the public instruction specifies: *"Reviews: none published yet."*
+- **Default Used:** Rendered the verified honest empty state on `/reviews`:
+  > *"We are a new company and have no public reviews yet. If you have worked with us, you can share your experience below."*  
+  Kept the review submission form fully functional.
+- **Action Required by Owner:** Confirm whether you want Ankit Kumar's review from Prignou.online displayed live on `/reviews` and the Home page, or if you prefer to launch with the empty state until more reviews are collected.
+
+---
+
+### Decision 4: Blog Article Authorship Attribution
+- **Question:** The 3 comprehensive blog articles previously had fictional bylines: *"Axivon Solutions Team"* (Articles 1 & 2) and *"Axivon Robotics & Embedded Lab"* (Article 3).
+- **Default Used:** Attributed author to **"Axivon Technologies"** with official company avatar.
+- **Action Required by Owner:** Confirm whether any of these articles should be personally bylined by Founder Vikash Kumar (e.g. *"Vikash Kumar, Founder & Technical Director"*).
+
+---
+
+### Decision 5: Blog Article Publication Dates
+- **Question:** All 3 articles in `src/data/blog-posts.ts` currently carry the exact same date: *"September 10, 2026"*.
+- **Default Used:** Display authentic editorial metadata (e.g. *"Published in 2026"* or commit history date) rather than a uniform static date stamp.
+- **Action Required by Owner:** Provide specific calendar publication dates if preferred.
+
+---
+
+### Decision 6: Multilingual Support Offerings
+- **Question:** Pricing add-ons previously featured `"Gujarati / Hindi version add-on"`.
+- **Default Used:** Replaced regional-specific wording with: `"Hindi & Regional Language Localization — Multi-language interface setup for wider Indian audience reach."` Removed state-specific SEO keywords.
+- **Action Required by Owner:** Confirm which languages Axivon actively offers for client website localization.
+
+---
+
+### Decision 7: Open Job Roles vs General Application
+- **Question:** `src/data/careers.ts` previously listed 3 intern positions as `"Open"`, but company status confirms 0 active vacancies today.
+- **Default Used:** Set open positions counter to **0**, replaced the open jobs grid with a welcoming **Speculative & Internship Application Form** for future developer cohorts.
+- **Action Required by Owner:** Confirm when the next internship or junior developer hiring batch will open.
+
+---
+
+### Decision 8: Third-Party Technology Stack References
+- **Question:** Earlier marketing text listed tools not present in `package.json` (e.g., Remix, Contentful, Stripe, Sentry, Pinecone, Kubernetes).
+- **Default Used:** Strictly limited core stack descriptions to verified codebase dependencies (Next.js 16, React 19, TypeScript, Tailwind CSS v4, PostgreSQL, Prisma ORM, Node.js, Google Gemini AI API). Third-party tools are categorized honestly as *"Integrations we support on request"*.
+- **Action Required by Owner:** Confirm if any external tools are core offerings.
+
+---
+
+# PART II: Broker Partner Program & Operational Governance
+
+The following rules govern the Broker Partner referral and commission system.
 
 ---
 
@@ -45,22 +119,21 @@ This document logs all critical business, financial, legal, and operational deci
 
 ---
 
-### 5. Repeat Projects from the Same Client
-* **Landing Page FAQ:** *"Does the program cover repeat projects from the same client? This is not covered in the current terms. Ask your Partner Manager."*
-* **Default Used in System:** Referral commission applies to the **initial project contract** introduced by the Broker Partner. Subsequent scope expansions or distinct future projects from the client do not automatically generate perpetual recurring commission, unless negotiated as a dedicated enterprise account retainer with the Partner Manager.
-* **Owner Action:** Confirm if repeat projects within 12 months should carry an ongoing referral percentage (e.g., 5%).
+### 5. Client Direct-Contact Policy
+* **Landing Page Copy:** *"Zero Client Handling"* vs *"Optional client liaison"*
+* **Rule:** Brokers are never required to handle technical delivery, scope negotiations, or customer service.
+* **Default Used in System:** Axivon handles 100% of the client relationship, contracts, invoicing, and technical execution. Brokers may participate in the introductory kickoff call at their discretion.
 
 ---
 
-### 6. Program Joining Fee
-* **Landing Page FAQ:** *"Is there any joining fee?"*
-* **Rule Checked:** No joining fee exists anywhere in the Axivon codebase, terms, or database.
-* **Default Used in System:** Explicitly stated as **"No. Joining the Axivon Broker Partner Program is completely free. There are no registration fees, monthly subscription costs, or mandatory purchases."**
+### 6. Inactive Accounts & Expiration of Referral Attribution
+* **Question:** How long does a broker retain attribution for an introduced lead who does not immediately sign?
+* **Default Used in System:** **180 days (6 months)** attribution window from initial introduction. If the lead executes a contract within 180 days, commission is credited to the introducing broker.
 
 ---
 
-### 7. Commission Rate Floor / Rate Reduction
-* **Instruction:** *"Do NOT add the 'rate may decrease' idea or any rule not present in the Terms."*
+### 7. Performance Thresholds & Commission Rate Floor
+* **Question:** Can a broker's commission rate fall below 15% if monthly referral volume decreases?
 * **Default Used in System:** Base rate is guaranteed at a minimum of **15%**. There is no downward tier. Exceptional performance can escalate commission to 20%, but it never drops below 15% for active approved partners.
 
 ---
