@@ -2,13 +2,14 @@
 
 import { useEffect } from "react";
 import { useAppMode } from "./useAppMode";
+import { UpdateGate } from "./components/UpdateGate";
 import "./app-mode.css";
 
 /**
  * AppModeInit mounts in the root layout to:
  * 1. Synchronously set data-app="true" on <html> when App Mode is active.
  * 2. Scope CSS and suppress marketing elements when running in Android WebView.
- * 3. Zero footprint when in standard web browsers.
+ * 3. Mount UpdateGate inside WebView for version requirement enforcement.
  */
 export function AppModeInit() {
   const { isAppMode } = useAppMode();
@@ -23,5 +24,5 @@ export function AppModeInit() {
     }
   }, [isAppMode]);
 
-  return null;
+  return <UpdateGate />;
 }
