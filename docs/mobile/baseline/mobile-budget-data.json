@@ -1,0 +1,165 @@
+{
+  "timestamp": "2026-11-02T12:16:42.853Z",
+  "pixel7": {
+    "viewport": {
+      "width": 412,
+      "height": 915,
+      "deviceScaleFactor": 2.625,
+      "isMobile": true,
+      "hasTouch": true
+    },
+    "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+  },
+  "login": {
+    "totalTransferredBytes": 564048,
+    "totalTransferredKB": "550.83",
+    "requestCount": 41,
+    "nextJsJsBytes": 0,
+    "captchaBytes": 0
+  },
+  "dashboards": {
+    "ADMIN": {
+      "path": "/admin/dashboard",
+      "coldTransferredBytes": 84779,
+      "coldTransferredKB": "82.79",
+      "coldReqs": 54,
+      "warmTransferredBytes": 30875,
+      "warmTransferredKB": "30.15",
+      "warmReqs": 55
+    },
+    "EMPLOYEE": {
+      "path": "/employee/dashboard",
+      "coldTransferredBytes": 33183,
+      "coldTransferredKB": "32.41",
+      "coldReqs": 31,
+      "warmTransferredBytes": 17742,
+      "warmTransferredKB": "17.33",
+      "warmReqs": 31
+    },
+    "BROKER": {
+      "path": "/broker/dashboard",
+      "coldTransferredBytes": 30852,
+      "coldTransferredKB": "30.13",
+      "coldReqs": 24,
+      "warmTransferredBytes": 24402,
+      "warmTransferredKB": "23.83",
+      "warmReqs": 34
+    },
+    "CLIENT": {
+      "path": "/client/dashboard",
+      "coldTransferredBytes": 24756,
+      "coldTransferredKB": "24.18",
+      "coldReqs": 24,
+      "warmTransferredBytes": 5608,
+      "warmTransferredKB": "5.48",
+      "warmReqs": 24
+    },
+    "FOUNDER": {
+      "path": "/executive/dashboard",
+      "coldTransferredBytes": 59981,
+      "coldTransferredKB": "58.58",
+      "coldReqs": 54,
+      "warmTransferredBytes": 46957,
+      "warmTransferredKB": "45.86",
+      "warmReqs": 62
+    }
+  },
+  "idlePolls": {
+    "sampleDurationSec": 30,
+    "idleVisibleRequestsPer30s": 17,
+    "idleVisibleTransferredKBPer30s": "13.20",
+    "extrapolated1MinRequests": 34,
+    "extrapolated5MinRequests": 170,
+    "extrapolated5MinKB": "132.01",
+    "observedEndpoints": [
+      "/api/chat/config",
+      "/api/v1/employee/me",
+      "/api/v1/employee/notifications?unreadOnly=true",
+      "/api/v1/portal-ai/config",
+      "/employee/profile?_rsc=WJzQY6xht9DTV0Rm",
+      "/employee/notifications?_rsc=WJzQY6xht9DTV0Rm",
+      "/employee/profile?_rsc=xMy7eCU7FgobYb-b",
+      "/employee/notifications?_rsc=xMy7eCU7FgobYb-b",
+      "/api/v1/employee/dashboard",
+      "/_next/static/media/70bc3e132a0a741e-s.3t6q91iet4nsy.woff2",
+      "/employee/work-reports?_rsc=WJzQY6xht9DTV0Rm",
+      "/employee/tasks?_rsc=WJzQY6xht9DTV0Rm",
+      "/employee/attendance?_rsc=WJzQY6xht9DTV0Rm",
+      "/employee/work-reports?_rsc=xMy7eCU7FgobYb-b",
+      "/employee/tasks?_rsc=xMy7eCU7FgobYb-b",
+      "/employee/attendance?_rsc=xMy7eCU7FgobYb-b"
+    ]
+  },
+  "heaviestApis": [
+    {
+      "role": "FOUNDER",
+      "url": "/api/v1/executive/analytics",
+      "status": 404,
+      "bytes": 54038,
+      "kb": "52.77"
+    },
+    {
+      "role": "ADMIN",
+      "url": "/api/v1/notifications",
+      "status": 200,
+      "bytes": 6601,
+      "kb": "6.45"
+    },
+    {
+      "role": "ADMIN",
+      "url": "/api/v1/admin/employees?page=1&limit=20",
+      "status": 200,
+      "bytes": 5374,
+      "kb": "5.25"
+    },
+    {
+      "role": "EMPLOYEE",
+      "url": "/api/v1/employee/attendance",
+      "status": 200,
+      "bytes": 2017,
+      "kb": "1.97"
+    },
+    {
+      "role": "BROKER",
+      "url": "/api/v1/broker/profile",
+      "status": 200,
+      "bytes": 1330,
+      "kb": "1.30"
+    },
+    {
+      "role": "EMPLOYEE",
+      "url": "/api/v1/employee/tasks",
+      "status": 200,
+      "bytes": 149,
+      "kb": "0.15"
+    },
+    {
+      "role": "FOUNDER",
+      "url": "/api/v1/executive/approvals",
+      "status": 200,
+      "bytes": 11,
+      "kb": "0.01"
+    },
+    {
+      "role": "EMPLOYEE",
+      "url": "/api/v1/announcements",
+      "status": 200,
+      "bytes": 11,
+      "kb": "0.01"
+    },
+    {
+      "role": "CLIENT",
+      "url": "/api/v1/client/projects",
+      "status": 200,
+      "bytes": 11,
+      "kb": "0.01"
+    },
+    {
+      "role": "ADMIN",
+      "url": "/api/v1/admin/calendar/holidays",
+      "status": 405,
+      "bytes": 0,
+      "kb": "0.00"
+    }
+  ]
+}
