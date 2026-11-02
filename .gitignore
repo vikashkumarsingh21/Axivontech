@@ -40,3 +40,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# mobile isolation
+/mobile/**/node_modules/
+/mobile/**/build/
+/mobile/**/.gradle/
+/mobile/**/local.properties
+*.keystore
+*.jks
+*.apk
+*.aab
+

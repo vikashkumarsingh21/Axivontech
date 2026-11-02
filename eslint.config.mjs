@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Mobile isolated directory
+    "mobile/**",
     // Scratch scripts — legacy CommonJS node scripts, not part of the application
     "scratch/**",
     "scripts/**",

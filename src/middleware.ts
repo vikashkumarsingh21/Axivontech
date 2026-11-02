@@ -105,6 +105,16 @@ export async function middleware(req: any) {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.delete("x-user-id");
   requestHeaders.delete("x-user-role");
+  requestHeaders.delete("x-app-mode");
+
+  // ─── Mobile App Mode Header Handling ───
+  // Minimal early check: zero DB calls, zero latency when APP_MODE_ENABLED is not true
+  if (process.env.APP_MODE_ENABLED === "true") {
+    const userAgent = req.headers.get("user-agent");
+    if (userAgent && userAgent.includes("AxivonApp")) {
+      requestHeaders.set("x-app-mode", "true");
+    }
+  }
 
   if (isProtectedRoute || isProtectedApiRoute) {
     const sessionCookie = req.cookies.get("axivon_session")?.value;

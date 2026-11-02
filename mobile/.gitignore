@@ -1,0 +1,20 @@
+# Mobile App Isolation .gitignore
+node_modules/
+**/node_modules/
+.gradle/
+**/build/
+android/app/build/
+android/.gradle/
+android/.idea/
+android/local.properties
+android/*.jks
+android/*.keystore
+android/**/*.apk
+android/**/*.aab
+*.apk
+*.aab
+*.keystore
+*.jks
+.env
+.env.local
+.DS_Store

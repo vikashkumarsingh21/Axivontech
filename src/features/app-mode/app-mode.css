@@ -1,0 +1,23 @@
+/* ============================================================
+   AXIVON APP MODE SCOPED STYLES
+   Strictly scoped to [data-app="true"].
+   Zero CSS leakage to desktop or standard web browser sessions.
+   ============================================================ */
+
+[data-app="true"] {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-app="true"] .web-only {
+  display: none !important;
+}
+
+[data-app="true"] * {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}

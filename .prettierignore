@@ -1,0 +1,7 @@
+# Prettier Ignore
+.next/
+node_modules/
+mobile/
+out/
+build/
+docs/
