@@ -1,0 +1,187 @@
+{
+  "timestamp": "2026-11-02T09:46:38.410Z",
+  "routesFirstLoadJS": {
+    "/": {
+      "scriptCount": 27,
+      "totalUncompressedBytes": 1711371,
+      "totalGzipBytes": 446407,
+      "totalGzipKB": "435.94"
+    },
+    "/login": {
+      "scriptCount": 24,
+      "totalUncompressedBytes": 2346264,
+      "totalGzipBytes": 742256,
+      "totalGzipKB": "724.86"
+    },
+    "/services": {
+      "scriptCount": 27,
+      "totalUncompressedBytes": 1711371,
+      "totalGzipBytes": 446407,
+      "totalGzipKB": "435.94"
+    },
+    "/blog": {
+      "scriptCount": 28,
+      "totalUncompressedBytes": 1786759,
+      "totalGzipBytes": 467260,
+      "totalGzipKB": "456.31"
+    },
+    "/admin/dashboard": {
+      "scriptCount": 18,
+      "totalUncompressedBytes": 1286736,
+      "totalGzipBytes": 318336,
+      "totalGzipKB": "310.88"
+    },
+    "/employee/dashboard": {
+      "scriptCount": 18,
+      "totalUncompressedBytes": 1272162,
+      "totalGzipBytes": 315464,
+      "totalGzipKB": "308.07"
+    },
+    "/broker/dashboard": {
+      "scriptCount": 18,
+      "totalUncompressedBytes": 1281189,
+      "totalGzipBytes": 318639,
+      "totalGzipKB": "311.17"
+    },
+    "/client/dashboard": {
+      "scriptCount": 18,
+      "totalUncompressedBytes": 1265799,
+      "totalGzipBytes": 314513,
+      "totalGzipKB": "307.14"
+    },
+    "/executive/dashboard": {
+      "scriptCount": 20,
+      "totalUncompressedBytes": 1312765,
+      "totalGzipBytes": 328576,
+      "totalGzipKB": "320.88"
+    }
+  },
+  "authSmokeTests": [
+    {
+      "role": "ADMIN",
+      "email": "admin@axivon.dev",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "role": "FOUNDER",
+      "email": "founder@axivon.dev",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "role": "EMPLOYEE",
+      "email": "qa.employee@axivon.dev",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "role": "BROKER",
+      "email": "qa.broker@axivon.dev",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "role": "CLIENT",
+      "email": "qa.client@axivon.dev",
+      "status": 200,
+      "passed": true
+    }
+  ],
+  "apiSmokeTests": [
+    {
+      "role": "ADMIN",
+      "url": "/api/v1/admin/employees",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "role": "FOUNDER",
+      "url": "/api/v1/executive/dashboard",
+      "status": 404,
+      "passed": false
+    },
+    {
+      "role": "EMPLOYEE",
+      "url": "/api/v1/employee/attendance",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "role": "BROKER",
+      "url": "/api/v1/broker/profile",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "role": "CLIENT",
+      "url": "/api/v1/client/projects",
+      "status": 500,
+      "passed": false
+    }
+  ],
+  "responseHeaders": {
+    "html_home": {
+      "url": "/",
+      "status": 200,
+      "cacheControl": "s-maxage=31536000",
+      "contentEncoding": "gzip",
+      "contentType": "text/html; charset=utf-8"
+    },
+    "html_login": {
+      "url": "/login",
+      "status": 200,
+      "cacheControl": "s-maxage=31536000",
+      "contentEncoding": "gzip",
+      "contentType": "text/html; charset=utf-8"
+    },
+    "static_chunk": {
+      "url": "/_next/static/chunks/0-mszpnvwiz79.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "contentEncoding": "gzip",
+      "contentType": "application/javascript; charset=UTF-8"
+    },
+    "api_auth": {
+      "url": "/api/v1/admin/employees",
+      "status": 200,
+      "cacheControl": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+      "contentEncoding": "none",
+      "contentType": "application/json"
+    },
+    "api_broker": {
+      "url": "/api/v1/broker/profile",
+      "status": 200,
+      "cacheControl": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+      "contentEncoding": "none",
+      "contentType": "application/json"
+    }
+  },
+  "screenshots": [
+    {
+      "role": "ADMIN",
+      "path": "/admin/dashboard",
+      "filename": "admin-dashboard-1440px.png"
+    },
+    {
+      "role": "EMPLOYEE",
+      "path": "/employee/dashboard",
+      "filename": "employee-dashboard-1440px.png"
+    },
+    {
+      "role": "BROKER",
+      "path": "/broker/dashboard",
+      "filename": "broker-dashboard-1440px.png"
+    },
+    {
+      "role": "CLIENT",
+      "path": "/client/dashboard",
+      "filename": "client-dashboard-1440px.png"
+    },
+    {
+      "role": "FOUNDER",
+      "path": "/executive/dashboard",
+      "filename": "founder-dashboard-1440px.png"
+    }
+  ]
+}
