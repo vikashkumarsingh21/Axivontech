@@ -10,6 +10,7 @@ import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 import { LoginPosterCarousel } from "@/components/auth/LoginPosterCarousel";
 import { resolveRoleDashboardUrl } from "@/lib/auth/roles";
 import { parseApiResponse } from "@/lib/errors/client";
+import { useAppMode } from "@/features/app-mode";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -26,6 +27,7 @@ export default function LoginPage() {
   const [captchaToken, setCaptchaToken] = useState("");
   const [recaptchaResetCount, setRecaptchaResetCount] = useState(0);
   const [prefersReduced, setPrefersReduced] = useState(false);
+  const { isAppMode } = useAppMode();
 
   // DOM input references for Chrome Autofill synchronization and focus management
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -304,12 +306,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-[#0B0D10] flex flex-col lg:flex-row relative overflow-x-hidden">
-      {/* Left panel (40% desktop, full width mobile): Login form */}
-      <div className="w-full lg:w-[40%] flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 min-h-dvh bg-[#0B0D10] z-10 border-r border-[#1E2530] overflow-y-auto">
+    <div className={`min-h-dvh bg-[#0B0D10] flex flex-col ${isAppMode ? "justify-center items-center" : "lg:flex-row"} relative overflow-x-hidden`}>
+      {/* Left panel (40% desktop, full width mobile, centered in app mode): Login form */}
+      <div className={`w-full ${isAppMode ? "max-w-md mx-auto border-none" : "lg:w-[40%] border-r border-[#1E2530]"} flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 min-h-dvh bg-[#0B0D10] z-10 overflow-y-auto`}>
         {/* Top: Logo & AXIVON ONE Badge */}
         <div>
-          <Link href="/" className="inline-block">
+          <Link href={isAppMode ? "/login" : "/"} className="inline-block">
             <Image
               src="/assets/logo/logo-full.png"
               alt="Axivon Technologies"
@@ -572,12 +574,30 @@ export default function LoginPage() {
 
         {/* Footer */}
         <div className="pt-6 border-t border-[#1E2530] flex items-center justify-between text-xs text-[#7E8997]">
-          <Link
-            href="/"
-            className="text-emerald-400 hover:text-emerald-300 transition-colors"
-          >
-            ← Back to website
-          </Link>
+          {isAppMode ? (
+            <div className="flex items-center gap-3">
+              <Link
+                href="/privacy-policy"
+                className="text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                Privacy Policy
+              </Link>
+              <span>•</span>
+              <Link
+                href="/terms"
+                className="text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                Terms
+              </Link>
+            </div>
+          ) : (
+            <Link
+              href="/"
+              className="text-emerald-400 hover:text-emerald-300 transition-colors"
+            >
+              ← Back to website
+            </Link>
+          )}
           <span className="text-[#566171]">
             © {new Date().getFullYear()} Axivon Technologies
           </span>
@@ -585,7 +605,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right panel (60% desktop, hidden mobile): Isolated Animated Poster Carousel */}
-      <LoginPosterCarousel />
+      {!isAppMode && <LoginPosterCarousel />}
     </div>
   );
 }

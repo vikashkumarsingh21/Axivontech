@@ -6,6 +6,7 @@ import {
   canAccessPartnerPortal,
   resolveRoleDashboardUrl,
 } from "./lib/auth/roles";
+import { isAllowedAppRoute } from "./features/app-mode/routing";
 
 const secretKey = new TextEncoder().encode(env.SESSION_SECRET);
 
@@ -106,13 +107,56 @@ export async function middleware(req: any) {
   requestHeaders.delete("x-user-id");
   requestHeaders.delete("x-user-role");
   requestHeaders.delete("x-app-mode");
+  requestHeaders.delete("x-axivon-app");
+  requestHeaders.delete("x-axivon-app-version");
 
-  // ─── Mobile App Mode Header Handling ───
+  // ─── Mobile App Mode Header & Route Handling ───
   // Minimal early check: zero DB calls, zero latency when APP_MODE_ENABLED is not true
-  if (process.env.APP_MODE_ENABLED === "true") {
-    const userAgent = req.headers.get("user-agent");
-    if (userAgent && userAgent.includes("AxivonApp")) {
+  const isMasterAppEnabled = process.env.APP_MODE_ENABLED === "true";
+  let isAppRequest = false;
+  let appVersion: string | null = null;
+
+  if (isMasterAppEnabled) {
+    const userAgent = req.headers.get("user-agent") || "";
+    if (userAgent.includes("AxivonApp")) {
+      isAppRequest = true;
+      const match = userAgent.match(/AxivonApp\/([0-9.]+)/i);
+      appVersion = match ? match[1] : null;
+    } else if (process.env.NODE_ENV !== "production") {
+      const url = req.nextUrl;
+      if (url.searchParams.get("app") === "1" || req.cookies.get("axivon_app_dev")?.value === "1") {
+        isAppRequest = true;
+        appVersion = "dev";
+      }
+    }
+
+    if (isAppRequest) {
+      requestHeaders.set("x-axivon-app", "1");
       requestHeaders.set("x-app-mode", "true");
+      if (appVersion) {
+        requestHeaders.set("x-axivon-app-version", appVersion);
+      }
+
+      // App-Mode Routing Policy: Public marketing routes redirect out of public view
+      if (!isAllowedAppRoute(pathname)) {
+        const sessionCookie = req.cookies.get("axivon_session")?.value;
+        if (!sessionCookie) {
+          return NextResponse.redirect(new URL("/login", req.url));
+        }
+
+        try {
+          const { payload } = await jwtVerify(sessionCookie, secretKey, {
+            algorithms: ["HS256"],
+          });
+          const role = normalizeRole(payload.role as string);
+          const targetUrl = resolveRoleDashboardUrl(role);
+          return NextResponse.redirect(new URL(targetUrl, req.url));
+        } catch {
+          const res = NextResponse.redirect(new URL("/login", req.url));
+          res.cookies.delete("axivon_session");
+          return res;
+        }
+      }
     }
   }
 
@@ -241,32 +285,12 @@ export async function middleware(req: any) {
 
 export const config = {
   matcher: [
-    "/employee/:path*",
-    "/api/v1/employee/:path*",
-    "/admin/:path*",
-    "/api/v1/admin/:path*",
-    "/executive/:path*",
-    "/api/v1/executive/:path*",
-    "/manager/:path*",
-    "/api/v1/manager/:path*",
-    "/broker/:path*",
-    "/api/v1/broker/:path*",
-    "/client/:path*",
-    "/api/v1/client/:path*",
-    "/crm/:path*",
-    "/api/v1/crm/:path*",
-    "/api/v1/analytics/:path*",
-    "/api/v1/jobs/:path*",
-    "/api/v1/me/:path*",
-    "/api/v1/notifications/:path*",
-    "/api/v1/reminders/:path*",
-    "/api/v1/documents/:path*",
-    "/api/v1/activity/:path*",
-    "/api/v1/preferences/:path*",
-    "/api/v1/automations/:path*",
-    "/api/v1/announcements/:path*",
-    "/api/v1/portal-ai/:path*",
-    "/api/v1/search/:path*",
-    "/auth/change-password",
+    /*
+     * Match all request paths except:
+     * - _next/static (static chunks, css, media)
+     * - _next/image (image optimization files)
+     * - favicon.ico, sitemap.xml, robots.txt, manifest.webmanifest
+     */
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest).*)",
   ],
 };
