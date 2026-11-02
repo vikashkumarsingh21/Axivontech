@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Search,
   Plus,
@@ -89,6 +90,7 @@ const KANBAN_STAGES = [
 ];
 
 export default function BrokerLeadsPage() {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<"table" | "kanban">("table");
   const [leads, setLeads] = useState<BrokerLead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -454,8 +456,8 @@ export default function BrokerLeadsPage() {
               ? "No leads matched your search criteria. Try clearing some filters."
               : "You haven't submitted any client leads yet. Share your intake link or manually submit a lead."
           }
-          actionLabel="Submit First Lead"
-          onAction={() => setIsAddModalOpen(true)}
+          actionLabel="Register First Lead"
+          onAction={() => router.push("/broker/leads/register")}
         />
       ) : viewMode === "table" ? (
         /* TABLE VIEW */

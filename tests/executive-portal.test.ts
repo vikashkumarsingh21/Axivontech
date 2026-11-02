@@ -64,19 +64,21 @@ describe("Phase 4 Executive Portal Authorization Matrix & Scope Tests", () => {
   it("should allow FOUNDER full unrestricted access", async () => {
     const scope = await getExecutiveScope("founder-user");
     expect(scope.isFounder).toBe(true);
+    expect(scope.role).toBe("FOUNDER");
     expect(scope.responsibilityProfile).toBe("FULL");
     expect(isDepartmentAllowed(scope, "Engineering")).toBe(true);
     expect(isDepartmentAllowed(scope, "Finance")).toBe(true);
   });
 
-  it("should allow CO_FOUNDER with TECHNOLOGY profile only assigned departments", async () => {
+  it("should allow CO_FOUNDER equal 50-50 partner access with full unrestricted access across departments", async () => {
     const scope = await getExecutiveScope("tech-cofounder");
-    expect(scope.isFounder).toBe(false);
-    expect(scope.responsibilityProfile).toBe("TECHNOLOGY");
+    expect(scope.isFounder).toBe(true); // Equal executive authority
+    expect(scope.isCoFounder).toBe(true);
+    expect(scope.role).toBe("CO_FOUNDER");
     expect(isDepartmentAllowed(scope, "Engineering")).toBe(true);
     expect(isDepartmentAllowed(scope, "IT")).toBe(true);
-    expect(isDepartmentAllowed(scope, "HR")).toBe(false);
-    expect(isDepartmentAllowed(scope, "Sales")).toBe(false);
+    expect(isDepartmentAllowed(scope, "HR")).toBe(true);
+    expect(isDepartmentAllowed(scope, "Sales")).toBe(true);
   });
 
   it("should enforce self-approval prevention in governance workflow", () => {

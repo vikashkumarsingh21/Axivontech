@@ -102,6 +102,7 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
       title: "Workforce & Operations",
       icon: Users,
       items: [
+        { name: "Departments", href: "/admin/departments", icon: Building2 },
         { name: "Employees", href: "/admin/employees", icon: Users },
         { name: "Attendance", href: "/admin/attendance", icon: CalendarCheck },
         { name: "Calendar & Holidays", href: "/admin/calendar", icon: Calendar },

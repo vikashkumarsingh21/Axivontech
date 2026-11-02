@@ -7,11 +7,11 @@ import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
 import { ROLE_HIERARCHY, normalizeRole } from "@/lib/auth/roles";
 
 // Allowed roles for privileged Profile & Account Settings
-export const ALLOWED_PROFILE_ROLES = ["ADMIN", "FOUNDER", "CO_FOUNDER"] as const;
+export const ALLOWED_PROFILE_ROLES = ["ADMIN", "FOUNDER", "CO_FOUNDER", "DEPARTMENT_MANAGER", "MANAGER"] as const;
 export type AllowedProfileRole = (typeof ALLOWED_PROFILE_ROLES)[number];
 
 export function isAllowedProfileRole(role: string): role is AllowedProfileRole {
-  return (ALLOWED_PROFILE_ROLES as readonly string[]).includes(role);
+  return (ALLOWED_PROFILE_ROLES as readonly string[]).includes(normalizeRole(role));
 }
 
 export function ensureAllowedProfileRole(role: string): void {

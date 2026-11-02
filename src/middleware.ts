@@ -12,6 +12,22 @@ const secretKey = new TextEncoder().encode(env.SESSION_SECRET);
 export async function middleware(req: any) {
   const pathname = req.nextUrl.pathname;
 
+  // ─── Legacy Founder & Co-Founder Portal Route Redirects ───────────────────
+  if (
+    pathname === "/founder" ||
+    pathname.startsWith("/founder/") ||
+    pathname === "/cofounder" ||
+    pathname.startsWith("/cofounder/") ||
+    pathname === "/co-founder" ||
+    pathname.startsWith("/co-founder/")
+  ) {
+    const cleanRemainder = pathname
+      .replace(/^\/(founder|cofounder|co-founder)/, "")
+      .replace(/^\/+/, "");
+    const targetUrl = cleanRemainder ? `/executive/${cleanRemainder}` : "/executive/dashboard";
+    return NextResponse.redirect(new URL(targetUrl, req.url));
+  }
+
   // Protect /employee and /api/v1/employee routes
   const isEmployeeRoute = pathname.startsWith("/employee");
   const isEmployeeApiRoute = pathname.startsWith("/api/v1/employee");
@@ -23,6 +39,10 @@ export async function middleware(req: any) {
   // Protect /executive routes (Phase 4)
   const isExecutiveRoute = pathname.startsWith("/executive");
   const isExecutiveApiRoute = pathname.startsWith("/api/v1/executive");
+
+  // Protect /manager routes (Department Manager Portal)
+  const isManagerRoute = pathname.startsWith("/manager");
+  const isManagerApiRoute = pathname.startsWith("/api/v1/manager");
 
   // Protect /broker routes
   const isBrokerRoute = pathname.startsWith("/broker");
@@ -63,6 +83,7 @@ export async function middleware(req: any) {
     isEmployeeApiRoute ||
     isAdminApiRoute ||
     isExecutiveApiRoute ||
+    isManagerApiRoute ||
     isBrokerApiRoute ||
     isClientApiRoute ||
     isCrmApiRoute ||
@@ -73,6 +94,7 @@ export async function middleware(req: any) {
     isEmployeeRoute ||
     isAdminRoute ||
     isExecutiveRoute ||
+    isManagerRoute ||
     isBrokerRoute ||
     isClientRoute ||
     isCrmRoute ||
@@ -145,11 +167,19 @@ export async function middleware(req: any) {
         return NextResponse.redirect(getRoleRedirectUrl(role));
       }
 
+      const allowedManagerRoles = ["DEPARTMENT_MANAGER", "MANAGER", "ADMIN", "FOUNDER", "CO_FOUNDER"];
+      if ((isManagerRoute || isManagerApiRoute) && !allowedManagerRoles.includes(role)) {
+        if (isManagerApiRoute) {
+          return NextResponse.json({ error: "Forbidden: Department manager access required." }, { status: 403 });
+        }
+        return NextResponse.redirect(getRoleRedirectUrl(role));
+      }
+
       if (isJobsApiRoute && role !== "ADMIN" && role !== "FOUNDER" && role !== "CO_FOUNDER") {
         return NextResponse.json({ error: "Forbidden: Administrative access required." }, { status: 403 });
       }
 
-      const allowedEmployeeRoles = ["EMPLOYEE", "ADMIN", "FOUNDER", "CO_FOUNDER"];
+      const allowedEmployeeRoles = ["EMPLOYEE", "ADMIN", "FOUNDER", "CO_FOUNDER", "DEPARTMENT_MANAGER", "MANAGER"];
       if ((isEmployeeRoute || isEmployeeApiRoute) && !allowedEmployeeRoles.includes(role)) {
         if (isEmployeeApiRoute) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -207,6 +237,8 @@ export const config = {
     "/api/v1/admin/:path*",
     "/executive/:path*",
     "/api/v1/executive/:path*",
+    "/manager/:path*",
+    "/api/v1/manager/:path*",
     "/broker/:path*",
     "/api/v1/broker/:path*",
     "/client/:path*",

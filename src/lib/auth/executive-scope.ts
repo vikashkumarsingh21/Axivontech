@@ -3,13 +3,25 @@ import { ApiError } from "@/lib/api-error";
 
 export interface ExecutiveScope {
   userId: string;
-  role: string;
-  isFounder: boolean;
+  role: "FOUNDER" | "CO_FOUNDER" | string;
+  isFounder: boolean; // Retained as true for both Founder & Co-Founder for 50-50 equality across legacy checks
+  isCoFounder: boolean;
+  isExecutive: boolean;
   responsibilityProfile: string; // FULL, TECHNOLOGY, OPERATIONS, BUSINESS_GROWTH
-  allowedDepartments: string[] | null; // null means unrestricted (all)
-  allowedProjects: string[] | null;    // null means unrestricted (all)
+  allowedDepartments: string[] | null; // null means unrestricted (all departments)
+  allowedProjects: string[] | null;    // null means unrestricted (all projects)
 }
 
+/**
+ * Resolves the executive scope for an authenticated executive.
+ *
+ * BUSINESS RULE (Consolidated Executive Governance):
+ * The Founder and Co-Founder represent equal 50-50 business partners.
+ * Both accounts possess equivalent executive permissions across all modules:
+ * - Unrestricted visibility across all departments and projects
+ * - Equal authority to review executive reports, analytics, people, and governance approvals
+ * - Distinct personal identity, session, and audit tracking
+ */
 export async function getExecutiveScope(userId: string | null): Promise<ExecutiveScope> {
   if (!userId) {
     throw new ApiError(401, "Unauthorized");
@@ -37,42 +49,32 @@ export async function getExecutiveScope(userId: string | null): Promise<Executiv
     throw new ApiError(403, "Forbidden: Executive portal access required");
   }
 
-  // Founder has full unrestricted access
-  if (isFounder || user.executiveProfile?.responsibilityProfile === "FULL") {
-    return {
-      userId,
-      role: isFounder ? "FOUNDER" : "CO_FOUNDER",
-      isFounder: true,
-      responsibilityProfile: "FULL",
-      allowedDepartments: null,
-      allowedProjects: null,
-    };
-  }
-
-  // Co-Founder with specific responsibility profile and scope
-  const profile = user.executiveProfile;
-  const respProfile = profile?.responsibilityProfile || "OPERATIONS";
-
-  const allowedDepartments = profile?.departmentScope
-    ? profile.departmentScope.split(",").map((d) => d.trim()).filter(Boolean)
-    : null;
-
-  const allowedProjects = profile?.projectScope
-    ? profile.projectScope.split(",").map((p) => p.trim()).filter(Boolean)
-    : null;
+  // Founder and Co-Founder have EQUAL 50-50 business authority
+  // Full unrestricted access across company departments and projects
+  const roleName = isFounder ? "FOUNDER" : "CO_FOUNDER";
+  const userProfile = user.executiveProfile;
+  const responsibilityProfile = userProfile?.responsibilityProfile || "FULL";
 
   return {
     userId,
-    role: "CO_FOUNDER",
-    isFounder: false,
-    responsibilityProfile: respProfile,
-    allowedDepartments,
-    allowedProjects,
+    role: roleName,
+    isFounder: true, // Equal executive authority: passes all existing executive capability checks
+    isCoFounder,
+    isExecutive: true,
+    responsibilityProfile,
+    allowedDepartments: null, // Unrestricted (all departments)
+    allowedProjects: null,    // Unrestricted (all projects)
   };
 }
 
+/**
+ * Checks if a specific department is accessible under the given executive scope.
+ * For equal 50-50 partners (Founder & Co-Founder), all departments are always accessible.
+ */
 export function isDepartmentAllowed(scope: ExecutiveScope, department?: string | null): boolean {
-  if (scope.isFounder || !scope.allowedDepartments) return true;
+  if (scope.isFounder || scope.isExecutive || !scope.allowedDepartments) {
+    return true;
+  }
   if (!department) return false;
   return scope.allowedDepartments.some(
     (d) => d.toLowerCase() === department.toLowerCase()

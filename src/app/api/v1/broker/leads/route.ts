@@ -68,13 +68,23 @@ export async function GET(req: NextRequest) {
           designation: true,
           industry: true,
           city: true,
+          state: true,
           serviceInterest: true,
           message: true,
+          businessNeed: true,
           budget: true,
           timeline: true,
           status: true,
           qualificationStatus: true,
           source: true,
+          convertedProject: {
+            select: {
+              id: true,
+              projectCode: true,
+              projectName: true,
+              status: true,
+            },
+          },
           createdAt: true,
           updatedAt: true,
           // Safe activity timeline (strips internal admin notes & raw metadata)

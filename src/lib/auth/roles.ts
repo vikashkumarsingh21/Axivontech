@@ -9,6 +9,12 @@
  *
  * Canonical Role: BUSINESS_PARTNER
  * Legacy Compatibility Alias: BROKER
+ *
+ * EXECUTIVE GOVERNANCE:
+ * Founder and Co-Founder represent equal 50-50 business partners with equivalent executive permissions.
+ *
+ * DEPARTMENT MANAGERS:
+ * Department managers hold scoped managerial access to their assigned business departments.
  */
 
 export const ROLES = {
@@ -16,6 +22,8 @@ export const ROLES = {
   CO_FOUNDER: "CO_FOUNDER",
   ADMIN: "ADMIN",
   EXECUTIVE: "EXECUTIVE",
+  DEPARTMENT_MANAGER: "DEPARTMENT_MANAGER",
+  MANAGER: "MANAGER", // alias
   HR: "HR",
   FINANCE: "FINANCE",
   LEAD_DEVELOPER: "LEAD_DEVELOPER",
@@ -38,6 +46,8 @@ export const ROLE_HIERARCHY: readonly string[] = [
   "CO_FOUNDER",
   "ADMIN",
   "EXECUTIVE",
+  "DEPARTMENT_MANAGER",
+  "MANAGER",
   "BUSINESS_PARTNER",
   "BROKER", // legacy alias
   "CLIENT",
@@ -50,14 +60,17 @@ export const ROLE_HIERARCHY: readonly string[] = [
 
 /**
  * Numeric priority map used for ordering roles by administrative weight.
+ * Founder and Co-Founder share equal 50-50 partner status (priority 100).
  */
 export const ROLE_PRIORITY: Record<string, number> = {
   FOUNDER: 100,
-  CO_FOUNDER: 95,
+  CO_FOUNDER: 100, // Equal 50-50 partner priority
   ADMIN: 90,
   EXECUTIVE: 85,
   HR: 80,
   FINANCE: 70,
+  DEPARTMENT_MANAGER: 65,
+  MANAGER: 65,
   LEAD_DEVELOPER: 60,
   EMPLOYEE: 50,
   CLIENT: 45,
@@ -69,12 +82,16 @@ export const ROLE_PRIORITY: Record<string, number> = {
 /**
  * Normalizes any role string to its canonical representation.
  * If "BROKER" or "PARTNER" is passed, it is normalized to "BUSINESS_PARTNER".
+ * If "MANAGER" is passed, it is normalized to "DEPARTMENT_MANAGER".
  */
 export function normalizeRole(role: string | null | undefined): string {
   if (!role) return "USER";
   const trimmed = role.trim().toUpperCase();
   if (trimmed === "BROKER" || trimmed === "PARTNER") {
     return "BUSINESS_PARTNER";
+  }
+  if (trimmed === "MANAGER") {
+    return "DEPARTMENT_MANAGER";
   }
   return trimmed;
 }
@@ -85,6 +102,14 @@ export function normalizeRole(role: string | null | undefined): string {
 export function isBusinessPartnerRole(role: string | null | undefined): boolean {
   if (!role) return false;
   return normalizeRole(role) === "BUSINESS_PARTNER";
+}
+
+/**
+ * Checks whether a given role is a Department Manager (canonical or alias).
+ */
+export function isDepartmentManagerRole(role: string | null | undefined): boolean {
+  if (!role) return false;
+  return normalizeRole(role) === "DEPARTMENT_MANAGER";
 }
 
 /**
@@ -113,6 +138,9 @@ export function resolveRoleDashboardUrl(userRole: string | null | undefined): st
   }
   if (normalized === "ADMIN") {
     return "/admin/dashboard";
+  }
+  if (normalized === "DEPARTMENT_MANAGER") {
+    return "/manager/dashboard";
   }
   if (normalized === "BUSINESS_PARTNER") {
     return "/broker/dashboard";

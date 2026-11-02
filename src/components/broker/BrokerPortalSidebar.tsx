@@ -81,9 +81,9 @@ export function BrokerPortalSidebar({
     {
       groupName: "Business Pipeline",
       items: [
+        { name: "Register New Lead", href: "/broker/leads/register", icon: PlusCircle },
         { name: "My Leads", href: "/broker/leads", icon: Users },
         { name: "Projects", href: "/broker/projects", icon: Briefcase },
-        { name: "Submit Project", href: "/broker/projects/new", icon: PlusCircle },
       ],
     },
     {

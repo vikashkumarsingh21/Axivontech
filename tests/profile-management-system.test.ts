@@ -289,7 +289,7 @@ describe("Profile Management & Email Change Security Suite", () => {
       expect(isAllowedProfileRole("ADMIN")).toBe(true);
       expect(isAllowedProfileRole("FOUNDER")).toBe(true);
       expect(isAllowedProfileRole("CO_FOUNDER")).toBe(true);
-      expect(ALLOWED_PROFILE_ROLES).toEqual(["ADMIN", "FOUNDER", "CO_FOUNDER"]);
+      expect(ALLOWED_PROFILE_ROLES).toEqual(["ADMIN", "FOUNDER", "CO_FOUNDER", "DEPARTMENT_MANAGER", "MANAGER"]);
     });
 
     it("denies EMPLOYEE, CLIENT, BROKER from using privileged profile endpoint", () => {

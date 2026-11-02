@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { UserCheck, ShieldCheck, Crown } from "lucide-react";
+import { UserCheck, ShieldCheck, Crown, KeyRound } from "lucide-react";
 import { AccountProfileSettings } from "@/components/portal/AccountProfileSettings";
+import { ExecutiveSecuritySettings } from "@/components/portal/ExecutiveSecuritySettings";
 
 export default function ExecutiveSettingsPage() {
-  const [activeTab, setActiveTab] = useState<"profile" | "policies">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "security" | "policies">("profile");
   const [settings, setSettings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,12 +34,12 @@ export default function ExecutiveSettingsPage() {
           </div>
           <h1 className="text-2xl font-bold text-[#F3F5F7] tracking-tight">Executive Account &amp; Settings</h1>
           <p className="text-sm text-[#7E8997] mt-0.5">
-            Manage your executive leadership profile, primary email verification, and company-wide governance policies.
+            Manage your personal executive leadership profile, primary email verification, credentials security, and company governance policies.
           </p>
         </div>
 
         {/* Tab Toggle */}
-        <div className="flex items-center gap-2 bg-[#10151B] p-1 rounded-xl border border-[#29313B]">
+        <div className="flex items-center gap-1.5 bg-[#10151B] p-1 rounded-xl border border-[#29313B]">
           <button
             onClick={() => setActiveTab("profile")}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
@@ -49,6 +50,17 @@ export default function ExecutiveSettingsPage() {
           >
             <UserCheck className="w-3.5 h-3.5" />
             Executive Profile
+          </button>
+          <button
+            onClick={() => setActiveTab("security")}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              activeTab === "security"
+                ? "bg-[#1B222B] text-[#D6B779] shadow-xs"
+                : "text-[#7E8997] hover:text-[#F3F5F7]"
+            }`}
+          >
+            <KeyRound className="w-3.5 h-3.5" />
+            Security &amp; Password
           </button>
           <button
             onClick={() => setActiveTab("policies")}
@@ -64,9 +76,15 @@ export default function ExecutiveSettingsPage() {
         </div>
       </div>
 
-      {activeTab === "profile" ? (
+      {activeTab === "profile" && (
         <AccountProfileSettings portalTheme="executive" />
-      ) : (
+      )}
+
+      {activeTab === "security" && (
+        <ExecutiveSecuritySettings />
+      )}
+
+      {activeTab === "policies" && (
         <div className="bg-[#151A21] border border-[#29313B] rounded-2xl p-6 sm:p-7 space-y-4">
           <h2 className="text-base font-bold text-[#F3F5F7]">Company Policy Settings</h2>
           <p className="text-xs text-[#7E8997]">Organizational attendance windows and privileged session policies.</p>

@@ -445,6 +445,80 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
         )}
       </div>
 
+      {/* Partner Attribution Card (Unified Registration System) */}
+      {lead.source === "PARTNER" && (
+        <div className="bg-[#111111] border border-[#C2A878]/30 rounded-2xl p-5 relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#C2A878]/15 text-[#C2A878] border border-[#C2A878]/30">
+                  PARTNER REFERRAL
+                </span>
+                {lead.owner?.brokerProfile?.partnerId && (
+                  <span className="text-xs font-mono text-gray-400">
+                    ID: {lead.owner.brokerProfile.partnerId}
+                  </span>
+                )}
+                {lead.owner?.brokerProfile?.referralCode && (
+                  <span className="text-xs font-mono text-[#C2A878]">
+                    Code: {lead.owner.brokerProfile.referralCode}
+                  </span>
+                )}
+              </div>
+              <h3 className="text-base font-semibold text-white">
+                Registered by Partner: {lead.owner?.name || "Business Partner"}
+              </h3>
+              <p className="text-xs text-gray-400">
+                Partner Email: {lead.owner?.email || "—"} {lead.owner?.brokerProfile?.companyName ? `• ${lead.owner.brokerProfile.companyName}` : ""}
+              </p>
+            </div>
+
+            {lead.convertedProject && (
+              <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/25 text-right">
+                <span className="text-[10px] uppercase font-mono text-purple-400 block">Converted Commercial Project</span>
+                <Link
+                  href={`/admin/crm/partner-projects/${lead.convertedProject.id}`}
+                  className="font-mono text-xs font-bold text-white hover:text-purple-300 underline"
+                >
+                  {lead.convertedProject.projectCode}: {lead.convertedProject.projectName}
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Supporting Documents Card */}
+      {lead.documents && lead.documents.length > 0 && (
+        <div className="bg-[#111111] border border-white/10 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <FileText className="w-4 h-4 text-[#C2A878]" />
+            <h3 className="text-sm font-semibold text-white">
+              Supporting Documents ({lead.documents.length})
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {lead.documents.map((doc: any) => (
+              <a
+                key={doc.id}
+                href={doc.fileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 rounded-xl bg-[#18181b] border border-white/10 hover:border-[#C2A878]/50 flex items-center justify-between text-xs text-white transition-colors group"
+              >
+                <div className="truncate mr-2">
+                  <div className="font-medium truncate group-hover:text-[#C2A878] transition-colors">{doc.title}</div>
+                  <div className="text-[10px] text-gray-500 font-mono">
+                    {doc.sizeBytes ? `${(doc.sizeBytes / 1024).toFixed(1)} KB • ` : ""}{new Date(doc.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <Send className="w-3.5 h-3.5 text-gray-500 group-hover:text-[#C2A878] shrink-0" />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Main Grid: Qualification Form + Timeline */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Col: Qualification & Actions */}

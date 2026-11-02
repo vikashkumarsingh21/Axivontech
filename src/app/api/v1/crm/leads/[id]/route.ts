@@ -13,8 +13,34 @@ export async function GET(req: NextRequest, props: { params: Promise<{ [key: str
     const lead = await db.lead.findUnique({
       where: { id },
       include: {
-        owner: { select: { id: true, name: true, email: true, department: true } },
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            department: true,
+            brokerProfile: {
+              select: {
+                id: true,
+                partnerId: true,
+                referralCode: true,
+                companyName: true,
+                city: true,
+                state: true,
+              },
+            },
+          },
+        },
         convertedClient: true,
+        convertedProject: {
+          select: {
+            id: true,
+            projectCode: true,
+            projectName: true,
+            status: true,
+            createdAt: true,
+          },
+        },
         activities: {
           include: { actor: { select: { id: true, name: true, email: true } } },
           orderBy: { createdAt: "desc" },
@@ -38,7 +64,27 @@ export async function GET(req: NextRequest, props: { params: Promise<{ [key: str
       throw new ApiError(404, "Lead not found");
     }
 
-    return NextResponse.json({ success: true, data: lead });
+    // Also look up any partner documents linked by description or leadCode
+    let documents: any[] = [];
+    if (lead.owner?.brokerProfile?.id) {
+      documents = await db.partnerDocument.findMany({
+        where: {
+          brokerProfileId: lead.owner.brokerProfile.id,
+          description: { contains: lead.leadCode },
+        },
+        select: {
+          id: true,
+          title: true,
+          fileUrl: true,
+          mimeType: true,
+          sizeBytes: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: "desc" },
+      });
+    }
+
+    return NextResponse.json({ success: true, data: { ...lead, documents } });
   } catch (error) {
     return handleApiError(error);
   }

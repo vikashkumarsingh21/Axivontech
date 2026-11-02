@@ -351,13 +351,13 @@ export default function BrokerDashboardPage() {
             >
               Share Referral Link
             </BrokerButton>
-            <Link href="/broker/projects/new">
+            <Link href="/broker/leads/register">
               <BrokerButton
                 variant="primary"
                 size="sm"
                 icon={<PlusCircle className="w-3.5 h-3.5 text-[#0A0B0D]" />}
               >
-                Submit Project
+                + Register New Lead
               </BrokerButton>
             </Link>
           </div>

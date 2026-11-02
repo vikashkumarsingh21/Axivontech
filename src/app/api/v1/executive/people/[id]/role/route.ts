@@ -4,6 +4,10 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/permissions";
 import { getExecutiveScope } from "@/lib/auth/executive-scope";
 import { handleApiError, ApiError } from "@/lib/api-error";
+import {
+  enforceExecutiveAccountLimits,
+  isExecutiveRole,
+} from "@/lib/auth/executive-account-guard";
 
 const VALID_ROLES = ["EMPLOYEE", "ADMIN", "CO_FOUNDER"] as const;
 
@@ -13,15 +17,16 @@ const changeRoleSchema = z.object({
 
 export async function PATCH(
   req: Request,
-  props: { params: Promise<{ [key: string]: string }> }) {
+  props: { params: Promise<{ [key: string]: string }> }
+) {
   const params = await props.params;
   try {
     const actorId = req.headers.get("x-user-id");
     await requirePermission(actorId, "people.view");
     const scope = await getExecutiveScope(actorId);
 
-    // Only Founders can change roles
-    if (!scope.isFounder) {
+    // Both Founder & Co-Founder possess executive authority to manage personnel roles
+    if (!scope.isFounder && !scope.isExecutive) {
       throw new ApiError(403, "Forbidden: Only Founders can change user roles");
     }
 
@@ -43,9 +48,11 @@ export async function PATCH(
       throw new ApiError(404, "User not found");
     }
 
-    // Cannot demote another Founder
-    const isTargetFounder = targetUser.userRoles.some((ur) => ur.role.name === "FOUNDER");
-    if (isTargetFounder) {
+    // Protect designated executive accounts from demotion or role tampering
+    const isTargetExecutive = targetUser.userRoles.some((ur) =>
+      isExecutiveRole(ur.role.name)
+    );
+    if (isTargetExecutive) {
       throw new ApiError(403, "Forbidden: Cannot change a Founder's role");
     }
 
@@ -53,6 +60,11 @@ export async function PATCH(
     const currentRole = targetUser.userRoles.length > 0 ? targetUser.userRoles[0].role.name : null;
     if (currentRole === roleName) {
       throw new ApiError(400, `User already has the ${roleName} role`);
+    }
+
+    // Strictly enforce account limits: exactly 1 Founder and exactly 1 Co-Founder
+    if (roleName === "CO_FOUNDER" || (roleName as string) === "FOUNDER") {
+      await enforceExecutiveAccountLimits(roleName, id, db);
     }
 
     // Get or create the target role record
@@ -84,6 +96,7 @@ export async function PATCH(
           targetUserEmail: targetUser.email,
           oldRole: currentRole,
           newRole: roleName,
+          executedByExecutiveRole: scope.role,
         },
         ipAddress: req.headers.get("x-forwarded-for") || "unknown",
         userAgent: req.headers.get("user-agent") || "unknown",
@@ -95,6 +108,17 @@ export async function PATCH(
       message: `Role changed to ${roleName} for ${targetUser.name}. User has been signed out and must re-authenticate.`,
     });
   } catch (error: any) {
+    if (error instanceof ApiError) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: error.message,
+          message: error.message,
+          code: error.code || "API_ERROR",
+        },
+        { status: error.statusCode }
+      );
+    }
     return handleApiError(error);
   }
 }
