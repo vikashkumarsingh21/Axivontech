@@ -41,7 +41,7 @@ export function PortalAppPromptWrapper() {
     if (!isPortal) return;
 
     // Check version and popup toggle status from API
-    fetch("/api/v1/app/version")
+    fetch("/api/v1/app/version", { cache: "no-store" })
       .then((res) => {
         if (!res.ok) throw new Error("App Mode or release not active");
         return res.json();

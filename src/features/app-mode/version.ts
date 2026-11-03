@@ -28,7 +28,7 @@ export async function handleAppVersion(): Promise<NextResponse> {
     {
       status: 200,
       headers: {
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+        "Cache-Control": "no-store, max-age=0",
       },
     }
   );
