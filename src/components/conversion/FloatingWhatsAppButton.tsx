@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { isPortalOrStandaloneRoute } from "@/lib/utils";
 import { getWhatsAppUrl } from "@/config/contact";
 import { trackWhatsAppClick } from "@/lib/analytics";
+import { useAppMode } from "@/features/app-mode";
 
 /**
  * FloatingWhatsAppButton
@@ -18,12 +19,13 @@ import { trackWhatsAppClick } from "@/lib/analytics";
  * Automatically hidden on auth/login, partner portals, and standalone demo pages.
  */
 export default function FloatingWhatsAppButton() {
+  const { isAppMode } = useAppMode();
   const pathname = usePathname();
   const shouldReduceMotion = useReducedMotion();
   const [isHovered, setIsHovered] = useState(false);
 
-  // Hide on /login and partner/broker/admin dashboard portals
-  if (isPortalOrStandaloneRoute(pathname)) {
+  // Suppress in App Mode, login, or portal routes
+  if (isAppMode || isPortalOrStandaloneRoute(pathname)) {
     return null;
   }
 

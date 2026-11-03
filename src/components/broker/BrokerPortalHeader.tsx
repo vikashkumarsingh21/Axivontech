@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { useSharedPoller } from "@/features/app-mode";
 import { 
   Bell, 
   Menu, 
@@ -65,7 +66,7 @@ export function BrokerPortalHeader({
   }, []);
 
   // Fetch unread count
-  const fetchUnreadCount = async () => {
+  const fetchUnreadCount = useCallback(async () => {
     try {
       const res = await fetch("/api/v1/notifications/unread-count");
       if (res.ok) {
@@ -73,13 +74,17 @@ export function BrokerPortalHeader({
         setUnreadCount(json.data?.unreadCount || 0);
       }
     } catch {}
-  };
+  }, []);
+
+  // Shared poller (>= 60s, paused in background)
+  useSharedPoller({
+    onPoll: fetchUnreadCount,
+    baseIntervalMs: 60000,
+  });
 
   useEffect(() => {
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  }, [fetchUnreadCount]);
 
   // Load notifications preview when opened
   const handleToggleNotif = async () => {

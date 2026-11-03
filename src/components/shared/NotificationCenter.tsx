@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Bell, CheckCheck } from "lucide-react";
+import { useSharedPoller } from "@/features/app-mode";
 
 export function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,13 +10,13 @@ export function NotificationCenter() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchUnread = async () => {
+  const fetchUnread = useCallback(async () => {
     try {
       const res = await fetch("/api/v1/notifications/unread-count");
       const d = await res.json();
       if (res.ok) setUnreadCount(d.unreadCount || 0);
     } catch (e) {}
-  };
+  }, []);
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -27,22 +28,15 @@ export function NotificationCenter() {
     setLoading(false);
   };
 
+  // Shared Poller: >= 60s, paused when page is hidden/background, exponential backoff
+  useSharedPoller({
+    onPoll: fetchUnread,
+    baseIntervalMs: 60000,
+  });
+
   useEffect(() => {
-    let active = true;
-    const getUnread = async () => {
-      try {
-        const res = await fetch("/api/v1/notifications/unread-count");
-        const d = await res.json();
-        if (res.ok && active) setUnreadCount(d.unreadCount || 0);
-      } catch (e) {}
-    };
-    getUnread();
-    const interval = setInterval(getUnread, 30000);
-    return () => {
-      active = false;
-      clearInterval(interval);
-    };
-  }, []);
+    fetchUnread();
+  }, [fetchUnread]);
 
   const toggleOpen = () => {
     if (!isOpen) fetchNotifications();

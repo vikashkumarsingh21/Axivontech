@@ -12,6 +12,7 @@ import { ChatMessage } from "./ChatMessage";
 import { TypingIndicator } from "./TypingIndicator";
 import { MessageInput } from "./MessageInput";
 import { isPortalOrStandaloneRoute } from "@/lib/utils";
+import { useAppMode } from "@/features/app-mode";
 
 interface ChatbotConfig {
   enabled: boolean;
@@ -22,6 +23,7 @@ interface ChatbotConfig {
 }
 
 export default function ChatWidget() {
+  const { isAppMode } = useAppMode();
   const pathname = usePathname();
   const shouldReduceMotion = useReducedMotion();
 
@@ -189,8 +191,8 @@ export default function ChatWidget() {
     setDraftText("");
   };
 
-  // Do not render floating public chatbot on portals, auth screens, or demo projects
-  if (isPortalOrStandaloneRoute(pathname)) {
+  // Do not render floating public chatbot in App Mode, on portals, auth screens, or demo projects
+  if (isAppMode || isPortalOrStandaloneRoute(pathname)) {
     return null;
   }
 

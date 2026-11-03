@@ -4,12 +4,14 @@ import Script from "next/script";
 import { Suspense, useState, useEffect } from "react";
 import AnalyticsRouteTracker from "@/components/analytics/AnalyticsRouteTracker";
 import { getStoredConsent, CONSENT_EVENT_NAME } from "@/lib/legal/cookie-consent";
+import { useAppMode } from "@/features/app-mode";
 
 interface GoogleAnalyticsProps {
   measurementId?: string;
 }
 
 export default function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
+  const { isAppMode } = useAppMode();
   const gaId = measurementId || process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-QCHH8ELS1K";
   const [hasConsent, setHasConsent] = useState(false);
 
@@ -30,7 +32,8 @@ export default function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps)
     return () => window.removeEventListener(CONSENT_EVENT_NAME, handleUpdate);
   }, []);
 
-  if (!gaId || !hasConsent) {
+  // Suppress third-party analytics in app mode to save low-data budget
+  if (isAppMode || !gaId || !hasConsent) {
     return null;
   }
 

@@ -10,3 +10,4 @@ export * from "./components/DownloadPopupErrorBoundary";
 export * from "./components/PortalAppPromptWrapper";
 export * from "./components/UpdateGate";
 export * from "./components/QrCodeSvg";
+export * from "./useSharedPoller";
