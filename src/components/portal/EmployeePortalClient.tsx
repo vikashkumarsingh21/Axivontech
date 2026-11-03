@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { EmployeeSidebar } from "./EmployeeSidebar";
 import { EmployeeNavbar } from "./EmployeeNavbar";
 import { PortalAIAssistant } from "@/components/portal-ai/PortalAIAssistant";
+import { MobileShell } from "@/components/mobile/MobileShell";
+import { useAppMode } from "@/features/app-mode/useAppMode";
 
 interface EmployeePortalClientProps {
   children: React.ReactNode;
@@ -11,6 +13,27 @@ interface EmployeePortalClientProps {
 
 export function EmployeePortalClient({ children }: EmployeePortalClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isAppMode } = useAppMode();
+  const [userName, setUserName] = useState("Employee");
+  const [userEmail, setUserEmail] = useState("");
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/v1/employee/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.user?.name) setUserName(data.user.name);
+        if (data?.user?.email) setUserEmail(data.user.email);
+      })
+      .catch(() => {});
+
+    fetch("/api/v1/employee/notifications?unreadOnly=true")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.total) setUnread(data.total);
+      })
+      .catch(() => {});
+  }, []);
 
   // Close sidebar on resize to desktop
   useEffect(() => {
@@ -23,6 +46,24 @@ export function EmployeePortalClient({ children }: EmployeePortalClientProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // App-Mode dedicated Mobile Shell
+  if (isAppMode) {
+    return (
+      <div className="min-h-screen bg-[#121212] text-[#EDEBE6]">
+        <MobileShell
+          role="EMPLOYEE"
+          userName={userName}
+          userEmail={userEmail}
+          unreadCount={unread}
+        >
+          {children}
+        </MobileShell>
+        <PortalAIAssistant portalRole="EMPLOYEE" />
+      </div>
+    );
+  }
+
+  // Desktop / Standard Browser layout remains 100% untouched
   return (
     <div className="flex h-screen overflow-hidden bg-[#121212] text-[#EDEBE6] antialiased">
       {/* Mobile Overlay */}

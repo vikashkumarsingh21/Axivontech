@@ -23,6 +23,8 @@ import { PageHeader } from "@/components/employee/PageHeader";
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
 import { StatusBadge } from "@/components/employee/StatusBadge";
 import { EpButton } from "@/components/employee/EpButton";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileEmployeeTasks } from "@/components/mobile/employee/MobileEmployeeTasks";
 
 interface TaskComment {
   id: string;
@@ -52,6 +54,7 @@ interface TaskItem {
 }
 
 export default function TasksPage() {
+  const { isAppMode } = useAppMode();
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -232,6 +235,16 @@ export default function TasksPage() {
         return "neutral";
     }
   };
+
+  if (isAppMode) {
+    return (
+      <MobileEmployeeTasks
+        tasks={tasks}
+        onUpdateStatus={updateStatus}
+        isLoading={loading}
+      />
+    );
+  }
 
   return (
     <motion.div

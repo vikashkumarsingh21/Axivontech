@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PageHeader } from "@/components/employee/PageHeader";
 import { EpButton } from "@/components/employee/EpButton";
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileEmployeeNotifications } from "@/components/mobile/employee/MobileEmployeeNotifications";
 import {
   Bell,
   Check,
@@ -27,6 +29,7 @@ interface NotificationItem {
 }
 
 export default function NotificationsPage() {
+  const { isAppMode } = useAppMode();
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [markingAll, setMarkingAll] = useState(false);
@@ -139,6 +142,17 @@ export default function NotificationsPage() {
         return <Bell className="w-4 h-4 text-[#4F9D83]" />;
     }
   };
+
+  if (isAppMode) {
+    return (
+      <MobileEmployeeNotifications
+        notifications={items}
+        onMarkAsRead={markRead}
+        onMarkAllAsRead={markAllAsRead}
+        isLoading={loading}
+      />
+    );
+  }
 
   return (
     <motion.div

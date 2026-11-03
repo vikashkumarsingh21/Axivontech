@@ -5,7 +5,82 @@
  * Zero impact on desktop or normal mobile browsers.
  */
 
-/* Hide marketing chrome in app mode */
+:root {
+  /* Default desktop values remain untouched */
+}
+
+/* ==========================================================================
+   APP MODE DESIGN TOKENS (Option A: Muted Emerald-Sage)
+   ========================================================================== */
+[data-app="true"] {
+  --app-bg-page: #121212;
+  --app-bg-card: #1A1A1B;
+  --app-bg-raised: #232324;
+  --app-border: #2E2E30;
+  --app-border-subtle: #242426;
+  --app-text-primary: #EDEBE6;
+  --app-text-secondary: #B3AFA6;
+  --app-text-muted: #827E76;
+  --app-accent: #4F9D83;
+  --app-accent-hover: #438770;
+  --app-accent-bg: #162721;
+  --app-accent-border: #27483C;
+  --app-accent-text: #A2D9C7;
+  --app-radius-card: 14px;
+  --app-radius-button: 10px;
+  --app-radius-input: 10px;
+  --app-radius-chip: 9999px;
+  --app-tab-bar-height: 56px;
+  --app-top-bar-height: 56px;
+  --app-shadow-card: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --app-shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* Prevent horizontal overflow on root elements in app mode */
+[data-app="true"] html,
+[data-app="true"] body {
+  background-color: var(--app-bg-page) !important;
+  color: var(--app-text-primary) !important;
+  overflow-x: hidden !important;
+  -webkit-tap-highlight-color: transparent;
+  user-select: text;
+}
+
+/* Enforce 16px font-size minimum on mobile inputs to prevent browser viewport zoom */
+[data-app="true"] input,
+[data-app="true"] select,
+[data-app="true"] textarea {
+  font-size: 16px !important;
+}
+
+/* Touch targets: buttons and links minimum 44px height where interactive */
+[data-app="true"] .app-touch-target,
+[data-app="true"] .btn-mobile {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tabular numerals on stats, clocks, tables, and currencies */
+[data-app="true"] .tabular-nums,
+[data-app="true"] [data-numeric="true"],
+[data-app="true"] .timer-display {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Active touch feedback */
+[data-app="true"] button:active:not(:disabled),
+[data-app="true"] .touch-press:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* ==========================================================================
+   DESKTOP OVERRIDES IN APP MODE
+   Hide desktop headers, sidebars, and marketing elements inside the App Shell
+   ========================================================================== */
 [data-app="true"] nav.marketing-nav,
 [data-app="true"] header.marketing-header,
 [data-app="true"] footer.marketing-footer,
@@ -13,6 +88,13 @@
 [data-app="true"] [data-widget="whatsapp"],
 [data-app="true"] .whatsapp-floating-button,
 [data-app="true"] .marketing-floating-elements {
+  display: none !important;
+}
+
+/* When App Shell is active, hide desktop sidebar and navbar */
+[data-app="true"] .desktop-portal-sidebar,
+[data-app="true"] .desktop-portal-navbar,
+[data-app="true"] aside.portal-sidebar {
   display: none !important;
 }
 
@@ -24,16 +106,17 @@
   justify-content: center;
   align-items: center;
   padding: 1.5rem 1rem;
+  background-color: var(--app-bg-page);
 }
 
 [data-app="true"] .app-mode-login-card {
   width: 100%;
   max-width: 400px;
-  background: #0e1116;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1rem;
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-card);
   padding: 2rem 1.5rem;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--app-shadow-card);
 }
 
 [data-app="true"] .app-mode-login-footer {
@@ -42,11 +125,11 @@
   justify-content: center;
   gap: 1.25rem;
   font-size: 0.8125rem;
-  color: #71717a;
+  color: var(--app-text-secondary);
 }
 
 [data-app="true"] .app-mode-login-footer a:hover {
-  color: #e8a064;
+  color: var(--app-accent-text);
 }
 
 /* Compact Cookie Banner in App Mode */
@@ -69,5 +152,6 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transform: none !important;
   }
 }

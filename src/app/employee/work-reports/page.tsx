@@ -21,6 +21,8 @@ import { SkeletonCard } from "@/components/employee/SkeletonCard";
 import { StatusBadge } from "@/components/employee/StatusBadge";
 import { EpButton } from "@/components/employee/EpButton";
 import { EmptyState } from "@/components/employee/EmptyState";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileEmployeeWorkReport } from "@/components/mobile/employee/MobileEmployeeWorkReport";
 
 interface WorkReportItem {
   id: string;
@@ -37,6 +39,7 @@ interface WorkReportItem {
 }
 
 export default function ReportsPage() {
+  const { isAppMode } = useAppMode();
   const [reports, setReports] = useState<WorkReportItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -172,6 +175,43 @@ export default function ReportsPage() {
         (r.challenges && r.challenges.toLowerCase().includes(query))
     );
   }, [reports, searchQuery]);
+
+  const handleMobileSubmitReport = async (formData: {
+    tasksCompleted: string;
+    hoursSpent: number;
+    blockers?: string;
+    planForTomorrow?: string;
+  }) => {
+    const res = await fetch("/api/v1/employee/work-reports", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        summary: formData.tasksCompleted.slice(0, 100),
+        workPerformed: formData.tasksCompleted,
+        tasksCompleted: formData.tasksCompleted,
+        challenges: formData.blockers || "",
+        nextSteps: formData.planForTomorrow || "",
+        hoursWorked: formData.hoursSpent,
+        status: "SUBMITTED",
+      }),
+    });
+    const parsed = await res.json();
+    if (!res.ok || !parsed.success) {
+      throw new Error(parsed.error || "Failed to submit report");
+    }
+    loadData();
+  };
+
+  if (isAppMode) {
+    return (
+      <MobileEmployeeWorkReport
+        reports={reports}
+        hasReportToday={Boolean(todayReport)}
+        onSubmitReport={handleMobileSubmitReport}
+        isLoading={loading}
+      />
+    );
+  }
 
   return (
     <motion.div

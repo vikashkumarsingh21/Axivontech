@@ -13,6 +13,7 @@ import NextTopLoader from 'nextjs-toploader';
 import CookieConsentBanner from "@/components/legal/CookieConsentBanner";
 import CookieSettingsButton from "@/components/legal/CookieSettingsButton";
 import { ToastProvider } from "@/components/notifications/ToastProvider";
+import { headers } from "next/headers";
 import { AppModeInit, PortalAppPromptWrapper, isAppModeEnvEnabled } from "@/features/app-mode";
 
 const ChatWidget = dynamic(() => import('@/components/chatbot/ChatWidget'));
@@ -133,15 +134,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [careersEnabled, seo] = await Promise.all([
+  const [careersEnabled, seo, reqHeaders] = await Promise.all([
     isCareersPageEnabled(),
     getSeoSettings(),
+    headers(),
   ]);
   const appModeActive = isAppModeEnvEnabled();
+  const isApp = appModeActive && (reqHeaders.get("x-axivon-app") === "1" || reqHeaders.get("x-app-mode") === "true");
 
   return (
     <html
       lang="en"
+      data-app={isApp ? "true" : undefined}
       className={`${inter.variable} ${manrope.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen flex flex-col bg-[#0B0D10] text-[#F3F5F7]">

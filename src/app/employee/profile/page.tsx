@@ -9,6 +9,8 @@ import { PageHeader } from "@/components/employee/PageHeader";
 import { EpButton } from "@/components/employee/EpButton";
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
 import { ChangePasswordForm } from "@/components/employee/ChangePasswordForm";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileEmployeeProfile } from "@/components/mobile/employee/MobileEmployeeProfile";
 import {
   User,
   Mail,
@@ -43,6 +45,7 @@ interface EmployeeProfileData {
 }
 
 export default function EmployeeProfilePage() {
+  const { isAppMode } = useAppMode();
   const [profile, setProfile] = useState<EmployeeProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -170,6 +173,14 @@ export default function EmployeeProfilePage() {
   };
 
   if (loading) {
+    if (isAppMode) {
+      return (
+        <div className="space-y-4 animate-pulse">
+          <div className="h-44 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+          <div className="h-32 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+        </div>
+      );
+    }
     return (
       <div className="space-y-6 max-w-5xl pb-12">
         <SkeletonCard />
@@ -181,6 +192,10 @@ export default function EmployeeProfilePage() {
         </div>
       </div>
     );
+  }
+
+  if (isAppMode) {
+    return <MobileEmployeeProfile user={profile} />;
   }
 
   return (

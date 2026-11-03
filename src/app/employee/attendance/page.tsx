@@ -21,6 +21,8 @@ import {
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
 import { PageHeader } from "@/components/employee/PageHeader";
 import { EpButton } from "@/components/employee/EpButton";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileEmployeeAttendance } from "@/components/mobile/employee/MobileEmployeeAttendance";
 
 function formatMinutes(mins: number): string {
   if (mins === undefined || mins === null) return "0h 0m";
@@ -61,6 +63,7 @@ function formatDateStr(dateVal: string | Date | null | undefined): string {
 }
 
 export default function AttendancePage() {
+  const { isAppMode } = useAppMode();
   const [today, setToday] = useState<any>(null);
   const [policy, setPolicy] = useState<any>(null);
   const [records, setRecords] = useState<any[]>([]);
@@ -213,6 +216,18 @@ export default function AttendancePage() {
   };
 
   if (loading) {
+    if (isAppMode) {
+      return (
+        <div className="space-y-4 animate-pulse">
+          <div className="h-44 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="h-20 rounded-xl bg-[#1A1A1B] border border-[#2E2E30]" />
+            <div className="h-20 rounded-xl bg-[#1A1A1B] border border-[#2E2E30]" />
+          </div>
+          <div className="h-48 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+        </div>
+      );
+    }
     return (
       <div className="space-y-6 pb-12">
         <div className="animate-pulse h-10 bg-[#1A1A1B] border border-[#2E2E30] rounded-xl w-1/3" />
@@ -223,6 +238,36 @@ export default function AttendancePage() {
           ))}
         </div>
       </div>
+    );
+  }
+
+  const handleRegularizeDirect = async (regData: {
+    date: string;
+    requestedCheckIn: string;
+    requestedCheckOut: string;
+    reason: string;
+  }) => {
+    const res = await fetch("/api/v1/employee/attendance/regularize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(regData),
+    });
+    const resJson = await res.json();
+    if (!res.ok) throw new Error(getErrorMessage(resJson) || "Failed to submit regularization");
+    loadData();
+  };
+
+  if (isAppMode) {
+    return (
+      <MobileEmployeeAttendance
+        today={today}
+        policy={policy}
+        records={records}
+        unregularizedMissed={unregularizedMissed}
+        onAction={handleAction}
+        onRegularize={handleRegularizeDirect}
+        isLoading={actionLoading}
+      />
     );
   }
 

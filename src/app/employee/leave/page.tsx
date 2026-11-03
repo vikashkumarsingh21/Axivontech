@@ -17,6 +17,8 @@ import { StatusBadge } from "@/components/employee/StatusBadge";
 import { EpButton } from "@/components/employee/EpButton";
 import { parseApiResponse, getErrorMessage } from "@/lib/errors/client";
 import { toast } from "@/lib/notifications/toast";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileEmployeeLeave } from "@/components/mobile/employee/MobileEmployeeLeave";
 
 interface LeaveRequestItem {
   id: string;
@@ -30,6 +32,7 @@ interface LeaveRequestItem {
 }
 
 export default function LeavePage() {
+  const { isAppMode } = useAppMode();
   const [requests, setRequests] = useState<LeaveRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -216,6 +219,53 @@ export default function LeavePage() {
         return "warning";
     }
   };
+
+  const handleApplyMobile = async (leaveForm: {
+    type: string;
+    start: string;
+    end: string;
+    reason: string;
+  }) => {
+    const res = await fetch("/api/v1/employee/leave", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        leaveType: leaveForm.type,
+        startDate: leaveForm.start,
+        endDate: leaveForm.end,
+        reason: leaveForm.reason.trim(),
+      }),
+    });
+    const parsed = await parseApiResponse(res);
+    if (!parsed.ok) {
+      throw new Error(parsed.errorMessage || "Failed to submit leave request.");
+    }
+    loadData();
+  };
+
+  const handleCancelMobile = async (requestId: string) => {
+    const res = await fetch("/api/v1/employee/leave", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ requestId, action: "CANCEL" }),
+    });
+    const parsed = await parseApiResponse(res);
+    if (!parsed.ok) {
+      throw new Error(parsed.errorMessage || "Failed to cancel leave request.");
+    }
+    loadData();
+  };
+
+  if (isAppMode) {
+    return (
+      <MobileEmployeeLeave
+        requests={requests}
+        onApplyLeave={handleApplyMobile}
+        onCancelLeave={handleCancelMobile}
+        isLoading={loading}
+      />
+    );
+  }
 
   return (
     <motion.div

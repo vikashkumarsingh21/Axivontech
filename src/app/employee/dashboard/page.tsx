@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { SkeletonCard } from "@/components/employee/SkeletonCard";
 import { EpButton } from "@/components/employee/EpButton";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileEmployeeHome } from "@/components/mobile/employee/MobileEmployeeHome";
 
 function formatMinutes(mins: number): string {
   if (mins === undefined || mins === null) return "0h 0m";
@@ -34,6 +36,7 @@ function formatTime(dt: string | null) {
 }
 
 export default function EmployeeDashboard() {
+  const { isAppMode } = useAppMode();
   const [user, setUser] = useState<any>(null);
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -108,6 +111,19 @@ export default function EmployeeDashboard() {
   };
 
   if (loading) {
+    if (isAppMode) {
+      return (
+        <div className="space-y-4 animate-pulse">
+          <div className="h-44 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+          <div className="grid grid-cols-3 gap-2.5">
+            <div className="h-20 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+            <div className="h-20 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+            <div className="h-20 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+          </div>
+          <div className="h-40 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+        </div>
+      );
+    }
     return (
       <div className="space-y-6 sm:space-y-8 animate-pulse pb-12">
         {/* Header skeleton */}
@@ -149,6 +165,16 @@ export default function EmployeeDashboard() {
   const isCheckedOut = attendance?.checkInAt && attendance?.checkOutAt;
   const taskStats = data?.taskStats || { total: 0, active: 0, completed: 0, overdue: 0, dueToday: 0 };
   const hasReportToday = data?.hasReportToday;
+
+  if (isAppMode) {
+    return (
+      <MobileEmployeeHome
+        data={data}
+        user={user}
+        onRefresh={fetchDashboard}
+      />
+    );
+  }
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
