@@ -6,7 +6,7 @@ import zlib from "zlib";
 
 const CHROME_PATH = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 const PORT = 3000;
-const BASE_URL = `http://localhost:${PORT}`;
+const BASE_URL = `http://127.0.0.1:${PORT}`;
 const BASELINE_DATA_FILE = path.resolve("./docs/mobile/baseline/baseline-data.json");
 const BASELINE_HTML_DIR = path.resolve("./docs/mobile/baseline/html");
 const BASELINE_SCREENSHOTS_DIR = path.resolve("./docs/mobile/baseline/screenshots");
@@ -73,7 +73,7 @@ async function runPass(appModeEnabledFlag) {
     PORT: String(PORT),
   };
 
-  const serverProcess = spawn("npx.cmd", ["next", "start", "-p", String(PORT)], {
+  const serverProcess = spawn("npx.cmd", ["next", "start", "-p", String(PORT), "-H", "127.0.0.1"], {
     env: serverEnv,
     stdio: "inherit",
     shell: true,
@@ -102,7 +102,11 @@ async function runPass(appModeEnabledFlag) {
         try {
           const res = await fetch(`${BASE_URL}/api/v1/auth/login`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", "x-test-mode": "true" },
+            headers: {
+              "Content-Type": "application/json",
+              "x-test-mode": "true",
+              "x-forwarded-for": `127.0.0.${10 + Object.keys(roleTokens).length}`,
+            },
             body: JSON.stringify({
               email: cred.email,
               password: cred.pass,
@@ -249,7 +253,7 @@ async function runPass(appModeEnabledFlag) {
         await page.setCookie({
           name: "axivon_session",
           value: roleTokens[r.role],
-          domain: "localhost",
+          domain: "127.0.0.1",
           path: "/",
         });
       }
