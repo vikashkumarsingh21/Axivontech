@@ -25,6 +25,42 @@ interface ServerSettings {
   theme: "dark" | "light" | "system";
 }
 
+function ToggleSwitch({
+  checked,
+  onChange,
+  label,
+  description,
+}: {
+  checked: boolean;
+  onChange: (val: boolean) => void;
+  label: string;
+  description: string;
+}) {
+  return (
+    <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#121212]/60 border border-[#2E2E30] hover:border-[#3A3A3D] transition-colors">
+      <div className="pr-4">
+        <div className="font-medium text-xs sm:text-sm text-[#EDEBE6]">{label}</div>
+        <div className="text-[11px] sm:text-xs text-[#8A867E] mt-0.5">{description}</div>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+          checked ? "bg-[#4F9D83]" : "bg-[#2E2E30]"
+        }`}
+      >
+        <span
+          className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-[#EDEBE6] shadow-sm ring-0 transition duration-200 ease-in-out ${
+            checked ? "translate-x-4 bg-[#0F1A16]" : "translate-x-0"
+          }`}
+        />
+      </button>
+    </div>
+  );
+}
+
 export default function EmployeeSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -124,39 +160,7 @@ export default function EmployeeSettingsPage() {
     }
   };
 
-  const ToggleSwitch = ({
-    checked,
-    onChange,
-    label,
-    description,
-  }: {
-    checked: boolean;
-    onChange: (val: boolean) => void;
-    label: string;
-    description: string;
-  }) => (
-    <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#121212]/60 border border-[#2E2E30] hover:border-[#3A3A3D] transition-colors">
-      <div className="pr-4">
-        <div className="font-medium text-xs sm:text-sm text-[#EDEBE6]">{label}</div>
-        <div className="text-[11px] sm:text-xs text-[#8A867E] mt-0.5">{description}</div>
-      </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
-          checked ? "bg-[#4F9D83]" : "bg-[#2E2E30]"
-        }`}
-      >
-        <span
-          className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-[#EDEBE6] shadow-sm ring-0 transition duration-200 ease-in-out ${
-            checked ? "translate-x-4 bg-[#0F1A16]" : "translate-x-0"
-          }`}
-        />
-      </button>
-    </div>
-  );
+
 
   return (
     <motion.div

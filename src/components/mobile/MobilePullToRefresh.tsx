@@ -103,7 +103,7 @@ export function MobilePullToRefresh({
       <div
         style={{
           transform: pullY > 0 ? `translateY(${pullY}px)` : undefined,
-          transition: isPullingRef.current ? "none" : "transform 0.2s ease-out",
+          transition: pullY > 0 && !isRefreshing ? "none" : "transform 0.2s ease-out",
         }}
       >
         {children}

@@ -171,7 +171,7 @@ export class AxivonExcelBuilder {
       const rowValues: any = {};
 
       columns.forEach((col) => {
-        let rawVal = row[col.key];
+        const rawVal = row[col.key];
 
         if (rawVal === undefined || rawVal === null) {
           rowValues[col.key] = "";

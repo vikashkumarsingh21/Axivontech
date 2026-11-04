@@ -31,8 +31,23 @@ export function useSharedPoller({
   const currentIntervalRef = useRef<number>(minInterval);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isPollingRef = useRef<boolean>(false);
+  const executePollRef = useRef<() => Promise<void>>(async () => {});
 
   const isLoginRoute = pathname === "/login";
+
+  const scheduleNextPoll = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    if (!enabled || isLoginRoute) return;
+    if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
+
+    timerRef.current = setTimeout(() => {
+      executePollRef.current();
+    }, currentIntervalRef.current);
+  }, [enabled, isLoginRoute]);
 
   const executePoll = useCallback(async () => {
     // Never poll if hidden or route is /login
@@ -57,19 +72,11 @@ export function useSharedPoller({
       isPollingRef.current = false;
       scheduleNextPoll();
     }
-  }, [onPoll, isLoginRoute, enabled, minInterval]);
+  }, [onPoll, isLoginRoute, enabled, minInterval, scheduleNextPoll]);
 
-  const scheduleNextPoll = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-
-    if (!enabled || isLoginRoute) return;
-    if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
-
-    timerRef.current = setTimeout(executePoll, currentIntervalRef.current);
-  }, [enabled, isLoginRoute, executePoll]);
+  useEffect(() => {
+    executePollRef.current = executePoll;
+  }, [executePoll]);
 
   useEffect(() => {
     if (!enabled || isLoginRoute) {

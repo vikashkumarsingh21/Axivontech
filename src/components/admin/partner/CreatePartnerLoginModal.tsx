@@ -104,6 +104,8 @@ export function CreatePartnerLoginModal({
     }
   }, [application]);
 
+  const currentApplicationEmail = application?.email;
+
   // Live email duplicate check with debounce
   const checkEmail = useCallback(async (testEmail: string) => {
     if (!testEmail || !testEmail.includes("@")) return;
@@ -117,7 +119,7 @@ export function CreatePartnerLoginModal({
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to verify email");
 
-      if (data.exists && data.user?.email?.toLowerCase() !== application?.email?.toLowerCase()) {
+      if (data.exists && data.user?.email?.toLowerCase() !== currentApplicationEmail?.toLowerCase()) {
         setEmailError(`Email is already in use by ${data.user?.name || "another user"}.`);
       } else {
         setEmailError("");
@@ -127,7 +129,7 @@ export function CreatePartnerLoginModal({
     } finally {
       setEmailChecking(false);
     }
-  }, [application?.email]);
+  }, [currentApplicationEmail]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

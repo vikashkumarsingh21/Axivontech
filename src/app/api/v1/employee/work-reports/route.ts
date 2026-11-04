@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
       sortedAll.map((r) => r.date.toISOString().split("T")[0])
     );
 
-    let checkDate = new Date(todayStr);
+    const checkDate = new Date(todayStr);
     // If user hasn't submitted today yet, check starting from yesterday
     if (!reportDateStrings.has(todayStr)) {
       checkDate.setDate(checkDate.getDate() - 1);

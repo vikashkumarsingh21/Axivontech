@@ -194,7 +194,7 @@ export class AttendanceService {
 
     // Determine effective end time
     let effectiveEnd: Date;
-    let isHistoricalUnclosed = false;
+    const isHistoricalUnclosed = false;
 
     if (checkOutAt) {
       effectiveEnd = new Date(checkOutAt);

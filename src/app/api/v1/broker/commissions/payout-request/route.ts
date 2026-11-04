@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { commissionId, notes } = validated.data;
-    let { payoutMethod, payoutDetails } = validated.data;
+    const { payoutMethod, payoutDetails } = validated.data;
 
     // Idempotency guard: prevent duplicate submission of the same commission request
     const isDuplicate = await checkIdempotency(req, "payout_request", `${commissionId}:${session.userId}`);

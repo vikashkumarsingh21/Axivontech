@@ -99,13 +99,14 @@ export function MobileEmployeeHome({ data, user, onRefresh }: MobileEmployeeHome
     return "—";
   }, [data]);
 
+  const checkInAt = attendance?.checkInAt;
   const checkInTimeStr = useMemo(() => {
-    if (!attendance?.checkInAt) return null;
-    return new Date(attendance.checkInAt).toLocaleTimeString("en-IN", {
+    if (!checkInAt) return null;
+    return new Date(checkInAt).toLocaleTimeString("en-IN", {
       hour: "2-digit",
       minute: "2-digit",
     });
-  }, [attendance?.checkInAt]);
+  }, [checkInAt]);
 
   const handleAttendanceAction = async (action: "check-in" | "check-out" | "break-start" | "break-end") => {
     setActionLoading(true);

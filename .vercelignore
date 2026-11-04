@@ -1,12 +1,10 @@
-# Vercel Deployment Ignore
-mobile/
-docs/
-scripts/
-scratch/
-tests/
+# Vercel Deployment Ignore - root-anchored paths
+/mobile
+/docs
+/scripts
+/scratch
+/tests
 *.test.ts
 *.test.tsx
 *.test.mjs
 *.test.js
-*.png
-*.jpg
