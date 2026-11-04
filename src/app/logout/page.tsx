@@ -58,10 +58,16 @@ export default function LogoutPage() {
       if (elapsed >= duration) {
         clearInterval(interval);
         // Clean redirect to login page with logged_out notice
+        const isApp =
+          typeof navigator !== "undefined" &&
+          (navigator.userAgent.includes("AxivonApp") ||
+            (typeof document !== "undefined" && document.referrer.includes("/app")));
+        const targetLogin = isApp ? "/app/login?logged_out=1" : "/login?logged_out=1";
+
         if (typeof window !== "undefined") {
-          window.location.href = "/login?logged_out=1";
+          window.location.href = targetLogin;
         } else {
-          router.replace("/login?logged_out=1");
+          router.replace(targetLogin);
         }
       }
     }, 40);
@@ -80,7 +86,7 @@ export default function LogoutPage() {
       <div className="w-full max-w-md relative z-10 flex flex-col items-center">
         {/* Brand Logo */}
         <div className="mb-8">
-          <Link href="/" className="inline-block focus:outline-none">
+          <div className="inline-block focus:outline-none">
             <Image
               src="/assets/logo/logo-full.png"
               alt="Axivon Technologies"
@@ -89,7 +95,7 @@ export default function LogoutPage() {
               className="h-8 sm:h-9 w-auto brightness-0 invert opacity-90"
               priority
             />
-          </Link>
+          </div>
         </div>
 
         {/* Central Logout Confirmation Card */}

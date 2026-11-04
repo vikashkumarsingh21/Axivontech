@@ -109,41 +109,85 @@ export async function middleware(req: any) {
   requestHeaders.delete("x-app-mode");
   requestHeaders.delete("x-axivon-app");
   requestHeaders.delete("x-axivon-app-version");
+  requestHeaders.delete("x-is-app-or-portal");
+  requestHeaders.delete("x-axivon-pathname");
+
+  // Track canonical pathname for downstream layout rendering
+  requestHeaders.set("x-axivon-pathname", pathname);
+  if (isProtectedRoute || pathname === "/app" || pathname.startsWith("/app/")) {
+    requestHeaders.set("x-is-app-or-portal", "1");
+  }
 
   // ─── Mobile App Mode Header & Route Handling ───
-  // Minimal early check: zero DB calls, zero latency when APP_MODE_ENABLED is not true
-  const isMasterAppEnabled = process.env.APP_MODE_ENABLED === "true";
+  const isMasterAppEnabled = process.env.APP_MODE_ENABLED === "true" || process.env.NODE_ENV !== "production";
   let isAppRequest = false;
   let appVersion: string | null = null;
 
-  if (isMasterAppEnabled) {
-    const userAgent = req.headers.get("user-agent") || "";
-    if (userAgent.includes("AxivonApp")) {
+  const userAgent = req.headers.get("user-agent") || "";
+  if (userAgent.includes("AxivonApp")) {
+    isAppRequest = true;
+    const match = userAgent.match(/AxivonApp\/([0-9.]+)/i);
+    appVersion = match ? match[1] : null;
+  } else if (pathname === "/app" || pathname.startsWith("/app/")) {
+    isAppRequest = true;
+    appVersion = "1.0.0";
+  } else if (process.env.NODE_ENV !== "production") {
+    const url = req.nextUrl;
+    if (url.searchParams.get("app") === "1" || req.cookies.get("axivon_app_dev")?.value === "1") {
       isAppRequest = true;
-      const match = userAgent.match(/AxivonApp\/([0-9.]+)/i);
-      appVersion = match ? match[1] : null;
-    } else if (process.env.NODE_ENV !== "production") {
-      const url = req.nextUrl;
-      if (url.searchParams.get("app") === "1" || req.cookies.get("axivon_app_dev")?.value === "1") {
-        isAppRequest = true;
-        appVersion = "dev";
-      }
+      appVersion = "dev";
+    }
+  }
+
+  if (isAppRequest) {
+    requestHeaders.set("x-axivon-app", "1");
+    requestHeaders.set("x-app-mode", "true");
+    requestHeaders.set("x-is-app-or-portal", "1");
+    if (appVersion) {
+      requestHeaders.set("x-axivon-app-version", appVersion);
     }
 
-    if (isAppRequest) {
-      requestHeaders.set("x-axivon-app", "1");
-      requestHeaders.set("x-app-mode", "true");
-      if (appVersion) {
-        requestHeaders.set("x-axivon-app-version", appVersion);
+    // Inside mobile app: redirect /login directly to dedicated /app/login
+    if (pathname === "/login") {
+      const search = req.nextUrl.search;
+      return NextResponse.redirect(new URL(`/app/login${search}`, req.url));
+    }
+
+    // App-Mode Routing Policy: Public marketing routes redirect out of public view
+    if (!isAllowedAppRoute(pathname)) {
+      const sessionCookie = req.cookies.get("axivon_session")?.value;
+      if (!sessionCookie) {
+        return NextResponse.redirect(new URL("/app/login", req.url));
       }
 
-      // App-Mode Routing Policy: Public marketing routes redirect out of public view
-      if (!isAllowedAppRoute(pathname)) {
-        const sessionCookie = req.cookies.get("axivon_session")?.value;
-        if (!sessionCookie) {
-          return NextResponse.redirect(new URL("/login", req.url));
-        }
+      try {
+        const { payload } = await jwtVerify(sessionCookie, secretKey, {
+          algorithms: ["HS256"],
+        });
+        const role = normalizeRole(payload.role as string);
+        const targetUrl = payload.mustChangePassword
+          ? "/auth/change-password"
+          : resolveRoleDashboardUrl(role);
+        return NextResponse.redirect(new URL(targetUrl, req.url));
+      } catch {
+        const res = NextResponse.redirect(new URL("/app/login", req.url));
+        res.cookies.delete("axivon_session");
+        return res;
+      }
+    }
+  }
 
+  // Auto-restore session on /login or /app/login if already authenticated (unless explicit logout query param)
+  if (pathname === "/login" || pathname === "/app/login") {
+    const hasLogoutParam =
+      req.nextUrl.searchParams.get("logged_out") === "1" ||
+      req.nextUrl.searchParams.get("logout") === "true" ||
+      req.nextUrl.searchParams.get("expired") === "1" ||
+      req.nextUrl.searchParams.get("error") === "account_suspended";
+
+    if (!hasLogoutParam) {
+      const sessionCookie = req.cookies.get("axivon_session")?.value;
+      if (sessionCookie) {
         try {
           const { payload } = await jwtVerify(sessionCookie, secretKey, {
             algorithms: ["HS256"],
@@ -154,38 +198,9 @@ export async function middleware(req: any) {
             : resolveRoleDashboardUrl(role);
           return NextResponse.redirect(new URL(targetUrl, req.url));
         } catch {
-          const res = NextResponse.redirect(new URL("/login", req.url));
+          const res = NextResponse.next({ request: { headers: requestHeaders } });
           res.cookies.delete("axivon_session");
           return res;
-        }
-      }
-    }
-
-    // Auto-restore session on /login if already authenticated (unless explicit logout query param)
-    if (pathname === "/login") {
-      const hasLogoutParam =
-        req.nextUrl.searchParams.get("logged_out") === "1" ||
-        req.nextUrl.searchParams.get("logout") === "true" ||
-        req.nextUrl.searchParams.get("expired") === "1" ||
-        req.nextUrl.searchParams.get("error") === "account_suspended";
-
-      if (!hasLogoutParam) {
-        const sessionCookie = req.cookies.get("axivon_session")?.value;
-        if (sessionCookie) {
-          try {
-            const { payload } = await jwtVerify(sessionCookie, secretKey, {
-              algorithms: ["HS256"],
-            });
-            const role = normalizeRole(payload.role as string);
-            const targetUrl = payload.mustChangePassword
-              ? "/auth/change-password"
-              : resolveRoleDashboardUrl(role);
-            return NextResponse.redirect(new URL(targetUrl, req.url));
-          } catch {
-            const res = NextResponse.next({ request: { headers: requestHeaders } });
-            res.cookies.delete("axivon_session");
-            return res;
-          }
         }
       }
     }

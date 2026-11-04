@@ -29,15 +29,24 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const userAgent = req.headers.get("user-agent") || "";
+    const referer = req.headers.get("referer") || "";
+    const isAppClient =
+      req.headers.get("x-axivon-app") === "1" ||
+      userAgent.includes("AxivonApp") ||
+      referer.includes("/app");
+
+    const targetLoginUrl = isAppClient ? "/app/login?logged_out=1" : "/login?logged_out=1";
+
     const acceptsHtml = req.headers.get("accept")?.includes("text/html");
     const isFormSubmit = req.headers.get("content-type")?.includes("application/x-www-form-urlencoded");
 
     let response: NextResponse;
     if (acceptsHtml || isFormSubmit) {
       // Standard browser form submission: redirect directly to login
-      response = NextResponse.redirect(new URL("/login?logged_out=1", req.url), 303);
+      response = NextResponse.redirect(new URL(targetLoginUrl, req.url), 303);
     } else {
-      response = NextResponse.json({ message: "Logged out successfully", redirectTo: "/login?logged_out=1" });
+      response = NextResponse.json({ message: "Logged out successfully", redirectTo: targetLoginUrl });
     }
 
     // Clear the cookie explicitly across all browser contexts
@@ -52,14 +61,23 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     // Even if something fails, ensure the cookie is cleared and redirect if HTML
+    const userAgent = req.headers.get("user-agent") || "";
+    const referer = req.headers.get("referer") || "";
+    const isAppClient =
+      req.headers.get("x-axivon-app") === "1" ||
+      userAgent.includes("AxivonApp") ||
+      referer.includes("/app");
+
+    const targetLoginUrl = isAppClient ? "/app/login?logged_out=1" : "/login?logged_out=1";
+
     const acceptsHtml = req.headers.get("accept")?.includes("text/html");
     const isFormSubmit = req.headers.get("content-type")?.includes("application/x-www-form-urlencoded");
 
     let response: NextResponse;
     if (acceptsHtml || isFormSubmit) {
-      response = NextResponse.redirect(new URL("/login?logged_out=1", req.url), 303);
+      response = NextResponse.redirect(new URL(targetLoginUrl, req.url), 303);
     } else {
-      response = NextResponse.json({ message: "Logged out", redirectTo: "/login?logged_out=1" });
+      response = NextResponse.json({ message: "Logged out", redirectTo: targetLoginUrl });
     }
 
     response.cookies.set({

@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 
-export type MobileRole = "EMPLOYEE" | "BROKER" | "CLIENT" | "EXECUTIVE" | "ADMIN";
+export type MobileRole = "EMPLOYEE" | "BROKER" | "CLIENT" | "EXECUTIVE" | "ADMIN" | "DEPARTMENT_MANAGER";
 
 export interface MobileTabItem {
   id: string;

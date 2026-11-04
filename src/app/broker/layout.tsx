@@ -6,6 +6,8 @@ import { BrokerPortalSidebar } from "@/components/broker/BrokerPortalSidebar";
 import { BrokerPortalHeader } from "@/components/broker/BrokerPortalHeader";
 import { BrokerMobileBottomNav } from "@/components/broker/BrokerMobileBottomNav";
 import { PortalAIAssistant } from "@/components/portal-ai/PortalAIAssistant";
+import { MobileShell } from "@/components/mobile/MobileShell";
+import { useAppMode } from "@/features/app-mode/useAppMode";
 
 interface BrokerProfileState {
   name: string;
@@ -18,6 +20,7 @@ interface BrokerProfileState {
 export default function BrokerLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { isAppMode } = useAppMode();
   const [isChecking, setIsChecking] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [pendingActionsCount, setPendingActionsCount] = useState(0);
@@ -69,12 +72,19 @@ export default function BrokerLayout({ children }: { children: React.ReactNode }
         ];
         const isCurrentPageOpen = openPages.some((p) => pathname === p || pathname?.startsWith(`${p}/`));
 
-        if (!referralCode && !isCurrentPageOpen) {
-          router.push("/broker/onboarding");
+        if (!isCompleted && !isCurrentPageOpen) {
+          router.replace("/broker/onboarding");
+          return;
+        }
+
+        // If completed and still on onboarding page, redirect to dashboard
+        if (isCompleted && pathname === "/broker/onboarding") {
+          router.replace("/broker/dashboard");
+          return;
         }
       }
-    } catch (error) {
-      console.error("Broker profile check error:", error);
+    } catch (err) {
+      console.error("Failed to check broker profile status:", err);
     } finally {
       setIsChecking(false);
     }
@@ -102,6 +112,23 @@ export default function BrokerLayout({ children }: { children: React.ReactNode }
     return (
       <div className="min-h-screen bg-[#0A0B0D] text-[#E6E8EB]">
         {children}
+      </div>
+    );
+  }
+
+  // Dedicated App-Mode Mobile Shell
+  if (isAppMode) {
+    return (
+      <div className="min-h-screen bg-[#121212] text-[#EDEBE6]">
+        <MobileShell
+          role="BROKER"
+          userName={brokerInfo.name}
+          userEmail={brokerInfo.email}
+          unreadCount={pendingActionsCount}
+        >
+          {children}
+        </MobileShell>
+        <PortalAIAssistant portalRole="BROKER" />
       </div>
     );
   }

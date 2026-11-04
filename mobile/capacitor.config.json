@@ -3,7 +3,7 @@
   "appName": "Axivon",
   "webDir": "dist",
   "server": {
-    "url": "https://axivontech.in",
+    "url": "https://axivontech.in/app",
     "cleartext": false,
     "allowNavigation": [
       "axivontech.in",

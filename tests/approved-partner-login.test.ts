@@ -63,13 +63,14 @@ vi.mock("@/lib/db", () => {
           found.brokerProfile = profile || null;
         }
         if (include?.userRoles) {
-          found.userRoles = [{ role: { name: found.role || "EMPLOYEE" } }];
+          found.userRoles = [{ role: { name: found.role || "BUSINESS_PARTNER" } }];
         }
         return Promise.resolve({ ...found });
       }),
       create: vi.fn().mockImplementation(({ data }: any) => {
         const newUser = {
           id: `usr_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          role: "BUSINESS_PARTNER",
           ...data,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -121,6 +122,7 @@ vi.mock("@/lib/db", () => {
       create: vi.fn().mockImplementation(({ data }: any) => {
         const newProfile = {
           id: `bp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          role: "BUSINESS_PARTNER",
           ...data,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -147,6 +149,7 @@ vi.mock("@/lib/db", () => {
         } else {
           if (where?.id) res = res.filter((a) => a.id === where.id);
           if (where?.applicationId) res = res.filter((a) => a.applicationId === where.applicationId);
+          if (where?.email) res = res.filter((a) => a.email.toLowerCase() === (typeof where.email === "string" ? where.email : where.email.equals).toLowerCase());
         }
         return Promise.resolve(res[0] || null);
       }),

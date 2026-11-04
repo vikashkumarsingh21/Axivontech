@@ -9,6 +9,8 @@
  */
 
 export const ALLOWED_EXACT_APP_ROUTES = new Set([
+  "/app",
+  "/app/login",
   "/login",
   "/logout",
   "/client/activate",
@@ -34,6 +36,8 @@ export const ALLOWED_EXACT_APP_ROUTES = new Set([
 ]);
 
 export const ALLOWED_PREFIX_APP_ROUTES = [
+  "/app",
+  "/auth",
   "/admin",
   "/executive",
   "/employee",

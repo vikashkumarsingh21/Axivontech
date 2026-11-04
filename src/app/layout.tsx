@@ -141,6 +141,10 @@ export default async function RootLayout({
   ]);
   const appModeActive = isAppModeEnvEnabled();
   const isApp = appModeActive && (reqHeaders.get("x-axivon-app") === "1" || reqHeaders.get("x-app-mode") === "true");
+  const isAppOrPortal =
+    isApp ||
+    reqHeaders.get("x-is-app-or-portal") === "1" ||
+    reqHeaders.get("x-axivon-pathname")?.startsWith("/app");
 
   return (
     <html
@@ -150,26 +154,26 @@ export default async function RootLayout({
     >
       <body className="min-h-screen flex flex-col bg-[#0B0D10] text-[#F3F5F7]">
         {appModeActive && <AppModeInit />}
-        <PortalAppPromptWrapper />
+        {!isAppOrPortal && <PortalAppPromptWrapper />}
         <ToastProvider />
         <NextTopLoader color="#10B981" showSpinner={false} />
-        <OrganizationSchema />
-        <LocalBusinessSchema />
-        <WebSiteSchema />
-        <Navbar careersEnabled={careersEnabled} />
+
+        {/* Public marketing schemas, navbar, widgets & footer strictly excluded from App & Portals */}
+        {!isAppOrPortal && <OrganizationSchema />}
+        {!isAppOrPortal && <LocalBusinessSchema />}
+        {!isAppOrPortal && <WebSiteSchema />}
+        {!isAppOrPortal && <Navbar careersEnabled={careersEnabled} />}
 
         <main className="flex-1">
           {children}
         </main>
 
-        <Footer careersEnabled={careersEnabled} />
-
-        <GoogleAnalytics measurementId={seo.gaMeasurementId} />
-
-        <FloatingWhatsAppButton />
-        <ChatWidget />
-        <CookieConsentBanner />
-        <CookieSettingsButton />
+        {!isAppOrPortal && <Footer careersEnabled={careersEnabled} />}
+        {!isAppOrPortal && <GoogleAnalytics measurementId={seo.gaMeasurementId} />}
+        {!isAppOrPortal && <FloatingWhatsAppButton />}
+        {!isAppOrPortal && <ChatWidget />}
+        {!isAppOrPortal && <CookieConsentBanner />}
+        {!isAppOrPortal && <CookieSettingsButton />}
       </body>
     </html>
   );

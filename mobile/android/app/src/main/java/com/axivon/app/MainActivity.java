@@ -21,6 +21,12 @@ public class MainActivity extends BridgeActivity {
         if (getBridge() != null && getBridge().getWebView() != null) {
             WebView webView = getBridge().getWebView();
             CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
+
+            // Guarantee that the AxivonApp token is always present in the User-Agent
+            String existingUa = webView.getSettings().getUserAgentString();
+            if (existingUa != null && !existingUa.contains("AxivonApp")) {
+                webView.getSettings().setUserAgentString(existingUa + " AxivonApp/1.0.0");
+            }
         }
     }
 

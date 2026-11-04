@@ -28,7 +28,8 @@ export function MobileEmployeeProfile({ user }: MobileEmployeeProfileProps) {
     } catch (e) {
       // Ignore
     }
-    window.location.href = "/login?logged_out=1";
+    const isApp = typeof navigator !== "undefined" && navigator.userAgent.includes("AxivonApp");
+    window.location.href = isApp ? "/app/login?logged_out=1" : "/login?logged_out=1";
   };
 
   const initials =

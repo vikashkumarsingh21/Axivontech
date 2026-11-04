@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { ExecutiveSidebar } from "./ExecutiveSidebar";
 import { PortalHeader } from "./PortalHeader";
 import { PortalAIAssistant } from "@/components/portal-ai/PortalAIAssistant";
+import { MobileShell } from "@/components/mobile/MobileShell";
+import { useAppMode } from "@/features/app-mode/useAppMode";
 
 interface ExecutivePortalClientProps {
   userName: string;
@@ -19,6 +21,7 @@ export function ExecutivePortalClient({
   children,
 }: ExecutivePortalClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isAppMode } = useAppMode();
 
   // Close sidebar on desktop resize
   useEffect(() => {
@@ -30,6 +33,22 @@ export function ExecutivePortalClient({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Dedicated App-Mode Mobile Shell
+  if (isAppMode) {
+    return (
+      <div className="min-h-screen bg-[#121212] text-[#EDEBE6]">
+        <MobileShell
+          role="EXECUTIVE"
+          userName={userName}
+          userEmail={userEmail}
+        >
+          {children}
+        </MobileShell>
+        <PortalAIAssistant portalRole={userRole} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0B0D10] text-[#F3F5F7]">

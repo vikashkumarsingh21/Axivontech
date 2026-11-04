@@ -5,10 +5,13 @@ import { useRouter, usePathname } from "next/navigation";
 import { ClientSidebar } from "@/components/portal/ClientSidebar";
 import { PortalHeader } from "@/components/portal/PortalHeader";
 import { PortalAIAssistant } from "@/components/portal-ai/PortalAIAssistant";
+import { MobileShell } from "@/components/mobile/MobileShell";
+import { useAppMode } from "@/features/app-mode/useAppMode";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { isAppMode } = useAppMode();
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [clientUser, setClientUser] = useState<{ name: string; email: string }>({
@@ -57,6 +60,22 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return (
       <div className="min-h-screen bg-[#0B0D10] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Dedicated App-Mode Mobile Shell
+  if (isAppMode) {
+    return (
+      <div className="min-h-screen bg-[#121212] text-[#EDEBE6]">
+        <MobileShell
+          role="CLIENT"
+          userName={clientUser.name}
+          userEmail={clientUser.email}
+        >
+          {children}
+        </MobileShell>
+        <PortalAIAssistant portalRole="CLIENT" />
       </div>
     );
   }

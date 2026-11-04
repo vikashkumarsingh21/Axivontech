@@ -13,18 +13,30 @@ export function cn(...inputs: ClassValue[]) {
 export function isPortalOrStandaloneRoute(pathname: string | null): boolean {
   if (!pathname) return false;
 
-  // Login and Auth flows
-  if (pathname === "/login" || pathname.startsWith("/login/")) {
+  // Login, App, and Auth flows
+  if (
+    pathname === "/login" ||
+    pathname.startsWith("/login/") ||
+    pathname === "/app" ||
+    pathname.startsWith("/app/") ||
+    pathname === "/logout" ||
+    pathname.startsWith("/logout/") ||
+    pathname === "/auth" ||
+    pathname.startsWith("/auth/")
+  ) {
     return true;
   }
 
   // Enterprise Portals
   const portalPrefixes = [
+    "/app",
     "/admin",
     "/employee",
     "/broker",
     "/executive",
     "/client",
+    "/manager",
+    "/crm",
   ];
 
   if (portalPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))) {

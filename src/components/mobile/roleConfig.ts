@@ -104,4 +104,19 @@ export const ROLE_CONFIGS: Record<MobileRole, RoleNavigationConfig> = {
       { id: "notifications", label: "Notifications", href: "/admin/notifications", icon: Bell, description: "System alerts and logs" },
     ],
   },
+  DEPARTMENT_MANAGER: {
+    role: "DEPARTMENT_MANAGER",
+    rootPath: "/manager/dashboard",
+    tabs: [
+      { id: "home", label: "Home", href: "/manager/dashboard", icon: LayoutDashboard },
+      { id: "team", label: "Team", href: "/manager/employees", icon: Users },
+      { id: "tasks", label: "Tasks", href: "/manager/tasks", icon: CheckSquare },
+      { id: "leave", label: "Leave", href: "/manager/leave", icon: Coffee },
+    ],
+    moreItems: [
+      { id: "attendance", label: "Department Attendance", href: "/manager/attendance", icon: CalendarCheck, description: "Team daily clock-ins & status" },
+      { id: "work-reports", label: "Work Reports", href: "/manager/work-reports", icon: FileText, description: "Team EOD submissions" },
+      { id: "notifications", label: "Notifications", href: "/admin/notifications", icon: Bell, description: "Team alerts & requests" },
+    ],
+  },
 };
