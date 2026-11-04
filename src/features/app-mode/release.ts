@@ -14,8 +14,8 @@ export interface AppReleaseConfig {
 }
 
 const DEFAULT_RELEASE_CONFIG: AppReleaseConfig = {
-  enabled: false,
-  popupEnabled: false,
+  enabled: true,
+  popupEnabled: true,
   latestVersion: process.env.APP_LATEST_VERSION || "1.0.0",
   minVersion: process.env.APP_MIN_VERSION || "1.0.0",
   apkUrl: process.env.APP_APK_URL || "https://github.com/axivon/axivon-mobile/releases/download/v1.0.0/axivon-app.apk",
@@ -41,12 +41,16 @@ export async function getAppReleaseConfig(): Promise<AppReleaseConfig> {
     ]);
 
     const releaseData = (releaseSetting?.value as Partial<AppReleaseConfig>) || {};
-    const isMasterDbEnabled = masterSetting?.value === true || (masterSetting?.value as any)?.enabled === true;
-    const isPopupDbEnabled = popupSetting?.value === true || (popupSetting?.value as any)?.enabled === true;
+    // Master toggle is considered enabled unless explicitly set to false
+    const isMasterDbDisabled = masterSetting?.value === false || (masterSetting?.value as any)?.enabled === false;
+    const isPopupDbDisabled = popupSetting?.value === false || (popupSetting?.value as any)?.enabled === false;
+
+    const isMasterDbEnabled = !isMasterDbDisabled;
+    const isPopupDbEnabled = !isPopupDbDisabled;
 
     return {
-      enabled: envEnabled && (masterSetting ? isMasterDbEnabled : false),
-      popupEnabled: popupSetting ? isPopupDbEnabled : false,
+      enabled: envEnabled && isMasterDbEnabled,
+      popupEnabled: isPopupDbEnabled,
       latestVersion: releaseData.latestVersion || DEFAULT_RELEASE_CONFIG.latestVersion,
       minVersion: releaseData.minVersion || DEFAULT_RELEASE_CONFIG.minVersion,
       apkUrl: releaseData.apkUrl || DEFAULT_RELEASE_CONFIG.apkUrl,
