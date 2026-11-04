@@ -1,0 +1,32 @@
+[
+  {
+    "flow": "1. Check-In",
+    "passed": true,
+    "dbDetail": "ID: cmw1tjj360005g8t9w4h8qggf, checkInAt: 2026-11-04T07:52:09.686Z, checkOutAt: null",
+    "screenshot": "01_pixel7_checkin.png"
+  },
+  {
+    "flow": "2. Break Start & End",
+    "passed": true,
+    "dbDetail": "breakId: cmw1tjlm60007g8t9glfw2w0i, breaksCompleted: 1",
+    "screenshot": "02_pixel7_break_active.png, 03_pixel7_break_resumed.png"
+  },
+  {
+    "flow": "3. Check-Out",
+    "passed": true,
+    "dbDetail": "checkInAt: 2026-11-04T07:52:09.686Z, checkOutAt: 2026-11-04T07:52:25.451Z",
+    "screenshot": "04_pixel7_checkout.png"
+  },
+  {
+    "flow": "4. Apply Leave",
+    "passed": true,
+    "dbDetail": "ID: cmw1tk3d5000ag8t9m251bf8j, type: CASUAL, status: PENDING, reason: Verified mobile flow leave request #1793778755623",
+    "screenshot": "05_pixel7_leave_applied.png"
+  },
+  {
+    "flow": "5. Submit Work Report",
+    "passed": true,
+    "dbDetail": "ID: cmw1t83uy000977ra4jwf8kwe, hoursWorked: 8, status: SUBMITTED",
+    "screenshot": "06_pixel7_work_report_submitted.png"
+  }
+]

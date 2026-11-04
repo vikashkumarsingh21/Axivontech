@@ -12,7 +12,10 @@ export async function handleApkDownload(req: NextRequest): Promise<NextResponse>
   if (!isAppModeEnabled()) {
     return new NextResponse("Not Found", {
       status: 404,
-      headers: { "Content-Type": "text/plain" },
+      headers: {
+        "Content-Type": "text/plain",
+        "X-Robots-Tag": "noindex, nofollow",
+      },
     });
   }
 
@@ -71,6 +74,7 @@ export async function handleApkDownload(req: NextRequest): Promise<NextResponse>
     headers: {
       "Content-Type": "application/vnd.android.package-archive",
       "Content-Disposition": 'attachment; filename="axivon-app.apk"',
+      "X-Robots-Tag": "noindex, nofollow",
     },
   });
 }

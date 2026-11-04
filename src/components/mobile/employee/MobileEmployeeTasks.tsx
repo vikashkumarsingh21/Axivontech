@@ -59,7 +59,7 @@ export function MobileEmployeeTasks({
       return {
         id: t.id,
         title: t.title,
-        subtitle: t.project?.name || "General Workspace",
+        subtitle: t.project?.name || "—",
         status: {
           label: isCompleted ? "Completed" : t.status === "IN_PROGRESS" ? "In Progress" : "Pending",
           variant: isCompleted ? "success" : "accent",
@@ -125,7 +125,7 @@ export function MobileEmployeeTasks({
         isOpen={Boolean(selectedTask)}
         onClose={() => setSelectedTask(null)}
         title={selectedTask?.title || "Task Details"}
-        description={selectedTask?.project?.name || "General Workspace"}
+        description={selectedTask?.project?.name || "—"}
       >
         {selectedTask && (
           <div className="space-y-4">

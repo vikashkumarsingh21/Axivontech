@@ -58,7 +58,7 @@ export function MobileEmployeeWorkReport({
         month: "short",
         day: "numeric",
       }),
-      subtitle: `${rep.hoursSpent || 8} hours logged`,
+      subtitle: rep.hoursSpent !== undefined && rep.hoursSpent !== null ? `${rep.hoursSpent} hours logged` : "—",
       status: {
         label: "Submitted",
         variant: "success",

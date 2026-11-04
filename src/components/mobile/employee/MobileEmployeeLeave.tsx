@@ -14,8 +14,16 @@ import { CardList, type CardListItem } from "../CardList";
 import { BottomSheet } from "../BottomSheet";
 import { ConfirmDialog } from "../ConfirmDialog";
 
+export interface LeaveBalances {
+  sick: { total: number; used: number; balance: number };
+  casual: { total: number; used: number; balance: number };
+  paid: { total: number; used: number; balance: number };
+  unpaid: { total: number; used: number; balance: number };
+}
+
 interface MobileEmployeeLeaveProps {
   requests: any[];
+  balances?: LeaveBalances | null;
   onApplyLeave: (form: {
     type: string;
     start: string;
@@ -28,6 +36,7 @@ interface MobileEmployeeLeaveProps {
 
 export function MobileEmployeeLeave({
   requests,
+  balances,
   onApplyLeave,
   onCancelLeave,
   isLoading = false,
@@ -39,6 +48,37 @@ export function MobileEmployeeLeave({
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
+
+  // Compute balances from requests if not explicitly passed (matches desktop formula)
+  const computedBalances = useMemo(() => {
+    if (balances) return balances;
+    if (!requests || !Array.isArray(requests)) return null;
+
+    let sickUsed = 0;
+    let casualUsed = 0;
+    let paidUsed = 0;
+    let unpaidUsed = 0;
+
+    requests.forEach((r: any) => {
+      if (r?.status === "APPROVED") {
+        const start = new Date(r.startDate);
+        const end = new Date(r.endDate);
+        const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+
+        if (r.leaveType === "SICK") sickUsed += days;
+        else if (r.leaveType === "CASUAL") casualUsed += days;
+        else if (r.leaveType === "PAID") paidUsed += days;
+        else if (r.leaveType === "UNPAID") unpaidUsed += days;
+      }
+    });
+
+    return {
+      sick: { total: 12, used: sickUsed, balance: Math.max(0, 12 - sickUsed) },
+      casual: { total: 12, used: casualUsed, balance: Math.max(0, 12 - casualUsed) },
+      paid: { total: 15, used: paidUsed, balance: Math.max(0, 15 - paidUsed) },
+      unpaid: { total: 0, used: unpaidUsed, balance: unpaidUsed },
+    };
+  }, [balances, requests]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,20 +159,38 @@ export function MobileEmployeeLeave({
       <section className="grid grid-cols-3 gap-2.5">
         <div className="rounded-2xl bg-[#1A1A1B] border border-[#2E2E30] p-3 text-center">
           <span className="text-[11px] font-medium text-[#B3AFA6] block">Casual Leave</span>
-          <span className="text-xl font-bold text-[#EDEBE6] tabular-nums mt-1 block">8</span>
+          {isLoading ? (
+            <div className="h-7 w-8 bg-[#232324] animate-pulse rounded mx-auto my-0.5" />
+          ) : (
+            <span className="text-xl font-bold text-[#EDEBE6] tabular-nums mt-1 block">
+              {computedBalances ? computedBalances.casual.balance : "—"}
+            </span>
+          )}
           <span className="text-[10px] text-[#4F9D83] mt-0.5 block">Days Available</span>
         </div>
 
         <div className="rounded-2xl bg-[#1A1A1B] border border-[#2E2E30] p-3 text-center">
           <span className="text-[11px] font-medium text-[#B3AFA6] block">Sick Leave</span>
-          <span className="text-xl font-bold text-[#EDEBE6] tabular-nums mt-1 block">6</span>
+          {isLoading ? (
+            <div className="h-7 w-8 bg-[#232324] animate-pulse rounded mx-auto my-0.5" />
+          ) : (
+            <span className="text-xl font-bold text-[#EDEBE6] tabular-nums mt-1 block">
+              {computedBalances ? computedBalances.sick.balance : "—"}
+            </span>
+          )}
           <span className="text-[10px] text-[#4F9D83] mt-0.5 block">Days Available</span>
         </div>
 
         <div className="rounded-2xl bg-[#1A1A1B] border border-[#2E2E30] p-3 text-center">
-          <span className="text-[11px] font-medium text-[#B3AFA6] block">Comp Off</span>
-          <span className="text-xl font-bold text-[#EDEBE6] tabular-nums mt-1 block">2</span>
-          <span className="text-[10px] text-[#D4A359] mt-0.5 block">Approved</span>
+          <span className="text-[11px] font-medium text-[#B3AFA6] block">Paid (PTO)</span>
+          {isLoading ? (
+            <div className="h-7 w-8 bg-[#232324] animate-pulse rounded mx-auto my-0.5" />
+          ) : (
+            <span className="text-xl font-bold text-[#EDEBE6] tabular-nums mt-1 block">
+              {computedBalances ? computedBalances.paid.balance : "—"}
+            </span>
+          )}
+          <span className="text-[10px] text-[#C9A15B] mt-0.5 block">Days Available</span>
         </div>
       </section>
 
@@ -180,9 +238,9 @@ export function MobileEmployeeLeave({
               className="w-full h-12 px-3.5 rounded-xl bg-[#232324] border border-[#2E2E30] text-[#EDEBE6] text-sm focus:border-[#4F9D83] focus:outline-none"
             >
               <option value="CASUAL">Casual Leave (CL)</option>
-              <option value="SICK">Sick / Medical Leave (SL)</option>
-              <option value="EARNED">Earned Privilege Leave (PL)</option>
-              <option value="COMP_OFF">Compensatory Off</option>
+              <option value="SICK">Sick Leave (SL)</option>
+              <option value="PAID">Paid Time Off (PTO)</option>
+              <option value="UNPAID">Unpaid Leave</option>
             </select>
           </div>
 

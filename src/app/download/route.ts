@@ -8,7 +8,10 @@ export async function GET() {
   if (!isAppModeEnabled()) {
     return new NextResponse("Not Found", {
       status: 404,
-      headers: { "Content-Type": "text/plain" },
+      headers: {
+        "Content-Type": "text/plain",
+        "X-Robots-Tag": "noindex, nofollow",
+      },
     });
   }
 
@@ -19,6 +22,7 @@ export async function GET() {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
   <title>Axivon Mobile App Download</title>
 </head>
 <body style="font-family: sans-serif; background: #0B0D10; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0;">
@@ -31,7 +35,10 @@ export async function GET() {
 </html>`,
     {
       status: 200,
-      headers: { "Content-Type": "text/html" },
+      headers: {
+        "Content-Type": "text/html",
+        "X-Robots-Tag": "noindex, nofollow",
+      },
     }
   );
 }

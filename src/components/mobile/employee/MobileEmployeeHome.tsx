@@ -67,6 +67,38 @@ export function MobileEmployeeHome({ data, user, onRefresh }: MobileEmployeeHome
       .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   }, [isCheckedIn, tickerSeconds]);
 
+  // Attendance metric: real monthly percent or computed today's progress percent, otherwise "—"
+  const attendancePercentDisplay = useMemo(() => {
+    if (typeof attendance?.monthlyPercent === "number") {
+      return `${Math.round(attendance.monthlyPercent)}%`;
+    }
+    if (typeof attendance?.monthlyPercent === "string" && attendance.monthlyPercent.trim()) {
+      return `${attendance.monthlyPercent}%`;
+    }
+    const reqMins = attendance?.requiredDailyMinutes || user?.requiredDailyMinutes || 480;
+    const netMins = attendance?.netMinutes ?? attendance?.grossMinutes;
+    if (typeof netMins === "number" && reqMins > 0 && (isCheckedIn || isCheckedOut)) {
+      return `${Math.min(100, Math.round((netMins / reqMins) * 100))}%`;
+    }
+    return "—";
+  }, [attendance, user, isCheckedIn, isCheckedOut]);
+
+  // Leaves available: computed from real leave balances or API, otherwise "—"
+  const leavesRemainingDisplay = useMemo(() => {
+    if (typeof data?.leaveBalance === "number") {
+      return `${data.leaveBalance} d`;
+    }
+    const balances = data?.leaveStats?.balances;
+    if (Array.isArray(balances) && balances.length > 0) {
+      const totalRemaining = balances.reduce((acc: number, b: any) => acc + (b.remainingDays || 0), 0);
+      return `${totalRemaining} d`;
+    }
+    if (data?.leaveStats?.pendingCount !== undefined) {
+      return `${data.leaveStats.pendingCount} req`;
+    }
+    return "—";
+  }, [data]);
+
   const checkInTimeStr = useMemo(() => {
     if (!attendance?.checkInAt) return null;
     return new Date(attendance.checkInAt).toLocaleTimeString("en-IN", {
@@ -122,7 +154,7 @@ export function MobileEmployeeHome({ data, user, onRefresh }: MobileEmployeeHome
   const taskCardItems: CardListItem[] = recentTasks.slice(0, 3).map((task: any) => ({
     id: task.id,
     title: task.title,
-    subtitle: task.project?.name || "General Workspace",
+    subtitle: task.project?.name || "—",
     status: {
       label: task.status === "COMPLETED" ? "Completed" : "In Progress",
       variant: task.status === "COMPLETED" ? "success" : "accent",
@@ -247,7 +279,7 @@ export function MobileEmployeeHome({ data, user, onRefresh }: MobileEmployeeHome
                 : "Active Work Session"
               : isCheckedOut
               ? "Day closed"
-              : "Standard Shift: 09:30 AM – 06:30 PM"}
+              : `Daily Shift Target: ${Math.round((user?.requiredDailyMinutes || attendance?.requiredDailyMinutes || 480) / 60)}h`}
           </div>
         </div>
 
@@ -310,9 +342,11 @@ export function MobileEmployeeHome({ data, user, onRefresh }: MobileEmployeeHome
         <div className="rounded-2xl bg-[#1A1A1B] border border-[#2E2E30] p-3 flex flex-col justify-between">
           <span className="text-[11px] font-medium text-[#B3AFA6]">Attendance</span>
           <span className="text-lg font-bold text-[#EDEBE6] tabular-nums mt-1">
-            {attendance?.monthlyPercent || "96.4"}%
+            {attendancePercentDisplay}
           </span>
-          <span className="text-[10px] text-[#4F9D83] mt-0.5">This Month</span>
+          <span className="text-[10px] text-[#4F9D83] mt-0.5">
+            {attendancePercentDisplay !== "—" ? "Monthly / Shift" : "No Session"}
+          </span>
         </div>
 
         <div className="rounded-2xl bg-[#1A1A1B] border border-[#2E2E30] p-3 flex flex-col justify-between">
@@ -326,7 +360,7 @@ export function MobileEmployeeHome({ data, user, onRefresh }: MobileEmployeeHome
         <div className="rounded-2xl bg-[#1A1A1B] border border-[#2E2E30] p-3 flex flex-col justify-between">
           <span className="text-[11px] font-medium text-[#B3AFA6]">Leaves Left</span>
           <span className="text-lg font-bold text-[#EDEBE6] tabular-nums mt-1">
-            {data?.leaveBalance || "14"} d
+            {leavesRemainingDisplay}
           </span>
           <span className="text-[10px] text-[#B3AFA6] mt-0.5">Available</span>
         </div>
@@ -353,18 +387,20 @@ export function MobileEmployeeHome({ data, user, onRefresh }: MobileEmployeeHome
       </section>
 
       {/* ── Announcements Notice Section ─────────────────────────────── */}
-      {announcements.length > 0 && (
+      {announcements.length > 0 && Boolean(announcements[0]?.title) && (
         <section className="rounded-2xl bg-[#1A1A1B] border border-[#2E2E30] p-4 space-y-2">
           <div className="flex items-center gap-2">
             <Megaphone className="h-4 w-4 text-[#D4A359]" />
             <span className="text-xs font-semibold text-[#EDEBE6]">Company Announcements</span>
           </div>
           <div className="text-xs text-[#EDEBE6] font-medium">
-            {announcements[0]?.title || "Quarterly team meeting scheduled this Friday."}
+            {announcements[0].title}
           </div>
-          <p className="text-[11px] text-[#B3AFA6] line-clamp-2">
-            {announcements[0]?.content || "All departments please review the Q3 roadmap beforehand."}
-          </p>
+          {Boolean(announcements[0]?.content) && (
+            <p className="text-[11px] text-[#B3AFA6] line-clamp-2">
+              {announcements[0].content}
+            </p>
+          )}
         </section>
       )}
 

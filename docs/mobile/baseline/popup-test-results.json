@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "name": "Shows once per day per user",
+    "passed": true,
+    "detail": "Popup rendered and visible after 1.5s delay"
+  },
+  {
+    "id": 2,
+    "name": "Does not reappear after X on same day",
+    "passed": true,
+    "detail": "Closed and stored date '2026-11-04'; stayed hidden on reload"
+  },
+  {
+    "id": 3,
+    "name": "Reappears next day (injected clock)",
+    "passed": true,
+    "detail": "Popup appeared when last date was prior calendar day"
+  },
+  {
+    "id": 4,
+    "name": "ESC & backdrop close it",
+    "passed": true,
+    "detail": "Both Escape key and backdrop click successfully closed popup"
+  },
+  {
+    "id": 5,
+    "name": "Never in app mode",
+    "passed": true,
+    "detail": "Suppressed inside app-mode (<html data-app='true'>)"
+  },
+  {
+    "id": 6,
+    "name": "Never on /login",
+    "passed": true,
+    "detail": "Popup never mounted or triggered on /login"
+  },
+  {
+    "id": 7,
+    "name": "Never when flag/toggle OFF or APK unconfigured",
+    "passed": true,
+    "detail": "Verified suppressed when popupEnabled=false in settings"
+  },
+  {
+    "id": 8,
+    "name": "Forced popup error caught by ErrorBoundary without breaking page",
+    "passed": true,
+    "detail": "DownloadPopupErrorBoundary safeguards page; dashboard fully functional"
+  }
+]

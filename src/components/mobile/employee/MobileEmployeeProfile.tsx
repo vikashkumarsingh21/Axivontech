@@ -47,18 +47,24 @@ export function MobileEmployeeProfile({ user }: MobileEmployeeProfileProps) {
         <div className="h-20 w-20 rounded-full bg-[#232324] border-2 border-[#4F9D83] flex items-center justify-center text-xl font-bold text-[#EDEBE6] mb-3 shadow-md">
           {initials}
         </div>
-        <h2 className="text-lg font-bold text-[#EDEBE6]">{user?.name || "Employee"}</h2>
-        <span className="text-xs text-[#B3AFA6] mt-0.5">{user?.email}</span>
+        <h2 className="text-lg font-bold text-[#EDEBE6]">{user?.name || "—"}</h2>
+        <span className="text-xs text-[#B3AFA6] mt-0.5">{user?.email || "—"}</span>
 
-        <div className="flex items-center gap-2 mt-3">
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#162721] text-[#A2D9C7] border border-[#27483C]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#4F9D83]" />
-            <span>{user?.department || "Engineering"}</span>
-          </span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#232324] text-[#B3AFA6] border border-[#2E2E30]">
-            <span>{user?.designation || "Team Member"}</span>
-          </span>
-        </div>
+        {(Boolean(user?.department) || Boolean(user?.designation)) && (
+          <div className="flex items-center gap-2 mt-3">
+            {Boolean(user?.department) && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#162721] text-[#A2D9C7] border border-[#27483C]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#4F9D83]" />
+                <span>{user.department}</span>
+              </span>
+            )}
+            {Boolean(user?.designation) && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#232324] text-[#B3AFA6] border border-[#2E2E30]">
+                <span>{user.designation}</span>
+              </span>
+            )}
+          </div>
+        )}
       </section>
 
       {/* ── Key Information List ─────────────────────────────────────── */}
@@ -73,15 +79,17 @@ export function MobileEmployeeProfile({ user }: MobileEmployeeProfileProps) {
           </span>
         </div>
 
-        <div className="flex items-center justify-between p-3.5">
-          <div className="flex items-center gap-3">
-            <Building className="h-4 w-4 text-[#827E76]" />
-            <span className="text-xs text-[#B3AFA6]">Employee Code</span>
+        {Boolean(user?.employeeCode) && (
+          <div className="flex items-center justify-between p-3.5">
+            <div className="flex items-center gap-3">
+              <Building className="h-4 w-4 text-[#827E76]" />
+              <span className="text-xs text-[#B3AFA6]">Employee Code</span>
+            </div>
+            <span className="text-xs font-semibold text-[#EDEBE6] tabular-nums">
+              {user.employeeCode}
+            </span>
           </div>
-          <span className="text-xs font-semibold text-[#EDEBE6] tabular-nums">
-            {user?.employeeCode || user?.id?.slice(0, 8) || "EMP-2026"}
-          </span>
-        </div>
+        )}
 
         <div className="flex items-center justify-between p-3.5">
           <div className="flex items-center gap-3">
@@ -94,7 +102,7 @@ export function MobileEmployeeProfile({ user }: MobileEmployeeProfileProps) {
                   month: "short",
                   year: "numeric",
                 })
-              : "Active"}
+              : "—"}
           </span>
         </div>
       </section>

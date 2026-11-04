@@ -260,6 +260,7 @@ export default function LeavePage() {
     return (
       <MobileEmployeeLeave
         requests={requests}
+        balances={balances}
         onApplyLeave={handleApplyMobile}
         onCancelLeave={handleCancelMobile}
         isLoading={loading}

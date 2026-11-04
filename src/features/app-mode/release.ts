@@ -21,7 +21,7 @@ const DEFAULT_RELEASE_CONFIG: AppReleaseConfig = {
   apkUrl: process.env.APP_APK_URL || "https://github.com/axivon/axivon-mobile/releases/download/v1.0.0/axivon-app.apk",
   sha256: process.env.APP_APK_SHA256 || "",
   sizeMb: parseFloat(process.env.APP_APK_SIZE_MB || "5.8"),
-  notes: process.env.APP_RELEASE_NOTES || "Official Axivon Portal Android Application with biometric attendance and push notifications.",
+  notes: process.env.APP_RELEASE_NOTES || "Axivon app: attendance, tasks, leave and reports from your phone.",
   updatedAt: new Date().toISOString(),
 };
 

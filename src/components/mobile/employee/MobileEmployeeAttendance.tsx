@@ -356,7 +356,7 @@ export function MobileEmployeeAttendance({
               rows={3}
               value={regReason}
               onChange={(e) => setRegReason(e.target.value)}
-              placeholder="e.g. biometric machine offline, client visit, forgot to check in"
+              placeholder="e.g. client visit, power outage, forgot to check in"
               className="w-full p-3.5 rounded-xl bg-[#232324] border border-[#2E2E30] text-[#EDEBE6] text-sm focus:border-[#4F9D83] focus:outline-none resize-none"
             />
           </div>
