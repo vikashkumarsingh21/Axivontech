@@ -60,10 +60,15 @@ export async function handleApkDownload(req: NextRequest): Promise<NextResponse>
       }
     });
 
-  // 4. Redirect (307) with proper attachment headers
-  const targetUrl = config.apkUrl.startsWith("http")
-    ? new URL(config.apkUrl)
-    : new URL(config.apkUrl, req.url);
+  // 4. Resolve download URL (fallback to local APK if placeholder GitHub URL)
+  let rawUrl = config.apkUrl || "/downloads/axivon-app.apk";
+  if (rawUrl.includes("axivon/axivon-mobile")) {
+    rawUrl = "/downloads/axivon-app.apk";
+  }
+
+  const targetUrl = rawUrl.startsWith("http")
+    ? new URL(rawUrl)
+    : new URL(rawUrl, req.url);
 
   return NextResponse.redirect(targetUrl, {
     status: 307,

@@ -1,0 +1,22 @@
+{
+  "appId": "com.axivon.app",
+  "appName": "Axivon",
+  "webDir": "dist",
+  "server": {
+    "url": "https://axivontech.in/login",
+    "cleartext": false,
+    "allowNavigation": [
+      "axivontech.in",
+      "*.axivontech.in",
+      "*.google.com",
+      "*.gstatic.com",
+      "challenges.cloudflare.com"
+    ]
+  },
+  "appendUserAgent": "AxivonApp/1.0.0",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  }
+}

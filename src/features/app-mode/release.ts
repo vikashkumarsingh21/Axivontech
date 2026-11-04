@@ -18,9 +18,9 @@ const DEFAULT_RELEASE_CONFIG: AppReleaseConfig = {
   popupEnabled: true,
   latestVersion: process.env.APP_LATEST_VERSION || "1.0.0",
   minVersion: process.env.APP_MIN_VERSION || "1.0.0",
-  apkUrl: process.env.APP_APK_URL || "https://github.com/axivon/axivon-mobile/releases/download/v1.0.0/axivon-app.apk",
+  apkUrl: process.env.APP_APK_URL || "/downloads/axivon-app.apk",
   sha256: process.env.APP_APK_SHA256 || "",
-  sizeMb: parseFloat(process.env.APP_APK_SIZE_MB || "5.8"),
+  sizeMb: parseFloat(process.env.APP_APK_SIZE_MB || "3.6"),
   notes: process.env.APP_RELEASE_NOTES || "Axivon app: attendance, tasks, leave and reports from your phone.",
   updatedAt: new Date().toISOString(),
 };
