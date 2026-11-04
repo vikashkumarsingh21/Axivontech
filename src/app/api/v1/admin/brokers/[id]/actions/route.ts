@@ -4,6 +4,7 @@ import { requirePermission } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { JobRunner } from "@/lib/jobs/runner";
 import { hashPassword, generateStrongPassword, validatePasswordStrength } from "@/lib/auth/password";
+import { isOutboundEmailConfigured } from "@/lib/email/service";
 import { z } from "zod";
 import crypto from "crypto";
 
@@ -12,7 +13,9 @@ const actionSchema = z.object({
   reason: z.string().max(1000).optional(),
   mode: z.enum(["DIRECT_PASSWORD", "ACTIVATION_LINK"]).optional(),
   newPassword: z.string().optional(),
+  password: z.string().optional(),
   mustChangePassword: z.boolean().optional(),
+  requirePasswordChange: z.boolean().optional(),
 });
 
 export async function POST(
@@ -27,7 +30,12 @@ export async function POST(
 
     const identifier = params.id;
     const body = await req.json().catch(() => ({}));
-    const { action, reason, mode = "DIRECT_PASSWORD", newPassword, mustChangePassword = true } = actionSchema.parse(body);
+    const parsed = actionSchema.parse(body);
+    const action = parsed.action;
+    const reason = parsed.reason;
+    const mode = parsed.mode || "DIRECT_PASSWORD";
+    const rawNewPassword = parsed.newPassword?.trim() || parsed.password?.trim();
+    const mustChangePassword = parsed.mustChangePassword ?? parsed.requirePasswordChange ?? true;
 
     const brokerUser = await db.user.findFirst({
       where: {
@@ -49,6 +57,8 @@ export async function POST(
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "127.0.0.1";
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in";
 
+    const emailConfigured = isOutboundEmailConfigured();
+
     if (action === "resend_activation") {
       const activationToken = crypto.randomUUID();
       await db.user.update({
@@ -62,16 +72,18 @@ export async function POST(
 
       const activationLink = `${appUrl}/broker-partner/activate?token=${activationToken}`;
 
-      await JobRunner.enqueue("SEND_EMAIL", {
-        to: brokerUser.email,
-        templateKey: "PARTNER_ACCOUNT_ACTIVATION",
-        variables: {
-          name: brokerUser.name,
-          partnerId: brokerProfile.partnerId || "",
-          referralCode: brokerProfile.referralCode || "",
-          activationLink,
-        },
-      });
+      if (emailConfigured) {
+        await JobRunner.enqueue("SEND_EMAIL", {
+          to: brokerUser.email,
+          templateKey: "PARTNER_ACCOUNT_ACTIVATION",
+          variables: {
+            name: brokerUser.name,
+            partnerId: brokerProfile.partnerId || "",
+            referralCode: brokerProfile.referralCode || "",
+            activationLink,
+          },
+        });
+      }
 
       await db.auditLog.create({
         data: {
@@ -84,8 +96,11 @@ export async function POST(
 
       return NextResponse.json({
         success: true,
-        message: `Activation link generated and email sent to ${brokerUser.email}`,
+        message: emailConfigured
+          ? `Activation link generated and email sent to ${brokerUser.email}`
+          : "Activation link generated. Outbound email is not configured, please copy the link manually.",
         activationLink,
+        emailConfigured,
       });
     }
 
@@ -163,16 +178,18 @@ export async function POST(
 
         const activationLink = `${appUrl}/broker-partner/activate?token=${activationToken}`;
 
-        await JobRunner.enqueue("SEND_EMAIL", {
-          to: brokerUser.email,
-          templateKey: "PARTNER_ACCOUNT_ACTIVATION",
-          variables: {
-            name: brokerUser.name,
-            partnerId: brokerProfile.partnerId || "",
-            referralCode: brokerProfile.referralCode || "",
-            activationLink,
-          },
-        });
+        if (emailConfigured) {
+          await JobRunner.enqueue("SEND_EMAIL", {
+            to: brokerUser.email,
+            templateKey: "PARTNER_ACCOUNT_ACTIVATION",
+            variables: {
+              name: brokerUser.name,
+              partnerId: brokerProfile.partnerId || "",
+              referralCode: brokerProfile.referralCode || "",
+              activationLink,
+            },
+          });
+        }
 
         await db.auditLog.create({
           data: {
@@ -186,8 +203,11 @@ export async function POST(
         return NextResponse.json(
           {
             success: true,
-            message: `Password reset link sent to ${brokerUser.email}`,
+            message: emailConfigured
+              ? `Password reset link sent to ${brokerUser.email}`
+              : "Password reset link generated. Outbound email is not configured, please copy the link manually.",
             activationLink,
+            emailConfigured,
           },
           {
             headers: {
@@ -198,7 +218,7 @@ export async function POST(
       }
 
       // Direct password mode
-      const rawPassword = newPassword?.trim() || generateStrongPassword(14);
+      const rawPassword = rawNewPassword || generateStrongPassword(14);
       const validation = validatePasswordStrength(rawPassword);
       if (!validation.isValid) {
         throw new ApiError(400, `Password does not meet rules: ${validation.errors.join(" ")}`);
@@ -228,6 +248,7 @@ export async function POST(
         {
           success: true,
           message: "Password reset successfully. Credentials ready for distribution.",
+          emailConfigured,
           data: {
             loginUrl: `${appUrl}/login`,
             email: brokerUser.email,

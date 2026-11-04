@@ -243,10 +243,38 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      const { EventBus } = await import("@/lib/events/bus").catch(() => ({
-        EventBus: null,
-      }));
-      if (EventBus) {
+        // Transactional Email to Management / Company Notification Inbox
+        try {
+          const { sendTransactionalEmail } = await import("@/lib/email/service");
+          const { getEmailConfig } = await import("@/lib/email/config");
+          const emailConfig = getEmailConfig();
+
+          await sendTransactionalEmail({
+            to: emailConfig.internalNotificationEmail,
+            templateKey: "LEAVE_REQUEST_SUBMITTED",
+            eventKey: `leave_submitted:${request.id}`,
+            variables: {
+              employeeName: user.name,
+              leaveType,
+              startDate: start.toLocaleDateString(),
+              endDate: end.toLocaleDateString(),
+              totalDays: requestedDays,
+              reason: reason.trim(),
+            },
+            metadata: {
+              leaveRequestId: request.id,
+              userId: user.id,
+              type: "LEAVE_APPLICATION_SUBMISSION",
+            },
+          });
+        } catch (emailErr) {
+          console.warn("[Leave API] Manager leave notification email failed:", emailErr);
+        }
+
+        const { EventBus } = await import("@/lib/events/bus").catch(() => ({
+          EventBus: null,
+        }));
+        if (EventBus) {
         await EventBus.emit({
           eventType: "LEAVE_SUBMITTED",
           actorId: user.id,

@@ -110,6 +110,33 @@ export async function PATCH(req: NextRequest) {
       });
     } catch (e) {}
 
+    // Dispatch Transactional Email Decision to Employee
+    if (updated.user?.email) {
+      try {
+        const { sendTransactionalEmail } = await import("@/lib/email/service");
+        await sendTransactionalEmail({
+          to: updated.user.email,
+          templateKey: newStatus === "APPROVED" ? "LEAVE_APPROVED" : "LEAVE_REJECTED",
+          eventKey: `leave_manager_decision:${leaveId}:${newStatus}`,
+          variables: {
+            employeeName: updated.user.name,
+            leaveType: updated.leaveType,
+            startDate: new Date(updated.startDate).toLocaleDateString(),
+            endDate: new Date(updated.endDate).toLocaleDateString(),
+            managerName: `${department.name} Department Leadership`,
+            reason: comment || undefined,
+          },
+          metadata: {
+            leaveId,
+            action: newStatus,
+            department: department.name,
+          },
+        });
+      } catch (leaveEmailErr) {
+        console.warn("[ManagerLeave] Failed to dispatch leave decision email:", leaveEmailErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: `Leave request for ${leave.user.name} has been ${newStatus.toLowerCase()}.`,

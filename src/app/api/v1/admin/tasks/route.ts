@@ -116,6 +116,34 @@ export async function POST(req: Request) {
       },
     });
 
+    // Dispatch Transactional Email Notification to Assigned Employee
+    if (assignedUser.email) {
+      try {
+        const { sendTransactionalEmail } = await import("@/lib/email/service");
+        await sendTransactionalEmail({
+          to: assignedUser.email,
+          templateKey: "TASK_ASSIGNED",
+          eventKey: `task_assigned:${task.id}:${userId}`,
+          variables: {
+            employeeName: assignedUser.name,
+            taskTitle: title,
+            priority: task.priority,
+            dueDate: dueDateFormatted,
+            assignedBy: admin.name,
+            projectName: task.project?.name || "Internal Operations",
+          },
+          metadata: {
+            taskId: task.id,
+            userId,
+            assignedBy: adminId,
+            type: "TASK_ASSIGNED_NOTIFICATION",
+          },
+        });
+      } catch (taskEmailErr) {
+        console.warn("[Tasks API] Failed to dispatch task assignment email:", taskEmailErr);
+      }
+    }
+
     // Emit platform event
     const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
     if (EventBus) {

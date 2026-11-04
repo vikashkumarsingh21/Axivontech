@@ -270,14 +270,18 @@ export async function POST(req: NextRequest) {
       console.error("[EventBus] Lead event emission failed:", eventBusErr);
     }
 
-    // Try to send email
+    // Try to send email notifications via Centralized Transactional Automation
     try {
-      const { EmailService } = await import("@/lib/email/service");
-      await EmailService.send({
-        to: process.env.COMPANY_CONTACT_EMAIL || "info@axivontech.in",
-        templateKey: "NEW_WEBSITE_LEAD",
+      const { sendTransactionalEmail } = await import("@/lib/email/service");
+      const { getEmailConfig } = await import("@/lib/email/config");
+      const emailConfig = getEmailConfig();
+
+      // 1. Internal Notification to axivontech.in@gmail.com
+      await sendTransactionalEmail({
+        to: emailConfig.internalNotificationEmail,
+        templateKey: "NEW_LEAD_REGISTERED",
+        eventKey: `lead_internal:${lead.leadCode}`,
         variables: {
-          title: `New Project Lead: ${lead.name} (${lead.leadCode})`,
           name: lead.name,
           email: lead.email,
           phone: lead.phone || "N/A",
@@ -289,23 +293,62 @@ export async function POST(req: NextRequest) {
           source: lead.source,
           leadCode: lead.leadCode,
           link: `${process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in"}/admin/crm/leads/${lead.id}`,
-        }
+        },
+        metadata: {
+          leadId: lead.id,
+          leadCode: lead.leadCode,
+          type: "INTERNAL_LEAD_NOTIFICATION",
+        },
       });
 
-      // Send automated client receipt acknowledgement
+      // 2. Client Receipt Acknowledgement
       if (lead.email) {
-        await EmailService.send({
+        await sendTransactionalEmail({
           to: lead.email,
-          templateKey: "LEAD_ACKNOWLEDGEMENT",
+          templateKey: "CONTACT_ENQUIRY_ACK",
+          eventKey: `lead_ack:${lead.leadCode}`,
           variables: {
-            title: `Thank you for contacting Axivon Technologies [${lead.leadCode}]`,
             name: lead.name,
             leadCode: lead.leadCode,
             service: lead.serviceInterest || "Custom Software Development",
-          }
+          },
+          metadata: {
+            leadId: lead.id,
+            leadCode: lead.leadCode,
+            type: "CLIENT_LEAD_ACK",
+          },
         }).catch((ackErr) => {
           console.warn("[EmailService] Client receipt acknowledgement dispatch skipped/failed:", ackErr);
         });
+      }
+
+      // 3. Broker Lead Registration Acknowledgement (if lead came via broker referral)
+      if (ownerId) {
+        const brokerUser = await db.user.findUnique({
+          where: { id: ownerId },
+          select: { email: true, name: true },
+        });
+        if (brokerUser?.email) {
+          await sendTransactionalEmail({
+            to: brokerUser.email,
+            templateKey: "NEW_LEAD_REGISTERED",
+            eventKey: `broker_lead_ack:${lead.leadCode}:${ownerId}`,
+            variables: {
+              name: lead.name,
+              company: lead.companyName || "Independent",
+              service: lead.serviceInterest || "Software Development",
+              leadCode: lead.leadCode,
+              budget: parsedBudget ? `₹${parsedBudget.toLocaleString()}` : "Flexible",
+              brokerName: brokerUser.name,
+              link: `${process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in"}/broker/leads`,
+            },
+            metadata: {
+              leadId: lead.id,
+              brokerId: ownerId,
+              type: "BROKER_LEAD_REGISTRATION_ACK",
+            },
+          }).catch(() => {});
+        }
       }
     } catch (emailError) {
       console.error("[Email Error] Failed to send new lead email:", emailError);
@@ -318,7 +361,7 @@ export async function POST(req: NextRequest) {
           notes: "Failed to send the new lead notification email to the company address.",
           metadata: { error: String(emailError) },
         },
-      });
+      }).catch(() => {});
     }
 
     return NextResponse.json(

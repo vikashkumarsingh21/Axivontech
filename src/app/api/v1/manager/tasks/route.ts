@@ -112,6 +112,34 @@ export async function POST(req: NextRequest) {
       });
     } catch (e) {}
 
+    // Dispatch Transactional Email Notification to Assigned Employee
+    if (newTask.user?.email) {
+      try {
+        const { sendTransactionalEmail } = await import("@/lib/email/service");
+        await sendTransactionalEmail({
+          to: newTask.user.email,
+          templateKey: "TASK_ASSIGNED",
+          eventKey: `task_assigned:${newTask.id}:${newTask.userId}`,
+          variables: {
+            employeeName: targetEmployee.name,
+            taskTitle: newTask.title,
+            priority: newTask.priority,
+            dueDate: newTask.dueDate ? newTask.dueDate.toLocaleDateString() : "Flexible",
+            assignedBy: `${department.name} Leadership`,
+            projectName: department.name,
+          },
+          metadata: {
+            taskId: newTask.id,
+            userId: newTask.userId,
+            assignedBy: actorId,
+            type: "MANAGER_TASK_ASSIGNED",
+          },
+        });
+      } catch (e) {
+        console.warn("[ManagerTasks] Email dispatch warning:", e);
+      }
+    }
+
     return NextResponse.json(
       {
         success: true,
@@ -124,4 +152,3 @@ export async function POST(req: NextRequest) {
     return handleApiError(error);
   }
 }
-

@@ -56,10 +56,11 @@ export default function AdminDashboard() {
     return time.toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
   };
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (isFresh = false) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/v1/admin/dashboard/summary");
+      const url = isFresh ? "/api/v1/admin/dashboard/summary?fresh=1" : "/api/v1/admin/dashboard/summary";
+      const res = await fetch(url);
       if (res.ok) {
         const json = await res.json();
         setData(json.data);
@@ -101,7 +102,7 @@ export default function AdminDashboard() {
 
         <div className="flex items-center gap-2.5 relative z-10 w-full sm:w-auto justify-between sm:justify-end">
           <button
-            onClick={loadData}
+            onClick={() => loadData(true)}
             title="Refresh Data"
             className="p-2.5 rounded-xl border border-white/10 bg-[#161618] text-gray-300 hover:text-white hover:bg-white/5 transition-all shadow-sm"
           >

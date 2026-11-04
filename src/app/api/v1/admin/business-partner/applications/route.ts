@@ -75,16 +75,34 @@ export async function GET(req: Request) {
 
     const enrichedApplications = applications.map((app) => {
       const u = userMap.get(app.email.toLowerCase().trim());
-      const hasUsableLogin = !!u && u.status === "ACTIVE" && !!u.brokerProfile;
+
+      let accountStatus: "NOT_CREATED" | "CREATION_PENDING" | "ACTIVE" | "PASSWORD_CHANGE_REQUIRED" | "DISABLED" = "NOT_CREATED";
+      if (!u || !u.brokerProfile) {
+        accountStatus = "NOT_CREATED";
+      } else if (u.status === "PENDING_ACTIVATION") {
+        accountStatus = "CREATION_PENDING";
+      } else if (u.status === "SUSPENDED" || u.status === "INACTIVE") {
+        accountStatus = "DISABLED";
+      } else if (u.status === "ACTIVE" && u.mustChangePassword) {
+        accountStatus = "PASSWORD_CHANGE_REQUIRED";
+      } else if (u.status === "ACTIVE") {
+        accountStatus = "ACTIVE";
+      }
+
+      const hasUsableLogin = !!u && !!u.brokerProfile && (u.status === "ACTIVE" || u.status === "PENDING_ACTIVATION");
+
       return {
         ...app,
+        accountStatus,
         hasUsableLogin,
         linkedUser: u
           ? {
+              id: u.id,
               status: u.status,
               mustChangePassword: u.mustChangePassword,
               partnerId: u.brokerProfile?.partnerId || null,
               referralCode: u.brokerProfile?.referralCode || null,
+              brokerProfileId: u.brokerProfile?.id || null,
             }
           : null,
       };

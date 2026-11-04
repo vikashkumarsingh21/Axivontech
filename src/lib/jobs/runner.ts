@@ -38,15 +38,31 @@ export class JobRunner {
             await cleanupInactiveUsers();
             break;
 
-          // ─── Phase 6: Email retry ───────────────────────────────────────
-          case "EMAIL_RETRY": {
+          // ─── Phase 6: Email dispatch & retry ───────────────────────────
+          case "SEND_EMAIL": {
             const p = job.payload as any;
             if (p?.to && p?.templateKey) {
-              const { EmailService } = await import("@/lib/email/service");
-              await EmailService.send({
+              const { sendTransactionalEmail } = await import("@/lib/email/service");
+              await sendTransactionalEmail({
                 to: p.to,
                 templateKey: p.templateKey,
                 variables: p.variables,
+                eventKey: p.eventKey || p.idempotencyKey,
+                metadata: p.metadata,
+              });
+            }
+            break;
+          }
+
+          case "EMAIL_RETRY": {
+            const p = job.payload as any;
+            if (p?.to && p?.templateKey) {
+              const { sendTransactionalEmail } = await import("@/lib/email/service");
+              await sendTransactionalEmail({
+                to: p.to,
+                templateKey: p.templateKey,
+                variables: p.variables,
+                eventKey: p.eventKey || p.idempotencyKey,
                 metadata: { ...p.metadata, retried: true },
               });
             }

@@ -28,7 +28,7 @@ export function MobileEmployeeProfile({ user }: MobileEmployeeProfileProps) {
     } catch (e) {
       // Ignore
     }
-    router.push("/login");
+    window.location.href = "/login?logged_out=1";
   };
 
   const initials =

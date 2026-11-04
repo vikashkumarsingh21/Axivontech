@@ -41,8 +41,10 @@ export function PortalAIAssistant({ portalRole, initialOpen = false }: PortalAIA
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch role-specific assistant configuration
+  // Fetch role-specific assistant configuration lazily on first open
   useEffect(() => {
+    if (!isOpen || config) return;
+
     let isMounted = true;
     async function loadConfig() {
       try {
@@ -61,7 +63,7 @@ export function PortalAIAssistant({ portalRole, initialOpen = false }: PortalAIA
     return () => {
       isMounted = false;
     };
-  }, [portalRole]);
+  }, [isOpen, config, portalRole]);
 
   // Auto-scroll to bottom
   const scrollToBottom = useCallback(() => {

@@ -151,7 +151,60 @@ export async function POST(req: Request) {
       console.error("[Career API] Failed to persist in database:", dbErr?.message);
     }
 
-    // 6. Forward application to external webhook integration only if securely configured via env
+    // 6. Dispatch Automated Transactional Email Notifications
+    const appRef = savedApplication?.id || `APP-${Date.now()}`;
+    try {
+      const { sendTransactionalEmail } = await import("@/lib/email/service");
+      const { getEmailConfig } = await import("@/lib/email/config");
+      const emailConfig = getEmailConfig();
+
+      // 6a. Internal Alert to axivontech.in@gmail.com
+      await sendTransactionalEmail({
+        to: emailConfig.internalNotificationEmail,
+        templateKey: "CAREER_APPLICATION_RECEIVED",
+        eventKey: `career_internal:${appRef}`,
+        variables: {
+          fullName,
+          email,
+          phone: phone || "Not provided",
+          position: matchedJob?.title || position,
+          location: location || "Not specified",
+          experience: experience || "Not specified",
+          resumeUrl,
+          portfolio: portfolio || undefined,
+          linkedin: linkedin || undefined,
+          applicationId: appRef,
+        },
+        metadata: {
+          applicationId: appRef,
+          position: matchedJob?.title || position,
+          type: "INTERNAL_CAREER_APPLICATION_ALERT",
+        },
+      });
+
+      // 6b. Candidate Acknowledgement Email
+      if (email) {
+        await sendTransactionalEmail({
+          to: email,
+          templateKey: "CAREER_APPLICATION_ACK",
+          eventKey: `career_ack:${appRef}`,
+          variables: {
+            fullName,
+            position: matchedJob?.title || position,
+            applicationId: appRef,
+          },
+          metadata: {
+            applicationId: appRef,
+            position: matchedJob?.title || position,
+            type: "CANDIDATE_CAREER_APPLICATION_ACK",
+          },
+        });
+      }
+    } catch (emailErr: any) {
+      console.warn("[Career API] Email dispatch warning:", emailErr?.message);
+    }
+
+    // 7. Forward application to external webhook integration only if securely configured via env
     const payload = {
       fullName,
       email,

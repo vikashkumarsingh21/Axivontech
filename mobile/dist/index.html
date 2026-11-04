@@ -17,9 +17,15 @@
       justify-content: center;
       min-height: 100vh;
     }
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 24px;
+      object-fit: contain;
+    }
     .spinner {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border: 3px solid rgba(16, 185, 129, 0.2);
       border-top-color: #10B981;
       border-radius: 50%;
@@ -30,16 +36,17 @@
     }
     .text {
       margin-top: 16px;
-      font-size: 14px;
+      font-size: 13px;
       color: #9CA3AF;
       letter-spacing: 0.5px;
     }
   </style>
   <script>
-    window.location.replace("https://axivontech.in/login");
+    window.location.replace("https://axivontech.in");
   </script>
 </head>
 <body>
+  <img src="assets/logo-icon.png" alt="Axivon" class="logo" />
   <div class="spinner"></div>
   <div class="text">Connecting to Axivon Secure Portal...</div>
 </body>

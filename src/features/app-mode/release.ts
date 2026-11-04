@@ -20,7 +20,7 @@ const DEFAULT_RELEASE_CONFIG: AppReleaseConfig = {
   minVersion: process.env.APP_MIN_VERSION || "1.0.0",
   apkUrl: process.env.APP_APK_URL || "/downloads/axivon-app.apk",
   sha256: process.env.APP_APK_SHA256 || "",
-  sizeMb: parseFloat(process.env.APP_APK_SIZE_MB || "3.6"),
+  sizeMb: parseFloat(process.env.APP_APK_SIZE_MB || "5.1"),
   notes: process.env.APP_RELEASE_NOTES || "Axivon app: attendance, tasks, leave and reports from your phone.",
   updatedAt: new Date().toISOString(),
 };
@@ -48,12 +48,18 @@ export async function getAppReleaseConfig(): Promise<AppReleaseConfig> {
     const isMasterDbEnabled = !isMasterDbDisabled;
     const isPopupDbEnabled = !isPopupDbDisabled;
 
+    const rawApkUrl = releaseData.apkUrl || DEFAULT_RELEASE_CONFIG.apkUrl;
+    const cleanApkUrl =
+      rawApkUrl.includes("axivon/axivon-mobile") || rawApkUrl.includes("axivon-test.apk") || rawApkUrl.includes("github.com")
+        ? DEFAULT_RELEASE_CONFIG.apkUrl
+        : rawApkUrl;
+
     return {
       enabled: envEnabled && isMasterDbEnabled,
       popupEnabled: isPopupDbEnabled,
       latestVersion: releaseData.latestVersion || DEFAULT_RELEASE_CONFIG.latestVersion,
       minVersion: releaseData.minVersion || DEFAULT_RELEASE_CONFIG.minVersion,
-      apkUrl: releaseData.apkUrl || DEFAULT_RELEASE_CONFIG.apkUrl,
+      apkUrl: cleanApkUrl,
       sha256: releaseData.sha256 || DEFAULT_RELEASE_CONFIG.sha256,
       sizeMb: releaseData.sizeMb || DEFAULT_RELEASE_CONFIG.sizeMb,
       notes: releaseData.notes || DEFAULT_RELEASE_CONFIG.notes,
@@ -77,11 +83,17 @@ export async function updateAppReleaseConfig(
 ): Promise<AppReleaseConfig> {
   const current = await getAppReleaseConfig();
 
+  const desiredApkUrl = updates.apkUrl ?? current.apkUrl;
+  const cleanApkUrl =
+    desiredApkUrl && (desiredApkUrl.includes("axivon/axivon-mobile") || desiredApkUrl.includes("axivon-test.apk") || desiredApkUrl.includes("github.com"))
+      ? DEFAULT_RELEASE_CONFIG.apkUrl
+      : desiredApkUrl;
+
   // 1. Update app.release key
   const updatedData: Partial<AppReleaseConfig> = {
     latestVersion: updates.latestVersion ?? current.latestVersion,
     minVersion: updates.minVersion ?? current.minVersion,
-    apkUrl: updates.apkUrl ?? current.apkUrl,
+    apkUrl: cleanApkUrl,
     sha256: updates.sha256 ?? current.sha256,
     sizeMb: updates.sizeMb ?? current.sizeMb,
     notes: updates.notes ?? current.notes,

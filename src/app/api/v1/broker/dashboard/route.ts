@@ -2,12 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireBroker, apiSuccess, handleApiError } from "@/lib/api/broker";
 
+const brokerDashCache = new Map<string, { data: any; expiresAt: number }>();
+
+export function invalidateBrokerDashboardCache(brokerId?: string) {
+  if (brokerId) brokerDashCache.delete(brokerId);
+  else brokerDashCache.clear();
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { brokerProfile, session } = await requireBroker(req);
     const userId = session.userId;
     const brokerId = brokerProfile.id;
     const referralCode = brokerProfile.referralCode;
+
+    const isFresh = req.nextUrl.searchParams.get("fresh") === "1";
+    const nowMs = Date.now();
+    const cached = brokerDashCache.get(brokerId);
+    if (!isFresh && cached && cached.expiresAt > nowMs) {
+      return apiSuccess(cached.data);
+    }
 
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -230,7 +244,7 @@ export async function GET(req: NextRequest) {
     const protocol = req.headers.get("x-forwarded-proto") || "https";
     const baseUrl = `${protocol}://${host}`;
 
-    return apiSuccess({
+    const payload = {
       profile: {
         id: brokerProfile.id,
         partnerId: brokerProfile.partnerId,
@@ -283,7 +297,11 @@ export async function GET(req: NextRequest) {
         projectName: m.partnerProject?.projectName,
       })),
       recentActivity: recentActivities,
-    });
+    };
+
+    brokerDashCache.set(brokerId, { data: payload, expiresAt: Date.now() + 30_000 });
+
+    return apiSuccess(payload);
   } catch (error) {
     return handleApiError(error);
   }

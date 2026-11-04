@@ -10,11 +10,11 @@ export interface SessionPayload {
   mustChangePassword?: boolean;
 }
 
-export async function signSession(payload: SessionPayload): Promise<string> {
+export async function signSession(payload: SessionPayload, expiresIn = "30d"): Promise<string> {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("24h")
+    .setExpirationTime(expiresIn)
     .sign(secretKey);
 }
 

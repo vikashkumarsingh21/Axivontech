@@ -13,11 +13,15 @@ import {
   ShieldCheck,
   AlertCircle,
   Key,
-  Send,
   Loader2,
   ExternalLink,
+  User,
+  Phone,
+  MapPin,
+  FileText,
+  ShieldAlert,
 } from "lucide-react";
-import { generateStrongPassword, validatePasswordStrength } from "@/lib/auth/password";
+import { generateStrongPassword, validatePasswordStrength } from "@/lib/auth/password-utils";
 import { toast } from "@/lib/notifications/toast";
 import { getErrorMessage } from "@/lib/errors/client";
 
@@ -29,6 +33,10 @@ interface CreatePartnerLoginModalProps {
     applicationId: string;
     fullName: string;
     email: string;
+    phone?: string;
+    city?: string;
+    state?: string;
+    country?: string;
     status: string;
     occupation?: string;
   } | null;
@@ -55,6 +63,7 @@ export function CreatePartnerLoginModal({
   const [email, setEmail] = useState("");
   const [emailChecking, setEmailChecking] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [emailConflictType, setEmailConflictType] = useState<string>("NONE");
 
   const [mode, setMode] = useState<"GENERATE" | "MANUAL" | "ACTIVATION_LINK">("GENERATE");
   const [generatedPassword, setGeneratedPassword] = useState("");
@@ -73,15 +82,19 @@ export function CreatePartnerLoginModal({
   const [credentials, setCredentials] = useState<{
     loginUrl: string;
     email: string;
+    name: string;
     password?: string | null;
     partnerId: string;
     referralCode: string;
+    applicationId: string;
     mode: string;
+    mustChangePassword: boolean;
     activationLink?: string | null;
+    emailConfigured?: boolean;
   } | null>(null);
 
-  const [copiedAll, setCopiedAll] = useState(false);
-  const [copiedPass, setCopiedPass] = useState(false);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
   // Initialize modal state when application changes
@@ -89,10 +102,11 @@ export function CreatePartnerLoginModal({
     if (application) {
       setEmail(application.email || "");
       setEmailError("");
+      setEmailConflictType("NONE");
       setError("");
       setCredentials(null);
-      setCopiedAll(false);
-      setCopiedPass(false);
+      setCopiedKey(null);
+      setEmailSending(false);
       setEmailSent(false);
       setMode("GENERATE");
       setGeneratedPassword(generateStrongPassword(14));
@@ -104,32 +118,36 @@ export function CreatePartnerLoginModal({
     }
   }, [application]);
 
-  const currentApplicationEmail = application?.email;
-
   // Live email duplicate check with debounce
-  const checkEmail = useCallback(async (testEmail: string) => {
-    if (!testEmail || !testEmail.includes("@")) return;
-    try {
-      setEmailChecking(true);
-      const res = await fetch(
-        `/api/v1/admin/business-partner/applications/check-email?email=${encodeURIComponent(
-          testEmail.trim()
-        )}`
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to verify email");
+  const checkEmail = useCallback(
+    async (testEmail: string) => {
+      if (!testEmail || !testEmail.includes("@")) return;
+      try {
+        setEmailChecking(true);
+        const appIdParam = application?.id ? `&applicationId=${encodeURIComponent(application.id)}` : "";
+        const res = await fetch(
+          `/api/v1/admin/business-partner/applications/check-email?email=${encodeURIComponent(
+            testEmail.trim()
+          )}${appIdParam}`
+        );
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to verify email");
 
-      if (data.exists && data.user?.email?.toLowerCase() !== currentApplicationEmail?.toLowerCase()) {
-        setEmailError(`Email is already in use by ${data.user?.name || "another user"}.`);
-      } else {
-        setEmailError("");
+        setEmailConflictType(data.conflictType || "NONE");
+
+        if (!data.canProceed && data.message) {
+          setEmailError(data.message);
+        } else {
+          setEmailError("");
+        }
+      } catch {
+        // Network errors on pre-check are non-fatal
+      } finally {
+        setEmailChecking(false);
       }
-    } catch {
-      // Ignore network errors on check
-    } finally {
-      setEmailChecking(false);
-    }
-  }, [currentApplicationEmail]);
+    },
+    [application?.id]
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -137,6 +155,7 @@ export function CreatePartnerLoginModal({
         checkEmail(email);
       } else {
         setEmailError("");
+        setEmailConflictType("NONE");
       }
     }, 400);
     return () => clearTimeout(timer);
@@ -144,7 +163,7 @@ export function CreatePartnerLoginModal({
 
   if (!isOpen || !application) return null;
 
-  // Validation
+  // Manual Password Validation Rules
   const manualValidation = validatePasswordStrength(manualPassword);
   const isManualValid = manualValidation.isValid && manualPassword === confirmPassword;
   const isSubmitDisabled =
@@ -159,7 +178,6 @@ export function CreatePartnerLoginModal({
 
   const handleClose = () => {
     if (loading) return;
-    // Clear credentials from memory
     setCredentials(null);
     onClose();
   };
@@ -182,6 +200,7 @@ export function CreatePartnerLoginModal({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: email.trim(),
+            loginEmail: email.trim(),
             mode: apiMode,
             password: apiMode === "DIRECT_PASSWORD" ? activePassword : undefined,
             mustChangePassword,
@@ -191,23 +210,32 @@ export function CreatePartnerLoginModal({
         }
       );
 
-      const data = await res.json();
+      const json = await res.json();
       if (!res.ok) {
-        throw new Error(getErrorMessage(data) || "Failed to create partner account");
+        throw new Error(getErrorMessage(json) || "Failed to create partner account");
       }
 
+      const accountData = json.data || {};
       setCredentials({
-        loginUrl: data.data?.loginUrl || `${window.location.origin}/login`,
-        email: data.data?.email || email.trim(),
-        password: data.data?.oneTimePassword || (apiMode === "DIRECT_PASSWORD" ? activePassword : null),
-        partnerId: data.data?.partnerId,
-        referralCode: data.data?.referralCode,
+        loginUrl: accountData.loginUrl || `${window.location.origin}/login`,
+        email: accountData.email || email.trim(),
+        name: accountData.name || application.fullName,
+        password: accountData.oneTimePassword || (apiMode === "DIRECT_PASSWORD" ? activePassword : null),
+        partnerId: accountData.partnerId,
+        referralCode: accountData.referralCode,
+        applicationId: accountData.applicationId || application.applicationId,
         mode: apiMode,
-        activationLink: data.data?.activationLink,
+        mustChangePassword: accountData.mustChangePassword ?? mustChangePassword,
+        activationLink: accountData.activationLink,
+        emailConfigured: !!accountData.emailConfigured,
       });
 
       onSuccess();
-      toast.success("Broker account created successfully!");
+      toast.success(
+        accountData.isExisting
+          ? "Partner profile linked to existing account."
+          : "Broker partner account created successfully!"
+      );
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
@@ -215,47 +243,66 @@ export function CreatePartnerLoginModal({
     }
   };
 
+  const handleCopy = async (text: string, key: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedKey(key);
+      toast.success(`${label} copied to clipboard.`);
+      setTimeout(() => setCopiedKey(null), 2500);
+    } catch {
+      toast.error(`Failed to copy ${label.toLowerCase()}.`);
+    }
+  };
+
   const handleCopyCredentials = () => {
     if (!credentials) return;
     const textBlock = [
-      `Axivon Technologies — Broker Partner Login Credentials`,
-      `----------------------------------------------------`,
+      `AXIVON TECHNOLOGIES — BUSINESS PARTNER LOGIN CREDENTIALS`,
+      `======================================================`,
+      `Partner Name: ${credentials.name}`,
+      `Application ID: ${credentials.applicationId}`,
       `Partner ID: ${credentials.partnerId}`,
       `Referral Code: ${credentials.referralCode}`,
       `Login URL: ${credentials.loginUrl}`,
-      `Username / Email: ${credentials.email}`,
+      `Login ID (Email): ${credentials.email}`,
       credentials.password ? `Temporary Password: ${credentials.password}` : ``,
-      `Security Note: You will be prompted to change your password upon first login.`,
+      credentials.activationLink ? `Activation Link: ${credentials.activationLink}` : ``,
+      `Account Status: ACTIVE ${credentials.mustChangePassword ? "(PASSWORD CHANGE REQUIRED)" : ""}`,
+      `Security Notice: Please replace your temporary password upon first sign-in.`,
     ]
       .filter(Boolean)
       .join("\n");
 
-    navigator.clipboard.writeText(textBlock);
-    setCopiedAll(true);
-    toast.success("Credentials formatted block copied to clipboard.");
-    setTimeout(() => setCopiedAll(false), 3000);
-  };
-
-  const handleCopyPasswordOnly = () => {
-    if (!credentials?.password) return;
-    navigator.clipboard.writeText(credentials.password);
-    setCopiedPass(true);
-    toast.success("Password copied to clipboard.");
-    setTimeout(() => setCopiedPass(false), 3000);
+    handleCopy(textBlock, "all", "Full credential details");
   };
 
   const handleSendEmail = async () => {
+    if (!credentials || !credentials.emailConfigured) return;
     try {
+      setEmailSending(true);
+      const res = await fetch(`/api/v1/admin/brokers/${credentials.partnerId}/actions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "resend_activation",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to dispatch email");
       setEmailSent(true);
-      toast.success(`Login credentials dispatched to ${credentials?.email}`);
-    } catch {
-      toast.error("Failed to trigger email.");
+      toast.success(`Activation details emailed to ${credentials.email}`);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
+    } finally {
+      setEmailSending(false);
     }
   };
 
+  const isApproved = application.status === "APPROVED";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#141414] border border-white/10 rounded-2xl w-full max-w-lg p-6 space-y-5 shadow-2xl relative max-h-[calc(100dvh-2rem)] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-[#141416] border border-white/10 rounded-2xl w-full max-w-xl p-5 sm:p-6 space-y-5 shadow-2xl relative max-h-[calc(100dvh-2rem)] overflow-y-auto">
         {/* Top Header */}
         <div className="flex items-start justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-3">
@@ -265,84 +312,132 @@ export function CreatePartnerLoginModal({
             <div>
               <h2 className="text-base font-bold text-white">
                 {credentials
-                  ? "Login Credentials Created"
-                  : application.status === "APPROVED"
+                  ? "Partner Account Created Successfully"
+                  : isApproved
                   ? "Create Broker Login"
                   : "Approve & Create Login"}
               </h2>
               <p className="text-xs text-gray-400">
-                {application.fullName} ({application.applicationId})
+                {application.fullName} • <span className="font-mono">{application.applicationId}</span>
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={handleClose}
-            className="text-gray-500 hover:text-white transition-colors"
+            className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {error && (
-          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
-        {/* ── SUCCESS VIEW: ONE-TIME REVEAL PANEL ── */}
+        {/* ── SUCCESS VIEW: ONE-TIME REVEAL PANEL (PHASE 4) ── */}
         {credentials ? (
           <div className="space-y-4 animate-in fade-in duration-200">
-            <div className="p-4 rounded-xl bg-[#C2A878]/10 border border-[#C2A878]/20 text-xs text-[#C2A878] flex items-start gap-2.5">
-              <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 flex items-start gap-2.5">
+              <ShieldCheck className="w-5 h-5 shrink-0 text-emerald-400 mt-0.5" />
               <div>
-                <strong className="block font-semibold mb-0.5">Important Security Notice</strong>
+                <strong className="block font-semibold text-white mb-0.5">
+                  Partner Account Active & Ready for Sign-in
+                </strong>
                 <span>
-                  This password is shown only once and cannot be retrieved later. Please copy or send
-                  these credentials now.
+                  The applicant can now log in using their registered email as the Login ID. For security,
+                  the temporary password is shown only now and will not be displayed again.
                 </span>
               </div>
             </div>
 
+            {/* Credentials Card */}
             <div className="bg-[#18181b] border border-white/10 rounded-xl p-4 space-y-3 text-xs">
               <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="text-gray-400">Login URL:</span>
+                <span className="text-gray-400 font-medium">Partner Name:</span>
+                <span className="text-white font-semibold">{credentials.name}</span>
+              </div>
+
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="text-gray-400 font-medium">Login URL:</span>
                 <a
                   href={credentials.loginUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-emerald-400 hover:underline flex items-center gap-1"
+                  className="font-mono text-emerald-400 hover:underline flex items-center gap-1 font-medium"
                 >
                   {credentials.loginUrl} <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
 
               <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="text-gray-400">Login Email:</span>
-                <span className="font-mono text-white font-medium">{credentials.email}</span>
+                <span className="text-gray-400 font-medium">Login ID (Registered Email):</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-white font-semibold">{credentials.email}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(credentials.email, "email", "Login ID")}
+                    className="p-1 text-gray-400 hover:text-white"
+                    title="Copy Login ID"
+                  >
+                    {copiedKey === "email" ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               {credentials.password ? (
                 <div className="flex justify-between items-center py-1 border-b border-white/5">
-                  <span className="text-gray-400">Password:</span>
+                  <span className="text-gray-400 font-medium">Temporary Password:</span>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-amber-300 font-bold tracking-wider">
+                    <span className="font-mono text-amber-300 font-bold tracking-wider text-sm bg-black/40 px-2.5 py-1 rounded border border-white/10">
                       {showPassword ? credentials.password : "••••••••••••••••"}
                     </span>
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="p-1 text-gray-400 hover:text-white"
-                      title={showPassword ? "Hide password" : "Reveal password"}
+                      title={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(credentials.password!, "password", "Password")}
+                      className="p-1 text-gray-400 hover:text-white"
+                      title="Copy Password"
+                    >
+                      {copiedKey === "password" ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
                     </button>
                   </div>
                 </div>
               ) : credentials.activationLink ? (
                 <div className="py-1 border-b border-white/5 space-y-1">
-                  <span className="text-gray-400">Activation Link:</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 font-medium">Activation Link:</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(credentials.activationLink!, "link", "Activation Link")}
+                      className="text-gray-400 hover:text-white text-[11px] flex items-center gap-1"
+                    >
+                      {copiedKey === "link" ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                      <span>Copy Link</span>
+                    </button>
+                  </div>
                   <p className="font-mono text-[11px] text-gray-300 break-all bg-black/40 p-2 rounded border border-white/5">
                     {credentials.activationLink}
                   </p>
@@ -350,66 +445,148 @@ export function CreatePartnerLoginModal({
               ) : null}
 
               <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="text-gray-400">Partner ID:</span>
+                <span className="text-gray-400 font-medium">Account Status:</span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  ACTIVE • {credentials.mustChangePassword ? "PASSWORD CHANGE REQUIRED" : "ACTIVE"}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="text-gray-400 font-medium">Partner ID:</span>
                 <span className="font-mono text-white font-semibold">{credentials.partnerId}</span>
               </div>
 
               <div className="flex justify-between items-center py-1">
-                <span className="text-gray-400">Referral Code:</span>
+                <span className="text-gray-400 font-medium">Referral Code:</span>
                 <span className="font-mono text-[#C2A878] font-bold">{credentials.referralCode}</span>
               </div>
             </div>
 
-            {/* Action Buttons for Credentials */}
-            <div className="grid grid-cols-2 gap-2 pt-2">
+            {/* Outbound Email Status Notification (Truthful handling - Phase 4) */}
+            {credentials.emailConfigured ? (
+              <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs flex items-center justify-between">
+                <span>Email service is active. You can send activation details directly.</span>
+                <button
+                  type="button"
+                  disabled={emailSending || emailSent}
+                  onClick={handleSendEmail}
+                  className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-medium flex items-center gap-1 transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>{emailSent ? "Email Sent" : emailSending ? "Sending..." : "Send Email"}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-start gap-2">
+                <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+                <div className="space-y-0.5">
+                  <span className="font-semibold block text-white">Outbound Email Service Not Configured</span>
+                  <span>
+                    No external email service (Resend or Webhook) is connected. Please copy the login
+                    credentials below and share them manually with the partner.
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Quick Action Buttons for Credentials */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
               <button
                 type="button"
-                onClick={handleCopyCredentials}
-                className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                onClick={() => handleCopy(credentials.email, "email_btn", "Login ID")}
+                className="px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
               >
-                {copiedAll ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedAll ? "Copied All!" : "Copy Credentials"}</span>
+                {copiedKey === "email_btn" ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+                <span>Copy Login ID</span>
               </button>
 
               {credentials.password && (
                 <button
                   type="button"
-                  onClick={handleCopyPasswordOnly}
-                  className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                  onClick={() => handleCopy(credentials.password!, "pass_btn", "Password")}
+                  className="px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                 >
-                  {copiedPass ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Key className="w-3.5 h-3.5" />}
-                  <span>{copiedPass ? "Password Copied!" : "Copy Password"}</span>
+                  {copiedKey === "pass_btn" ? (
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  ) : (
+                    <Key className="w-3.5 h-3.5" />
+                  )}
+                  <span>Copy Password</span>
                 </button>
               )}
-            </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-white/10">
               <button
                 type="button"
-                onClick={handleSendEmail}
-                disabled={emailSent}
-                className="text-xs text-gray-400 hover:text-white flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                onClick={handleCopyCredentials}
+                className="px-3 py-2.5 rounded-xl bg-[#C2A878]/15 hover:bg-[#C2A878]/25 border border-[#C2A878]/30 text-[#E5D2A6] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
               >
-                <Mail className="w-3.5 h-3.5" />
-                <span>{emailSent ? "Email Sent to Broker" : "Send Email to Broker"}</span>
+                {copiedKey === "all" ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+                <span>Copy All Details</span>
               </button>
+            </div>
 
+            <div className="flex items-center justify-end pt-3 border-t border-white/10">
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20 transition-colors"
+                className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20 transition-colors"
               >
                 Done
               </button>
             </div>
           </div>
         ) : (
-          /* ── FORM VIEW: CREATE LOGIN CONFIGURATION ── */
+          /* ── FORM VIEW: APPLICANT REVIEW & ACCOUNT PROVISIONING ── */
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-            {/* Email Field */}
+            {/* Applicant Information Summary (Phase 2 & Phase 3) */}
+            <div className="bg-[#18181b] border border-white/10 rounded-xl p-3.5 space-y-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 block mb-1">
+                Applicant Information
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-300 text-xs">
+                <div className="flex items-center gap-2">
+                  <User className="w-3.5 h-3.5 text-[#C2A878]" />
+                  <span className="text-white font-medium">{application.fullName}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5 text-gray-400" />
+                  <span className="font-mono text-gray-200">{application.email}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5 text-gray-400" />
+                  <span>{application.phone || "No phone provided"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                  <span>
+                    {application.city || "N/A"}, {application.country || "India"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileText className="w-3.5 h-3.5 text-gray-400" />
+                  <span>Status: <strong className="text-white">{application.status.replace(/_/g, " ")}</strong></span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Key className="w-3.5 h-3.5 text-gray-400" />
+                  <span>Type: {application.occupation || "Broker Partner"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Login Email Field & Notice */}
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="font-semibold text-gray-300">Login Email</label>
+                <label className="font-semibold text-gray-300">
+                  Login ID (Registered Email)
+                </label>
                 {emailChecking && <span className="text-[10px] text-gray-400">Verifying...</span>}
               </div>
               <input
@@ -417,24 +594,32 @@ export function CreatePartnerLoginModal({
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="broker@example.com"
-                className={`w-full bg-[#18181b] border rounded-xl px-3 py-2 text-white focus:outline-none ${
+                placeholder="partner@example.com"
+                className={`w-full bg-[#18181b] border rounded-xl px-3.5 py-2.5 text-white focus:outline-none ${
                   emailError ? "border-red-500" : "border-white/10 focus:border-[#C2A878]/50"
                 }`}
               />
-              {emailError && <p className="text-[11px] text-red-400 mt-1">{emailError}</p>}
+              <p className="text-[11px] text-gray-400 mt-1">
+                The partner will use this registered email address to log in to the Broker Portal.
+              </p>
+              {emailError && (
+                <div className="mt-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[11px] flex items-start gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  <span>{emailError}</span>
+                </div>
+              )}
             </div>
 
-            {/* Mode Selector Tabs */}
+            {/* Password Provisioning Mode Selector */}
             <div>
-              <label className="font-semibold text-gray-300 block mb-1.5">Password Provisioning</label>
+              <label className="font-semibold text-gray-300 block mb-1.5">Temporary Password Creation</label>
               <div className="grid grid-cols-3 gap-1.5 bg-[#18181b] p-1 rounded-xl border border-white/10">
                 <button
                   type="button"
                   onClick={() => setMode("GENERATE")}
                   className={`py-1.5 rounded-lg font-medium text-[11px] transition-colors ${
                     mode === "GENERATE"
-                      ? "bg-[#C2A878] text-black shadow-sm"
+                      ? "bg-[#C2A878] text-black shadow-sm font-semibold"
                       : "text-gray-400 hover:text-white"
                   }`}
                 >
@@ -445,7 +630,7 @@ export function CreatePartnerLoginModal({
                   onClick={() => setMode("MANUAL")}
                   className={`py-1.5 rounded-lg font-medium text-[11px] transition-colors ${
                     mode === "MANUAL"
-                      ? "bg-[#C2A878] text-black shadow-sm"
+                      ? "bg-[#C2A878] text-black shadow-sm font-semibold"
                       : "text-gray-400 hover:text-white"
                   }`}
                 >
@@ -456,7 +641,7 @@ export function CreatePartnerLoginModal({
                   onClick={() => setMode("ACTIVATION_LINK")}
                   className={`py-1.5 rounded-lg font-medium text-[11px] transition-colors ${
                     mode === "ACTIVATION_LINK"
-                      ? "bg-[#C2A878] text-black shadow-sm"
+                      ? "bg-[#C2A878] text-black shadow-sm font-semibold"
                       : "text-gray-400 hover:text-white"
                   }`}
                 >
@@ -465,7 +650,7 @@ export function CreatePartnerLoginModal({
               </div>
             </div>
 
-            {/* Mode A: Generated Password Display */}
+            {/* Mode A: Generated Strong Password */}
             {mode === "GENERATE" && (
               <div className="p-3 bg-white/[0.02] border border-white/10 rounded-xl space-y-2">
                 <div className="flex items-center justify-between">
@@ -473,7 +658,7 @@ export function CreatePartnerLoginModal({
                   <button
                     type="button"
                     onClick={handleRegeneratePassword}
-                    className="text-[#C2A878] hover:underline text-[11px] flex items-center gap-1"
+                    className="text-[#C2A878] hover:underline text-[11px] flex items-center gap-1 font-medium"
                   >
                     <RefreshCw className="w-3 h-3" /> Regenerate
                   </button>
@@ -495,7 +680,7 @@ export function CreatePartnerLoginModal({
                   </button>
                 </div>
                 <p className="text-[10px] text-gray-500">
-                  14 characters, cryptographically secure. Excludes ambiguous symbols (0, O, 1, l).
+                  14 characters cryptographically secure. Excludes ambiguous symbols for easy transcription.
                 </p>
               </div>
             )}
@@ -505,7 +690,7 @@ export function CreatePartnerLoginModal({
               <div className="space-y-2.5">
                 <div>
                   <label className="text-[11px] font-semibold text-gray-300 block mb-1">
-                    Enter Password
+                    Enter Temporary Password
                   </label>
                   <div className="relative">
                     <input
@@ -527,13 +712,13 @@ export function CreatePartnerLoginModal({
 
                 <div>
                   <label className="text-[11px] font-semibold text-gray-300 block mb-1">
-                    Confirm Password
+                    Confirm Temporary Password
                   </label>
                   <input
                     type={showPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Re-type password"
+                    placeholder="Re-type password to verify"
                     className="w-full bg-[#18181b] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C2A878]/50"
                   />
                   {confirmPassword && manualPassword !== confirmPassword && (
@@ -543,11 +728,7 @@ export function CreatePartnerLoginModal({
 
                 {/* Password Rules checklist */}
                 <div className="p-2.5 bg-black/40 border border-white/5 rounded-lg space-y-1 text-[10px]">
-                  <div
-                    className={
-                      manualPassword.length >= 10 ? "text-emerald-400" : "text-gray-500"
-                    }
-                  >
+                  <div className={manualPassword.length >= 10 ? "text-emerald-400" : "text-gray-500"}>
                     • Minimum 10 characters ({manualPassword.length}/10)
                   </div>
                   <div
@@ -557,7 +738,7 @@ export function CreatePartnerLoginModal({
                         : "text-gray-500"
                     }
                   >
-                    • Uppercase and lowercase letters
+                    • Both uppercase and lowercase letters
                   </div>
                   <div
                     className={
@@ -575,13 +756,13 @@ export function CreatePartnerLoginModal({
             {/* Mode C: Activation Link Notice */}
             {mode === "ACTIVATION_LINK" && (
               <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-blue-300 text-[11px] leading-relaxed">
-                A single-use, 48-hour activation link will be generated and emailed to{" "}
-                <strong className="text-white">{email}</strong>. The broker can set their own password
-                upon clicking the link.
+                A single-use, 48-hour activation link will be generated for{" "}
+                <strong className="text-white">{email}</strong>. The partner can choose their own password
+                upon visiting the link.
               </div>
             )}
 
-            {/* Checkbox: Force Password Change */}
+            {/* Mandatory First Login Password Change Flag */}
             {mode !== "ACTIVATION_LINK" && (
               <label className="flex items-center gap-2 cursor-pointer pt-1">
                 <input
@@ -591,14 +772,14 @@ export function CreatePartnerLoginModal({
                   className="rounded border-white/20 bg-white/5 text-[#C2A878] focus:ring-0 focus:outline-none"
                 />
                 <span className="text-gray-300 text-[11px]">
-                  Require password change at first login (recommended)
+                  Require password change at first login (mandatory security recommendation)
                 </span>
               </label>
             )}
 
-            {/* Partner Type Selector */}
+            {/* Partner Designation / Type */}
             <div>
-              <label className="font-semibold text-gray-300 block mb-1">Partner Type</label>
+              <label className="font-semibold text-gray-300 block mb-1">Partner Designation / Role</label>
               <select
                 value={partnerType}
                 onChange={(e) => setPartnerType(e.target.value)}
@@ -612,7 +793,7 @@ export function CreatePartnerLoginModal({
               </select>
             </div>
 
-            {/* Internal Note */}
+            {/* Internal Administrative Note */}
             <div>
               <label className="font-semibold text-gray-300 block mb-1">
                 Internal Administrative Note <span className="text-gray-500">(Optional)</span>
@@ -621,12 +802,12 @@ export function CreatePartnerLoginModal({
                 rows={2}
                 value={internalNote}
                 onChange={(e) => setInternalNote(e.target.value)}
-                placeholder="e.g. Approved following intro meeting with Channel Lead."
+                placeholder="e.g. Approved following intro meeting with Partner Operations."
                 className="w-full bg-[#18181b] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none"
               />
             </div>
 
-            {/* Modal Actions */}
+            {/* Dialog Action Buttons */}
             <div className="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
               <button
                 type="button"
@@ -645,10 +826,10 @@ export function CreatePartnerLoginModal({
                 {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>
                   {mode === "ACTIVATION_LINK"
-                    ? "Send Activation Link"
-                    : application.status === "APPROVED"
-                    ? "Create Login"
-                    : "Approve & Create Login"}
+                    ? "Generate Activation Link"
+                    : isApproved
+                    ? "Create Account & Login"
+                    : "Approve & Create Account"}
                 </span>
               </button>
             </div>

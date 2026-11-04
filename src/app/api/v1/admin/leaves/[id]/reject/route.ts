@@ -71,6 +71,32 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
       }).catch(() => {});
     }
 
+    if (leave.user?.email) {
+      try {
+        const { sendTransactionalEmail } = await import("@/lib/email/service");
+        await sendTransactionalEmail({
+          to: leave.user.email,
+          templateKey: "LEAVE_REJECTED",
+          eventKey: `leave_rejected:${leave.id}`,
+          variables: {
+            employeeName: leave.user.name,
+            leaveType: leave.leaveType,
+            startDate: new Date(leave.startDate).toLocaleDateString(),
+            endDate: new Date(leave.endDate).toLocaleDateString(),
+            managerName: "Administrator",
+            reason,
+          },
+          metadata: {
+            leaveId: leave.id,
+            userId: leave.userId,
+            action: "REJECTED",
+          },
+        });
+      } catch (e) {
+        console.warn("[LeaveReject] Failed to dispatch leave rejection email:", e);
+      }
+    }
+
     return NextResponse.json({ success: true, leave: updated });
   } catch (error: any) {
     return handleApiError(error);

@@ -70,6 +70,25 @@ export async function POST(req: NextRequest) {
       });
     });
 
+    // Dispatch Security Notification via Centralized Email Service
+    try {
+      const { sendTransactionalEmail } = await import("@/lib/email/service");
+      await sendTransactionalEmail({
+        to: user.email,
+        templateKey: "PASSWORD_CHANGED",
+        eventKey: `password_changed:${user.id}:${Date.now()}`,
+        variables: {
+          name: user.name,
+        },
+        metadata: {
+          userId: user.id,
+          type: "SECURITY_PASSWORD_CHANGED",
+        },
+      });
+    } catch (emailErr) {
+      console.warn("[PasswordChange] Failed to dispatch security alert email:", emailErr);
+    }
+
     // Re-sign session with mustChangePassword = false
     const newSessionToken = await signSession({
       userId: user.id,

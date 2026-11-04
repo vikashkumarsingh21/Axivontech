@@ -165,16 +165,37 @@ export async function POST(req: Request) {
       },
     });
 
-    // Enqueue verification email
-    await JobRunner.enqueue("SEND_EMAIL", {
-      to: application.email,
-      templateKey: "PARTNER_APPLICATION_RECEIVED",
-      variables: {
-        name: application.fullName,
-        applicationId: application.applicationId,
-        verificationLink: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/v1/public/business-partner/applications/verify?token=${verificationToken}`,
-      },
-    });
+    // Dispatch Automated Transactional Emails (Internal alert + Applicant acknowledgement)
+    try {
+      const { getEmailConfig } = await import("@/lib/email/config");
+      const emailConfig = getEmailConfig();
+
+      // 1. Internal Notification to axivontech.in@gmail.com
+      await JobRunner.enqueue("SEND_EMAIL", {
+        to: emailConfig.internalNotificationEmail,
+        templateKey: "PARTNER_APPLICATION_RECEIVED",
+        eventKey: `bpa_internal:${application.applicationId}`,
+        variables: {
+          name: application.fullName,
+          applicationId: application.applicationId,
+          occupation: data.occupation,
+        },
+      });
+
+      // 2. Acknowledgement to Applicant with Reference ID
+      await JobRunner.enqueue("SEND_EMAIL", {
+        to: application.email,
+        templateKey: "PARTNER_APPLICATION_ACK",
+        eventKey: `bpa_ack:${application.applicationId}`,
+        variables: {
+          name: application.fullName,
+          applicationId: application.applicationId,
+          verificationLink: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/v1/public/business-partner/applications/verify?token=${verificationToken}`,
+        },
+      });
+    } catch (queueErr) {
+      console.warn("[Partner Application] Email dispatch warning:", queueErr);
+    }
 
     // Create initial status history
     await db.applicationStatusHistory.create({

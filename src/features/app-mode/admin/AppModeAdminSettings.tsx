@@ -319,14 +319,14 @@ export function AppModeAdminSettings() {
 
             <div className="md:col-span-2">
               <label className="block text-xs font-medium text-neutral-300 mb-1.5">
-                APK Download URL (GitHub Releases Asset URL)
+                APK Download URL or Local Path
               </label>
               <div className="flex gap-2">
                 <input
-                  type="url"
+                  type="text"
                   value={config.apkUrl}
                   onChange={(e) => setConfig({ ...config, apkUrl: e.target.value })}
-                  placeholder="https://github.com/axivon/axivon-mobile/releases/download/v1.0.0/axivon-app.apk"
+                  placeholder="/downloads/axivon-app.apk"
                   className="w-full h-11 px-3.5 rounded-lg bg-[#0E1116] border border-white/10 text-white text-sm focus:border-emerald-500 focus:outline-none font-mono text-xs"
                   required
                 />
@@ -342,6 +342,9 @@ export function AppModeAdminSettings() {
                   </a>
                 )}
               </div>
+              <span className="text-[11px] text-neutral-500 mt-1 block">
+                Direct local download: <code className="text-emerald-400">/downloads/axivon-app.apk</code> (recommended). External CDN URLs also accepted.
+              </span>
             </div>
 
             <div>

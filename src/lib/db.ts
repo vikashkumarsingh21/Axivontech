@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { env } from "./env";
 
 const prismaClientSingleton = () => {
   return new PrismaClient();
@@ -11,4 +10,5 @@ declare global {
 
 export const db = globalThis.prismaGlobal ?? prismaClientSingleton();
 
-if (env.NODE_ENV !== "production") globalThis.prismaGlobal = db;
+// Re-use connection pool across warm serverless lambdas and dev server restarts
+globalThis.prismaGlobal = db;

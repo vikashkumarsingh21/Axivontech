@@ -76,6 +76,31 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
       }).catch(() => {});
     }
 
+    if (leave.user?.email) {
+      try {
+        const { sendTransactionalEmail } = await import("@/lib/email/service");
+        await sendTransactionalEmail({
+          to: leave.user.email,
+          templateKey: "LEAVE_APPROVED",
+          eventKey: `leave_approved:${leave.id}`,
+          variables: {
+            employeeName: leave.user.name,
+            leaveType: leave.leaveType,
+            startDate: new Date(leave.startDate).toLocaleDateString(),
+            endDate: new Date(leave.endDate).toLocaleDateString(),
+            managerName: "Administrator",
+          },
+          metadata: {
+            leaveId: leave.id,
+            userId: leave.userId,
+            action: "APPROVED",
+          },
+        });
+      } catch (e) {
+        console.warn("[LeaveApprove] Failed to dispatch leave approved email:", e);
+      }
+    }
+
     return NextResponse.json({ success: true, leave: updated });
   } catch (error: any) {
     return handleApiError(error);

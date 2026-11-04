@@ -69,18 +69,27 @@ export async function POST(
       return m;
     });
 
-    // Enqueue meeting email
-    await JobRunner.enqueue("SEND_EMAIL", {
-      to: application.email,
-      templateKey: "PARTNER_APPLICATION_MEETING",
-      variables: {
-        name: application.fullName,
-        applicationId: application.applicationId,
-        meetingDate: new Date(data.meetingDate).toLocaleString(),
-        meetingType: data.meetingType,
-        locationOrLink: data.locationOrLink || "TBD",
-      },
-    });
+    // Dispatch Partner Meeting Notification
+    try {
+      const { formatKolkataDateTime } = await import("@/lib/email/templates/base-layout");
+      const formattedDate = formatKolkataDateTime(new Date(data.meetingDate));
+
+      await JobRunner.enqueue("SEND_EMAIL", {
+        to: application.email,
+        templateKey: "PARTNER_MEETING_SCHEDULED",
+        eventKey: `meeting:${meeting.id}`,
+        variables: {
+          name: application.fullName,
+          applicationId: application.applicationId,
+          meetingDate: formattedDate,
+          meetingType: data.meetingType,
+          locationOrLink: data.locationOrLink || "Link to be provided prior to session",
+          instructions: data.notes || "Please have your business background and regional enterprise contacts ready for review.",
+        },
+      });
+    } catch (meetingEmailErr) {
+      console.warn("[Meeting API] Meeting email enqueue warning:", meetingEmailErr);
+    }
 
     return NextResponse.json(
       { message: "Meeting scheduled successfully", meeting },

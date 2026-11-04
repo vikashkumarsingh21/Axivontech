@@ -98,20 +98,26 @@ export async function POST(req: NextRequest) {
     const userRoleNames = user.userRoles.map((ur) => normalizeRole(ur.role.name));
     const role = ROLE_HIERARCHY.find((r) => userRoleNames.includes(r)) || userRoleNames[0] || "EMPLOYEE";
 
+    const sessionDays = 30; // 30-day persistent session
+    const sessionDurationMs = sessionDays * 24 * 60 * 60 * 1000;
+
     // Generate Session
-    const sessionToken = await signSession({
-      userId: user.id,
-      role: role,
-      sessionId: crypto.randomUUID(),
-      mustChangePassword,
-    });
+    const sessionToken = await signSession(
+      {
+        userId: user.id,
+        role: role,
+        sessionId: crypto.randomUUID(),
+        mustChangePassword,
+      },
+      `${sessionDays}d`
+    );
 
     // Create session record in database
     await db.session.create({
       data: {
         userId: user.id,
         token: sessionToken,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        expiresAt: new Date(Date.now() + sessionDurationMs),
       },
     });
 
@@ -153,7 +159,7 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       secure: isSecure,
       sameSite: "lax",
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: 60 * 60 * 24 * sessionDays, // 30 days persistent session
       path: "/",
     });
 

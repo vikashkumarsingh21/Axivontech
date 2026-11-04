@@ -2,7 +2,22 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Eye, Filter, Download, ChevronDown, FileSpreadsheet, UserPlus, ShieldAlert } from "lucide-react";
+import {
+  Search,
+  Eye,
+  Filter,
+  Download,
+  ChevronDown,
+  FileSpreadsheet,
+  UserPlus,
+  ShieldAlert,
+  CheckCircle2,
+  Lock,
+  Clock,
+  ShieldOff,
+  UserCheck,
+  ShieldCheck,
+} from "lucide-react";
 import { format } from "date-fns";
 import { ExportPartnersModal } from "@/components/admin/export/ExportPartnersModal";
 import { CreatePartnerLoginModal } from "@/components/admin/partner/CreatePartnerLoginModal";
@@ -250,20 +265,60 @@ export default function BusinessPartnerApplicationsPage() {
                           <span className={`inline-flex items-center px-2 py-1 rounded-sm text-[10px] font-semibold uppercase tracking-wider border ${getStatusColor(app.status)}`}>
                             {app.status.replace(/_/g, " ")}
                           </span>
-                          {app.status === "APPROVED" && !app.hasUsableLogin && (
-                            <span
-                              title="Application approved but partner has no active login credentials yet"
-                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30"
-                            >
-                              <ShieldAlert className="w-3 h-3 text-amber-400" />
-                              No login yet
-                            </span>
+                          {app.status === "APPROVED" && (
+                            <>
+                              {app.accountStatus === "ACTIVE" && (
+                                <span
+                                  title="Active Broker Account"
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+                                >
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                  Account: Active
+                                </span>
+                              )}
+                              {app.accountStatus === "PASSWORD_CHANGE_REQUIRED" && (
+                                <span
+                                  title="Account active, password change required at first login"
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/30"
+                                >
+                                  <Lock className="w-3 h-3 text-cyan-400" />
+                                  Password Setup Req.
+                                </span>
+                              )}
+                              {app.accountStatus === "CREATION_PENDING" && (
+                                <span
+                                  title="Activation link sent, pending partner verification"
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30"
+                                >
+                                  <Clock className="w-3 h-3 text-blue-400" />
+                                  Activation Pending
+                                </span>
+                              )}
+                              {app.accountStatus === "DISABLED" && (
+                                <span
+                                  title="Partner account is deactivated or suspended"
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-500/10 text-red-400 border border-red-500/30"
+                                >
+                                  <ShieldOff className="w-3 h-3 text-red-400" />
+                                  Account: Disabled
+                                </span>
+                              )}
+                              {(!app.accountStatus || app.accountStatus === "NOT_CREATED") && (
+                                <span
+                                  title="Application approved but partner has no active login credentials yet"
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30"
+                                >
+                                  <ShieldAlert className="w-3 h-3 text-amber-400" />
+                                  No login yet
+                                </span>
+                              )}
+                            </>
                           )}
                         </div>
                       </td>
                       <td className="p-4 text-right">
                         <div className="inline-flex items-center gap-2 justify-end">
-                          {app.status === "APPROVED" && !app.hasUsableLogin && (
+                          {app.status === "APPROVED" && (!app.accountStatus || app.accountStatus === "NOT_CREATED") && (
                             <button
                               onClick={() => setSelectedAppForLogin(app)}
                               className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 transition-colors"
@@ -273,13 +328,34 @@ export default function BusinessPartnerApplicationsPage() {
                               Create Login
                             </button>
                           )}
+                          {app.status === "APPROVED" && (app.accountStatus === "ACTIVE" || app.accountStatus === "PASSWORD_CHANGE_REQUIRED") && (
+                            <Link
+                              href={app.linkedUser?.brokerProfileId ? `/admin/crm/brokers/${app.linkedUser.brokerProfileId}` : `/admin/crm/brokers`}
+                              className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 transition-colors"
+                              title="View and manage active partner account dossier"
+                            >
+                              <UserCheck className="w-3 h-3 text-emerald-400" />
+                              Manage Account
+                            </Link>
+                          )}
+                          {app.status === "APPROVED" && app.accountStatus === "DISABLED" && (
+                            <Link
+                              href={app.linkedUser?.brokerProfileId ? `/admin/crm/brokers/${app.linkedUser.brokerProfileId}` : `/admin/crm/brokers`}
+                              className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-md bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors"
+                              title="Reactivate partner account"
+                            >
+                              <ShieldCheck className="w-3 h-3 text-red-400" />
+                              Reactivate Account
+                            </Link>
+                          )}
                           {app.status !== "APPROVED" && app.status !== "REJECTED" && (
                             <button
                               onClick={() => setSelectedAppForLogin(app)}
                               className="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 transition-colors"
                               title="Approve application and create login credentials"
                             >
-                              Approve & Login
+                              <UserPlus className="w-3 h-3" />
+                              Approve & Create Login
                             </button>
                           )}
                           <Link 

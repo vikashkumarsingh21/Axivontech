@@ -107,27 +107,55 @@ export async function POST(req: Request) {
         }).catch(() => {});
       }
 
-      // 3. Dispatch Email Notification
+      // 3. Dispatch Email Notifications (Centralized Transactional Automation)
       try {
-        const { EmailService } = await import("@/lib/email/service");
-        await EmailService.send({
-          to: process.env.COMPANY_CONTACT_EMAIL || "info@axivontech.in",
-          templateKey: "NEW_WEBSITE_LEAD",
+        const { sendTransactionalEmail } = await import("@/lib/email/service");
+        const { getEmailConfig } = await import("@/lib/email/config");
+        const emailConfig = getEmailConfig();
+
+        // 3a. Internal Business Alert to axivontech.in@gmail.com
+        await sendTransactionalEmail({
+          to: emailConfig.internalNotificationEmail,
+          templateKey: "CONTACT_ENQUIRY_RECEIVED",
+          eventKey: `contact_internal:${lead.leadCode}`,
           variables: {
-            title: `New Website Inquiry: ${lead.name} (${lead.leadCode})`,
             name: lead.name,
             email: lead.email,
-            phone: lead.phone || "N/A",
-            company: lead.companyName || "N/A",
-            service: lead.serviceInterest || "General Contact",
-            message: lead.message || "N/A",
+            phone: lead.phone || "Not provided",
+            company: lead.companyName || "Independent",
+            service: lead.serviceInterest || "General Inquiry",
+            message: lead.message || "No message provided.",
             source: lead.source,
             leadCode: lead.leadCode,
             link: `${process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in"}/admin/crm/leads/${lead.id}`,
           },
+          metadata: {
+            leadId: lead.id,
+            leadCode: lead.leadCode,
+            type: "INTERNAL_CONTACT_NOTIFICATION",
+          },
         });
+
+        // 3b. Customer Acknowledgement Email
+        if (lead.email) {
+          await sendTransactionalEmail({
+            to: lead.email,
+            templateKey: "CONTACT_ENQUIRY_ACK",
+            eventKey: `contact_ack:${lead.leadCode}`,
+            variables: {
+              name: lead.name,
+              service: lead.serviceInterest || "our services",
+              leadCode: lead.leadCode,
+            },
+            metadata: {
+              leadId: lead.id,
+              leadCode: lead.leadCode,
+              type: "CUSTOMER_CONTACT_ACK",
+            },
+          });
+        }
       } catch (emailErr) {
-        console.error("[Email Error] Failed to send contact email:", emailErr);
+        console.error("[Email Error] Failed to send contact emails:", emailErr);
       }
 
     return NextResponse.json({

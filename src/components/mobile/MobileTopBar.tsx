@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Bell } from "lucide-react";
 import type { MobileRole } from "./types";
 import { ROLE_CONFIGS } from "./roleConfig";
@@ -119,8 +120,15 @@ export function MobileTopBar({
               <ArrowLeft className="h-5 w-5" />
             </button>
           ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#4F9D83] to-[#438770] text-[#121212] font-bold text-sm shadow-sm">
-              A
+            <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 border border-white/10 p-1 shrink-0 overflow-hidden shadow-sm">
+              <Image
+                src="/assets/logo/logo-icon.png"
+                alt="Axivon Technologies"
+                width={28}
+                height={28}
+                className="object-contain"
+                priority
+              />
             </div>
           )}
 

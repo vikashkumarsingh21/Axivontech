@@ -96,9 +96,22 @@ async function saveBrokerExtendedSettings(brokerProfileId: string, data: Record<
   });
 }
 
+const brokerProfileCache = new Map<string, { data: any; expiresAt: number }>();
+
+export function invalidateBrokerProfileCache(brokerId?: string) {
+  if (brokerId) brokerProfileCache.delete(brokerId);
+  else brokerProfileCache.clear();
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { brokerProfile, user, brokerId } = await requireBroker(req);
+
+    const now = Date.now();
+    const cached = brokerProfileCache.get(brokerProfile.id);
+    if (cached && cached.expiresAt > now) {
+      return apiSuccess(cached.data);
+    }
 
     // Load extended settings (payout, PAN, GST, onboarding checklist)
     const extSettings = await getBrokerExtendedSettings(brokerProfile.id);
@@ -180,7 +193,9 @@ export async function GET(req: NextRequest) {
       },
     };
 
-    return apiSuccess({ profile: profileData });
+    const result = { profile: profileData };
+    brokerProfileCache.set(brokerProfile.id, { data: result, expiresAt: Date.now() + 60_000 });
+    return apiSuccess(result);
   } catch (error) {
     return handleApiError(error);
   }
@@ -278,6 +293,8 @@ export async function PATCH(req: NextRequest) {
         ],
       },
     });
+
+    invalidateBrokerProfileCache(brokerProfile.id);
 
     return apiSuccess(
       {

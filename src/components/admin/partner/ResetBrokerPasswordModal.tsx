@@ -15,7 +15,7 @@ import {
   Link as LinkIcon,
   Loader2,
 } from "lucide-react";
-import { generateStrongPassword, validatePasswordStrength } from "@/lib/auth/password";
+import { generateStrongPassword, validatePasswordStrength } from "@/lib/auth/password-utils";
 import { toast } from "@/lib/notifications/toast";
 import { getErrorMessage } from "@/lib/errors/client";
 
@@ -54,6 +54,7 @@ export function ResetBrokerPasswordModal({
     referralCode?: string;
     activationLink?: string;
     isLinkMode?: boolean;
+    emailConfigured?: boolean;
   } | null>(null);
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -130,8 +131,13 @@ export function ResetBrokerPasswordModal({
           email: brokerEmail,
           activationLink: data.activationLink,
           isLinkMode: true,
+          emailConfigured: !!data.emailConfigured,
         });
-        toast.success("Reset link generated successfully");
+        toast.success(
+          data.emailConfigured
+            ? "Reset link generated and sent to email"
+            : "Reset link generated successfully"
+        );
       } else {
         // Direct password
         const validation = validatePasswordStrength(password);
@@ -146,8 +152,9 @@ export function ResetBrokerPasswordModal({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "reset_password",
-            password: password.trim(),
-            requirePasswordChange: mustChangePassword,
+            mode: "DIRECT_PASSWORD",
+            newPassword: password.trim(),
+            mustChangePassword,
           }),
         });
 
@@ -162,6 +169,7 @@ export function ResetBrokerPasswordModal({
           partnerId: data.data?.partnerId || partnerId,
           referralCode: data.data?.referralCode || referralCode,
           isLinkMode: false,
+          emailConfigured: !!data.emailConfigured,
         });
         toast.success("Password reset successfully");
       }
@@ -204,12 +212,16 @@ export function ResetBrokerPasswordModal({
                 <div className="text-xs space-y-1">
                   <p className="font-semibold text-white">
                     {createdCredentials.isLinkMode
-                      ? "Activation Link Dispatched"
+                      ? createdCredentials.emailConfigured
+                        ? "Activation Link Dispatched"
+                        : "Activation Link Generated"
                       : "Password Reset Completed"}
                   </p>
                   <p className="text-gray-300">
                     {createdCredentials.isLinkMode
-                      ? `A reset link was sent to ${createdCredentials.email}.`
+                      ? createdCredentials.emailConfigured
+                        ? `A reset link was emailed to ${createdCredentials.email}.`
+                        : "Outbound email is not configured. Please copy the link below and share it directly with the broker."
                       : "These credentials are ready for the broker. The password will not be viewable again after closing."}
                   </p>
                 </div>

@@ -531,6 +531,30 @@ export async function createDepartmentManagerAccount(
     } catch (e) {}
   }
 
+  // 8. Dispatch Manager Onboarding Notification via Centralized Email Service
+  let invitationSent = false;
+  try {
+    const { sendTransactionalEmail } = await import("@/lib/email/service");
+    await sendTransactionalEmail({
+      to: newManager.email,
+      templateKey: "GENERIC_NOTIFICATION",
+      eventKey: `dept_manager_created:${newManager.id}`,
+      variables: {
+        title: `Welcome to Axivon Technologies — ${department.name} Department Leadership`,
+        message: `Your department manager account has been provisioned for the ${department.name} department. Please log in to your Manager Portal at ${process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in"}/login to begin overseeing department operations.`,
+        link: `${process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in"}/login`,
+      },
+      metadata: {
+        managerId: newManager.id,
+        departmentId: department.id,
+        type: "DEPARTMENT_MANAGER_PROVISIONED",
+      },
+    });
+    invitationSent = true;
+  } catch (emailErr) {
+    console.warn("[DepartmentService] Manager invitation email failed:", emailErr);
+  }
+
   return {
     manager: newManager,
     temporaryPassword: rawPassword,
@@ -540,8 +564,10 @@ export async function createDepartmentManagerAccount(
       code: department.code,
     },
     invitation: {
-      sent: false,
-      deliveryNote: "Account provisioned. Temporary password requires first-login change.",
+      sent: invitationSent,
+      deliveryNote: invitationSent
+        ? "Account invitation delivered to registered work email."
+        : "Account provisioned. Temporary password requires first-login change.",
     },
   };
 }
@@ -632,10 +658,23 @@ export async function enforceDepartmentIsolation(
   }
 }
 
+const deptDashboardCache = new Map<string, { data: any; expiresAt: number }>();
+
+export function invalidateDepartmentDashboardCache(managerId?: string) {
+  if (managerId) deptDashboardCache.delete(managerId);
+  else deptDashboardCache.clear();
+}
+
 /**
  * Gathers complete real-time dashboard data for an authorized manager's department.
  */
 export async function getDepartmentDashboardMetrics(managerUserId: string) {
+  const nowMs = Date.now();
+  const cached = deptDashboardCache.get(managerUserId);
+  if (cached && cached.expiresAt > nowMs) {
+    return cached.data;
+  }
+
   const department = await getManagerAuthorizedDepartment(managerUserId);
   const deptName = department.name;
 
@@ -662,23 +701,74 @@ export async function getDepartmentDashboardMetrics(managerUserId: string) {
 
   const employeeIds = employees.map((e) => e.id);
 
-  // 2. Department Tasks
-  const tasks = await db.task.findMany({
-    where: {
-      userId: { in: employeeIds },
-    },
-    select: {
-      id: true,
-      title: true,
-      priority: true,
-      status: true,
-      dueDate: true,
-      userId: true,
-      user: { select: { name: true, email: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
+  // 2-6. Run Department Queries in Parallel
+  const [tasks, attendanceToday, pendingLeaves, recentWorkReports, announcements] = await Promise.all([
+    // 2. Department Tasks
+    db.task.findMany({
+      where: {
+        userId: { in: employeeIds },
+      },
+      select: {
+        id: true,
+        title: true,
+        priority: true,
+        status: true,
+        dueDate: true,
+        userId: true,
+        user: { select: { name: true, email: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    }),
+
+    // 3. Attendance Today
+    db.attendance.findMany({
+      where: {
+        userId: { in: employeeIds },
+        date: { gte: today },
+      },
+      include: {
+        user: { select: { name: true, designation: true } },
+      },
+    }),
+
+    // 4. Pending Leave Requests
+    db.leaveRequest.findMany({
+      where: {
+        userId: { in: employeeIds },
+        status: "PENDING",
+      },
+      include: {
+        user: { select: { name: true, email: true, designation: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+
+    // 5. Recent Work Reports
+    db.workReport.findMany({
+      where: {
+        userId: { in: employeeIds },
+      },
+      include: {
+        user: { select: { name: true, designation: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
+
+    // 6. Department Announcements
+    db.announcement.findMany({
+      where: {
+        OR: [
+          { audienceScope: null },
+          { audienceScope: "ALL" },
+          { audienceScope: { contains: deptName, mode: "insensitive" } },
+        ],
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
+  ]);
 
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((t) => t.status === "COMPLETED").length;
@@ -687,55 +777,7 @@ export async function getDepartmentDashboardMetrics(managerUserId: string) {
     (t) => t.status !== "COMPLETED" && t.dueDate && new Date(t.dueDate) < new Date()
   ).length;
 
-  // 3. Attendance Today
-  const attendanceToday = await db.attendance.findMany({
-    where: {
-      userId: { in: employeeIds },
-      date: { gte: today },
-    },
-    include: {
-      user: { select: { name: true, designation: true } },
-    },
-  });
-
-  // 4. Pending Leave Requests
-  const pendingLeaves = await db.leaveRequest.findMany({
-    where: {
-      userId: { in: employeeIds },
-      status: "PENDING",
-    },
-    include: {
-      user: { select: { name: true, email: true, designation: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  // 5. Recent Work Reports
-  const recentWorkReports = await db.workReport.findMany({
-    where: {
-      userId: { in: employeeIds },
-    },
-    include: {
-      user: { select: { name: true, designation: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 10,
-  });
-
-  // 6. Department Announcements
-  const announcements = await db.announcement.findMany({
-    where: {
-      OR: [
-        { audienceScope: null },
-        { audienceScope: "ALL" },
-        { audienceScope: { contains: deptName, mode: "insensitive" } },
-      ],
-    },
-    orderBy: { createdAt: "desc" },
-    take: 5,
-  });
-
-  return {
+  const result = {
     department: {
       id: department.id,
       name: department.name,
@@ -760,4 +802,8 @@ export async function getDepartmentDashboardMetrics(managerUserId: string) {
     recentWorkReports,
     announcements,
   };
+
+  deptDashboardCache.set(managerUserId, { data: result, expiresAt: Date.now() + 30_000 });
+
+  return result;
 }

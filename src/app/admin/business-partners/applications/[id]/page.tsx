@@ -6,8 +6,24 @@ import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, User, Briefcase, GraduationCap, FileText, Calendar, Clock, ShieldCheck, StickyNote, Send, UserPlus, AlertCircle, ShieldAlert } from "lucide-react";
+import {
+  ArrowLeft,
+  User,
+  Briefcase,
+  GraduationCap,
+  FileText,
+  Calendar,
+  Clock,
+  ShieldCheck,
+  StickyNote,
+  Send,
+  UserPlus,
+  AlertCircle,
+  ShieldAlert,
+  Key,
+} from "lucide-react";
 import { CreatePartnerLoginModal } from "@/components/admin/partner/CreatePartnerLoginModal";
+import { ResetBrokerPasswordModal } from "@/components/admin/partner/ResetBrokerPasswordModal";
 import { format } from "date-fns";
 
 export default function ApplicationDetailPage() {
@@ -20,6 +36,7 @@ export default function ApplicationDetailPage() {
   const [actionReason, setActionReason] = useState("");
   const [actionModal, setActionModal] = useState<"APPROVE" | "REJECT" | "ON_HOLD" | "MORE_INFO" | "UNDER_REVIEW" | null>(null);
   const [isCreateLoginOpen, setIsCreateLoginOpen] = useState(false);
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
   const [submittingAction, setSubmittingAction] = useState(false);
 
   const [meetingModal, setMeetingModal] = useState(false);
@@ -161,28 +178,6 @@ export default function ApplicationDetailPage() {
     }
   };
 
-  const [creatingAccount, setCreatingAccount] = useState(false);
-
-  const handleCreateAccount = async () => {
-    if (!confirm("Are you sure you want to create a Partner Account for this approved applicant?")) return;
-    
-    try {
-      setCreatingAccount(true);
-      const res = await fetch(`/api/v1/admin/business-partner/applications/${params.id}/create-account`, {
-        method: "POST",
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(getErrorMessage(data) || "Failed to create account");
-      
-      toast.success(`Partner Account created successfully!\nPartner ID: ${data.partnerId}\nReferral Code: ${data.referralCode}`);
-      fetchApplication();
-    } catch (err: unknown) {
-      toast.error(getErrorMessage(err));
-    } finally {
-      setCreatingAccount(false);
-    }
-  };
-
   if (loading) return <div className="p-8 text-gray-500">Loading application details...</div>;
   if (error || !app) return <div className="p-8 text-red-500">Error: {error}</div>;
 
@@ -226,13 +221,12 @@ export default function ApplicationDetailPage() {
               <button onClick={() => setIsCreateLoginOpen(true)} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-sm text-sm transition-colors flex items-center gap-1.5 shadow-sm"><UserPlus className="w-4 h-4" /> Approve & Create Login</button>
             </>
           )}
-          {app.status === "APPROVED" && !app.linkedBroker && (
+          {app.status === "APPROVED" && !app.hasUsableLogin && (
             <button 
-              onClick={handleCreateAccount} 
-              disabled={creatingAccount}
-              className="bg-[#e8a064] text-black font-semibold px-4 py-2 rounded-sm text-sm hover:bg-[#f0c090] transition-colors"
+              onClick={() => setIsCreateLoginOpen(true)} 
+              className="bg-amber-500 hover:bg-amber-400 text-black font-semibold px-4 py-2 rounded-sm text-sm transition-colors flex items-center gap-1.5 shadow-sm"
             >
-              {creatingAccount ? "Creating Account..." : "Create Partner Account"}
+              <UserPlus className="w-4 h-4" /> Create Login
             </button>
           )}
         </div>
@@ -266,16 +260,25 @@ export default function ApplicationDetailPage() {
             <div>
               <p className="font-semibold text-sm text-white">Active Partner Account</p>
               <p className="text-xs text-green-300/80">
-                Partner ID: <strong className="font-mono text-white">{app.linkedBroker.partnerId}</strong> | Referral Code: <strong className="font-mono text-white">{app.linkedBroker.referralCode}</strong>
+                Partner ID: <strong className="font-mono text-white">{app.linkedBroker.partnerId}</strong> | Referral Code: <strong className="font-mono text-white">{app.linkedBroker.referralCode}</strong> | Login: <span className="font-mono text-white">{app.linkedUser?.email || app.email}</span>
               </p>
             </div>
           </div>
-          <Link
-            href={`/admin/crm/brokers/${app.linkedBroker.id}`}
-            className="px-3.5 py-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-xs font-semibold text-white transition-colors text-center"
-          >
-            View in Broker Directory →
-          </Link>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsResetPasswordOpen(true)}
+              className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition-colors flex items-center gap-1.5"
+            >
+              <Key className="w-3.5 h-3.5" />
+              Reset Password
+            </button>
+            <Link
+              href={`/admin/crm/brokers/${app.linkedBroker.id}`}
+              className="px-3.5 py-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-xs font-semibold text-white transition-colors text-center"
+            >
+              Manage Partner Dossier →
+            </Link>
+          </div>
         </div>
       )}
 
@@ -589,6 +592,30 @@ export default function ApplicationDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Create Partner Login Modal */}
+      <CreatePartnerLoginModal
+        isOpen={isCreateLoginOpen}
+        onClose={() => setIsCreateLoginOpen(false)}
+        application={app}
+        onSuccess={() => {
+          setIsCreateLoginOpen(false);
+          fetchApplication();
+        }}
+      />
+
+      {/* Reset Broker Password Modal */}
+      {app?.linkedBroker && (
+        <ResetBrokerPasswordModal
+          isOpen={isResetPasswordOpen}
+          onClose={() => setIsResetPasswordOpen(false)}
+          brokerId={app.linkedBroker.id}
+          brokerEmail={app.linkedUser?.email || app.email}
+          brokerName={app.fullName}
+          partnerId={app.linkedBroker.partnerId}
+          referralCode={app.linkedBroker.referralCode}
+        />
       )}
 
     </div>

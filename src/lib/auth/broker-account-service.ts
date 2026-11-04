@@ -1,7 +1,8 @@
 import { db } from "@/lib/db";
 import { ApiError } from "@/lib/api-error";
-import { hashPassword, validatePasswordStrength } from "@/lib/auth/password";
+import { hashPassword, validatePasswordStrength, generateStrongPassword } from "@/lib/auth/password";
 import { JobRunner } from "@/lib/jobs/runner";
+import { isOutboundEmailConfigured } from "@/lib/email/service";
 import crypto from "crypto";
 
 export interface ApproveAndCreateBrokerAccountParams {
@@ -10,7 +11,7 @@ export interface ApproveAndCreateBrokerAccountParams {
   adminIp?: string;
   email?: string;
   loginEmail?: string;
-  mode: "DIRECT_PASSWORD" | "ACTIVATION_LINK";
+  mode?: "DIRECT_PASSWORD" | "ACTIVATION_LINK";
   password?: string;
   mustChangePassword?: boolean;
   partnerType?: string;
@@ -30,47 +31,171 @@ export interface ApproveAndCreateBrokerAccountResult {
   loginUrl: string;
   oneTimePassword?: string | null;
   activationLink?: string | null;
+  emailConfigured: boolean;
   user?: any;
   profile?: any;
 }
 
+export interface EmailAvailabilityResult {
+  available: boolean;
+  exists: boolean;
+  canProceed: boolean;
+  conflictType:
+    | "NONE"
+    | "INTERNAL_ROLE_CONFLICT"
+    | "EXISTING_BROKER_SAME_APP"
+    | "EXISTING_BROKER_ANOTHER_APP"
+    | "UNLINKED_BROKER_ACCOUNT";
+  message: string;
+  user?: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+    status: string;
+    hasBrokerProfile: boolean;
+    partnerId?: string | null;
+    referralCode?: string | null;
+  } | null;
+}
+
 /**
  * Checks if a login email is already registered to any User across the platform.
+ * Strictly classifies internal employee/admin accounts, existing broker accounts,
+ * and cross-application duplicate submissions.
  */
-export async function checkEmailAvailability(email: string) {
+export async function checkEmailAvailability(
+  email: string,
+  currentApplicationId?: string
+): Promise<EmailAvailabilityResult> {
   const normalized = email.toLowerCase().trim();
   if (!normalized || !normalized.includes("@")) {
-    return { available: false, exists: false, message: "Invalid email format" };
+    return {
+      available: false,
+      exists: false,
+      canProceed: false,
+      conflictType: "NONE",
+      message: "Invalid email format. Please provide a valid work or personal email.",
+    };
   }
 
+  // Check if an existing User account exists
   const existing = await db.user.findUnique({
     where: { email: normalized },
     include: {
-      brokerProfile: { select: { id: true, partnerId: true } },
+      brokerProfile: { select: { id: true, partnerId: true, referralCode: true } },
       userRoles: { include: { role: true } },
     },
   });
 
   if (!existing) {
-    return { available: true, exists: false, user: null };
+    // Check if another BusinessPartnerApplication uses this email
+    const otherApp = await db.businessPartnerApplication.findFirst({
+      where: {
+        email: normalized,
+        ...(currentApplicationId
+          ? {
+              NOT: [{ id: currentApplicationId }, { applicationId: currentApplicationId }],
+            }
+          : {}),
+      },
+      select: { id: true, applicationId: true, fullName: true, status: true },
+    });
+
+    if (otherApp) {
+      return {
+        available: false,
+        exists: false,
+        canProceed: false,
+        conflictType: "EXISTING_BROKER_ANOTHER_APP",
+        message: `This email address is already associated with another partner application (${otherApp.applicationId} - ${otherApp.fullName}, Status: ${otherApp.status}).`,
+      };
+    }
+
+    return {
+      available: true,
+      exists: false,
+      canProceed: true,
+      conflictType: "NONE",
+      message: "Email is available. A new partner account will be created.",
+      user: null,
+    };
   }
 
-  const primaryRole =
-    existing.userRoles?.[0]?.role?.name || (existing as any).role || "EMPLOYEE";
+  const roleNames = existing.userRoles.map((ur) => ur.role.name.toUpperCase());
+  const primaryRole = roleNames[0] || (existing as any).role || "EMPLOYEE";
 
+  // Check if existing user belongs to internal staff or higher-privilege administrative roles
+  const internalRoles = [
+    "ADMIN",
+    "FOUNDER",
+    "CO_FOUNDER",
+    "EXECUTIVE",
+    "EMPLOYEE",
+    "HR",
+    "FINANCE",
+    "LEAD_DEVELOPER",
+    "DEPARTMENT_MANAGER",
+    "MANAGER",
+  ];
+  const isInternal = roleNames.some((r) => internalRoles.includes(r));
+
+  if (isInternal) {
+    return {
+      available: false,
+      exists: true,
+      canProceed: false,
+      conflictType: "INTERNAL_ROLE_CONFLICT",
+      message: `Account Conflict: Email "${normalized}" belongs to an existing ${primaryRole} account (${existing.name}). Internal staff accounts cannot be converted to broker accounts. Please use a separate partner email address.`,
+      user: {
+        id: existing.id,
+        email: existing.email,
+        name: existing.name,
+        role: primaryRole,
+        status: existing.status,
+        hasBrokerProfile: !!existing.brokerProfile,
+        partnerId: existing.brokerProfile?.partnerId || null,
+        referralCode: existing.brokerProfile?.referralCode || null,
+      },
+    };
+  }
+
+  // If existing user already has a broker profile
+  if (existing.brokerProfile) {
+    return {
+      available: false,
+      exists: true,
+      canProceed: true,
+      conflictType: "EXISTING_BROKER_SAME_APP",
+      message: `Partner account already exists for ${existing.name} (Partner ID: ${existing.brokerProfile.partnerId}). Provisioning will ensure profile linkage and preserve existing access.`,
+      user: {
+        id: existing.id,
+        email: existing.email,
+        name: existing.name,
+        role: "BUSINESS_PARTNER",
+        status: existing.status,
+        hasBrokerProfile: true,
+        partnerId: existing.brokerProfile.partnerId,
+        referralCode: existing.brokerProfile.referralCode,
+      },
+    };
+  }
+
+  // User exists but has no broker profile yet (e.g. unlinked user)
   return {
     available: false,
     exists: true,
+    canProceed: true,
+    conflictType: "UNLINKED_BROKER_ACCOUNT",
+    message: `Account exists for ${existing.name} without an active broker profile. Provisioning will activate partner credentials and create their partner profile.`,
     user: {
       id: existing.id,
       email: existing.email,
       name: existing.name,
       role: primaryRole,
       status: existing.status,
-      hasBrokerProfile: !!existing.brokerProfile,
-      partnerId: existing.brokerProfile?.partnerId,
+      hasBrokerProfile: false,
     },
-    message: `A user account with email "${normalized}" is already registered to ${existing.name}.`,
   };
 }
 
@@ -88,18 +213,12 @@ export async function approveAndCreateBrokerAccount(
     adminIp = "127.0.0.1",
     email,
     loginEmail,
-    mode,
+    mode = "DIRECT_PASSWORD",
     password,
     mustChangePassword = true,
     partnerType,
     internalNote,
   } = params;
-
-  const rawEmail = email || loginEmail;
-  if (!rawEmail) {
-    throw new ApiError(400, "Login email is required.");
-  }
-  const normalizedEmail = rawEmail.toLowerCase().trim();
 
   // 1. Fetch application
   const application = await db.businessPartnerApplication.findFirst({
@@ -112,11 +231,46 @@ export async function approveAndCreateBrokerAccount(
     throw new ApiError(404, "Partner application not found.");
   }
 
+  const rawEmail = email || loginEmail || application.email;
+  if (!rawEmail) {
+    throw new ApiError(400, "Login email is required.");
+  }
+  const normalizedEmail = rawEmail.toLowerCase().trim();
+
   // 2. Duplicate / Existing account check
   const existingUser = await db.user.findUnique({
     where: { email: normalizedEmail },
-    include: { brokerProfile: true },
+    include: {
+      brokerProfile: true,
+      userRoles: { include: { role: true } },
+    },
   });
+
+  // Strict Protection: Do NOT convert internal employee/admin accounts into broker accounts!
+  if (existingUser) {
+    const roleNames = existingUser.userRoles.map((ur) => ur.role.name.toUpperCase());
+    const internalRoles = [
+      "ADMIN",
+      "FOUNDER",
+      "CO_FOUNDER",
+      "EXECUTIVE",
+      "EMPLOYEE",
+      "HR",
+      "FINANCE",
+      "LEAD_DEVELOPER",
+      "DEPARTMENT_MANAGER",
+      "MANAGER",
+    ];
+    const isInternal = roleNames.some((r) => internalRoles.includes(r));
+    if (isInternal) {
+      throw new ApiError(
+        409,
+        `Account conflict: Email "${normalizedEmail}" belongs to an existing ${roleNames[0]} account (${existingUser.name}). Internal accounts cannot be converted to partner accounts. Please use a dedicated business partner email.`,
+        undefined,
+        "INTERNAL_ROLE_CONFLICT"
+      );
+    }
+  }
 
   // Idempotency: If the account is already fully approved and linked to this broker profile
   if (existingUser?.brokerProfile && application.status === "APPROVED") {
@@ -134,6 +288,7 @@ export async function approveAndCreateBrokerAccount(
       loginUrl: `${baseUrl}/login`,
       user: existingUser,
       profile: existingUser.brokerProfile,
+      emailConfigured: isOutboundEmailConfigured(),
     };
   }
 
@@ -147,16 +302,17 @@ export async function approveAndCreateBrokerAccount(
 
   let finalPasswordHash: string;
   let activationToken: string | null = null;
+  const activePassword = password?.trim() || (mode === "DIRECT_PASSWORD" ? generateStrongPassword(14) : undefined);
 
   if (mode === "DIRECT_PASSWORD") {
-    if (!password) {
+    if (!activePassword) {
       throw new ApiError(400, "Password is required for direct password provisioning.");
     }
-    const validation = validatePasswordStrength(password);
+    const validation = validatePasswordStrength(activePassword);
     if (!validation.isValid) {
       throw new ApiError(400, `Password does not meet security rules: ${validation.errors.join(" ")}`);
     }
-    finalPasswordHash = await hashPassword(password);
+    finalPasswordHash = await hashPassword(activePassword);
   } else {
     // Mode is ACTIVATION_LINK: generate a random unguessable temporary password and 48h activation token
     activationToken = crypto.randomUUID();
@@ -313,22 +469,24 @@ export async function approveAndCreateBrokerAccount(
       ? `${baseUrl}/broker-partner/activate?token=${activationToken}`
       : null;
 
+  const emailConfigured = isOutboundEmailConfigured();
+
   // 6. Enqueue Email Notifications
-  if (mode === "ACTIVATION_LINK" && activationLink) {
-    try {
-      await JobRunner.enqueue("SEND_EMAIL", {
-        to: normalizedEmail,
-        templateKey: "PARTNER_ACCOUNT_ACTIVATION",
-        variables: {
-          name: application.fullName,
-          partnerId: transactionResult.profile.partnerId,
-          referralCode: transactionResult.profile.referralCode,
-          activationLink,
-        },
-      });
-    } catch (err) {
-      console.error("[EmailQueue] Failed to enqueue partner activation email:", err);
-    }
+  try {
+    await JobRunner.enqueue("SEND_EMAIL", {
+      to: normalizedEmail,
+      templateKey: "PARTNER_ACCOUNT_ACTIVATION",
+      eventKey: `broker_account_ready:${transactionResult.profile.partnerId}`,
+      variables: {
+        name: application.fullName,
+        email: normalizedEmail,
+        partnerId: transactionResult.profile.partnerId,
+        referralCode: transactionResult.profile.referralCode,
+        activationLink: activationLink || loginUrl,
+      },
+    });
+  } catch (err) {
+    console.error("[EmailQueue] Failed to enqueue partner activation email:", err);
   }
 
   return {
@@ -342,8 +500,9 @@ export async function approveAndCreateBrokerAccount(
     mode,
     mustChangePassword,
     loginUrl,
-    oneTimePassword: mode === "DIRECT_PASSWORD" ? password : null,
+    oneTimePassword: mode === "DIRECT_PASSWORD" ? (activePassword || null) : null,
     activationLink,
+    emailConfigured,
     user: transactionResult.user,
     profile: transactionResult.profile,
   };

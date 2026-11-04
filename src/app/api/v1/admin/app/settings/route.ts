@@ -11,7 +11,7 @@ const updateSchema = z.object({
   popupEnabled: z.boolean().optional(),
   latestVersion: z.string().min(1).optional(),
   minVersion: z.string().min(1).optional(),
-  apkUrl: z.string().url().optional(),
+  apkUrl: z.string().min(1).optional(),
   sha256: z.string().optional(),
   sizeMb: z.number().positive().optional(),
   notes: z.string().optional(),

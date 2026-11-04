@@ -38,7 +38,19 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
 
     const payment = await db.partnerPayment.findUnique({
       where: { id: params.id },
-      include: { partnerProject: { select: { id: true, projectCode: true, brokerProfileId: true, brokerProfile: { select: { id: true, userId: true } } } } },
+      include: {
+        partnerProject: {
+          select: {
+            id: true,
+            projectCode: true,
+            projectName: true,
+            clientName: true,
+            clientEmail: true,
+            brokerProfileId: true,
+            brokerProfile: { select: { id: true, userId: true } },
+          },
+        },
+      },
     });
     if (!payment) throw new ApiError(404, "Payment not found.");
 
@@ -151,6 +163,39 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
       }
 
       await db.$transaction(transactionOps);
+
+      // Dispatch Transactional Payment Receipt Email to Client and Internal Accounts
+      try {
+        const { sendTransactionalEmail } = await import("@/lib/email/service");
+        const { getEmailConfig } = await import("@/lib/email/config");
+        const emailConfig = getEmailConfig();
+
+        const amountFormatted = `₹${(payment.amountPaid ?? 0).toLocaleString("en-IN")}`;
+        const targetEmail = payment.partnerProject.clientEmail || emailConfig.internalNotificationEmail;
+
+        await sendTransactionalEmail({
+          to: targetEmail,
+          templateKey: "PAYMENT_RECEIVED",
+          eventKey: `payment_verified:${payment.id}`,
+          variables: {
+            clientName: payment.partnerProject.clientName || "Valued Client",
+            amount: amountFormatted,
+            paymentCode: (payment as any).transactionRef || `PAY-${params.id.slice(-6).toUpperCase()}`,
+            invoiceNumber: `INV-${projectCode}`,
+            projectCode,
+            projectName: payment.partnerProject.projectName || "Enterprise Software Solutions",
+          },
+          metadata: {
+            paymentId: params.id,
+            projectId,
+            projectCode,
+            amount: payment.amountPaid ?? 0,
+            type: "PAYMENT_VERIFIED_RECEIPT",
+          },
+        });
+      } catch (payEmailErr) {
+        console.warn("[PartnerPayments] Failed to dispatch payment receipt email:", payEmailErr);
+      }
 
       return NextResponse.json({ 
         success: true, 

@@ -61,14 +61,20 @@ export default function EmployeeDashboard() {
 
   const fetchDashboard = useCallback(async () => {
     try {
-      const [meRes, dashRes] = await Promise.all([
-        fetch("/api/v1/employee/me"),
-        fetch("/api/v1/employee/dashboard"),
-      ]);
-      const meData = await meRes.json();
+      const dashRes = await fetch("/api/v1/employee/dashboard");
       const dashData = await dashRes.json();
-      if (meData?.user) setUser(meData.user);
-      if (dashData?.success) setData(dashData.data);
+      if (dashData?.success) {
+        setData(dashData.data);
+        if (dashData.data?.user) {
+          setUser(dashData.data.user);
+        }
+      }
+      // If user wasn't included, fallback to me endpoint
+      if (!dashData?.data?.user) {
+        const meRes = await fetch("/api/v1/employee/me");
+        const meData = await meRes.json();
+        if (meData?.user) setUser(meData.user);
+      }
     } catch (e) {
       console.error("Dashboard load error:", e);
     } finally {

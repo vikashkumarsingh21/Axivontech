@@ -4,10 +4,24 @@ import { getExecutiveScope, isDepartmentAllowed } from "@/lib/auth/executive-sco
 import { requirePermission } from "@/lib/auth/permissions";
 import { handleApiError } from "@/lib/api-error";
 
+const execSummaryCache = new Map<string, { data: any; expiresAt: number }>();
+
+export function invalidateExecutiveSummaryCache(userId?: string) {
+  if (userId) execSummaryCache.delete(userId);
+  else execSummaryCache.clear();
+}
+
 export async function GET(req: Request) {
   try {
     const userId = req.headers.get("x-user-id");
     await requirePermission(userId, "executive.dashboard.view");
+
+    const nowMs = Date.now();
+    const cached = userId ? execSummaryCache.get(userId) : null;
+    if (cached && cached.expiresAt > nowMs) {
+      return NextResponse.json({ data: cached.data });
+    }
+
     const scope = await getExecutiveScope(userId);
 
     const today = new Date();
@@ -51,24 +65,30 @@ export async function GET(req: Request) {
       db.approvalRequest.count({ where: { status: "PENDING" } }),
     ]);
 
-    return NextResponse.json({
-      data: {
-        scope: {
-          role: scope.role,
-          responsibilityProfile: scope.responsibilityProfile,
-          allowedDepartments: scope.allowedDepartments,
-        },
-        kpis: {
-          totalEmployees,
-          activeEmployees,
-          presentToday,
-          activeProjects,
-          openTasks,
-          overdueTasks,
-          pendingLeave,
-          pendingApprovals,
-        },
+    const payload = {
+      scope: {
+        role: scope.role,
+        responsibilityProfile: scope.responsibilityProfile,
+        allowedDepartments: scope.allowedDepartments,
       },
+      kpis: {
+        totalEmployees,
+        activeEmployees,
+        presentToday,
+        activeProjects,
+        openTasks,
+        overdueTasks,
+        pendingLeave,
+        pendingApprovals,
+      },
+    };
+
+    if (userId) {
+      execSummaryCache.set(userId, { data: payload, expiresAt: Date.now() + 30_000 });
+    }
+
+    return NextResponse.json({
+      data: payload,
     });
   } catch (error: any) {
     return handleApiError(error);

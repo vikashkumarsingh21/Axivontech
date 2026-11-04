@@ -34,21 +34,44 @@ export default function LoginPage() {
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // Check URL parameters for logout, expired session, or error notice safely
+  // Check URL parameters and automatically restore valid active session
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      if (params.get("logged_out") === "1" || params.get("logout") === "true") {
+      const isLoggedOut = params.get("logged_out") === "1" || params.get("logout") === "true";
+      const isExpired = params.get("expired") === "1" || params.get("session_expired") === "true";
+      const isSuspended = params.get("error") === "account_suspended";
+
+      if (isLoggedOut) {
         setLoggedOutNotice(true);
       }
-      if (params.get("expired") === "1" || params.get("session_expired") === "true") {
+      if (isExpired) {
         setError("Session expired, please sign in again.");
       }
-      if (params.get("error") === "account_suspended") {
-        setError("Your partner account has been suspended. Please contact AXIVON administration (admin@axivontech.in) for assistance.");
+      if (isSuspended) {
+        setError(
+          "Your partner account has been suspended. Please contact AXIVON administration (admin@axivontech.in) for assistance."
+        );
+      }
+
+      // If not explicitly logging out or handling an error, verify if session already exists
+      if (!isLoggedOut && !isExpired && !isSuspended) {
+        fetch("/api/v1/auth/session")
+          .then((res) => {
+            if (res.ok) return res.json();
+            return null;
+          })
+          .then((data) => {
+            if (data?.authenticated && data?.dashboardUrl) {
+              router.replace(data.dashboardUrl);
+            }
+          })
+          .catch(() => {
+            // Network failure or unauthenticated, stay on login page
+          });
       }
     }
-  }, []);
+  }, [router]);
 
   // Check prefers-reduced-motion safely
   useEffect(() => {

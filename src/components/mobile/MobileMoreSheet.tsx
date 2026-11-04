@@ -58,7 +58,7 @@ export function MobileMoreSheet({
       // Ignore network errors on logout
     }
     onClose();
-    router.push("/login");
+    window.location.href = "/login?logged_out=1";
   };
 
   return (

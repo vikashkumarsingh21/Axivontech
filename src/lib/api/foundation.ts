@@ -33,6 +33,14 @@ export type AuthenticatedUserContext = AuthenticatedUserPayload & {
 // 1. Session & Role Verification Helpers
 // ─────────────────────────────────────────────────────────────
 
+const sessionUserCache = new Map<string, { user: AuthenticatedUserPayload; expiresAt: number }>();
+const CACHE_TTL_MS = 60_000;
+
+export function invalidateSessionUserCache(userId?: string) {
+  if (userId) sessionUserCache.delete(userId);
+  else sessionUserCache.clear();
+}
+
 /**
  * Extracts and cryptographically verifies the current authenticated user session,
  * verifies active account status, and loads user profile with assigned roles.
@@ -57,30 +65,41 @@ export async function getSessionUser(req: Request | NextRequest): Promise<Authen
     }
   }
 
-  const user = await db.user.findUnique({
-    where: { id: session.userId },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      status: true,
-      department: true,
-      designation: true,
-      employeeId: true,
-      requiredDailyMinutes: true,
-      organizationId: true,
-      userRoles: {
-        include: {
-          role: {
-            select: {
-              id: true,
-              name: true,
+  // Check warm cache
+  const now = Date.now();
+  const cached = sessionUserCache.get(session.userId);
+  let user: AuthenticatedUserPayload | null = cached && cached.expiresAt > now ? cached.user : null;
+
+  if (!user) {
+    user = await db.user.findUnique({
+      where: { id: session.userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        status: true,
+        department: true,
+        designation: true,
+        employeeId: true,
+        requiredDailyMinutes: true,
+        organizationId: true,
+        userRoles: {
+          include: {
+            role: {
+              select: {
+                id: true,
+                name: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
+
+    if (user) {
+      sessionUserCache.set(session.userId, { user, expiresAt: now + CACHE_TTL_MS });
+    }
+  }
 
   if (!user) {
     throw new ApiError(401, "Unauthorized: User account not found", undefined, "USER_NOT_FOUND");

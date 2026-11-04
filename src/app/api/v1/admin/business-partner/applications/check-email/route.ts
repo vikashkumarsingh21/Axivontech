@@ -10,11 +10,12 @@ export async function GET(req: NextRequest) {
     await requirePermission(userId, "business_partner_application.review");
 
     const email = req.nextUrl.searchParams.get("email");
+    const applicationId = req.nextUrl.searchParams.get("applicationId") || undefined;
     if (!email) {
       return NextResponse.json({ available: false, message: "Email query param required" }, { status: 400 });
     }
 
-    const result = await checkEmailAvailability(email);
+    const result = await checkEmailAvailability(email, applicationId);
     return NextResponse.json(result, {
       status: 200,
       headers: {

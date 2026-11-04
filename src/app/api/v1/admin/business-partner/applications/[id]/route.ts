@@ -89,15 +89,30 @@ export async function GET(
       },
     });
 
+    let accountStatus: "NOT_CREATED" | "CREATION_PENDING" | "ACTIVE" | "PASSWORD_CHANGE_REQUIRED" | "DISABLED" = "NOT_CREATED";
+    if (!linkedUser || !linkedUser.brokerProfile) {
+      accountStatus = "NOT_CREATED";
+    } else if (linkedUser.status === "PENDING_ACTIVATION") {
+      accountStatus = "CREATION_PENDING";
+    } else if (linkedUser.status === "SUSPENDED" || linkedUser.status === "INACTIVE") {
+      accountStatus = "DISABLED";
+    } else if (linkedUser.status === "ACTIVE" && linkedUser.mustChangePassword) {
+      accountStatus = "PASSWORD_CHANGE_REQUIRED";
+    } else if (linkedUser.status === "ACTIVE") {
+      accountStatus = "ACTIVE";
+    }
+
     const hasUsableLogin = !!(
       linkedUser &&
       linkedUser.passwordHash &&
+      linkedUser.brokerProfile &&
       (linkedUser.status === "ACTIVE" || linkedUser.status === "PENDING_ACTIVATION")
     );
 
     return NextResponse.json(
       {
         ...application,
+        accountStatus,
         linkedBroker: linkedUser?.brokerProfile || null,
         linkedUser: linkedUser
           ? {
@@ -105,6 +120,9 @@ export async function GET(
               email: linkedUser.email,
               status: linkedUser.status,
               mustChangePassword: linkedUser.mustChangePassword,
+              partnerId: linkedUser.brokerProfile?.partnerId || null,
+              referralCode: linkedUser.brokerProfile?.referralCode || null,
+              brokerProfileId: linkedUser.brokerProfile?.id || null,
             }
           : null,
         hasUsableLogin,
@@ -183,17 +201,30 @@ export async function PUT(
       });
     });
 
-    // Enqueue status update email
-    await JobRunner.enqueue("SEND_EMAIL", {
-      to: updatedApp.email,
-      templateKey: "PARTNER_APPLICATION_STATUS_UPDATE",
-      variables: {
-        name: updatedApp.fullName,
-        applicationId: updatedApp.applicationId,
-        newStatus,
-        reason: reason ?? "N/A",
-      },
-    });
+    // Dispatch Status-Specific Transactional Notification
+    try {
+      let emailTemplateKey = "PARTNER_APPLICATION_STATUS_UPDATE";
+      if (newStatus === "APPROVED") {
+        emailTemplateKey = "PARTNER_APPLICATION_APPROVED";
+      } else if (newStatus === "REJECTED") {
+        emailTemplateKey = "PARTNER_APPLICATION_REJECTED";
+      }
+
+      await JobRunner.enqueue("SEND_EMAIL", {
+        to: updatedApp.email,
+        templateKey: emailTemplateKey,
+        eventKey: `bpa_status:${updatedApp.id}:${newStatus}`,
+        variables: {
+          name: updatedApp.fullName,
+          applicationId: updatedApp.applicationId,
+          newStatus,
+          // If rejected, do not leak raw internal staff notes to candidate
+          reason: newStatus === "REJECTED" ? undefined : (reason ?? "N/A"),
+        },
+      });
+    } catch (statusEmailErr) {
+      console.warn("[Partner Status API] Email enqueue warning:", statusEmailErr);
+    }
 
     // Emit AuditLog (existing infrastructure)
     try {

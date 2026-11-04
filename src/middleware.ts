@@ -149,12 +149,43 @@ export async function middleware(req: any) {
             algorithms: ["HS256"],
           });
           const role = normalizeRole(payload.role as string);
-          const targetUrl = resolveRoleDashboardUrl(role);
+          const targetUrl = payload.mustChangePassword
+            ? "/auth/change-password"
+            : resolveRoleDashboardUrl(role);
           return NextResponse.redirect(new URL(targetUrl, req.url));
         } catch {
           const res = NextResponse.redirect(new URL("/login", req.url));
           res.cookies.delete("axivon_session");
           return res;
+        }
+      }
+    }
+
+    // Auto-restore session on /login if already authenticated (unless explicit logout query param)
+    if (pathname === "/login") {
+      const hasLogoutParam =
+        req.nextUrl.searchParams.get("logged_out") === "1" ||
+        req.nextUrl.searchParams.get("logout") === "true" ||
+        req.nextUrl.searchParams.get("expired") === "1" ||
+        req.nextUrl.searchParams.get("error") === "account_suspended";
+
+      if (!hasLogoutParam) {
+        const sessionCookie = req.cookies.get("axivon_session")?.value;
+        if (sessionCookie) {
+          try {
+            const { payload } = await jwtVerify(sessionCookie, secretKey, {
+              algorithms: ["HS256"],
+            });
+            const role = normalizeRole(payload.role as string);
+            const targetUrl = payload.mustChangePassword
+              ? "/auth/change-password"
+              : resolveRoleDashboardUrl(role);
+            return NextResponse.redirect(new URL(targetUrl, req.url));
+          } catch {
+            const res = NextResponse.next({ request: { headers: requestHeaders } });
+            res.cookies.delete("axivon_session");
+            return res;
+          }
         }
       }
     }
@@ -290,7 +321,8 @@ export const config = {
      * - _next/static (static chunks, css, media)
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt, manifest.webmanifest
+     * - static asset files (svg, png, jpg, jpeg, gif, webp, ico, apk, woff, woff2)
      */
-    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest|assets/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|apk|css|js|woff|woff2)$).*)",
   ],
 };
