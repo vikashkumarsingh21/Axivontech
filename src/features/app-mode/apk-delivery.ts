@@ -1,16 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { isAppModeEnabled } from "./flags";
 import { getAppReleaseConfig } from "./release";
-import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit";
+import { isRateLimited } from "@/lib/rate-limit";
 
 /**
  * Handles APK download requests at /download/axivon-app
  */
 export async function handleApkDownload(req: NextRequest): Promise<NextResponse> {
-  // 1. Kill switch check
-  if (!isAppModeEnabled()) {
-    return new NextResponse("Not Found", {
+  // 1. Retrieve release config (checks kill switch and database organization settings)
+  const config = await getAppReleaseConfig();
+
+  if (!config.enabled || !config.apkUrl) {
+    return new NextResponse("APK download is not yet configured.", {
       status: 404,
       headers: {
         "Content-Type": "text/plain",
@@ -34,16 +35,7 @@ export async function handleApkDownload(req: NextRequest): Promise<NextResponse>
     );
   }
 
-  // 3. Retrieve release config
-  const config = await getAppReleaseConfig();
-  if (!config.apkUrl) {
-    return new NextResponse("APK download is not yet configured.", {
-      status: 404,
-      headers: { "Content-Type": "text/plain" },
-    });
-  }
-
-  // 4. Log download event in background (AuditLog / Activity)
+  // 3. Log download event in background (AuditLog / Activity)
   const userId = req.headers.get("x-user-id") || null;
   const userAgent = req.headers.get("user-agent") || "unknown";
 
@@ -68,8 +60,12 @@ export async function handleApkDownload(req: NextRequest): Promise<NextResponse>
       }
     });
 
-  // 5. Redirect (307) with proper attachment headers
-  return NextResponse.redirect(new URL(config.apkUrl), {
+  // 4. Redirect (307) with proper attachment headers
+  const targetUrl = config.apkUrl.startsWith("http")
+    ? new URL(config.apkUrl)
+    : new URL(config.apkUrl, req.url);
+
+  return NextResponse.redirect(targetUrl, {
     status: 307,
     headers: {
       "Content-Type": "application/vnd.android.package-archive",

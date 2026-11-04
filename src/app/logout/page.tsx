@@ -34,6 +34,11 @@ export default function LogoutPage() {
         if (typeof document !== "undefined") {
           document.cookie =
             "axivon_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
+          try {
+            sessionStorage.removeItem("axivon_app_prompt_pending");
+            sessionStorage.removeItem("axivon_app_prompt_dismissed");
+            localStorage.removeItem("axivon_app_prompt_last_date");
+          } catch {}
         }
         setLoggedOut(true);
       }

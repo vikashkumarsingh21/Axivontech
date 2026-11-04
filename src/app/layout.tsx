@@ -149,12 +149,8 @@ export default async function RootLayout({
       className={`${inter.variable} ${manrope.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen flex flex-col bg-[#0B0D10] text-[#F3F5F7]">
-        {appModeActive && (
-          <>
-            <AppModeInit />
-            <PortalAppPromptWrapper />
-          </>
-        )}
+        {appModeActive && <AppModeInit />}
+        <PortalAppPromptWrapper />
         <ToastProvider />
         <NextTopLoader color="#10B981" showSpinner={false} />
         <OrganizationSchema />

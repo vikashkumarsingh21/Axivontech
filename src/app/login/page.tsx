@@ -266,7 +266,15 @@ export default function LoginPage() {
         return;
       }
 
-      // Success: route based on normalized primary role via centralized resolver
+      // Success: queue app download prompt for portal session & route based on normalized primary role via centralized resolver
+      try {
+        sessionStorage.setItem("axivon_app_prompt_pending", "true");
+        sessionStorage.removeItem("axivon_app_prompt_dismissed");
+        localStorage.removeItem("axivon_app_prompt_last_date");
+      } catch {
+        // Safe fallback in restricted environments
+      }
+
       const responseData = parsed.data as any;
       if (responseData?.mustChangePassword || responseData?.user?.mustChangePassword) {
         router.push("/auth/change-password");

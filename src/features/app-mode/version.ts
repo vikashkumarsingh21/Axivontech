@@ -1,18 +1,16 @@
 import { NextResponse } from "next/server";
-import { isAppModeEnabled } from "./flags";
 import { getAppReleaseConfig } from "./release";
 
 /**
  * Handles GET /api/v1/app/version
  */
 export async function handleAppVersion(): Promise<NextResponse> {
-  // 1. Kill switch check
-  if (!isAppModeEnabled()) {
+  const config = await getAppReleaseConfig();
+
+  // If App Mode is not enabled in database settings or kill-switched, return 404
+  if (!config.enabled) {
     return NextResponse.json({ error: "Not Found" }, { status: 404 });
   }
-
-  // 2. Fetch public release info
-  const config = await getAppReleaseConfig();
 
   return NextResponse.json(
     {

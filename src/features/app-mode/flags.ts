@@ -28,7 +28,10 @@ export interface AppModeSettings {
  * Defaults strictly to FALSE unless APP_MODE_ENABLED === "true".
  */
 export function isAppModeEnvEnabled(): boolean {
-  return process.env.APP_MODE_ENABLED === "true";
+  if (process.env.APP_MODE_ENABLED === "false") {
+    return false;
+  }
+  return true;
 }
 
 /**

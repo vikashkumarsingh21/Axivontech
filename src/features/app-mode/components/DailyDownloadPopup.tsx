@@ -60,7 +60,7 @@ export function DailyDownloadPopup({
     }
   }, []);
 
-  // Determine if popup should display today
+  // Determine if popup should display
   useEffect(() => {
     // 1. Hard kill switch guards
     if (!isMasterEnabled || !isPopupEnabled || !apkConfigured) return;
@@ -68,27 +68,41 @@ export function DailyDownloadPopup({
     // 2. Never show inside app mode
     if (isAppMode) return;
 
-    // 3. Check once-a-day persistence in Asia/Kolkata timezone
-    const todayStr = getKolkataDateString();
-    const lastShown = localStorage.getItem(STORAGE_KEY);
+    // 3. Check triggers: show every time anyone logs in, or on fresh browser session
+    let shouldShow = false;
+    let delay = 1200;
 
-    if (lastShown === todayStr) {
-      return; // Already dismissed today
+    try {
+      const justLoggedIn = sessionStorage.getItem("axivon_app_prompt_pending") === "true";
+      const dismissedInSession = sessionStorage.getItem("axivon_app_prompt_dismissed") === "true";
+
+      if (justLoggedIn) {
+        shouldShow = true;
+        delay = 600;
+      } else if (!dismissedInSession) {
+        shouldShow = true;
+        delay = 1200;
+      }
+    } catch {
+      // Fallback if sessionStorage is restricted
+      shouldShow = true;
     }
 
-    // 4. Trigger modal ~1.5s after page ready
+    if (!shouldShow) return;
+
+    // 4. Trigger modal smoothly after dashboard renders
     const timer = setTimeout(() => {
       previousFocusRef.current = document.activeElement as HTMLElement;
       setIsOpen(true);
-    }, 1500);
+    }, delay);
 
     return () => clearTimeout(timer);
   }, [isMasterEnabled, isPopupEnabled, apkConfigured, isAppMode]);
 
   const handleClose = useCallback(() => {
-    const todayStr = getKolkataDateString();
     try {
-      localStorage.setItem(STORAGE_KEY, todayStr);
+      sessionStorage.setItem("axivon_app_prompt_dismissed", "true");
+      sessionStorage.removeItem("axivon_app_prompt_pending");
     } catch {
       // Storage might be restricted in private mode
     }
@@ -97,6 +111,15 @@ export function DailyDownloadPopup({
     // Return focus to previous element for accessibility
     if (previousFocusRef.current && typeof previousFocusRef.current.focus === "function") {
       previousFocusRef.current.focus();
+    }
+  }, []);
+
+  const handleDownloadAction = useCallback(() => {
+    try {
+      sessionStorage.setItem("axivon_app_prompt_dismissed", "true");
+      sessionStorage.removeItem("axivon_app_prompt_pending");
+    } catch {
+      // Storage might be restricted in private mode
     }
   }, []);
 
@@ -153,6 +176,7 @@ export function DailyDownloadPopup({
       title: "Get the Axivon app",
       body: "Mark your attendance and manage everything from your phone with the Axivon app.",
       downloadBtn: "Download App",
+      downloadApkDirectly: "Download APK for Android",
       howToInstall: "How to install APK?",
       step1: "1. Tap 'Download App' and confirm the APK file download.",
       step2: "2. If prompted, allow 'Install unknown apps' for your browser.",
@@ -162,7 +186,7 @@ export function DailyDownloadPopup({
       iosStep2: "2. Scroll down and select 'Add to Home Screen'.",
       iosStep3: "3. Tap 'Add' in the top right corner.",
       desktopTitle: "Scan with your Android phone",
-      desktopDesc: "Point your phone camera at the QR code to open the download page:",
+      desktopDesc: "Point your phone camera at the QR code to open on mobile:",
       copyLink: "Copy Link",
       copied: "Link Copied!",
       close: "Close dialog",
@@ -171,6 +195,7 @@ export function DailyDownloadPopup({
       title: "Axivon app download karein",
       body: "Axivon app se apni attendance lagayein aur sab kuch apne phone se manage karein.",
       downloadBtn: "App Download Karein",
+      downloadApkDirectly: "Android ke liye APK Download Karein",
       howToInstall: "APK kaise install karein?",
       step1: "1. 'App Download Karein' par tap karein aur APK download confirm karein.",
       step2: "2. Browser settings mein 'Install unknown apps' allow karein.",
@@ -180,7 +205,7 @@ export function DailyDownloadPopup({
       iosStep2: "2. Neeche scroll karke 'Add to Home Screen' chunein.",
       iosStep3: "3. Upar right corner mein 'Add' par tap karein.",
       desktopTitle: "Apne phone se scan karein",
-      desktopDesc: "Download page kholne ke liye camera se QR code scan karein:",
+      desktopDesc: "Mobile par kholne ke liye camera se QR code scan karein:",
       copyLink: "Link Copy Karein",
       copied: "Link Copy Ho Gaya!",
       close: "Band karein",
@@ -245,6 +270,7 @@ export function DailyDownloadPopup({
               <a
                 href={downloadUrl}
                 download="axivon-app.apk"
+                onClick={handleDownloadAction}
                 className="w-full min-h-[44px] px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-[#04130E] font-semibold text-sm inline-flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-500/20"
               >
                 <Download className="w-4 h-4" />
@@ -285,26 +311,38 @@ export function DailyDownloadPopup({
           )}
 
           {platform === "desktop" && (
-            <div className="flex flex-col items-center text-center space-y-3.5">
-              <p className="text-xs text-neutral-400">{content.desktopDesc}</p>
-              <div className="p-2 bg-white rounded-xl shadow-inner">
-                <QrCodeSvg value={DOWNLOAD_PAGE_URL} size={150} />
-              </div>
-              <div className="flex items-center gap-2 w-full pt-1">
-                <input
-                  type="text"
-                  readOnly
-                  value={DOWNLOAD_PAGE_URL}
-                  className="flex-1 min-h-[44px] px-3 text-xs bg-black/40 border border-white/10 rounded-lg text-neutral-300 focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={handleCopyLink}
-                  className="min-h-[44px] px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-xs text-white inline-flex items-center gap-1.5 transition-colors shrink-0"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? content.copied : content.copyLink}</span>
-                </button>
+            <div className="space-y-4">
+              <a
+                href={downloadUrl}
+                download="axivon-app.apk"
+                onClick={handleDownloadAction}
+                className="w-full min-h-[44px] px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-[#04130E] font-semibold text-sm inline-flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-500/20"
+              >
+                <Download className="w-4 h-4" />
+                <span>{content.downloadApkDirectly}</span>
+              </a>
+
+              <div className="flex flex-col items-center text-center space-y-3 pt-3 border-t border-white/5">
+                <p className="text-xs text-neutral-400">{content.desktopDesc}</p>
+                <div className="p-2 bg-white rounded-xl shadow-inner">
+                  <QrCodeSvg value={DOWNLOAD_PAGE_URL} size={135} />
+                </div>
+                <div className="flex items-center gap-2 w-full pt-1">
+                  <input
+                    type="text"
+                    readOnly
+                    value={DOWNLOAD_PAGE_URL}
+                    className="flex-1 min-h-[40px] px-3 text-xs bg-black/40 border border-white/10 rounded-lg text-neutral-300 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="min-h-[40px] px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-xs text-white inline-flex items-center gap-1.5 transition-colors shrink-0"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copied ? content.copied : content.copyLink}</span>
+                  </button>
+                </div>
               </div>
             </div>
           )}
