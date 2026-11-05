@@ -471,7 +471,7 @@ export async function approveAndCreateBrokerAccount(
 
   const emailConfigured = isOutboundEmailConfigured();
 
-  // 6. Enqueue Email Notifications
+  // 6. Dispatch Email Notifications (Customer activation + Internal alert)
   try {
     await JobRunner.enqueue("SEND_EMAIL", {
       to: normalizedEmail,
@@ -485,8 +485,48 @@ export async function approveAndCreateBrokerAccount(
         activationLink: activationLink || loginUrl,
       },
     });
+
+    const { sendTransactionalEmail } = await import("@/lib/email/service");
+    const { getEmailConfig } = await import("@/lib/email/config");
+    const emailConfig = getEmailConfig();
+
+    // 6a. Dispatch Customer Partner Activation Email
+    await sendTransactionalEmail({
+      to: normalizedEmail,
+      templateKey: "PARTNER_ACCOUNT_ACTIVATION",
+      eventKey: `broker_account_ready:${transactionResult.profile.partnerId}`,
+      variables: {
+        name: application.fullName,
+        email: normalizedEmail,
+        partnerId: transactionResult.profile.partnerId,
+        referralCode: transactionResult.profile.referralCode,
+        activationLink: activationLink || loginUrl,
+      },
+      metadata: {
+        partnerId: transactionResult.profile.partnerId,
+        applicationId: transactionResult.updatedApplication.applicationId,
+        type: "PARTNER_ACCOUNT_ACTIVATION",
+      },
+    });
+
+    // 6b. Internal Business Notification to info@axivontech.in
+    await sendTransactionalEmail({
+      to: emailConfig.internalNotificationEmail,
+      templateKey: "GENERIC_NOTIFICATION",
+      eventKey: `broker_account_created_internal:${transactionResult.profile.partnerId}`,
+      variables: {
+        title: "Broker Account Created & Activated",
+        message: `A new partner account has been created for ${application.fullName} (${transactionResult.profile.partnerId}). Application ID: ${transactionResult.updatedApplication.applicationId}. Registered Email: ${normalizedEmail}.`,
+        link: `${baseUrl}/admin/crm/brokers`,
+      },
+      metadata: {
+        partnerId: transactionResult.profile.partnerId,
+        applicationId: transactionResult.updatedApplication.applicationId,
+        type: "INTERNAL_BROKER_ACCOUNT_CREATED",
+      },
+    });
   } catch (err) {
-    console.error("[EmailQueue] Failed to enqueue partner activation email:", err);
+    console.error("[EmailQueue] Failed to dispatch partner activation email:", err);
   }
 
   return {

@@ -5,7 +5,7 @@
  * - Sender Name: Axivon Technologies
  * - Sender Email: axivontech.in@gmail.com
  * - Reply-To: axivontech.in@gmail.com
- * - Internal Business Notification Recipient: axivontech.in@gmail.com
+ * - Internal Business Notification Recipient: info@axivontech.in
  */
 
 export interface EmailConfiguration {
@@ -40,7 +40,7 @@ export function getEmailConfig(): EmailConfiguration {
     senderName: process.env.EMAIL_FROM_NAME || "Axivon Technologies",
     senderEmail: process.env.EMAIL_FROM_ADDRESS || "axivontech.in@gmail.com",
     replyTo: process.env.EMAIL_REPLY_TO || "axivontech.in@gmail.com",
-    internalNotificationEmail: process.env.EMAIL_INTERNAL_NOTIFICATION_TO || "axivontech.in@gmail.com",
+    internalNotificationEmail: process.env.EMAIL_INTERNAL_NOTIFICATION_TO || "info@axivontech.in",
     smtpHost: process.env.SMTP_HOST || "smtp.gmail.com",
     smtpPort: parseInt(process.env.SMTP_PORT || "587", 10),
     smtpSecure: process.env.SMTP_SECURE === "true",
@@ -50,7 +50,7 @@ export function getEmailConfig(): EmailConfiguration {
     webhookUrl: process.env.EMAIL_WEBHOOK_URL || undefined,
     webhookSecret: process.env.EMAIL_WEBHOOK_SECRET || undefined,
     emailMode,
-    testRecipient: process.env.EMAIL_TEST_RECIPIENT || "axivontech.in@gmail.com",
+    testRecipient: process.env.EMAIL_INTERNAL_NOTIFICATION_TO || process.env.EMAIL_TEST_RECIPIENT || "info@axivontech.in",
     companyName: "Axivon Technologies",
     companyWebsite: process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in",
     companyPhone: "+91 91572 26367",

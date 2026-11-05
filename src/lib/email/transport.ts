@@ -22,7 +22,11 @@ export interface DeliveryResult {
 
 let cachedTransporter: Transporter | null = null;
 
-function getSmtpTransporter(): Transporter {
+export function resetSmtpTransporter(): void {
+  cachedTransporter = null;
+}
+
+export function getSmtpTransporter(): Transporter {
   if (cachedTransporter) return cachedTransporter;
 
   const config = getEmailConfig();
@@ -118,10 +122,35 @@ export async function deliverEmailMessage(message: OutboundMessage): Promise<Del
   const config = getEmailConfig();
   const testMode = isEmailTestMode();
 
-  // Test mode safety guard: Route external recipient to company test inbox to prevent accidental customer emails
+  // Test mode safety guard: Route external recipient to company internal notification recipient
   const targetRecipient = testMode ? config.testRecipient : message.to;
   const replyToAddress = message.replyTo || config.replyTo;
   const fromHeader = `"${config.senderName}" <${config.senderEmail}>`;
+
+  // Prepare test mode banner to clearly inform the recipient of originally intended destination
+  const htmlContent = testMode
+    ? `
+      <div style="background-color: #fef3c7; border: 2px dashed #f59e0b; padding: 14px 18px; margin-bottom: 20px; border-radius: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; color: #92400e; line-height: 1.5;">
+        <strong style="color: #b45309; font-size: 14px;">⚠️ [TEST MODE ACTIVE — ROUTED TO INTERNAL COMPANY INBOX]</strong><br/>
+        <strong>Originally Intended Recipient:</strong> <code style="background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px;">${message.to}</code><br/>
+        <strong>Internal Destination:</strong> <code style="background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px;">${targetRecipient}</code><br/>
+        <span style="font-size: 11px; color: #78350f;">External customer delivery is suppressed while EMAIL_MODE=${config.emailMode}.</span>
+      </div>
+      ${message.html}
+    `
+    : message.html;
+
+  const rawText = message.text || message.html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const textContent = testMode
+    ? `====================================================
+⚠️ [TEST MODE ACTIVE — ROUTED TO INTERNAL COMPANY INBOX]
+Originally Intended Recipient: ${message.to}
+Internal Destination: ${targetRecipient}
+Environment Mode: ${config.emailMode}
+====================================================
+
+${rawText}`
+    : rawText;
 
   // 1. Gmail SMTP Delivery (Primary Preferred Method)
   if (config.smtpUser && config.smtpAppPassword) {
@@ -132,11 +161,17 @@ export async function deliverEmailMessage(message: OutboundMessage): Promise<Del
         to: targetRecipient,
         replyTo: replyToAddress,
         subject: testMode ? `[TEST MODE] ${message.subject}` : message.subject,
-        html: message.html,
-        text: message.text || message.html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim(),
+        html: htmlContent,
+        text: textContent,
         headers: {
           "X-Entity-Ref-ID": message.eventKey || "general",
           "X-Axivon-Source": "Axivon Technologies Core",
+          ...(testMode
+            ? {
+                "X-Axivon-Test-Mode": "true",
+                "X-Original-Recipient": message.to,
+              }
+            : {}),
         },
       });
 
@@ -148,8 +183,20 @@ export async function deliverEmailMessage(message: OutboundMessage): Promise<Del
         isTestMode: testMode,
       };
     } catch (smtpErr: unknown) {
-      console.error("[EmailTransport] Gmail SMTP error:", (smtpErr as Error).message);
-      // Fall through to next provider if available
+      const errMsg = (smtpErr as Error).message || "Unknown SMTP error";
+      console.error("[EmailTransport] Gmail SMTP error:", errMsg);
+
+      // If no other outbound provider (Resend or Webhook) is configured, return the SMTP failure directly
+      if (!config.resendApiKey && !config.webhookUrl) {
+        return {
+          success: false,
+          error: errMsg,
+          provider: "gmail-smtp",
+          recipientUsed: targetRecipient,
+          isTestMode: testMode,
+        };
+      }
+      // Otherwise fall through to alternative fallback
     }
   }
 
@@ -167,8 +214,8 @@ export async function deliverEmailMessage(message: OutboundMessage): Promise<Del
           to: targetRecipient,
           reply_to: replyToAddress,
           subject: testMode ? `[TEST MODE] ${message.subject}` : message.subject,
-          html: message.html,
-          text: message.text,
+          html: htmlContent,
+          text: textContent,
         }),
       });
 
@@ -203,9 +250,9 @@ export async function deliverEmailMessage(message: OutboundMessage): Promise<Del
           from: fromHeader,
           to: targetRecipient,
           replyTo: replyToAddress,
-          subject: message.subject,
-          html: message.html,
-          text: message.text,
+          subject: testMode ? `[TEST MODE] ${message.subject}` : message.subject,
+          html: htmlContent,
+          text: textContent,
           eventKey: message.eventKey,
         }),
       });
@@ -223,7 +270,7 @@ export async function deliverEmailMessage(message: OutboundMessage): Promise<Del
     }
   }
 
-  // 4. Fallback / Test Mode Console Log
+  // 4. Simulated Fallback (Used when no external transport credentials configured)
   console.log(`[EmailTransport] [${testMode ? "TEST_MODE" : "SIMULATED"}] To: ${targetRecipient} | Subject: ${message.subject}`);
   return {
     success: true,

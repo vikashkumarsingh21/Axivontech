@@ -75,6 +75,7 @@ export function escapeHtml(str: unknown): string {
 
 export function renderEmailHtml(options: BaseLayoutOptions): string {
   const currentYear = new Date().getFullYear();
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in";
   const badgeStyle = options.badge ? BADGE_STYLES[options.badge.variant || "gray"] : "";
   const boxStyle = options.highlightBox ? BOX_STYLES[options.highlightBox.variant || "info"] : "";
 
@@ -149,15 +150,24 @@ export function renderEmailHtml(options: BaseLayoutOptions): string {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td>
-                    <span style="font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; text-transform: uppercase;">
-                      Axivon<span style="color: #C2A878;">Tech</span>
-                    </span>
-                    <span style="display: block; font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">
-                      Axivon Technologies Private Limited
-                    </span>
+                    <table cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td valign="middle" style="padding-right: 12px;">
+                          <img src="${appUrl}/assets/logo/logo-white.png" alt="AxivonTech" height="32" style="display: block; height: 32px; width: auto; border: 0;" />
+                        </td>
+                        <td valign="middle">
+                          <span style="font-size: 19px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; text-transform: uppercase; line-height: 1;">
+                            Axivon<span style="color: #C2A878;">Tech</span>
+                          </span>
+                          <span style="display: block; font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px;">
+                            Axivon Technologies Private Limited
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                   ${options.referenceId ? `
-                  <td align="right">
+                  <td align="right" valign="middle">
                     <span style="display: inline-block; padding: 4px 10px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; font-family: monospace; font-size: 12px; color: #e5e7eb;">
                       ${escapeHtml(options.referenceId)}
                     </span>

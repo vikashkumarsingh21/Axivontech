@@ -167,11 +167,12 @@ export async function POST(req: Request) {
 
     // Dispatch Automated Transactional Emails (Internal alert + Applicant acknowledgement)
     try {
+      const { sendTransactionalEmail } = await import("@/lib/email/service");
       const { getEmailConfig } = await import("@/lib/email/config");
       const emailConfig = getEmailConfig();
 
-      // 1. Internal Notification to axivontech.in@gmail.com
-      await JobRunner.enqueue("SEND_EMAIL", {
+      // 1. Internal Notification to info@axivontech.in
+      await sendTransactionalEmail({
         to: emailConfig.internalNotificationEmail,
         templateKey: "PARTNER_APPLICATION_RECEIVED",
         eventKey: `bpa_internal:${application.applicationId}`,
@@ -180,10 +181,14 @@ export async function POST(req: Request) {
           applicationId: application.applicationId,
           occupation: data.occupation,
         },
+        metadata: {
+          applicationId: application.applicationId,
+          type: "INTERNAL_PARTNER_APPLICATION_ALERT",
+        },
       });
 
       // 2. Acknowledgement to Applicant with Reference ID
-      await JobRunner.enqueue("SEND_EMAIL", {
+      await sendTransactionalEmail({
         to: application.email,
         templateKey: "PARTNER_APPLICATION_ACK",
         eventKey: `bpa_ack:${application.applicationId}`,
@@ -191,6 +196,10 @@ export async function POST(req: Request) {
           name: application.fullName,
           applicationId: application.applicationId,
           verificationLink: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/v1/public/business-partner/applications/verify?token=${verificationToken}`,
+        },
+        metadata: {
+          applicationId: application.applicationId,
+          type: "APPLICANT_PARTNER_APPLICATION_ACK",
         },
       });
     } catch (queueErr) {

@@ -97,9 +97,9 @@ export function CreatePartnerLoginModal({
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
-  // Initialize modal state when application changes
+  // Initialize modal state when opened with an application
   useEffect(() => {
-    if (application) {
+    if (isOpen && application) {
       setEmail(application.email || "");
       setEmailError("");
       setEmailConflictType("NONE");
@@ -116,7 +116,7 @@ export function CreatePartnerLoginModal({
       setPartnerType(application.occupation || "Broker or Referral Agent");
       setInternalNote("");
     }
-  }, [application]);
+  }, [isOpen, application]);
 
   // Live email duplicate check with debounce
   const checkEmail = useCallback(
@@ -297,6 +297,8 @@ export function CreatePartnerLoginModal({
       setEmailSending(false);
     }
   };
+
+  if (!isOpen || !application) return null;
 
   const isApproved = application.status === "APPROVED";
 

@@ -44,12 +44,12 @@ describe("Axivon Centralized Transactional Email Automation System", () => {
   });
 
   describe("1. Official Sender & Company Identity Configuration", () => {
-    it("enforces official company sender identity (axivontech.in@gmail.com)", () => {
+    it("enforces official company sender identity (axivontech.in@gmail.com) and internal recipient (info@axivontech.in)", () => {
       const config = getEmailConfig();
       expect(config.senderName).toBe("Axivon Technologies");
       expect(config.senderEmail).toBe("axivontech.in@gmail.com");
       expect(config.replyTo).toBe("axivontech.in@gmail.com");
-      expect(config.internalNotificationEmail).toBe("axivontech.in@gmail.com");
+      expect(config.internalNotificationEmail).toBe("info@axivontech.in");
     });
 
     it("defaults to safe TEST mode to avoid spamming real recipients in development", () => {
@@ -170,7 +170,7 @@ describe("Axivon Centralized Transactional Email Automation System", () => {
   });
 
   describe("3. Delivery Transport & Test Mode Redirection", () => {
-    it("delivers simulated email and redirects external recipient to axivontech.in@gmail.com in test mode", async () => {
+    it("delivers email and redirects external recipient to info@axivontech.in in test mode with clear warning banner", async () => {
       const result = await deliverEmailMessage({
         to: "external-client@corporate.com",
         subject: "Contract Agreement Ready",
@@ -179,7 +179,7 @@ describe("Axivon Centralized Transactional Email Automation System", () => {
 
       expect(result.success).toBe(true);
       if (result.isTestMode) {
-        expect(result.recipientUsed).toBe("axivontech.in@gmail.com");
+        expect(result.recipientUsed).toBe("info@axivontech.in");
       }
     });
   });
@@ -233,6 +233,36 @@ describe("Axivon Centralized Transactional Email Automation System", () => {
       expect(result).toBeDefined();
       expect(typeof result.id).toBe("string");
       expect(result.status).toBe("SENT");
+    });
+  });
+
+  describe("6. Gmail SMTP Configuration & Health Verification", () => {
+    it("verifyEmailTransport reports status without exposing sensitive credentials", async () => {
+      const { verifyEmailTransport } = await import("@/lib/email/transport");
+      const health = await verifyEmailTransport();
+      expect(health).toHaveProperty("configured");
+      expect(health).toHaveProperty("verified");
+      expect(health).toHaveProperty("provider");
+      expect(health).toHaveProperty("senderEmail", "axivontech.in@gmail.com");
+      expect(health).not.toHaveProperty("smtpAppPassword");
+    });
+  });
+
+  describe("7. Forgot Password Email Dispatch Flow", () => {
+    it("dispatches PASSWORD_RESET email with single-use reset link and masked recipient", async () => {
+      const log = await sendTransactionalEmail({
+        to: "employee.user@example.com",
+        templateKey: "PASSWORD_RESET",
+        eventKey: "pwd_reset:user-123:test",
+        variables: {
+          name: "Suresh Pillai",
+          resetLink: "https://axivontech.in/reset-password?token=secure-token-hex-123",
+        },
+      });
+
+      expect(log).toBeDefined();
+      expect(log?.status).toBe("SENT");
+      expect(log?.templateKey).toBe("PASSWORD_RESET");
     });
   });
 });

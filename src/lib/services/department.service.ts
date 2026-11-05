@@ -535,6 +535,7 @@ export async function createDepartmentManagerAccount(
   let invitationSent = false;
   try {
     const { sendTransactionalEmail } = await import("@/lib/email/service");
+    // 8a. Manager Welcome Email
     await sendTransactionalEmail({
       to: newManager.email,
       templateKey: "GENERIC_NOTIFICATION",
@@ -551,6 +552,25 @@ export async function createDepartmentManagerAccount(
       },
     });
     invitationSent = true;
+
+    // 8b. Internal Alert to Company
+    const { getEmailConfig } = await import("@/lib/email/config");
+    const emailConfig = getEmailConfig();
+    await sendTransactionalEmail({
+      to: emailConfig.internalNotificationEmail,
+      templateKey: "GENERIC_NOTIFICATION",
+      eventKey: `dept_manager_created_internal:${newManager.id}`,
+      variables: {
+        title: "New Department Manager Account Provisioned",
+        message: `Department Manager account for ${newManager.name} (${newManager.email}) was provisioned for the ${department.name} department.`,
+        link: `${process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in"}/admin/departments`,
+      },
+      metadata: {
+        managerId: newManager.id,
+        departmentId: department.id,
+        type: "INTERNAL_DEPARTMENT_MANAGER_PROVISIONED",
+      },
+    });
   } catch (emailErr) {
     console.warn("[DepartmentService] Manager invitation email failed:", emailErr);
   }

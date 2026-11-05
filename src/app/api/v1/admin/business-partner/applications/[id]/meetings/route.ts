@@ -69,12 +69,16 @@ export async function POST(
       return m;
     });
 
-    // Dispatch Partner Meeting Notification
+    // Dispatch Partner Meeting Notification (Customer + Internal)
     try {
+      const { sendTransactionalEmail } = await import("@/lib/email/service");
+      const { getEmailConfig } = await import("@/lib/email/config");
+      const emailConfig = getEmailConfig();
       const { formatKolkataDateTime } = await import("@/lib/email/templates/base-layout");
       const formattedDate = formatKolkataDateTime(new Date(data.meetingDate));
 
-      await JobRunner.enqueue("SEND_EMAIL", {
+      // 1. Customer Notification
+      await sendTransactionalEmail({
         to: application.email,
         templateKey: "PARTNER_MEETING_SCHEDULED",
         eventKey: `meeting:${meeting.id}`,
@@ -86,9 +90,31 @@ export async function POST(
           locationOrLink: data.locationOrLink || "Link to be provided prior to session",
           instructions: data.notes || "Please have your business background and regional enterprise contacts ready for review.",
         },
+        metadata: {
+          meetingId: meeting.id,
+          applicationId: application.applicationId,
+          type: "PARTNER_MEETING_SCHEDULED",
+        },
+      });
+
+      // 2. Internal Company Notification
+      await sendTransactionalEmail({
+        to: emailConfig.internalNotificationEmail,
+        templateKey: "GENERIC_NOTIFICATION",
+        eventKey: `meeting_internal:${meeting.id}`,
+        variables: {
+          title: "Partner Evaluation Meeting Scheduled",
+          message: `A partner evaluation meeting has been scheduled with ${application.fullName} (${application.applicationId}) for ${formattedDate} (${data.meetingType}).`,
+          link: `${process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in"}/admin/business-partners/applications/${application.id}`,
+        },
+        metadata: {
+          meetingId: meeting.id,
+          applicationId: application.applicationId,
+          type: "INTERNAL_MEETING_SCHEDULED",
+        },
       });
     } catch (meetingEmailErr) {
-      console.warn("[Meeting API] Meeting email enqueue warning:", meetingEmailErr);
+      console.warn("[Meeting API] Meeting email dispatch warning:", meetingEmailErr);
     }
 
     return NextResponse.json(

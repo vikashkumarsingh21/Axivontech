@@ -203,6 +203,10 @@ export async function PUT(
 
     // Dispatch Status-Specific Transactional Notification
     try {
+      const { sendTransactionalEmail } = await import("@/lib/email/service");
+      const { getEmailConfig } = await import("@/lib/email/config");
+      const emailConfig = getEmailConfig();
+
       let emailTemplateKey = "PARTNER_APPLICATION_STATUS_UPDATE";
       if (newStatus === "APPROVED") {
         emailTemplateKey = "PARTNER_APPLICATION_APPROVED";
@@ -210,7 +214,8 @@ export async function PUT(
         emailTemplateKey = "PARTNER_APPLICATION_REJECTED";
       }
 
-      await JobRunner.enqueue("SEND_EMAIL", {
+      // 1. Customer Notification
+      await sendTransactionalEmail({
         to: updatedApp.email,
         templateKey: emailTemplateKey,
         eventKey: `bpa_status:${updatedApp.id}:${newStatus}`,
@@ -221,9 +226,31 @@ export async function PUT(
           // If rejected, do not leak raw internal staff notes to candidate
           reason: newStatus === "REJECTED" ? undefined : (reason ?? "N/A"),
         },
+        metadata: {
+          applicationId: updatedApp.applicationId,
+          status: newStatus,
+        },
       });
+
+      // 2. If Approved, send internal notification to company
+      if (newStatus === "APPROVED") {
+        await sendTransactionalEmail({
+          to: emailConfig.internalNotificationEmail,
+          templateKey: "GENERIC_NOTIFICATION",
+          eventKey: `bpa_approved_internal:${updatedApp.applicationId}`,
+          variables: {
+            title: "Broker Partner Application Approved",
+            message: `Partner application ${updatedApp.applicationId} for ${updatedApp.fullName} has been approved by administrator.`,
+            link: `${process.env.NEXT_PUBLIC_APP_URL || "https://axivontech.in"}/admin/business-partners/applications/${updatedApp.id}`,
+          },
+          metadata: {
+            applicationId: updatedApp.applicationId,
+            type: "INTERNAL_PARTNER_APPROVED",
+          },
+        });
+      }
     } catch (statusEmailErr) {
-      console.warn("[Partner Status API] Email enqueue warning:", statusEmailErr);
+      console.warn("[Partner Status API] Email dispatch warning:", statusEmailErr);
     }
 
     // Emit AuditLog (existing infrastructure)
