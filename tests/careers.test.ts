@@ -158,7 +158,7 @@ describe("Admin-Controlled Careers Visibility & Access Guards", () => {
     expect(response.status).toBe(403);
 
     const data = await response.json();
-    expect(data.error).toContain("Recruitment is currently closed");
+    expect(typeof data.error === "object" ? data.error.message : (data.message || data.error)).toContain("Recruitment is currently closed");
   });
 });
 
@@ -264,7 +264,7 @@ describe("Careers API Validations When Recruitment is Active (ON)", () => {
     expect(response.status).toBe(400);
 
     const data = await response.json();
-    expect(data.error).toContain("No resume file was uploaded");
+    expect(typeof data.error === "object" ? data.error.message : (data.message || data.error)).toContain("No resume file was uploaded");
   });
 
   it("should reject executable or disallowed file extensions for resume uploads", async () => {
@@ -283,7 +283,7 @@ describe("Careers API Validations When Recruitment is Active (ON)", () => {
     expect(response.status).toBe(400);
 
     const data = await response.json();
-    expect(data.error).toContain("Invalid file format");
+    expect(typeof data.error === "object" ? data.error.message : (data.message || data.error)).toContain("Invalid file format");
   });
 });
 

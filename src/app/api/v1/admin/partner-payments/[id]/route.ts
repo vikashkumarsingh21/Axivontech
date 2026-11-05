@@ -73,7 +73,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
       }
 
       // COMMISSION CALCULATION (supports broker custom rate override or active global rule)
-      const extSetting = brokerProfileId
+      const extSetting = brokerProfileId && db.organizationSetting?.findUnique
         ? await db.organizationSetting.findUnique({
             where: { key: `broker_ext:${brokerProfileId}` },
           })

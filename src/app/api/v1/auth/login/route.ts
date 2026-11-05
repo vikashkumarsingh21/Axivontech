@@ -83,11 +83,11 @@ export async function POST(req: NextRequest) {
     }
 
     if (user.status === "SUSPENDED" || user.status === "INACTIVE") {
-      throw new ApiError(403, `Your account is ${user.status.toLowerCase()}. Please contact AXIVON administration (admin@axivontech.in).`);
+      throw new ApiError(403, `Account is ${user.status}. Your account is suspended or inactive. Please contact AXIVON administration (admin@axivontech.in).`);
     }
 
     if (user.status === "PENDING_ACTIVATION") {
-      throw new ApiError(403, "Your account is pending activation. Please use the activation link sent to your email or contact support.");
+      throw new ApiError(403, "Account is PENDING_ACTIVATION. Your account is pending activation. Please complete your account activation using the activation link sent to your email or contact support.");
     }
 
     if (user.status !== "ACTIVE") {

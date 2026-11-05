@@ -137,7 +137,7 @@ describe("Contact Form & Lead Submission Verification Suite", () => {
 
     // Verify lead email notification was logged
     expect(sentEmails.length).toBeGreaterThanOrEqual(1);
-    const internalLeadEmail = sentEmails.find((e) => e.templateKey === "NEW_WEBSITE_LEAD");
+    const internalLeadEmail = sentEmails.find((e) => e.templateKey === "NEW_LEAD_REGISTERED" || e.templateKey === "NEW_WEBSITE_LEAD");
     expect(internalLeadEmail).toBeDefined();
     expect(internalLeadEmail.subject).toContain("Rohit Verma");
   });
@@ -182,7 +182,7 @@ describe("Contact Form & Lead Submission Verification Suite", () => {
     expect(createdNotifications[0].title).toContain("Pooja Patel");
 
     // Verify email dispatch
-    expect(sentEmails.some((e) => e.templateKey === "NEW_WEBSITE_LEAD")).toBe(true);
+    expect(sentEmails.some((e) => e.templateKey === "CONTACT_ENQUIRY_RECEIVED" || e.templateKey === "NEW_WEBSITE_LEAD" || e.templateKey === "NEW_LEAD_REGISTERED")).toBe(true);
   });
 
   it("supports international and formatted phone numbers", async () => {

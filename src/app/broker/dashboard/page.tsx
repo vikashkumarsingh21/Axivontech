@@ -684,7 +684,7 @@ export default function BrokerDashboardPage() {
           title="Recent Activity Timeline"
           subtitle="Audit events across your leads, projects, contracts, and payouts"
           action={
-            <Link href="/broker/activity" className="text-xs text-[#8B94A1] hover:text-[#E6E8EB] transition-colors font-mono">
+            <Link href="/broker/notifications" className="text-xs text-[#8B94A1] hover:text-[#E6E8EB] transition-colors font-mono">
               View Complete Feed →
             </Link>
           }

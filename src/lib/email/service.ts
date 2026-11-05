@@ -46,7 +46,7 @@ export async function sendTransactionalEmail(options: SendTransactionalEmailOpti
   }
 
   // 2. Idempotency Check: Prevent duplicate email dispatch for same business event within 24h
-  if (idempotencyKey) {
+  if (idempotencyKey && db?.emailLog?.findFirst) {
     try {
       const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
       const existing = await db.emailLog.findFirst({
@@ -71,11 +71,47 @@ export async function sendTransactionalEmail(options: SendTransactionalEmailOpti
     }
   }
 
-  // 3. Render Template
-  const { subject, html, text } = renderEmailTemplate(templateKey, {
-    ...variables,
-    to: normalizedTo,
-  });
+  // 3. Render Template (Check custom DB communicationTemplate / emailTemplate first)
+  let subject: string;
+  let html: string;
+  let text: string | undefined;
+
+  let dbTemplate: any = null;
+  if (db?.communicationTemplate?.findFirst) {
+    try {
+      dbTemplate = await db.communicationTemplate.findFirst({
+        where: { key: templateKey, isActive: true },
+      });
+    } catch {
+      // ignore
+    }
+  }
+  if (!dbTemplate && db?.emailTemplate?.findUnique) {
+    try {
+      dbTemplate = await db.emailTemplate.findUnique({
+        where: { key: templateKey },
+      });
+    } catch {
+      // ignore
+    }
+  }
+
+  if (dbTemplate && dbTemplate.subject && (dbTemplate.content || dbTemplate.body)) {
+    const rawSubject = dbTemplate.subject;
+    const rawContent = dbTemplate.content || dbTemplate.body || "";
+    const vars: Record<string, any> = { ...variables, to: normalizedTo };
+    subject = rawSubject.replace(/\{\{\s*(\w+)\s*\}\}/g, (_: string, k: string) => (vars[k] !== undefined ? String(vars[k]) : ""));
+    html = rawContent.replace(/\{\{\s*(\w+)\s*\}\}/g, (_: string, k: string) => (vars[k] !== undefined ? String(vars[k]) : ""));
+    text = html.replace(/<[^>]+>/g, "").trim();
+  } else {
+    const rendered = renderEmailTemplate(templateKey, {
+      ...variables,
+      to: normalizedTo,
+    });
+    subject = rendered.subject;
+    html = rendered.html;
+    text = rendered.text;
+  }
 
   // 4. Attempt Outbound Delivery
   let deliveryResult: DeliveryResult;
@@ -101,12 +137,13 @@ export async function sendTransactionalEmail(options: SendTransactionalEmailOpti
 
   // 5. Record Transactional Outbox Log
   let logRecord = null;
-  try {
-    const sanitizedError = deliveryResult.error
-      ? deliveryResult.error.replace(/(password|token|secret|key)=[^\s&]+/gi, "$1=[REDACTED]")
-      : null;
+  if (db?.emailLog?.create) {
+    try {
+      const sanitizedError = deliveryResult.error
+        ? deliveryResult.error.replace(/(password|token|secret|key)=[^\s&]+/gi, "$1=[REDACTED]")
+        : null;
 
-    logRecord = await db.emailLog.create({
+      logRecord = await db.emailLog.create({
       data: {
         toEmail: normalizedTo,
         templateKey,
@@ -125,8 +162,9 @@ export async function sendTransactionalEmail(options: SendTransactionalEmailOpti
         },
       },
     });
-  } catch (dbErr: unknown) {
-    console.error("[EmailService] Failed to record EmailLog:", (dbErr as Error).message);
+    } catch (dbErr: unknown) {
+      console.error("[EmailService] Failed to record EmailLog:", (dbErr as Error).message);
+    }
   }
 
   // 6. Enqueue Background Retry if delivery failed

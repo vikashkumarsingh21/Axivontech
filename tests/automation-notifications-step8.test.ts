@@ -607,7 +607,7 @@ describe("Step 8: Business Automation, Notifications & Operational Efficiency", 
       const res = await POST(req);
       expect(res.status).toBe(401);
       const json = await res.json();
-      expect(json.error).toMatch(/Unauthorized/i);
+      expect(json.error?.message || json.message || json.error).toMatch(/Unauthorized/i);
     });
 
     it("should authorize execution when valid CRON_SECRET bearer token is provided", async () => {

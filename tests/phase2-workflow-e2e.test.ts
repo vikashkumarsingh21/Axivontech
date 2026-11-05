@@ -311,7 +311,7 @@ describe("Phase 2: Broker-to-Client Business Workflow & Direct Client Lifecycle"
       const res = await POST(req);
       const json = await res.json();
       expect(res.status).toBe(400);
-      expect(json.error).toContain("Invalid IFSC code format");
+      expect(json.error?.message || json.message || json.error).toContain("Invalid IFSC code format");
     });
 
     it("accepts valid payout request and calculates 48-hour SLA due timestamp", async () => {
@@ -451,7 +451,7 @@ describe("Phase 2: Broker-to-Client Business Workflow & Direct Client Lifecycle"
       const json = await res.json();
 
       expect(res.status).toBe(400);
-      expect(json.error).toContain("Bank transaction reference (UTR) is strictly required");
+      expect(json.error?.message || json.message || json.error).toContain("Bank transaction reference (UTR) is strictly required");
     });
 
     it("successfully marks commission as PAID when verified UTR settlement is provided", async () => {

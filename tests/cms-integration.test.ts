@@ -409,7 +409,7 @@ describe("CMS Integration & Persistence Tests", () => {
       const res = await uploadMedia(req);
       expect(res.status).toBe(400);
       const data = await res.json();
-      expect(data.error).toContain("No file provided");
+      expect(data.error?.message || data.message || data.error).toContain("No file provided");
     });
 
     it("upload rejects unsupported MIME types with HTTP 400", async () => {
@@ -428,7 +428,7 @@ describe("CMS Integration & Persistence Tests", () => {
       const res = await uploadMedia(req);
       expect(res.status).toBe(400);
       const data = await res.json();
-      expect(data.error).toContain("Invalid file type");
+      expect(data.error?.message || data.message || data.error).toContain("Invalid file type");
     });
 
     it("upload accepts valid image and registers MediaAsset record", async () => {

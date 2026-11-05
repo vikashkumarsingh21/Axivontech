@@ -108,7 +108,7 @@ export function MobileAdminHome({ initialData, onRefresh }: MobileAdminHomeProps
           : "—",
       },
     ],
-    href: `/admin/leads`,
+    href: `/admin/crm/leads`,
   }));
 
   return (
@@ -204,7 +204,7 @@ export function MobileAdminHome({ initialData, onRefresh }: MobileAdminHomeProps
         </Link>
 
         <Link
-          href="/admin/approvals"
+          href="/admin/business-partners/applications"
           className="rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs hover:border-slate-300 transition-all flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
@@ -222,7 +222,7 @@ export function MobileAdminHome({ initialData, onRefresh }: MobileAdminHomeProps
         </Link>
 
         <Link
-          href="/admin/leads"
+          href="/admin/crm/leads"
           className="rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs hover:border-slate-300 transition-all flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
@@ -243,7 +243,7 @@ export function MobileAdminHome({ initialData, onRefresh }: MobileAdminHomeProps
       {/* ── Quick Action Tiles (Light) ─────────────────────────────────── */}
       <section className="grid grid-cols-4 gap-2">
         <Link
-          href="/admin/approvals"
+          href="/admin/leave"
           className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-slate-300 active:scale-95 transition-all"
         >
           <div className="h-10 w-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 mb-1.5">
@@ -279,7 +279,7 @@ export function MobileAdminHome({ initialData, onRefresh }: MobileAdminHomeProps
         </Link>
 
         <Link
-          href="/admin/export"
+          href="/admin/reports"
           className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-slate-300 active:scale-95 transition-all"
         >
           <div className="h-10 w-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 mb-1.5">
@@ -296,7 +296,7 @@ export function MobileAdminHome({ initialData, onRefresh }: MobileAdminHomeProps
         <div className="flex items-center justify-between px-1">
           <h2 className="text-sm font-bold text-slate-900">Recent CRM Leads</h2>
           <Link
-            href="/admin/leads"
+            href="/admin/crm/leads"
             className="text-xs font-semibold text-teal-600 flex items-center gap-1 hover:underline"
           >
             <span>View All</span>

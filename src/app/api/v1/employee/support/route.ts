@@ -143,12 +143,20 @@ export async function POST(req: NextRequest) {
 
     // Notify Admins
     try {
-      const admins = await getPlatformAdmins();
+      const admins = (await getPlatformAdmins()) || [];
+      let adminUserIds = admins.map((a) => a.id);
+      if (adminUserIds.length === 0 && db.userRole?.findMany) {
+        const urAdmins = (await db.userRole.findMany({
+          where: { role: { name: { in: ["ADMIN", "SUPER_ADMIN", "HR"] } } },
+          select: { userId: true },
+        })) || [];
+        adminUserIds = urAdmins.map((u: any) => u.userId);
+      }
 
-      if (admins.length > 0) {
+      if (adminUserIds.length > 0) {
         await db.notification.createMany({
-          data: admins.map((admin) => ({
-            userId: admin.id,
+          data: adminUserIds.map((adminId) => ({
+            userId: adminId,
             title: `[Support Ticket ${ticketNumber}] ${category}: ${subject}`,
             message: `${user.name} submitted ticket ${ticketNumber}: "${message.slice(0, 100)}${message.length > 100 ? '...' : ''}"`,
             type: priority === "HIGH" || priority === "URGENT" ? "WARNING" : "INFO",

@@ -353,7 +353,7 @@ describe("Step 9: Business Intelligence, Analytics & Reporting System", () => {
       const res = await GET(req);
       expect(res.status).toBe(403);
       const json = await res.json();
-      expect(json.error).toMatch(/Founder or Finance authorization/i);
+      expect(json.error?.message || json.message || json.error).toMatch(/Founder or Finance authorization/i);
     });
 
     it("should allow Founder to access /api/v1/analytics/finance", async () => {

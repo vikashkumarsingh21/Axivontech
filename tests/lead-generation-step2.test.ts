@@ -124,6 +124,7 @@ vi.mock("@/lib/auth/permissions", () => {
 // Mock email service
 vi.mock("@/lib/email/service", () => {
   return {
+    sendTransactionalEmail: vi.fn().mockResolvedValue({ success: true, messageId: "msg-123" }),
     EmailService: {
       send: vi.fn().mockResolvedValue({ success: true }),
     },
@@ -177,7 +178,7 @@ describe("STEP 2: Client Lead Generation, Inquiry Automation & CRM Tests", () =>
       const res = await publicLeadsPOST(req);
       expect(res.status).toBe(400);
       const json = await res.json();
-      expect(json.error).toMatch(/Name is required/i);
+      expect(json.error?.message || json.message || json.error).toMatch(/Name is required/i);
     });
 
     it("rejects invalid email formats with HTTP 400", async () => {
@@ -190,7 +191,7 @@ describe("STEP 2: Client Lead Generation, Inquiry Automation & CRM Tests", () =>
       const res = await publicLeadsPOST(req);
       expect(res.status).toBe(400);
       const json = await res.json();
-      expect(json.error).toMatch(/valid email/i);
+      expect(json.error?.message || json.message || json.error).toMatch(/valid email/i);
     });
 
     it("detects existing duplicate lead submitted within 30 days and flags duplicateReason", async () => {
@@ -307,7 +308,7 @@ describe("STEP 2: Client Lead Generation, Inquiry Automation & CRM Tests", () =>
       expect(res.status).toBe(400);
 
       const json = await res.json();
-      expect(json.error).toMatch(/Use the \/convert endpoint/i);
+      expect(json.error?.message || json.message || json.error).toMatch(/Use the \/convert endpoint/i);
     });
   });
 });

@@ -16,7 +16,10 @@ import {
   ShieldCheck,
   Cpu,
 } from "lucide-react";
-import { portfolioProjects, getProjectBySlug } from "@/data/portfolio";
+import {
+  getPublishedPortfolioProjectBySlug,
+  getPublishedPortfolioProjects,
+} from "@/lib/content/content-db";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 
 interface PageProps {
@@ -24,14 +27,15 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return portfolioProjects.map((project) => ({
+  const projects = await getPublishedPortfolioProjects();
+  return projects.map((project) => ({
     slug: project.slug,
   }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getPublishedPortfolioProjectBySlug(slug);
 
   if (!project) {
     return {
@@ -71,13 +75,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PortfolioCaseStudyPage({ params }: PageProps) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getPublishedPortfolioProjectBySlug(slug);
 
   if (!project) {
     notFound();
   }
 
-  const otherProjects = portfolioProjects.filter((p) => p.slug !== project.slug);
+  const allProjects = await getPublishedPortfolioProjects();
+  const otherProjects = allProjects.filter((p) => p.slug !== project.slug);
 
   const statusColor =
     project.status === "Live"

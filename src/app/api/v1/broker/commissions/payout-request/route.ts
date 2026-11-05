@@ -20,7 +20,13 @@ const payoutRequestSchema = z.object({
     .object({
       accountHolder: z.string().optional(),
       accountNumber: z.string().optional(),
-      ifsc: z.string().optional(),
+      ifsc: z
+        .string()
+        .refine(
+          (val) => !val || /^[A-Z]{4}0[A-Z0-9]{6}$/i.test(val.trim()),
+          "Invalid IFSC code format (e.g. HDFC0001234)."
+        )
+        .optional(),
       bankName: z.string().optional(),
       upiId: z.string().optional(),
     })
@@ -44,15 +50,6 @@ export async function POST(req: NextRequest) {
     const { commissionId, notes } = validated.data;
     const { payoutMethod, payoutDetails } = validated.data;
 
-    // Idempotency guard: prevent duplicate submission of the same commission request
-    const isDuplicate = await checkIdempotency(req, "payout_request", `${commissionId}:${session.userId}`);
-    if (isDuplicate) {
-      return apiSuccess({
-        commissionId,
-        message: "Payout request has already been registered and is under processing.",
-      });
-    }
-
     // 1. Fetch commission
     const commission = await db.commission.findUnique({
       where: { id: commissionId },
@@ -67,7 +64,7 @@ export async function POST(req: NextRequest) {
 
     // IDOR protection
     if (commission.brokerProfileId !== brokerProfile.id) {
-      throw new ApiError(403, "Access denied. You do not own this commission record.");
+      throw new ApiError(403, "Access denied. This commission does not belong to your broker account.");
     }
 
     if (commission.status === "PAID") {
@@ -130,6 +127,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Idempotency guard: prevent duplicate submission of the same commission request
+    const isDuplicate = await checkIdempotency(req, "payout_request", `${commissionId}:${session.userId}`);
+    if (isDuplicate) {
+      return apiSuccess({
+        commissionId,
+        message: "Payout request has already been registered and is under processing.",
+      });
+    }
+
     const requestedAt = new Date();
     // SLA: 48 business hours
     const dueAt = new Date(requestedAt.getTime() + 48 * 60 * 60 * 1000);
@@ -178,7 +184,7 @@ export async function POST(req: NextRequest) {
       link: "/admin/crm/commissions",
     });
 
-    return apiSuccess({
+    const resultPayload = {
       commissionId: updatedCommission.id,
       status: "REQUESTED",
       amount: updatedCommission.commissionAmount,
@@ -186,7 +192,9 @@ export async function POST(req: NextRequest) {
       requestedAt: requestedAt.toISOString(),
       slaDueAt: dueAt.toISOString(),
       message: "Payout request submitted successfully. SLA target is 48 business hours.",
-    });
+    };
+
+    return apiSuccess(resultPayload, undefined, resultPayload);
   } catch (error) {
     return handleApiError(error);
   }

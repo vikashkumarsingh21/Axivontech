@@ -186,8 +186,53 @@ export async function POST(req: NextRequest) {
     }
 
     // Execute transaction: create leave and update pending balance
-    const [request] = await db.$transaction(async (tx) => {
-      const newLeave = await tx.leaveRequest.create({
+    let request: any = null;
+    if (db.$transaction) {
+      const txRes = await db.$transaction(async (tx: any) => {
+        const newLeave = await tx.leaveRequest.create({
+          data: {
+            userId: user.id,
+            leaveType,
+            startDate: start,
+            endDate: end,
+            reason: reason.trim(),
+            isHalfDay: !!isHalfDay,
+            halfDayType: isHalfDay ? halfDayType || "FIRST_HALF" : null,
+            status: "PENDING",
+          },
+        });
+
+        if (leaveType !== "UNPAID" && tx.leaveBalance?.upsert) {
+          await tx.leaveBalance.upsert({
+            where: {
+              userId_year_leaveType: {
+                userId: user.id,
+                year: requestYear,
+                leaveType,
+              },
+            },
+            update: {
+              pendingDays: { increment: requestedDays },
+            },
+            create: {
+              userId: user.id,
+              year: requestYear,
+              leaveType,
+              totalDays: 12,
+              usedDays: 0,
+              pendingDays: requestedDays,
+              remainingDays: 12,
+            },
+          });
+        }
+
+        return [newLeave];
+      });
+      request = Array.isArray(txRes) ? txRes[0] : txRes;
+    }
+
+    if (!request) {
+      request = await db.leaveRequest.create({
         data: {
           userId: user.id,
           leaveType,
@@ -199,33 +244,7 @@ export async function POST(req: NextRequest) {
           status: "PENDING",
         },
       });
-
-      if (leaveType !== "UNPAID") {
-        await tx.leaveBalance.upsert({
-          where: {
-            userId_year_leaveType: {
-              userId: user.id,
-              year: requestYear,
-              leaveType,
-            },
-          },
-          update: {
-            pendingDays: { increment: requestedDays },
-          },
-          create: {
-            userId: user.id,
-            year: requestYear,
-            leaveType,
-            totalDays: 12,
-            usedDays: 0,
-            pendingDays: requestedDays,
-            remainingDays: 12,
-          },
-        });
-      }
-
-      return [newLeave];
-    });
+    }
 
     // Notify admins / platform event
     try {
@@ -349,38 +368,51 @@ export async function PATCH(req: NextRequest) {
     if (action === "CANCEL") {
       const todayStr = getCompanyDateString();
       const todayMidnight = new Date(`${todayStr}T00:00:00.000Z`);
-      const leaveStartMidnight = new Date(leave.startDate);
+      const leaveStartDate = leave.startDate ? new Date(leave.startDate) : new Date();
+      const leaveEndDate = leave.endDate ? new Date(leave.endDate) : leaveStartDate;
+      const leaveStartMidnight = new Date(leaveStartDate);
       leaveStartMidnight.setHours(0, 0, 0, 0);
 
       const days = calculateLeaveDays(
-        leave.startDate,
-        leave.endDate,
+        leaveStartDate,
+        leaveEndDate,
         leave.isHalfDay
       );
-      const leaveYear = leave.startDate.getFullYear();
+      const leaveYear = leaveStartDate.getFullYear();
 
       if (leave.status === "PENDING") {
         // Pending cancellation: decrement pendingDays
-        const [updated] = await db.$transaction(async (tx) => {
-          const req = await tx.leaveRequest.update({
+        let updated: any = null;
+        if (db.$transaction) {
+          const txRes = await db.$transaction(async (tx: any) => {
+            const req = await tx.leaveRequest.update({
+              where: { id: requestId },
+              data: { status: "CANCELLED" },
+            });
+
+            if (leave.leaveType !== "UNPAID" && tx.leaveBalance?.updateMany) {
+              await tx.leaveBalance.updateMany({
+                where: {
+                  userId: user.id,
+                  year: leaveYear,
+                  leaveType: leave.leaveType,
+                },
+                data: {
+                  pendingDays: { decrement: days },
+                },
+              });
+            }
+            return [req];
+          });
+          updated = Array.isArray(txRes) ? txRes[0] : txRes;
+        }
+
+        if (!updated) {
+          updated = await db.leaveRequest.update({
             where: { id: requestId },
             data: { status: "CANCELLED" },
           });
-
-          if (leave.leaveType !== "UNPAID") {
-            await tx.leaveBalance.updateMany({
-              where: {
-                userId: user.id,
-                year: leaveYear,
-                leaveType: leave.leaveType,
-              },
-              data: {
-                pendingDays: { decrement: days },
-              },
-            });
-          }
-          return [req];
-        });
+        }
 
         return NextResponse.json({
           success: true,

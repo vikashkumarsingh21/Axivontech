@@ -28,7 +28,9 @@ const createWorkReportSchema = z.object({
   hoursWorked: z.coerce
     .number()
     .min(0.1, "Hours worked must be at least 0.1")
-    .max(24, "Hours worked cannot exceed 24 hours in a single day"),
+    .max(24, "Hours worked cannot exceed 24 hours in a single day")
+    .optional()
+    .nullable(),
   status: z.enum(["DRAFT", "SUBMITTED"]).optional().default("SUBMITTED"),
 });
 
@@ -152,6 +154,10 @@ export async function POST(req: NextRequest) {
       status,
     } = parsed.data;
 
+    const defaultHours = user.requiredDailyMinutes ? user.requiredDailyMinutes / 60 : 8;
+    const finalHoursWorked =
+      hoursWorked !== undefined && hoursWorked !== null ? hoursWorked : defaultHours;
+
     // Date resolution
     const today = getCompanyCalendarDate();
 
@@ -181,9 +187,11 @@ export async function POST(req: NextRequest) {
     checkIdempotency(idempotencyKey, 3000);
 
     // Check if an existing report exists and whether it is within the 48-hour edit window
-    const existing = await db.workReport.findUnique({
-      where: { userId_date: { userId: user.id, date: reportDate } },
-    });
+    const existing = db.workReport?.findUnique
+      ? await db.workReport.findUnique({
+          where: { userId_date: { userId: user.id, date: reportDate } },
+        })
+      : null;
 
     if (existing) {
       const hoursSinceCreation =
@@ -204,7 +212,7 @@ export async function POST(req: NextRequest) {
         tasksCompleted: tasksCompleted || null,
         challenges: challenges || null,
         nextSteps: nextSteps || null,
-        hoursWorked,
+        hoursWorked: finalHoursWorked,
         status,
       },
       create: {
@@ -215,7 +223,7 @@ export async function POST(req: NextRequest) {
         tasksCompleted: tasksCompleted || null,
         challenges: challenges || null,
         nextSteps: nextSteps || null,
-        hoursWorked,
+        hoursWorked: finalHoursWorked,
         status,
       },
     });
@@ -228,7 +236,7 @@ export async function POST(req: NextRequest) {
           reportId: report.id,
           employeeUserId: user.id,
           date: reportDate,
-          hoursWorked,
+          hoursWorked: finalHoursWorked,
           summary,
         }).catch((err) => console.warn("[WorkReport] Department manager notification error:", err));
 

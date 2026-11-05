@@ -87,15 +87,19 @@ async function getCachedUserAuth(userId: string): Promise<CachedUserAuth | null>
   const permissions = new Set<string>();
   let isSuperAdmin = false;
 
-  for (const ur of user.userRoles) {
-    const roleName = ur.role.name;
-    roles.push(roleName);
-    if (roleName === "FOUNDER" || roleName === "CO_FOUNDER" || roleName === "ADMIN") {
-      isSuperAdmin = true;
+  const userRoles = Array.isArray(user.userRoles) ? user.userRoles : [];
+
+  for (const ur of userRoles) {
+    const roleName = ur?.role?.name;
+    if (roleName) {
+      roles.push(roleName);
+      if (roleName === "FOUNDER" || roleName === "CO_FOUNDER" || roleName === "ADMIN") {
+        isSuperAdmin = true;
+      }
     }
-    if (ur.role.rolePermissions) {
+    if (ur?.role?.rolePermissions && Array.isArray(ur.role.rolePermissions)) {
       for (const rp of ur.role.rolePermissions) {
-        if (rp.permission?.name) {
+        if (rp?.permission?.name) {
           permissions.add(rp.permission.name);
         }
       }

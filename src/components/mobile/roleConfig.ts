@@ -83,7 +83,7 @@ export const ROLE_CONFIGS: Record<MobileRole, RoleNavigationConfig> = {
     ],
     moreItems: [
       { id: "settings", label: "Organization Settings", href: "/executive/settings", icon: Settings, description: "Company parameters" },
-      { id: "profile", label: "Executive Profile", href: "/executive/profile", icon: Users, description: "Credentials & security" },
+      { id: "profile", label: "Executive Profile", href: "/executive/settings", icon: Users, description: "Credentials & security" },
     ],
   },
   ADMIN: {
@@ -91,15 +91,15 @@ export const ROLE_CONFIGS: Record<MobileRole, RoleNavigationConfig> = {
     rootPath: "/admin/dashboard",
     tabs: [
       { id: "home", label: "Home", href: "/admin/dashboard", icon: LayoutDashboard },
-      { id: "approvals", label: "Approvals", href: "/admin/approvals", icon: CheckCircle2 },
+      { id: "approvals", label: "Approvals", href: "/admin/leave", icon: CheckCircle2 },
       { id: "people", label: "People", href: "/admin/employees", icon: Users },
-      { id: "crm", label: "CRM", href: "/admin/leads", icon: Briefcase },
+      { id: "crm", label: "CRM", href: "/admin/crm/leads", icon: Briefcase },
     ],
     moreItems: [
       { id: "attendance", label: "Attendance Manager", href: "/admin/attendance", icon: CalendarCheck, description: "Track daily logs & regularization" },
       { id: "tasks", label: "Task Board", href: "/admin/tasks", icon: CheckSquare, description: "Task delegation and tracking" },
       { id: "projects", label: "Project Portfolio", href: "/admin/projects", icon: Briefcase, description: "Active milestones & delivery" },
-      { id: "export", label: "Export Center", href: "/admin/export", icon: Download, description: "CSV and Excel data downloads" },
+      { id: "export", label: "Export Center", href: "/admin/reports", icon: Download, description: "CSV and Excel data downloads" },
       { id: "app-settings", label: "Mobile App Settings", href: "/admin/settings/app", icon: Smartphone, description: "Releases, APKs & app-mode toggles" },
       { id: "notifications", label: "Notifications", href: "/admin/notifications", icon: Bell, description: "System alerts and logs" },
     ],
@@ -116,7 +116,7 @@ export const ROLE_CONFIGS: Record<MobileRole, RoleNavigationConfig> = {
     moreItems: [
       { id: "attendance", label: "Department Attendance", href: "/manager/attendance", icon: CalendarCheck, description: "Team daily clock-ins & status" },
       { id: "work-reports", label: "Work Reports", href: "/manager/work-reports", icon: FileText, description: "Team EOD submissions" },
-      { id: "notifications", label: "Notifications", href: "/admin/notifications", icon: Bell, description: "Team alerts & requests" },
+      { id: "notifications", label: "Notifications", href: "/manager/dashboard", icon: Bell, description: "Team alerts & requests" },
     ],
   },
 };

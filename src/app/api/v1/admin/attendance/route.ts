@@ -295,6 +295,7 @@ export async function GET(req: NextRequest) {
         OR: [
           { date: { gte: startOfDay, lte: endOfDay } },
           { checkInAt: { gte: startOfDay, lte: endOfDay } },
+          { checkOutAt: null },
         ],
       },
       include: {
@@ -497,9 +498,10 @@ export async function GET(req: NextRequest) {
         policy,
       });
 
+      const isActivelyWorking = !att.checkOutAt && !!att.checkInAt && !calc.isOnBreak;
       if (calc.isOnBreak) {
         currentlyOnBreak++;
-      } else if (calc.isWorking) {
+      } else if (calc.isWorking || isActivelyWorking) {
         currentlyWorking++;
       }
 
@@ -534,7 +536,7 @@ export async function GET(req: NextRequest) {
         status: !att.checkOutAt && !!att.checkInAt ? "IN_PROGRESS" : calc.completionStatus,
         completionStatus: calc.completionStatus,
         emailAlertSent: att.emailAlertSent,
-        currentState: calc.isOnBreak ? "ON_BREAK" : calc.isWorking ? "WORKING" : "IDLE",
+        currentState: calc.isOnBreak ? "ON_BREAK" : (calc.isWorking || isActivelyWorking) ? "WORKING" : "IDLE",
         breaks: att.breaks,
         regularization: att.regularization,
         notes: att.notes,

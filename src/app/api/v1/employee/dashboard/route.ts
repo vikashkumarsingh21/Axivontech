@@ -248,9 +248,9 @@ export async function GET(req: NextRequest) {
         },
         unreadNotifs,
         recentAnnouncements,
-        upcomingHolidays: upcomingHolidays.map((h) => ({
+        upcomingHolidays: (upcomingHolidays || []).map((h) => ({
           ...h,
-          date: h.date.toISOString().split("T")[0],
+          date: h.date instanceof Date ? h.date.toISOString().split("T")[0] : String(h.date || ""),
         })),
       },
     });

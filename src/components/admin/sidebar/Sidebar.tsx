@@ -34,15 +34,15 @@ interface NavItem {
  */
 const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Portfolio", href: "/admin/portfolio", icon: Briefcase },
-  { label: "Services", href: "/admin/services", icon: Wrench },
+  { label: "Portfolio", href: "/admin/content/portfolio", icon: Briefcase },
+  { label: "Services", href: "/admin/content/services", icon: Wrench },
   { label: "Careers", href: "/admin/careers", icon: GraduationCap },
-  { label: "Contacts", href: "/admin/contacts", icon: Mail },
-  { label: "Blogs", href: "/admin/blogs", icon: FileText },
-  { label: "Media", href: "/admin/media", icon: ImageIcon },
+  { label: "Contacts", href: "/admin/crm/leads", icon: Mail },
+  { label: "Blogs", href: "/admin/content/blog", icon: FileText },
+  { label: "Media", href: "/admin/content/media", icon: ImageIcon },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-  { label: "Testimonials", href: "/admin/testimonials", icon: MessageSquareQuote },
-  { label: "Team", href: "/admin/team", icon: Users },
+  { label: "Testimonials", href: "/admin/reviews", icon: MessageSquareQuote },
+  { label: "Team", href: "/admin/employees", icon: Users },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
@@ -130,9 +130,9 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
         <ul className="flex flex-col gap-1">
           <li>
             <Link
-              href="/admin/profile"
+              href="/admin/settings"
               className={`group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors duration-200 ${
-                pathname === "/admin/profile"
+                pathname === "/admin/settings"
                   ? "bg-[#1B212A] text-[#C08457]"
                   : "text-[#B7BDC7] hover:bg-[#1B212A] hover:text-white"
               }`}
@@ -140,7 +140,7 @@ export default function Sidebar({ isCollapsed = false }: SidebarProps) {
               <User
                 size={18}
                 className={`shrink-0 transition-colors duration-200 ${
-                  pathname === "/admin/profile"
+                  pathname === "/admin/settings"
                     ? "text-[#C08457]"
                     : "text-[#B7BDC7] group-hover:text-white"
                 }`}

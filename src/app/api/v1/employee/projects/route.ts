@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
     const projects = rawProjects.map((p) => {
       const myTasks = p.tasks || [];
       const completedMyTasks = myTasks.filter((t) => t.status === "COMPLETED").length;
-      const myRole = p.members[0]?.role || "CONTRIBUTOR";
+      const myRole = p.members?.[0]?.role || "CONTRIBUTOR";
 
       return {
         id: p.id,

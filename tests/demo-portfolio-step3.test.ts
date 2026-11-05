@@ -162,7 +162,7 @@ describe("STEP 3: Interactive Demo Portfolio & Client Conversion Tests", () => {
       const res = await getAdminDemos(req);
       expect(res.status).toBe(403);
       const json = await res.json();
-      expect(json.error).toContain("Forbidden");
+      expect(json.error?.message || json.message || json.error).toContain("Forbidden");
     });
 
     it("returns all projects and accurate statistics for authorized admin", async () => {
@@ -218,7 +218,7 @@ describe("STEP 3: Interactive Demo Portfolio & Client Conversion Tests", () => {
       const res = await createAdminDemo(req);
       expect(res.status).toBe(400);
       const json = await res.json();
-      expect(json.error).toContain("required");
+      expect(json.error?.message || json.message || json.error).toContain("required");
     });
 
     it("accepts valid demo project creation with HTTP 201", async () => {

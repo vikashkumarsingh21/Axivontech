@@ -72,7 +72,7 @@ export async function getAuthenticatedSession(req: Request | any): Promise<Sessi
     if (testUserId && !isForgedTest) {
       return {
         userId: testUserId,
-        role: req.headers.get("x-user-role") || "USER",
+        role: req.headers.get("x-user-role") || "",
         sessionId: "test-session-id",
       };
     }

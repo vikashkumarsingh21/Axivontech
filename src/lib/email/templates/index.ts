@@ -55,7 +55,7 @@ export function renderEmailTemplate(
     // ── 1. Contact Form Templates ───────────────────────────────────────────
     case "CONTACT_ENQUIRY_RECEIVED": {
       const clientName = variables.name || variables.clientName || variables.fullName || "Client";
-      const subject = `[AxivonTech] New Contact Enquiry Received — ${variables.leadCode || "Inbound"}`;
+      const subject = `[AxivonTech] New Contact Enquiry Received — ${clientName} [${variables.leadCode || "Inbound"}]`;
       const html = renderEmailHtml({
         title: "New Website Contact Enquiry",
         previewText: `New enquiry received from ${clientName} (${variables.service || "General"}).`,
@@ -471,7 +471,8 @@ export function renderEmailTemplate(
 
     // ── 4. CRM & Sales Workflows ─────────────────────────────────────────────
     case "NEW_LEAD_REGISTERED": {
-      const subject = `[AxivonTech CRM] New Lead Registered — ${variables.leadCode || "Lead"}`;
+      const leadName = variables.name || variables.clientName || variables.fullName || "";
+      const subject = `[AxivonTech CRM] New Lead Registered — ${leadName ? `${leadName} [${variables.leadCode || "Lead"}]` : (variables.leadCode || "Lead")}`;
       const html = renderEmailHtml({
         title: "New Lead Registered in CRM",
         previewText: `New lead registered: ${variables.name || "Client"} (${variables.leadCode}).`,

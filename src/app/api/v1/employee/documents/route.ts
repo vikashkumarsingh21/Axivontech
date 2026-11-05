@@ -21,10 +21,10 @@ export async function GET(req: NextRequest) {
     const userRoles = user.userRoles.map((ur) => ur.role.name);
     const primaryRole = userRoles[0] || user.role;
 
-    const userProjects = await db.projectMember.findMany({
+    const userProjects = (await db.projectMember?.findMany?.({
       where: { userId: user.id },
       select: { projectId: true },
-    });
+    })) || [];
     const projectIds = userProjects.map((p) => p.projectId);
 
     // Build single-query permission-scoped filter
@@ -107,9 +107,9 @@ export async function GET(req: NextRequest) {
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
       uploadedBy: doc.uploadedBy,
-      versionCount: doc._count.versions,
-      isAcknowledged: doc.acknowledgments.length > 0,
-      acknowledgedAt: doc.acknowledgments[0]?.acknowledgedAt || null,
+      versionCount: doc._count?.versions || 0,
+      isAcknowledged: (doc.acknowledgments || []).length > 0,
+      acknowledgedAt: doc.acknowledgments?.[0]?.acknowledgedAt || null,
     }));
 
     return NextResponse.json({

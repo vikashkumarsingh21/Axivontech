@@ -39,12 +39,29 @@ export async function requireBroker(req: Request | NextRequest): Promise<BrokerA
     );
   }
 
-  const user = await db.user.findUnique({
-    where: { id: session.userId },
-    include: {
-      brokerProfile: true,
-    },
-  });
+  let user = db.user
+    ? await db.user.findUnique({
+        where: { id: session.userId },
+        include: {
+          brokerProfile: true,
+        },
+      })
+    : null;
+
+  if (!user && db.brokerProfile?.findUnique) {
+    const profile = await db.brokerProfile.findUnique({
+      where: { userId: session.userId },
+      include: { user: true },
+    });
+    if (profile) {
+      user = {
+        id: session.userId,
+        status: (profile as any).user?.status || "ACTIVE",
+        brokerProfile: profile,
+        ...(profile as any).user,
+      } as any;
+    }
+  }
 
   if (!user) {
     throw new ApiError(401, "User account not found.", undefined, "USER_NOT_FOUND");

@@ -161,7 +161,7 @@ describe("Phase 3: Final Platform-Wide Integration Audit & Security Verification
       const res = await POST(req);
       expect(res.status).toBe(403);
       const data = await res.json();
-      expect(data.error).toMatch(/does not belong to your broker account|access denied/i);
+      expect(data.error?.message || data.message || data.error).toMatch(/does not belong to your broker account|access denied/i);
     });
   });
 
@@ -193,7 +193,7 @@ describe("Phase 3: Final Platform-Wide Integration Audit & Security Verification
 
       expect(res.status).toBe(404);
       const data = await res.json();
-      expect(data.error).toMatch(/document not found or access denied/i);
+      expect(data.error?.message || data.message || data.error).toMatch(/document not found or access denied/i);
     });
 
     it("allows authorized Client A to view and stream their own verified HTML delivery report", async () => {
@@ -257,7 +257,7 @@ describe("Phase 3: Final Platform-Wide Integration Audit & Security Verification
 
       expect(res.status).toBe(403);
       const data = await res.json();
-      expect(data.error).toMatch(/insufficient permissions/i);
+      expect(data.error?.message || data.message || data.error).toMatch(/insufficient permissions/i);
     });
   });
 
@@ -353,7 +353,7 @@ describe("Phase 3: Final Platform-Wide Integration Audit & Security Verification
 
       expect(res.status).toBe(400);
       const data = await res.json();
-      expect(data.error).toMatch(/UAT must be approved before delivery/i);
+      expect(data.error?.message || data.message || data.error).toMatch(/UAT must be approved before delivery/i);
     });
 
     it("allows delivery and auto-generates delivery report when qaStatus is UAT_APPROVED", async () => {
@@ -455,7 +455,7 @@ describe("Phase 3: Final Platform-Wide Integration Audit & Security Verification
 
       expect(res.status).toBe(400);
       const data = await res.json();
-      expect(data.error).toMatch(/must be DELIVERED before it can be marked as COMPLETED/i);
+      expect(data.error?.message || data.message || data.error).toMatch(/must be DELIVERED before it can be marked as COMPLETED/i);
     });
 
     it("successfully finalizes completion when project is DELIVERED", async () => {
@@ -530,7 +530,7 @@ describe("Phase 3: Final Platform-Wide Integration Audit & Security Verification
 
       expect(res.status).toBe(400);
       const data = await res.json();
-      expect(data.error).toMatch(/bank transaction reference \(UTR\) is strictly required/i);
+      expect(data.error?.message || data.message || data.error).toMatch(/bank transaction reference \(UTR\) is strictly required/i);
     });
 
     it("settles commission to PAID when valid UTR is provided", async () => {
@@ -609,7 +609,7 @@ describe("Phase 3: Final Platform-Wide Integration Audit & Security Verification
 
       expect(res.status).toBe(400);
       const data = await res.json();
-      expect(data.error).toMatch(/lead is already converted/i);
+      expect(data.error?.message || data.message || data.error).toMatch(/lead is already converted/i);
     });
   });
 
@@ -636,7 +636,7 @@ describe("Phase 3: Final Platform-Wide Integration Audit & Security Verification
       const res = await POST(req);
       expect(res.status).toBe(400);
       const data = await res.json();
-      expect(data.error).toMatch(/invalid or expired activation token/i);
+      expect(data.error?.message || data.message || data.error).toMatch(/invalid or expired activation token/i);
     });
 
     it("activates user, clears activationToken, invalidates sessions, and sets status to ACTIVE", async () => {
@@ -742,7 +742,7 @@ describe("Phase 3: Final Platform-Wide Integration Audit & Security Verification
 
       expect(res.status).toBe(400);
       const data = await res.json();
-      expect(data.error).toMatch(/invalid qaStatus/i);
+      expect(data.error?.message || data.message || data.error).toMatch(/invalid qaStatus/i);
     });
   });
 });

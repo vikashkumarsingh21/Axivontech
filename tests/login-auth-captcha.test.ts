@@ -166,7 +166,8 @@ describe("AXIVON ONE: Login Route Anti-Bot & CAPTCHA Verification Security Suite
       expect(res.status).toBe(429);
 
       const data = await res.json();
-      expect(data.error).toBe("Too many login attempts. Please try again later.");
+      const errorMessage = typeof data.error === "object" ? data.error.message : (data.error || data.message);
+      expect(errorMessage).toBe("Too many login attempts. Please try again later.");
       expect(res.headers.get("Retry-After")).toBeDefined();
     });
   });
@@ -253,7 +254,7 @@ describe("AXIVON ONE: Login Route Anti-Bot & CAPTCHA Verification Security Suite
         id: "usr-pending-activation",
         email: "newhire@axivontech.in",
         passwordHash: "$2b$10$hashedPasswordSample",
-        status: "ACTIVE",
+        status: "PENDING_ACTIVATION",
         mustChangePassword: true,
         userRoles: [{ role: { name: "EMPLOYEE" } }],
       });

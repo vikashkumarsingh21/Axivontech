@@ -67,6 +67,9 @@ export async function seedInitialCareersData() {
  */
 export async function isCareersPageEnabled(): Promise<boolean> {
   try {
+    if (!db?.careersPageSetting?.findUnique) {
+      return false;
+    }
     const setting = await db.careersPageSetting.findUnique({
       where: { id: "default" },
       select: { careersPageEnabled: true },

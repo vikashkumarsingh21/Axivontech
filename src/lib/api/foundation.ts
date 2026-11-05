@@ -114,7 +114,9 @@ export async function getSessionUser(req: Request | NextRequest): Promise<Authen
     );
   }
 
-  const primaryRole = normalizeRole(session.role || user.userRoles[0]?.role?.name || "EMPLOYEE");
+  const dbRole = user.userRoles?.[0]?.role?.name;
+  const rawRole = (session.role && session.role !== "USER") ? session.role : (dbRole || "EMPLOYEE");
+  const primaryRole = normalizeRole(rawRole);
 
   return {
     ...user,
@@ -155,7 +157,8 @@ export async function requireEmployee(
  * Safely fetches active platform administrators and founders for event/task notifications.
  */
 export async function getPlatformAdmins() {
-  return db.user.findMany({
+  if (!db.user?.findMany) return [];
+  const admins = await db.user.findMany({
     where: {
       status: "ACTIVE",
       userRoles: {
@@ -168,6 +171,7 @@ export async function getPlatformAdmins() {
     },
     select: { id: true, name: true, email: true },
   });
+  return admins || [];
 }
 
 // ─────────────────────────────────────────────────────────────

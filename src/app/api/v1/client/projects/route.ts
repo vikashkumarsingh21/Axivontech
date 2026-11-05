@@ -16,7 +16,10 @@ export async function GET(req: Request) {
     const role = req.headers.get("x-user-role");
 
     const allowedRoles = ["CLIENT", "ADMIN", "FOUNDER", "CO_FOUNDER"];
-    if (!userId || !role || !allowedRoles.includes(role)) {
+    if (!userId) {
+      throw new ApiError(401, "Authentication required.");
+    }
+    if (!role || !allowedRoles.includes(role)) {
       throw new ApiError(403, "Access denied.");
     }
 

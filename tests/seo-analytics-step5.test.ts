@@ -252,6 +252,20 @@ describe("Step 5 — Analytics Engine & Zero-PII Sanitization", () => {
     const mockGtag = vi.fn();
     (global as any).window = {
       gtag: mockGtag,
+      localStorage: {
+        getItem: (key: string) => {
+          if (key === "axivon_consent_preferences") {
+            return JSON.stringify({
+              necessary: true,
+              analytics: true,
+              marketing: true,
+              preferences: true,
+            });
+          }
+          return null;
+        },
+        setItem: vi.fn(),
+      },
     };
 
     // Track Lead Submission

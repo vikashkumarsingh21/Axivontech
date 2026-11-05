@@ -33,7 +33,7 @@ export async function closeStaleAttendance(
   const todayCalendarDate = getCompanyCalendarDate(now, timezone);
 
   // Find all open sessions from days strictly before today's calendar date
-  const staleSessions = await db.attendance.findMany({
+  const staleSessions = (await db.attendance.findMany({
     where: {
       ...(options.userId ? { userId: options.userId } : {}),
       date: { lt: todayCalendarDate },
@@ -51,9 +51,9 @@ export async function closeStaleAttendance(
       },
     },
     orderBy: { date: "asc" },
-  });
+  })) || [];
 
-  if (staleSessions.length === 0) {
+  if (!Array.isArray(staleSessions) || staleSessions.length === 0) {
     return {
       success: true,
       closedCount: 0,
@@ -127,11 +127,11 @@ export async function closeStaleAttendance(
 
     // 4. Create in-app notification with dedupKey to ensure idempotency
     const dedupKey = `missed_checkout_${session.id}`;
-    const existingNotification = await db.notification.findFirst({
+    const existingNotification = db.notification?.findFirst ? await db.notification.findFirst({
       where: { dedupKey },
-    });
+    }) : null;
 
-    if (!existingNotification) {
+    if (!existingNotification && db.notification?.create) {
       await db.notification.create({
         data: {
           userId: session.userId,
@@ -148,7 +148,7 @@ export async function closeStaleAttendance(
 
       // Console notification logging (with email fallback)
       console.log(
-        `[Attendance] In-app notification sent to ${session.user.email} for missed check-out on ${formattedDate}`
+        `[Attendance] In-app notification sent to ${session.user?.email || session.userId} for missed check-out on ${formattedDate}`
       );
     }
 

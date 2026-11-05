@@ -452,7 +452,7 @@ describe("AXIVON AI Phase 1: End-to-End System Tests", () => {
       const res = await uploadDoc(req);
       expect(res.status).toBe(400);
       const json = await res.json();
-      expect(json.error).toContain("Unsupported file format");
+      expect(json.error?.message || json.message || json.error).toContain("Unsupported file format");
     });
   });
 

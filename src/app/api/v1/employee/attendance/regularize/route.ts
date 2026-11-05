@@ -144,25 +144,27 @@ export async function POST(req: NextRequest) {
 
     // 5. Notify Admins and HR
     try {
-      const adminRoles = await db.userRole.findMany({
-        where: { role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] } } },
-        select: { userId: true },
-      });
-      const adminIds = Array.from(new Set(adminRoles.map((r) => r.userId))).filter((id) => id !== user.id);
-
-      if (adminIds.length > 0) {
-        await db.notification.createMany({
-          data: adminIds.map((adminId) => ({
-            userId: adminId,
-            type: "ATTENDANCE_REGULARIZATION_SUBMITTED",
-            title: `Attendance Regularization: ${user.name}`,
-            message: `${user.name} submitted a regularization request for ${targetDate.toISOString().split("T")[0]}: "${reason.trim()}"`,
-            priority: "NORMAL",
-            link: "/admin/attendance",
-            entityType: "REGULARIZATION_REQUEST",
-            entityId: regularization.id,
-          })),
+      if (db.userRole?.findMany && db.notification?.createMany) {
+        const adminRoles = await db.userRole.findMany({
+          where: { role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] } } },
+          select: { userId: true },
         });
+        const adminIds = Array.from(new Set(adminRoles.map((r) => r.userId))).filter((id) => id !== user.id);
+
+        if (adminIds.length > 0) {
+          await db.notification.createMany({
+            data: adminIds.map((adminId) => ({
+              userId: adminId,
+              type: "ATTENDANCE_REGULARIZATION_SUBMITTED",
+              title: `Attendance Regularization: ${user.name}`,
+              message: `${user.name} submitted a regularization request for ${targetDate.toISOString().split("T")[0]}: "${reason.trim()}"`,
+              priority: "NORMAL",
+              link: "/admin/attendance",
+              entityType: "REGULARIZATION_REQUEST",
+              entityId: regularization.id,
+            })),
+          });
+        }
       }
     } catch (notifErr) {
       console.error("[Notification] Regularization submission notification failed:", notifErr);

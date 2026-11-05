@@ -76,7 +76,8 @@ export async function GET(req: NextRequest) {
     }
 
     const announcements = targeted.map((ann) => {
-      const isRead = ann.reads.length > 0;
+      const reads = ann.reads || [];
+      const isRead = reads.length > 0;
       return {
         id: ann.id,
         title: ann.title,
@@ -91,7 +92,7 @@ export async function GET(req: NextRequest) {
         createdAt: ann.createdAt,
         updatedAt: ann.updatedAt,
         isRead,
-        readAt: ann.reads[0]?.readAt || null,
+        readAt: reads[0]?.readAt || null,
       };
     });
 
