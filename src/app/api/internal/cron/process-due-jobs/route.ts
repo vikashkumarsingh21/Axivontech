@@ -133,17 +133,25 @@ export async function POST(req: NextRequest) {
     });
 
     // 6. Return concise execution summary (No sensitive data, well under 64 KB)
-    return NextResponse.json({
-      success: result.success,
-      dryRun: result.dryRun,
-      processed: result.processed,
-      sent: result.sent,
-      skipped: result.skipped,
-      failed: result.failed,
-      durationMs: result.durationMs,
-      executionId: result.executionId,
-      ...(result.message ? { message: result.message } : {}),
-    });
+    // If all background operations failed, respond with 500 so external alerting triggers.
+    // If partial or complete success, respond with 200 with complete transparent job telemetry.
+    const httpStatus = result.status === "FAILED" ? 500 : 200;
+    return NextResponse.json(
+      {
+        success: result.success,
+        status: result.status,
+        dryRun: result.dryRun,
+        processed: result.processed,
+        sent: result.sent,
+        skipped: result.skipped,
+        failed: result.failed,
+        durationMs: result.durationMs,
+        executionId: result.executionId,
+        ...(result.errors && result.errors.length > 0 ? { errors: result.errors } : {}),
+        ...(result.message ? { message: result.message } : {}),
+      },
+      { status: httpStatus }
+    );
   } catch (error: any) {
     return handleApiError(error);
   }

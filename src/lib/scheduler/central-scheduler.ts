@@ -16,6 +16,7 @@ export interface ProcessDueJobsOptions {
 
 export interface ProcessDueJobsResult {
   success: boolean;
+  status: "SUCCESS" | "PARTIAL" | "FAILED" | "LOCKED";
   dryRun: boolean;
   processed: number;
   sent: number;
@@ -24,6 +25,7 @@ export interface ProcessDueJobsResult {
   durationMs: number;
   executionId: string;
   message?: string;
+  errors?: string[];
   details?: {
     attendance?: any;
     workReports?: any;
@@ -173,6 +175,7 @@ export class CentralScheduler {
     if (!acquired) {
       return {
         success: true,
+        status: "LOCKED",
         dryRun,
         processed: 0,
         sent: 0,
@@ -325,7 +328,8 @@ export class CentralScheduler {
       });
 
       return {
-        success: failed === 0 || sent > 0,
+        success: failed === 0,
+        status,
         dryRun,
         processed,
         sent,
@@ -333,6 +337,7 @@ export class CentralScheduler {
         failed,
         durationMs,
         executionId,
+        errors: errors.length > 0 ? errors.slice(0, 5) : undefined,
         details,
       };
     } finally {

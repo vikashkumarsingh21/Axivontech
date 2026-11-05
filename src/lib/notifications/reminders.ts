@@ -113,12 +113,13 @@ export async function getDepartmentManagersForUser(userId: string): Promise<stri
     });
 
     if (user?.department) {
+      const cleanDept = user.department.trim();
       const dept = await db.department.findFirst({
         where: {
           OR: [
-            { id: user.department },
-            { name: user.department },
-            { code: user.department },
+            { id: cleanDept },
+            { name: { equals: cleanDept, mode: "insensitive" } },
+            { code: { equals: cleanDept, mode: "insensitive" } },
           ],
         },
         include: {
@@ -155,7 +156,22 @@ export async function getDepartmentManagersForUser(userId: string): Promise<stri
     return admins.map((a) => a.id);
   } catch (err) {
     console.error("[Reminders] Error resolving department managers:", err);
-    return [];
+    try {
+      const fallbackAdmins = await db.user.findMany({
+        where: {
+          status: "ACTIVE",
+          userRoles: {
+            some: {
+              role: { name: { in: ["ADMIN", "FOUNDER", "CO_FOUNDER"] } },
+            },
+          },
+        },
+        select: { id: true },
+      });
+      return fallbackAdmins.map((a) => a.id);
+    } catch {
+      return [];
+    }
   }
 }
 
