@@ -720,3 +720,153 @@ export async function notifyTaskAssigned(params: {
     console.error("[Reminders] Error notifying task assignment:", err);
   }
 }
+
+/**
+ * Automated Reminders for Pending Approvals & Requests:
+ * - High-impact executive approval requests pending > 24 hours
+ * - Employee leave requests pending > 24 hours
+ * - Attendance regularization requests pending > 24 hours
+ * - Idempotent with daily dedupKey per request ID.
+ */
+export async function runPendingApprovalReminders(options: { now?: Date; dryRun?: boolean } = {}) {
+  const now = options.now || new Date();
+  const settings = await getReminderScheduleSettings();
+  const parts = getZonedTimeParts(now, settings.timezone);
+  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+  const result = {
+    executed: true,
+    approvalsEvaluated: 0,
+    remindersSent: 0,
+    dryRun: !!options.dryRun,
+  };
+
+  // 1. Pending Approval Requests (Executive / Admin)
+  try {
+    const pendingApprovals = await db.approvalRequest.findMany({
+      where: {
+        status: "PENDING",
+        createdAt: { lte: oneDayAgo },
+      },
+      include: {
+        requestedBy: { select: { id: true, name: true } },
+      },
+      take: 20,
+    });
+
+    result.approvalsEvaluated += pendingApprovals.length;
+
+    if (pendingApprovals.length > 0) {
+      const executiveUserIds = await NotificationService.resolveAudience("FOUNDERS");
+      for (const req of pendingApprovals) {
+        const dedupKey = `pending_approval_reminder:${req.id}:${parts.dateStr}`;
+        for (const execId of executiveUserIds) {
+          if (!options.dryRun) {
+            await NotificationService.sendToUser(execId, {
+              type: "APPROVAL_REQUESTED",
+              title: "Pending Approval Reminder",
+              message: `Approval request "${req.requestType.replace(/_/g, " ")}" requested by ${req.requestedBy?.name || "a user"} is awaiting your review.`,
+              category: "GENERAL",
+              priority: "HIGH",
+              link: "/executive/approvals",
+              actionLabel: "Review Approval",
+              entityType: "APPROVAL_REQUEST",
+              entityId: req.id,
+              dedupKey,
+              channels: ["IN_APP", "PUSH"],
+            });
+          }
+          result.remindersSent++;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("[Reminders] Pending approval requests check error:", err);
+  }
+
+  // 2. Pending Leave Requests > 24 hours
+  try {
+    const pendingLeaves = await db.leaveRequest.findMany({
+      where: {
+        status: "PENDING",
+        createdAt: { lte: oneDayAgo },
+      },
+      include: {
+        user: { select: { id: true, name: true, department: true } },
+      },
+      take: 20,
+    });
+
+    result.approvalsEvaluated += pendingLeaves.length;
+
+    for (const leave of pendingLeaves) {
+      const managers = await getDepartmentManagersForUser(leave.user.id);
+      const dedupKey = `pending_leave_escalation:${leave.id}:${parts.dateStr}`;
+
+      for (const mgrId of managers) {
+        if (!options.dryRun) {
+          await NotificationService.sendToUser(mgrId, {
+            type: "LEAVE_SUBMITTED",
+            title: `Pending Leave Reminder: ${leave.user.name}`,
+            message: `Leave request for ${leave.user.name} (${leave.leaveType}) has been awaiting action for over 24 hours.`,
+            category: "LEAVE",
+            priority: "NORMAL",
+            link: "/admin/leaves",
+            actionLabel: "Review Request",
+            entityType: "LEAVE_REQUEST",
+            entityId: leave.id,
+            dedupKey,
+            channels: ["IN_APP", "PUSH"],
+          });
+        }
+        result.remindersSent++;
+      }
+    }
+  } catch (err) {
+    console.warn("[Reminders] Pending leave reminders check error:", err);
+  }
+
+  // 3. Pending Attendance Regularizations > 24 hours
+  try {
+    const pendingRegs = await db.regularizationRequest.findMany({
+      where: {
+        status: "PENDING",
+        createdAt: { lte: oneDayAgo },
+      },
+      include: {
+        user: { select: { id: true, name: true } },
+      },
+      take: 20,
+    });
+
+    result.approvalsEvaluated += pendingRegs.length;
+
+    for (const reg of pendingRegs) {
+      const managers = await getDepartmentManagersForUser(reg.user.id);
+      const dedupKey = `pending_regularization_escalation:${reg.id}:${parts.dateStr}`;
+
+      for (const mgrId of managers) {
+        if (!options.dryRun) {
+          await NotificationService.sendToUser(mgrId, {
+            type: "ATTENDANCE_REGULARIZATION_SUBMITTED",
+            title: `Pending Regularization: ${reg.user.name}`,
+            message: `Attendance regularization submitted by ${reg.user.name} is awaiting review.`,
+            category: "ATTENDANCE",
+            priority: "NORMAL",
+            link: "/admin/attendance",
+            actionLabel: "Review",
+            entityType: "REGULARIZATION_REQUEST",
+            entityId: reg.id,
+            dedupKey,
+            channels: ["IN_APP", "PUSH"],
+          });
+        }
+        result.remindersSent++;
+      }
+    }
+  } catch (err) {
+    console.warn("[Reminders] Pending regularization check error:", err);
+  }
+
+  return result;
+}
