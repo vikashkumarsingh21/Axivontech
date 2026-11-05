@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -44,7 +44,7 @@ export function ConfirmDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
         onClick={!isLoading ? onCancel : undefined}
         aria-hidden="true"
       />
@@ -52,38 +52,39 @@ export function ConfirmDialog({
       {/* Modal Dialog */}
       <div
         ref={dialogRef}
-        className="relative z-10 w-full max-w-sm rounded-2xl bg-[#1A1A1B] border border-[#2E2E30] p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150 ease-out"
+        className="relative z-10 w-full max-w-sm rounded-2xl bg-white border border-slate-200 p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150 ease-out"
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-desc"
       >
-        <div className="flex items-start gap-3.5">
+        <div className="flex items-start gap-3">
           <div
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
               isDestructive
-                ? "bg-[#C85555]/10 border-[#C85555]/20 text-[#C85555]"
-                : "bg-[#162721] border-[#27483C] text-[#4F9D83]"
+                ? "bg-rose-50 border border-rose-200 text-rose-600"
+                : "bg-teal-50 border border-teal-200 text-teal-600"
             }`}
           >
             <AlertTriangle className="h-5 w-5" />
           </div>
           <div>
-            <h3 id="confirm-dialog-title" className="text-base font-semibold text-[#EDEBE6] tracking-tight">
+            <h3 id="confirm-dialog-title" className="text-base font-bold text-slate-900">
               {title}
             </h3>
-            <p id="confirm-dialog-desc" className="text-xs text-[#B3AFA6] mt-1 leading-relaxed">
+            <p id="confirm-dialog-desc" className="text-xs text-slate-500 mt-1 leading-relaxed">
               {message}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2.5 pt-2">
+        {/* Action buttons */}
+        <div className="flex items-center justify-end gap-2 pt-2">
           <button
             type="button"
             disabled={isLoading}
             onClick={onCancel}
-            className="flex-1 py-2.5 px-4 rounded-xl bg-[#232324] border border-[#2E2E30] text-xs font-semibold text-[#EDEBE6] hover:bg-[#2A2A2C] active:scale-95 transition-all disabled:opacity-50"
+            className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-semibold active:scale-95 transition-transform disabled:opacity-50"
           >
             {cancelLabel}
           </button>
@@ -91,13 +92,14 @@ export function ConfirmDialog({
             type="button"
             disabled={isLoading}
             onClick={onConfirm}
-            className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold active:scale-95 transition-all disabled:opacity-50 ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold text-white shadow-xs active:scale-95 transition-transform disabled:opacity-50 ${
               isDestructive
-                ? "bg-[#C85555] text-white hover:bg-[#B04545]"
-                : "bg-[#4F9D83] text-[#121212] hover:bg-[#438770]"
+                ? "bg-rose-600 hover:bg-rose-700"
+                : "bg-teal-600 hover:bg-teal-700"
             }`}
           >
-            {isLoading ? "Processing..." : confirmLabel}
+            {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            <span>{confirmLabel}</span>
           </button>
         </div>
       </div>

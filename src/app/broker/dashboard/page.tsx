@@ -34,6 +34,8 @@ import { BrokerStatusBadge } from "@/components/broker/BrokerStatusBadge";
 import { BrokerSkeletonMetrics, BrokerSkeletonCard } from "@/components/broker/BrokerSkeleton";
 import { BrokerErrorState } from "@/components/broker/BrokerErrorState";
 import { BrokerEmptyState } from "@/components/broker/BrokerEmptyState";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileBrokerHome } from "@/components/mobile";
 
 interface DashboardData {
   profile?: {
@@ -141,6 +143,7 @@ interface AnalyticsData {
 }
 
 export default function BrokerDashboardPage() {
+  const { isAppMode } = useAppMode();
   const { data: dashboard, loading: dashLoading, error: dashError, refetch: refetchDash } =
     useBrokerFetch<DashboardData>("/api/v1/broker/dashboard");
 
@@ -308,6 +311,10 @@ export default function BrokerDashboardPage() {
     if (!Array.isArray(list)) return [];
     return list;
   }, [analytics]);
+
+  if (isAppMode) {
+    return <MobileBrokerHome initialData={dashboard} onRefresh={async () => { await refetchDash(); }} />;
+  }
 
   if (dashLoading) {
     return (

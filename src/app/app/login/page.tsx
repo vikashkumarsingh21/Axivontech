@@ -4,17 +4,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Eye, EyeOff, Lock, Mail, AlertCircle, CheckCircle2, ShieldCheck, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, AlertCircle, CheckCircle2, ShieldCheck, Loader2, Fingerprint } from "lucide-react";
 import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 import { resolveRoleDashboardUrl } from "@/lib/auth/roles";
 import { parseApiResponse } from "@/lib/errors/client";
+import { isBiometricsEnrolled, authenticateWithBiometrics, getEnrolledBiometricUser } from "@/lib/mobile/biometrics";
+import { toast } from "@/lib/notifications/toast";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * Dedicated Application Login Screen (/app/login)
- * Strictly isolated for the mobile business application.
- * Connects directly to the existing unified authentication backend.
+ * Modern Enterprise Light UI/UX designed specifically for mobile users.
+ * Directly authenticated against existing user accounts, RBAC, and sessions.
  */
 export default function AppLoginPage() {
   const [email, setEmail] = useState("");
@@ -27,10 +29,22 @@ export default function AppLoginPage() {
   const [loggedOutNotice, setLoggedOutNotice] = useState(false);
   const [captchaToken, setCaptchaToken] = useState("");
   const [recaptchaResetCount, setRecaptchaResetCount] = useState(0);
+  const [hasBiometrics, setHasBiometrics] = useState(false);
 
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  // Check biometric enrollment on mount
+  useEffect(() => {
+    if (isBiometricsEnrolled()) {
+      setHasBiometrics(true);
+      const enrolledUser = getEnrolledBiometricUser();
+      if (enrolledUser && !email) {
+        setEmail(enrolledUser);
+      }
+    }
+  }, []);
 
   // Rate-limit countdown timer
   useEffect(() => {
@@ -55,6 +69,7 @@ export default function AppLoginPage() {
       const isLoggedOut = params.get("logged_out") === "1" || params.get("logout") === "true";
       const isExpired = params.get("expired") === "1" || params.get("session_expired") === "true";
       const isSuspended = params.get("error") === "account_suspended";
+      const resetSuccess = params.get("reset_success") === "1";
 
       if (isLoggedOut) {
         setLoggedOutNotice(true);
@@ -64,6 +79,9 @@ export default function AppLoginPage() {
       }
       if (isSuspended) {
         setError("Your account is currently inactive or suspended. Please contact administrator (admin@axivontech.in).");
+      }
+      if (resetSuccess) {
+        toast.success("Password reset successfully. Please sign in with your new password.");
       }
 
       // Check if session is already active and valid
@@ -78,9 +96,7 @@ export default function AppLoginPage() {
               router.replace(target);
             }
           })
-          .catch(() => {
-            // Unauthenticated, stay on login page
-          });
+          .catch(() => {});
       }
     }
   }, [router]);
@@ -99,7 +115,7 @@ export default function AppLoginPage() {
     if (!activeEmail) {
       newFieldErrors.email = "Please enter your work email.";
     } else if (!EMAIL_REGEX.test(activeEmail)) {
-      newFieldErrors.email = "Please enter a valid work email address.";
+      newFieldErrors.email = "Please enter a valid email address.";
     }
 
     if (!activePassword) {
@@ -108,123 +124,128 @@ export default function AppLoginPage() {
 
     if (Object.keys(newFieldErrors).length > 0) {
       setFieldErrors(newFieldErrors);
-      if (newFieldErrors.email) emailInputRef.current?.focus();
-      else if (newFieldErrors.password) passwordInputRef.current?.focus();
       return;
     }
-
-    if (!captchaToken) {
-      setError("Please complete the security verification below.");
-      setRecaptchaResetCount((prev) => prev + 1);
-      return;
-    }
-
-    setLoading(true);
 
     try {
-      const res = await fetch("/api/v1/auth/login", {
+      setLoading(true);
+      setError("");
+
+      const response = await fetch("/api/v1/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-axivon-app": "1",
+        },
         body: JSON.stringify({
           email: activeEmail,
           password: activePassword,
-          recaptchaToken: captchaToken,
-          captchaToken,
+          captchaToken: captchaToken || undefined,
         }),
       });
 
-      const parsed = await parseApiResponse<{ user: { role: string; mustChangePassword?: boolean } }>(res);
+      const parsed = await parseApiResponse<{
+        user?: { role?: string; mustChangePassword?: boolean };
+        mustChangePassword?: boolean;
+        retryAfter?: number;
+      }>(response);
 
-      if (!parsed.ok) {
-        setEmail(activeEmail);
-        setPassword("");
-        if (passwordInputRef.current) passwordInputRef.current.value = "";
-        setCaptchaToken("");
+      if (!response.ok || !parsed.ok) {
+        if (response.status === 429) {
+          const waitTime = parsed.retryAfter || 30;
+          setRateLimitCountdown(waitTime);
+          setError(`Too many login attempts. Please wait ${waitTime} seconds before trying again.`);
+        } else {
+          setError(parsed.errorMessage || "Invalid email or password. Please try again.");
+        }
         setRecaptchaResetCount((prev) => prev + 1);
-
-        if (parsed.status === 429) {
-          const seconds = parsed.retryAfter && parsed.retryAfter > 0 ? parsed.retryAfter : 30;
-          setRateLimitCountdown(seconds);
-          setError(`Too many attempts. Please try again in ${seconds}s.`);
-          return;
-        }
-
-        if (parsed.status === 401) {
-          setError("Incorrect email or password.");
-          return;
-        }
-
-        if (parsed.status === 403) {
-          setError(parsed.errorMessage || "Account is inactive or suspended. Contact administration.");
-          return;
-        }
-
-        setError(parsed.errorMessage || "Authentication failed. Please verify credentials.");
+        setCaptchaToken("");
         return;
       }
 
-      // Successful authentication
-      const responseData = parsed.data as any;
-      const userRole = responseData?.user?.role || "EMPLOYEE";
-      const mustChange = responseData?.mustChangePassword || responseData?.user?.mustChangePassword;
+      const userRole = parsed.data?.user?.role || "EMPLOYEE";
+      const mustChange = parsed.data?.user?.mustChangePassword || parsed.data?.mustChangePassword;
 
       if (mustChange) {
         router.push("/auth/change-password");
       } else {
         router.push(resolveRoleDashboardUrl(userRole));
       }
-    } catch {
-      setError("Network connection issue. Please check your internet connection.");
+    } catch (err) {
+      setError("Unable to connect to server. Please check your internet connection.");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#0B0D10] text-[#F3F5F7] flex flex-col justify-center px-4 py-8 sm:px-6 lg:px-8 relative overflow-hidden select-none">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
+  const handleBiometricLogin = async () => {
+    try {
+      const verified = await authenticateWithBiometrics();
+      if (verified) {
+        const enrolledUser = getEnrolledBiometricUser();
+        if (enrolledUser) {
+          // Check if existing session is already active
+          const sessionRes = await fetch("/api/v1/auth/session");
+          if (sessionRes.ok) {
+            const data = await sessionRes.json();
+            if (data?.authenticated && data?.user?.role) {
+              router.replace(resolveRoleDashboardUrl(data.user.role));
+              return;
+            }
+          }
+          toast.info("Biometric verified. Please enter password once to re-authenticate session.");
+          if (passwordInputRef.current) {
+            passwordInputRef.current.focus();
+          }
+        }
+      }
+    } catch {
+      toast.error("Biometric authentication was cancelled or unavailable.");
+    }
+  };
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        {/* Official Brand Logo */}
-        <div className="flex flex-col items-center mb-6">
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-center px-4 py-8 sm:px-6 select-none">
+      <div className="w-full max-w-sm mx-auto">
+        {/* Brand Header */}
+        <div className="flex flex-col items-center mb-6 text-center">
           <Image
             src="/assets/logo/logo-full.png"
             alt="Axivon Technologies"
-            width={220}
-            height={60}
+            width={200}
+            height={52}
             priority
-            className="h-10 sm:h-12 w-auto brightness-0 invert object-contain"
+            className="h-11 w-auto object-contain mb-2.5"
           />
-          <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold tracking-wide">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Official Business Application</span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-[11px] font-semibold tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-600 animate-pulse" />
+            <span>Enterprise Mobile Application</span>
           </div>
         </div>
 
         {/* Login Card */}
-        <div className="bg-[#12161D] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-sm">
-          <div className="mb-6">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-              Sign In to Your Portal
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-[0_4px_25px_-4px_rgba(0,0,0,0.06)]">
+          <div className="mb-5">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">
+              Sign In to Your Workspace
             </h1>
-            <p className="mt-1 text-xs sm:text-sm text-neutral-400">
-              Access your authorized executive, employee, broker, or client workspace.
+            <p className="mt-1 text-xs text-slate-500">
+              Enter your credentials to access your authorized portal.
             </p>
           </div>
 
           {/* Logged Out Notice Banner */}
           {loggedOutNotice && !error && (
-            <div className="mb-5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center gap-2.5">
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <div className="mb-4 p-3 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 text-xs flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-teal-600" />
               <span>You have been safely signed out.</span>
             </div>
           )}
 
           {/* Error Alert Banner */}
           {error && (
-            <div className="mb-5 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-start gap-2.5 leading-relaxed">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2 leading-relaxed">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
               <span>{error}</span>
             </div>
           )}
@@ -232,11 +253,11 @@ export default function AppLoginPage() {
           <form onSubmit={handleLogin} className="space-y-4" noValidate>
             {/* Email Field */}
             <div>
-              <label htmlFor="app-email" className="block text-xs font-medium text-neutral-300 mb-1.5">
+              <label htmlFor="app-email" className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Work Email / User ID
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Mail className="h-4 w-4" />
                 </div>
                 <input
@@ -250,32 +271,34 @@ export default function AppLoginPage() {
                     if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
                   }}
                   placeholder="name@axivontech.in"
-                  className={`w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border ${
-                    fieldErrors.email ? "border-red-500/80 focus:border-red-500" : "border-white/10 focus:border-emerald-500"
-                  } text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors`}
+                  className={`w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border ${
+                    fieldErrors.email
+                      ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                      : "border-slate-200 focus:border-teal-600 focus:ring-teal-100"
+                  } text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-3 transition-all`}
                   disabled={loading}
                 />
               </div>
               {fieldErrors.email && (
-                <p className="mt-1 text-xs text-red-400">{fieldErrors.email}</p>
+                <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.email}</p>
               )}
             </div>
 
             {/* Password Field */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="app-password" className="block text-xs font-medium text-neutral-300">
+                <label htmlFor="app-password" className="block text-xs font-semibold text-slate-700">
                   Password
                 </label>
                 <Link
-                  href="/auth/forgot-password"
-                  className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
+                  href="/app/forgot-password"
+                  className="text-xs text-teal-700 hover:text-teal-800 transition-colors font-semibold"
                 >
                   Forgot password?
                 </Link>
               </div>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Lock className="h-4 w-4" />
                 </div>
                 <input
@@ -289,15 +312,17 @@ export default function AppLoginPage() {
                     if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: undefined }));
                   }}
                   placeholder="••••••••••••"
-                  className={`w-full pl-10 pr-11 py-3 rounded-xl bg-white/5 border ${
-                    fieldErrors.password ? "border-red-500/80 focus:border-red-500" : "border-white/10 focus:border-emerald-500"
-                  } text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors`}
+                  className={`w-full pl-10 pr-11 py-2.5 rounded-xl bg-slate-50 border ${
+                    fieldErrors.password
+                      ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                      : "border-slate-200 focus:border-teal-600 focus:ring-teal-100"
+                  } text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-3 transition-all`}
                   disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-neutral-400 hover:text-white transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 transition-colors"
                   tabIndex={-1}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
@@ -305,7 +330,7 @@ export default function AppLoginPage() {
                 </button>
               </div>
               {fieldErrors.password && (
-                <p className="mt-1 text-xs text-red-400">{fieldErrors.password}</p>
+                <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.password}</p>
               )}
             </div>
 
@@ -314,7 +339,7 @@ export default function AppLoginPage() {
               <GoogleRecaptchaWidget
                 onVerify={(tok) => setCaptchaToken(tok)}
                 onExpire={() => setCaptchaToken("")}
-                theme="dark"
+                theme="light"
                 size="normal"
                 resetTrigger={recaptchaResetCount}
               />
@@ -324,7 +349,7 @@ export default function AppLoginPage() {
             <button
               type="submit"
               disabled={loading || rateLimitCountdown > 0}
-              className="w-full min-h-[46px] mt-2 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-[#04130E] font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full min-h-[44px] mt-2 py-3 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? (
                 <>
@@ -337,12 +362,24 @@ export default function AppLoginPage() {
                 <span>Sign In to Workspace</span>
               )}
             </button>
+
+            {/* Biometric Quick Login Button */}
+            {hasBiometrics && (
+              <button
+                type="button"
+                onClick={handleBiometricLogin}
+                className="w-full py-2.5 px-4 rounded-xl border border-teal-600/30 bg-teal-50 hover:bg-teal-100 text-teal-800 font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <Fingerprint className="w-4 h-4 text-teal-700" />
+                <span>Quick Sign-In with Biometrics</span>
+              </button>
+            )}
           </form>
 
-          {/* Security Badge */}
-          <div className="mt-6 pt-5 border-t border-white/5 flex items-center justify-center gap-2 text-[11px] text-neutral-400">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Encrypted Session • Role-Authorized Access Only</span>
+          {/* Security Assurance Footer */}
+          <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
+            <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+            <span>256-Bit SSL Protected • Axivon Technologies</span>
           </div>
         </div>
       </div>

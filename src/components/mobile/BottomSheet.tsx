@@ -51,7 +51,7 @@ export function BottomSheet({
     <div className="fixed inset-0 z-50 flex flex-col justify-end" role="dialog" aria-modal="true">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity duration-200"
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-200"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -59,25 +59,25 @@ export function BottomSheet({
       {/* Sheet Content */}
       <div
         ref={sheetRef}
-        className="relative z-10 w-full max-h-[90vh] rounded-t-2xl bg-[#1A1A1B] border-t border-[#2E2E30] pb-[env(safe-area-inset-bottom)] shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-200 ease-out"
+        className="relative z-10 w-full max-h-[90vh] rounded-t-3xl bg-white border-t border-slate-200 pb-[env(safe-area-inset-bottom)] shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-200 ease-out"
       >
         {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-1" onClick={onClose}>
-          <div className="h-1.5 w-10 rounded-full bg-[#38383A]" />
+          <div className="h-1.5 w-12 rounded-full bg-slate-300" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-[#2E2E30]">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200">
           <div>
-            <h2 className="text-base font-semibold text-[#EDEBE6] tracking-tight">{title}</h2>
+            <h2 className="text-base font-bold text-slate-900 tracking-tight">{title}</h2>
             {Boolean(description) && (
-              <p className="text-xs text-[#B3AFA6] mt-0.5">{description}</p>
+              <p className="text-xs text-slate-500 mt-0.5">{description}</p>
             )}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#232324] text-[#B3AFA6] hover:text-[#EDEBE6] active:scale-95 transition-transform"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 active:scale-95 transition-transform"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -91,7 +91,7 @@ export function BottomSheet({
 
         {/* Optional Sticky Footer */}
         {Boolean(footer) && (
-          <div className="border-t border-[#2E2E30] px-5 py-3 bg-[#1A1A1B]">
+          <div className="border-t border-slate-200 px-5 py-3 bg-slate-50">
             {footer}
           </div>
         )}

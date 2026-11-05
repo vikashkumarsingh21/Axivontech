@@ -17,6 +17,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileNotificationCenter } from "@/components/mobile/MobileNotificationCenter";
 
 interface NotificationItem {
   id: string;
@@ -29,6 +31,7 @@ interface NotificationItem {
 }
 
 export default function ClientNotificationsPage() {
+  const { isAppMode } = useAppMode();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -77,6 +80,18 @@ export default function ClientNotificationsPage() {
         return <Info className="w-4 h-4 text-blue-400 shrink-0" />;
     }
   };
+
+  if (isAppMode) {
+    return (
+      <MobileNotificationCenter
+        notifications={notifications}
+        onMarkAsRead={handleMarkAsRead}
+        isLoading={loading}
+        emptyTitle="No client alerts"
+        emptyDescription="Project updates and invoice notices will appear here."
+      />
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-4xl">

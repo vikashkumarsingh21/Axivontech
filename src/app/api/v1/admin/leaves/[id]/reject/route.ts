@@ -58,6 +58,19 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
       return [updatedLeave];
     });
 
+    try {
+      const { notifyLeaveDecided } = await import("@/lib/notifications/reminders");
+      await notifyLeaveDecided({
+        leaveId: leave.id,
+        employeeUserId: leave.userId,
+        status: "REJECTED",
+        approverName: "Administration",
+        rejectionReason: reason,
+      });
+    } catch (e) {
+      console.warn("[LeaveReject] Push notification warning:", e);
+    }
+
     const { EventBus } = await import("@/lib/events/bus").catch(() => ({ EventBus: null }));
     if (EventBus) {
       EventBus.emit({

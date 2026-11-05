@@ -8,6 +8,8 @@ import {
   FileCheck2, DollarSign, Award, Plus, Sparkles, ExternalLink,
   ChevronRight, Calendar, Building2, CheckCircle2, Megaphone, FileText
 } from "lucide-react";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileAdminHome } from "@/components/mobile";
 
 interface LeadItem {
   id: string;
@@ -44,6 +46,7 @@ const STATUS_BADGES: Record<string, string> = {
 };
 
 export default function AdminDashboard() {
+  const { isAppMode } = useAppMode();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState("Welcome");
@@ -82,6 +85,10 @@ export default function AdminDashboard() {
   const recentLeads: LeadItem[] = data?.recentLeads || [];
   const activities: ActivityItem[] = data?.recentActivity || [];
   const charts = data?.charts || {};
+
+  if (isAppMode) {
+    return <MobileAdminHome initialData={data} onRefresh={() => loadData(true)} />;
+  }
 
   return (
     <div className="space-y-8">

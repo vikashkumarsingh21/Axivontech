@@ -35,7 +35,7 @@ export function ResponsiveTable({
 
   // Otherwise render table container (with touch-friendly scroll container on small screens)
   return (
-    <div className={`w-full overflow-x-auto rounded-2xl border border-[#2E2E30] bg-[#1A1A1B] ${className}`}>
+    <div className={`w-full overflow-x-auto rounded-2xl border border-slate-200/90 bg-white shadow-xs ${className}`}>
       {children}
     </div>
   );

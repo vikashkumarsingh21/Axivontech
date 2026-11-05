@@ -27,11 +27,11 @@ interface CardListProps {
 }
 
 const STATUS_VARIANT_STYLES: Record<string, string> = {
-  success: "bg-[#162721] text-[#A2D9C7] border-[#27483C]",
-  accent: "bg-[#162721] text-[#A2D9C7] border-[#27483C]",
-  warning: "bg-[#2B2113] text-[#F5D59E] border-[#523E1F]",
-  error: "bg-[#2A1515] text-[#F5A3A3] border-[#5A2424]",
-  neutral: "bg-[#232324] text-[#B3AFA6] border-[#2E2E30]",
+  success: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  accent: "bg-teal-50 text-teal-700 border-teal-200",
+  warning: "bg-amber-50 text-amber-700 border-amber-200",
+  error: "bg-rose-50 text-rose-700 border-rose-200",
+  neutral: "bg-slate-100 text-slate-700 border-slate-200",
 };
 
 export function CardList({
@@ -56,11 +56,11 @@ export function CardList({
             {/* Header row: Title + Status chip */}
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-[#EDEBE6] leading-snug">
+                <div className="text-sm font-semibold text-slate-900 leading-snug">
                   {item.title}
                 </div>
                 {Boolean(item.subtitle) && (
-                  <div className="text-xs text-[#B3AFA6] mt-0.5 truncate">{item.subtitle}</div>
+                  <div className="text-xs text-slate-500 mt-0.5 truncate">{item.subtitle}</div>
                 )}
               </div>
 
@@ -75,13 +75,13 @@ export function CardList({
 
             {/* Key fields (2-3 items) */}
             {Boolean(item.fields && item.fields.length > 0) && (
-              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[#242426]">
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
                 {item.fields?.map((field, idx) => (
                   <div key={idx} className="min-w-0">
-                    <span className="text-[10px] uppercase tracking-wider text-[#827E76] font-medium block truncate">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium block truncate">
                       {field.label}
                     </span>
-                    <span className="text-xs text-[#EDEBE6] font-medium truncate block tabular-nums">
+                    <span className="text-xs text-slate-700 font-medium truncate block tabular-nums">
                       {field.value}
                     </span>
                   </div>
@@ -94,7 +94,7 @@ export function CardList({
               {item.action ? (
                 <div className="w-full">{item.action}</div>
               ) : item.onClick || item.href ? (
-                <div className="flex items-center justify-end w-full text-xs font-medium text-[#4F9D83] gap-1">
+                <div className="flex items-center justify-end w-full text-xs font-semibold text-teal-600 gap-1 hover:text-teal-700">
                   <span>View Details</span>
                   <ChevronRight className="h-3.5 w-3.5" />
                 </div>
@@ -108,7 +108,7 @@ export function CardList({
             <Link
               key={item.id}
               href={item.href}
-              className="block rounded-2xl bg-[#1A1A1B] border border-[#2E2E30] hover:border-[#4F9D83]/40 active:scale-[0.99] transition-all shadow-sm"
+              className="block rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-slate-300 hover:shadow-sm active:scale-[0.99] transition-all overflow-hidden"
             >
               {content}
             </Link>
@@ -120,7 +120,9 @@ export function CardList({
             <div
               key={item.id}
               onClick={item.onClick}
-              className="cursor-pointer rounded-2xl bg-[#1A1A1B] border border-[#2E2E30] hover:border-[#4F9D83]/40 active:scale-[0.99] transition-all shadow-sm"
+              role="button"
+              tabIndex={0}
+              className="block cursor-pointer rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:border-slate-300 hover:shadow-sm active:scale-[0.99] transition-all overflow-hidden"
             >
               {content}
             </div>
@@ -130,7 +132,7 @@ export function CardList({
         return (
           <div
             key={item.id}
-            className="rounded-2xl bg-[#1A1A1B] border border-[#2E2E30] shadow-sm"
+            className="rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden"
           >
             {content}
           </div>

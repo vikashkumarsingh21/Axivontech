@@ -98,6 +98,19 @@ export async function POST(req: Request) {
       },
     });
 
+    try {
+      const { notifyTaskAssigned } = await import("@/lib/notifications/reminders");
+      await notifyTaskAssigned({
+        taskId: task.id,
+        assigneeUserId: userId,
+        taskTitle: title,
+        assignerName: admin.name,
+        dueDate: task.dueDate,
+      });
+    } catch (e) {
+      console.warn("[TaskAssigned] Push notification warning:", e);
+    }
+
     await db.auditLog.create({
       data: {
         userId: adminId,

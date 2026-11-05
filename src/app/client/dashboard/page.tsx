@@ -33,7 +33,11 @@ interface ProjectItem {
   createdAt: string;
 }
 
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileClientHome } from "@/components/mobile";
+
 export default function ClientDashboardPage() {
+  const { isAppMode } = useAppMode();
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,6 +52,10 @@ export default function ClientDashboardPage() {
       .catch((err) => console.error("Error loading client projects:", err))
       .finally(() => setLoading(false));
   }, []);
+
+  if (isAppMode) {
+    return <MobileClientHome initialProjects={projects} />;
+  }
 
   const totalProjects = projects.length;
   const activeProjects = projects.filter((p) => p.status === "IN_PROGRESS" || p.status === "ACTIVE").length;

@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useCallback, type ReactNode } from "react";
 import { useAppMode } from "@/features/app-mode/useAppMode";
 import type { MobileRole } from "./types";
 import { MobileTopBar } from "./MobileTopBar";
 import { MobileTabBar } from "./MobileTabBar";
 import { MobileMoreSheet } from "./MobileMoreSheet";
 import { MobilePullToRefresh } from "./MobilePullToRefresh";
+import { MobileNetworkStatus } from "./MobileNetworkStatus";
+import { useAndroidBackButton } from "@/lib/mobile/back-button";
 
 interface MobileShellProps {
   role: MobileRole;
@@ -30,6 +32,17 @@ export function MobileShell({
   const { isAppMode } = useAppMode();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
 
+  // Close more sheet if open on back button press
+  const handleBackModal = useCallback(() => {
+    if (isMoreOpen) {
+      setIsMoreOpen(false);
+      return true;
+    }
+    return false;
+  }, [isMoreOpen]);
+
+  useAndroidBackButton(handleBackModal);
+
   // ZERO modification when not in app mode (desktop or normal mobile browser)
   if (!isAppMode) {
     return <>{children}</>;
@@ -37,9 +50,12 @@ export function MobileShell({
 
   return (
     <div
-      className="mobile-app-shell flex flex-col min-h-screen w-full bg-[#121212] text-[#EDEBE6] antialiased selection:bg-[#4F9D83]/20"
+      className="mobile-app-shell flex flex-col min-h-screen w-full bg-slate-50 text-slate-900 antialiased selection:bg-teal-500/20"
       data-mobile-shell="true"
     >
+      {/* Network / Offline Alert Bar */}
+      <MobileNetworkStatus />
+
       {/* Top App Bar */}
       <MobileTopBar
         role={role}

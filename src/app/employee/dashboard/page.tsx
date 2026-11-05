@@ -120,13 +120,13 @@ export default function EmployeeDashboard() {
     if (isAppMode) {
       return (
         <div className="space-y-4 animate-pulse">
-          <div className="h-44 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+          <div className="h-44 rounded-2xl bg-white border border-slate-200" />
           <div className="grid grid-cols-3 gap-2.5">
-            <div className="h-20 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
-            <div className="h-20 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
-            <div className="h-20 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+            <div className="h-20 rounded-2xl bg-white border border-slate-200" />
+            <div className="h-20 rounded-2xl bg-white border border-slate-200" />
+            <div className="h-20 rounded-2xl bg-white border border-slate-200" />
           </div>
-          <div className="h-40 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+          <div className="h-40 rounded-2xl bg-white border border-slate-200" />
         </div>
       );
     }

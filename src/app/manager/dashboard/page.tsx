@@ -18,7 +18,11 @@ import {
   Megaphone,
 } from "lucide-react";
 
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileManagerHome } from "@/components/mobile";
+
 export default function ManagerDashboardPage() {
+  const { isAppMode } = useAppMode();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +43,10 @@ export default function ManagerDashboardPage() {
       .catch((err) => setError(err.message || "Network error loading dashboard."))
       .finally(() => setLoading(false));
   }, []);
+
+  if (isAppMode) {
+    return <MobileManagerHome initialData={data} />;
+  }
 
   if (loading) {
     return (

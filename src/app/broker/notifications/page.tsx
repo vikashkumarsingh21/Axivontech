@@ -21,6 +21,8 @@ import { BrokerButton } from "@/components/broker/BrokerButton";
 import { BrokerSkeletonCard } from "@/components/broker/BrokerSkeleton";
 import { BrokerEmptyState } from "@/components/broker/BrokerEmptyState";
 import { formatDateIN } from "@/components/broker/BrokerFormatters";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileNotificationCenter } from "@/components/mobile/MobileNotificationCenter";
 
 interface NotificationItem {
   id: string;
@@ -34,6 +36,7 @@ interface NotificationItem {
 }
 
 export default function BrokerNotificationsPage() {
+  const { isAppMode } = useAppMode();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadOnly, setUnreadOnly] = useState(false);
@@ -116,6 +119,17 @@ export default function BrokerNotificationsPage() {
 
     return groups;
   }, [notifications, unreadOnly]);
+
+  if (isAppMode) {
+    return (
+      <MobileNotificationCenter
+        notifications={notifications}
+        onMarkAsRead={markSingleRead}
+        onMarkAllAsRead={markAllRead}
+        isLoading={loading}
+      />
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12">

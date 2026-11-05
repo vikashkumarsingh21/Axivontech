@@ -220,9 +220,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Notify admins / platform event
+    // Notify admins & department managers / platform event
     if (status === "SUBMITTED") {
       try {
+        const { notifyWorkReportSubmitted } = await import("@/lib/notifications/reminders");
+        await notifyWorkReportSubmitted({
+          reportId: report.id,
+          employeeUserId: user.id,
+          date: reportDate,
+          hoursWorked,
+          summary,
+        }).catch((err) => console.warn("[WorkReport] Department manager notification error:", err));
+
         const admins = await getPlatformAdmins();
 
         if (admins.length > 0) {

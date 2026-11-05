@@ -229,6 +229,16 @@ export async function POST(req: NextRequest) {
 
     // Notify admins / platform event
     try {
+      const { notifyLeaveSubmitted } = await import("@/lib/notifications/reminders");
+      await notifyLeaveSubmitted({
+        leaveId: request.id,
+        employeeUserId: user.id,
+        leaveType,
+        startDate: start,
+        endDate: end,
+        reason,
+      }).catch((err) => console.warn("[Leave] Department manager notification warning:", err));
+
       const admins = await getPlatformAdmins();
 
       if (admins.length > 0) {

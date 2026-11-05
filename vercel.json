@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/v1/cron/reminders",
+      "schedule": "*/15 4-15 * * 1-6"
+    },
+    {
+      "path": "/api/v1/cron/close-attendance",
+      "schedule": "30 18 * * *"
+    },
+    {
+      "path": "/api/v1/cron/cleanup-users",
+      "schedule": "0 2 * * *"
+    }
+  ]
+}

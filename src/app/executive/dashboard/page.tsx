@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Users, Activity, Briefcase, CheckSquare, Clock, Coffee, ShieldCheck, AlertCircle } from "lucide-react";
+import { useAppMode } from "@/features/app-mode/useAppMode";
+import { MobileExecutiveHome } from "@/components/mobile";
 
 export default function ExecutiveDashboardPage() {
+  const { isAppMode } = useAppMode();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -23,6 +26,10 @@ export default function ExecutiveDashboardPage() {
         setLoading(false);
       });
   }, []);
+
+  if (isAppMode) {
+    return <MobileExecutiveHome initialData={data} />;
+  }
 
   if (loading) return <div className="text-amber-400/70 p-4">Loading Executive Dashboard...</div>;
   if (error) return <div className="text-red-400 p-4">{error}</div>;

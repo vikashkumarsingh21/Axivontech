@@ -176,8 +176,8 @@ export default function EmployeeProfilePage() {
     if (isAppMode) {
       return (
         <div className="space-y-4 animate-pulse">
-          <div className="h-44 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
-          <div className="h-32 rounded-2xl bg-[#1A1A1B] border border-[#2E2E30]" />
+          <div className="h-44 rounded-2xl bg-white border border-slate-200" />
+          <div className="h-32 rounded-2xl bg-white border border-slate-200" />
         </div>
       );
     }
