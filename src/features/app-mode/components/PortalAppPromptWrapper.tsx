@@ -47,10 +47,15 @@ export function PortalAppPromptWrapper() {
         return res.json();
       })
       .then((data) => {
+        const payload = data?.data || data;
+        const apkUrl = payload?.apkUrl || data?.apkUrl || payload?.downloadUrl || data?.downloadUrl;
+        const popupEnabled = payload?.popupEnabled !== false && data?.popupEnabled !== false;
+        const enabled = payload?.enabled !== false && data?.enabled !== false;
+
         setAppConfig({
-          enabled: true,
-          popupEnabled: data.popupEnabled !== false,
-          apkConfigured: Boolean(data.apkUrl),
+          enabled,
+          popupEnabled,
+          apkConfigured: Boolean(apkUrl),
         });
       })
       .catch(() => {

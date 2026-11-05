@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, AlertCircle, Lock, Mail, CheckCircle2, X } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, Lock, Mail, CheckCircle2, X, Smartphone } from "lucide-react";
 import { GoogleRecaptchaWidget } from "@/components/ui/GoogleRecaptchaWidget";
 import { LoginPosterCarousel } from "@/components/auth/LoginPosterCarousel";
 import { resolveRoleDashboardUrl } from "@/lib/auth/roles";
@@ -622,12 +622,22 @@ export default function LoginPage() {
               </Link>
             </div>
           ) : (
-            <Link
-              href="/"
-              className="text-emerald-400 hover:text-emerald-300 transition-colors"
-            >
-              ← Back to website
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/"
+                className="text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                ← Back to website
+              </Link>
+              <span>•</span>
+              <Link
+                href="/download"
+                className="text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 font-medium"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                Download App
+              </Link>
+            </div>
           )}
           <span className="text-[#566171]">
             © {new Date().getFullYear()} Axivon Technologies

@@ -43,8 +43,14 @@ export function UpdateGate() {
         if (!res.ok) throw new Error("Could not fetch version");
         return res.json();
       })
-      .then((data: VersionInfo) => {
-        setVersionInfo(data);
+      .then((data: any) => {
+        const payload = data?.data || data;
+        setVersionInfo({
+          latestVersion: payload.latestVersion || payload.version,
+          minVersion: payload.minVersion || "1.0.0",
+          apkUrl: payload.apkUrl || payload.downloadUrl,
+          notes: payload.notes || (Array.isArray(payload.releaseNotes) ? payload.releaseNotes.join("\n") : undefined),
+        });
       })
       .catch(() => {
         // Fallback: don't block if version endpoint fails
