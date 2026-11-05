@@ -9,10 +9,10 @@ export async function GET() {
   const responsePayload = {
     appName: "AxivonTech",
     packageName: "com.axivon.app",
-    version: releaseInfo.latestVersion || "1.0.0",
-    latestVersion: releaseInfo.latestVersion || "1.0.0",
+    version: releaseInfo.latestVersion || "1.0.1",
+    latestVersion: releaseInfo.latestVersion || "1.0.1",
     minVersion: releaseInfo.minVersion || "1.0.0",
-    versionCode: 100,
+    versionCode: 101,
     releaseDate: releaseInfo.updatedAt ? releaseInfo.updatedAt.slice(0, 10) : "2026-11-05",
     apkUrl: releaseInfo.apkUrl || "/downloads/axivon-app.apk",
     downloadUrl: releaseInfo.apkUrl || "/downloads/axivon-app.apk",

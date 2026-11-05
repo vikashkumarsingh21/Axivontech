@@ -16,7 +16,7 @@ export interface AppReleaseConfig {
 const DEFAULT_RELEASE_CONFIG: AppReleaseConfig = {
   enabled: true,
   popupEnabled: true,
-  latestVersion: process.env.APP_LATEST_VERSION || "1.0.0",
+  latestVersion: process.env.APP_LATEST_VERSION || "1.0.1",
   minVersion: process.env.APP_MIN_VERSION || "1.0.0",
   apkUrl: process.env.APP_APK_URL || "/downloads/axivon-app.apk",
   sha256: process.env.APP_APK_SHA256 || "",

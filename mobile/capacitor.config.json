@@ -13,10 +13,10 @@
       "challenges.cloudflare.com"
     ]
   },
-  "appendUserAgent": "AxivonApp/1.0.0",
+  "appendUserAgent": "AxivonApp/1.0.1",
   "android": {
     "allowMixedContent": false,
     "captureInput": true,
-    "webContentsDebuggingEnabled": false
+    "webContentsDebuggingEnabled": true
   }
 }

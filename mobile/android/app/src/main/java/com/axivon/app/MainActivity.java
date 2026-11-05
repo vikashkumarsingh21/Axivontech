@@ -10,6 +10,9 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Enable WebView debugging for diagnostic inspections
+        WebView.setWebContentsDebuggingEnabled(true);
+
         // Ensure CookieManager accepts cookies for persistent sessions across app restarts
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
@@ -25,7 +28,7 @@ public class MainActivity extends BridgeActivity {
             // Guarantee that the AxivonApp token is always present in the User-Agent
             String existingUa = webView.getSettings().getUserAgentString();
             if (existingUa != null && !existingUa.contains("AxivonApp")) {
-                webView.getSettings().setUserAgentString(existingUa + " AxivonApp/1.0.0");
+                webView.getSettings().setUserAgentString(existingUa + " AxivonApp/1.0.1");
             }
         }
     }

@@ -48,7 +48,7 @@ describe("AxivonTech Android Mobile Transformation — Architecture & Verificati
       expect(json.success).toBe(true);
       expect(json.data.appName).toBe("AxivonTech");
       expect(json.data.packageName).toBe("com.axivon.app");
-      expect(json.data.version).toBe("1.0.0");
+      expect(json.data.version).toBe("1.0.1");
       expect(json.data.apkUrl).toBe("/downloads/axivon-app.apk");
       expect(json.data.apkSizeBytes).toBeGreaterThan(0);
       expect(Array.isArray(json.data.releaseNotes)).toBe(true);
@@ -70,7 +70,7 @@ describe("AxivonTech Android Mobile Transformation — Architecture & Verificati
       const capacitorConfig = await import("../mobile/capacitor.config.json");
       expect(capacitorConfig.appId).toBe("com.axivon.app");
       expect(capacitorConfig.appName).toBe("Axivon");
-      expect(capacitorConfig.appendUserAgent).toBe("AxivonApp/1.0.0");
+      expect(capacitorConfig.appendUserAgent).toBe("AxivonApp/1.0.1");
       expect(capacitorConfig.server.url).toBe("https://axivontech.in/app");
     });
   });

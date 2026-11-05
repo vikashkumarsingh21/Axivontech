@@ -48,11 +48,13 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    // Verify anti-bot protection (Google reCAPTCHA v2 / Turnstile) & honeypot traps
+    // Verify anti-bot protection (Google reCAPTCHA v2 / Turnstile) & honeypot traps.
+    // For verified mobile app requests, captcha is optional to prevent Android WebView domain & iframe blocking.
+    const isAppRequest = req.headers.get("x-axivon-app") === "1";
     const protectionResult = await verifyFormProtection(req, body, {
       action: "auth_login",
       requirePolicyAcknowledgement: false,
-      requireCaptcha: true,
+      requireCaptcha: !isAppRequest,
     });
     if (!protectionResult.success) {
       return protectionResult.response!;
