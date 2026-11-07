@@ -6,6 +6,8 @@
 import { PortfolioProject } from "./types";
 
 import { axivonProject } from "./axivon";
+import { purvarangProject } from "./purvarang";
+import { udaanProject } from "./udaan";
 import { jalmitraProject } from "./jalmitra";
 import { krishiProject } from "./krishi";
 import { naniProject } from "./nani";
@@ -16,6 +18,8 @@ import { naniProject } from "./nani";
 
 export const portfolioProjects: PortfolioProject[] = [
   axivonProject,
+  purvarangProject,
+  udaanProject,
   krishiProject,
   jalmitraProject,
   naniProject,
@@ -71,6 +75,7 @@ export const getProjectById = (id: string) => {
 
 export const portfolioCategories = [
   "All",
+  "Website Development",
   "Business Website",
   "Business Automation",
   "Smart Agriculture",
@@ -98,4 +103,7 @@ export const portfolioTechnologies = [
   "ESP8266",
   "IoT",
   "Artificial Intelligence",
+  "Vite",
+  "Digital Menu",
+  "Showroom Catalog",
 ];

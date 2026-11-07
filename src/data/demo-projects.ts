@@ -27,12 +27,13 @@ export const DEMO_CATEGORIES = [
   "Healthcare",
   "Education",
   "Restaurants & Food",
-  "E-commerce",
-  "Real Estate",
   "Hotels & Travel",
+  "Furniture & Interiors",
+  "Real Estate",
+  "E-commerce",
+  "Fitness & Wellness",
   "SaaS & Software",
   "Local Businesses",
-  "Fitness & Wellness",
   "Events",
   "Professional Services",
   "Agriculture & IoT",
@@ -58,7 +59,7 @@ export type DemoCategory = (typeof DEMO_CATEGORIES)[number];
 export const SHOW_COMING_SOON_DEMOS = false;
 
 export const DEMO_PROJECTS: DemoProject[] = [
-  // ── LIVE DEMO 1 ──
+  // ── LIVE DEMO 1: Healthcare ──
   {
     id: "medicare",
     name: "MediCare",
@@ -87,7 +88,37 @@ export const DEMO_PROJECTS: DemoProject[] = [
     displayOrder: 1,
   },
 
-  // ── LIVE DEMO 2 ──
+  // ── LIVE DEMO 2: K-12 School Education ──
+  {
+    id: "oakfield",
+    name: "Oakfield International School",
+    slug: "oakfield",
+    category: "Education",
+    shortDescription: "Premier CBSE K-12 institutional platform featuring progressive academic wings, Principal's desk, validated admissions workflow, faculty roster, and campus infrastructure.",
+    targetAudience: "K-12 schools, CBSE/ICSE institutions, academic trusts, international academies",
+    features: ["Four Academic Wings (EYFS to Grade XII)", "Online Admissions Workflow & Validation", "Principal's Welcome Address", "15-Acre Campus Infrastructure Showcase"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Live Demo",
+    enquiryType: "View Demo",
+    demoUrl: "/demo-projects/education/oakfield",
+    accentColor: "#143D30",
+    image: "/demo-assets/education/oakfield/hero-campus.jpg",
+    gallery: [
+      "/demo-assets/education/oakfield/hero-campus.jpg",
+      "/demo-assets/education/oakfield/smart-classroom.jpg",
+      "/demo-assets/education/oakfield/stem-robotics.jpg",
+      "/demo-assets/education/oakfield/school-library.jpg",
+      "/demo-assets/education/oakfield/sports-ground.jpg",
+    ],
+    techStack: ["Next.js 16", "TypeScript", "Tailwind CSS", "Interactive Admissions Engine"],
+    problemStatement: "School management trusts struggle to convey academic caliber, CBSE accreditation, and campus facilities through generic school templates.",
+    solutionOverview: "Oakfield delivers a realistic, prestigious school web platform with progressive academic wing exploration, online admission enquiry validation, digital circulars, and guided campus tour booking.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 2,
+  },
+
+  // ── LIVE DEMO 3: Higher Education & Academies ──
   {
     id: "edusmart",
     name: "EduSmart",
@@ -113,10 +144,96 @@ export const DEMO_PROJECTS: DemoProject[] = [
     problemStatement: "Educational academies and universities need to present multi-tier degree curricula, campus facilities, and admissions deadlines clearly to prospective students and parents.",
     solutionOverview: "EduSmart (Aurevia Academy) provides an academic digital portal featuring program filtering, curriculum modal views, admissions inquiry forms, faculty directories, and campus life photo galleries.",
     relatedServiceSlug: "web-development",
-    displayOrder: 2,
+    displayOrder: 3,
   },
 
-  // ── LIVE DEMO 3 ──
+  // ── LIVE DEMO 4: Hotels & Travel ──
+  {
+    id: "solara",
+    name: "Solara Retreat & Resort",
+    slug: "solara",
+    category: "Hotels & Travel",
+    shortDescription: "Luxury eco-hospitality website featuring private plunge-pool villas, organic farm-to-table dining, Ayurvedic wellness spa, stargazing observatory, and reservation booking.",
+    targetAudience: "Luxury resorts, boutique eco-hotels, wellness retreats, safari lodges",
+    features: ["Eighteen Villa & Suite Dossiers", "Farm-to-Table Dining Showcase", "Ayurvedic Spa & Hydrotherapy", "Curated Stay Reservation Desk"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Live Demo",
+    enquiryType: "View Demo",
+    demoUrl: "/demo-projects/hospitality/solara",
+    accentColor: "#B57A42",
+    image: "/demo-assets/hospitality/solara/hero-resort.jpg",
+    gallery: [
+      "/demo-assets/hospitality/solara/hero-resort.jpg",
+      "/demo-assets/hospitality/solara/villa-plunge-pool.jpg",
+      "/demo-assets/hospitality/solara/canopy-suite.jpg",
+      "/demo-assets/hospitality/solara/harvest-dining.jpg",
+      "/demo-assets/hospitality/solara/ayurvedic-spa.jpg",
+      "/demo-assets/hospitality/solara/stargazing-deck.jpg",
+    ],
+    techStack: ["Next.js 16", "TypeScript", "Tailwind CSS", "Interactive Reservation Engine"],
+    problemStatement: "Luxury resorts and wellness retreats require atmospheric storytelling, accommodation dossiers, and direct booking inquiries without high OTA commission leakage.",
+    solutionOverview: "Solara creates an editorial hospitality flagship showcasing private pool villas, farm-to-table menus, Ayurvedic wellness therapies, and an interactive stay reservation desk.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 4,
+  },
+
+  // ── LIVE DEMO 5: Real Estate ──
+  {
+    id: "estatevista",
+    name: "EstateVista",
+    slug: "estatevista",
+    category: "Real Estate",
+    shortDescription: "Curated architectural real estate platform featuring verified listings, CAD floor plans, enclave guides, mortgage calculators, and private viewing workflows.",
+    targetAudience: "Luxury brokerages, property developers, private family offices, institutional investors",
+    features: ["Interactive Multi-Facet Search", "CAD Floor Plan Room Dimensions", "Side-by-Side Comparison", "Dynamic Mortgage Modeler"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Live Demo",
+    enquiryType: "View Demo",
+    demoUrl: "/demo-projects/real-estate/estatevista",
+    accentColor: "#123C32",
+    image: "/images/demo-projects/estatevista/hero-villa.jpg",
+    gallery: [
+      "/images/demo-projects/estatevista/hero-villa.jpg",
+      "/images/demo-projects/estatevista/prop-1-exterior.jpg",
+      "/images/demo-projects/estatevista/prop-2-interior.jpg",
+      "/images/demo-projects/estatevista/prop-3-courtyard.jpg",
+    ],
+    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Framer Motion", "Vector CAD Blueprints"],
+    problemStatement: "Ultra-luxury real estate brokerages struggle to convey architectural grandeur through generic real estate templates that lack CAD floor plans, enclave context, or dynamic mortgage telemetry.",
+    solutionOverview: "EstateVista delivers an architectural-grade real estate experience featuring verified high-value property dossiers, vector CAD floor plans with room measurements, enclave guides, interactive mortgage calculators, and private VIP tour booking.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 5,
+  },
+
+  // ── LIVE DEMO 6: Live Client Restaurant ──
+  {
+    id: "purvarang",
+    name: "Purvarang Family Restaurant",
+    slug: "purvarang-family-restaurant",
+    category: "Restaurants & Food",
+    shortDescription: "Dedicated restaurant website showcasing authentic North Indian, Tandoori, and Chinese culinary offerings with a digital menu, ambiance showcase, and direct customer contact in Lalganj, Vaishali.",
+    targetAudience: "Family restaurants, multi-cuisine dining, banquet halls, local culinary businesses",
+    features: ["Interactive Digital Menu", "Dining Space Ambiance Showcase", "One-Tap Calling & Contact", "Google Maps Location Directions"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Live Demo",
+    enquiryType: "View Demo",
+    demoUrl: "https://purvarang-family-restaurant.onrender.com/",
+    accentColor: "#C2410C",
+    image: "/assets/images/portfolio/purvarang-family-restaurant.jpg",
+    gallery: [
+      "/assets/images/portfolio/purvarang-family-restaurant.jpg",
+    ],
+    techStack: ["React", "TypeScript", "Vite", "Tailwind CSS", "Digital Menu"],
+    problemStatement: "Local family restaurants require a clean, fast online presence to display complete digital menus, operating hours, and location directions without high aggregator fees.",
+    solutionOverview: "A dedicated digital menu and restaurant identity platform engineered for customer convenience, fast mobile loading, and direct customer inquiries.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 6,
+  },
+
+  // ── LIVE DEMO 7: Fine Dining & Culinary ──
   {
     id: "foodiehub",
     name: "FoodieHub",
@@ -142,10 +259,65 @@ export const DEMO_PROJECTS: DemoProject[] = [
     problemStatement: "Fine dining restaurants require atmospheric storytelling, interactive digital menus with allergen and dietary tagging, and reliable reservation lead capture without paying exorbitant aggregator fees.",
     solutionOverview: "FoodieHub creates an editorial culinary showcase featuring high-res signature dish presentation, interactive multi-course digital menus with allergen indicators, and direct table reservation workflows.",
     relatedServiceSlug: "web-development",
-    displayOrder: 3,
+    displayOrder: 7,
   },
 
-  // ── LIVE DEMO 4 ──
+  // ── LIVE DEMO 8: Live Client Furniture Showroom ──
+  {
+    id: "udaan-furniture",
+    name: "Udaan Furniture",
+    slug: "udaan-furniture",
+    category: "Furniture & Interiors",
+    shortDescription: "Showroom website presenting residential and office furniture collections across living, bedroom, dining, and workspace interiors for customers in Rajkot, Gujarat.",
+    targetAudience: "Furniture showrooms, home interior retailers, modular kitchen studios, office decor brands",
+    features: ["Showroom Collection Galleries", "Living & Bedroom Furniture", "Office & Ergonomic Desks", "Store Directions & Contact"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Live Demo",
+    enquiryType: "View Demo",
+    demoUrl: "https://udaan-furniture.onrender.com/",
+    accentColor: "#B45309",
+    image: "/assets/images/portfolio/udaan-furniture.jpg",
+    gallery: [
+      "/assets/images/portfolio/udaan-furniture.jpg",
+    ],
+    techStack: ["React", "TypeScript", "Vite", "Tailwind CSS", "Responsive UI"],
+    problemStatement: "Regional furniture showrooms need to present extensive collections across residential and corporate segments clearly to local retail buyers.",
+    solutionOverview: "A modern furniture catalog website highlighting craftsmanship, room-by-room collections, and direct showroom visit booking.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 8,
+  },
+
+  // ── LIVE DEMO 9: E-Commerce Store ──
+  {
+    id: "novacart",
+    name: "NovaCart",
+    slug: "novacart",
+    category: "E-commerce",
+    shortDescription: "Thoughtfully selected everyday lifestyle products with dynamic filtering, live cart persistence, and checkout demonstration.",
+    targetAudience: "D2C brands, online retailers, lifestyle boutique stores, consumer products",
+    features: ["Dynamic Cart & Wishlist", "Category & Price Filters", "Live Product Search", "Simulated Checkout Flow"],
+    priority: "P1",
+    isFeatured: true,
+    status: "Live Demo",
+    enquiryType: "View Demo",
+    demoUrl: "/demo-projects/ecommerce/novacart",
+    accentColor: "#D8F16A",
+    image: "/images/demo-projects/novacart/hero-lifestyle.jpg",
+    gallery: [
+      "/images/demo-projects/novacart/hero-lifestyle.jpg",
+      "/images/demo-projects/novacart/watch-matte-chrono.jpg",
+      "/images/demo-projects/novacart/backpack-commuter.jpg",
+      "/images/demo-projects/novacart/mechanical-keyboard.jpg",
+    ],
+    techStack: ["Next.js 15", "React Context API", "LocalStorage Persistence", "Tailwind CSS", "Framer Motion"],
+    problemStatement: "D2C lifestyle retailers require sub-second catalog responsiveness, dynamic multi-attribute filtering, persistent cart state across sessions, and simulated checkout flows to maximize conversion.",
+    solutionOverview: "NovaCart is an ultra-fast lifestyle e-commerce demonstration featuring live search, faceted category and price filtering, reactive cart and wishlist drawers, discount coupon logic, and interactive checkout simulation.",
+    relatedServiceSlug: "web-development",
+    displayOrder: 9,
+  },
+
+  // ── LIVE DEMO 10: Fitness & 3D Gym ──
   {
     id: "fitzone",
     name: "FitZone",
@@ -176,68 +348,10 @@ export const DEMO_PROJECTS: DemoProject[] = [
     problemStatement: "Athletic clubs and boutique gyms fail to convert online visitors when websites present static schedule PDFs and generic trainer lists without immersive kinetic energy.",
     solutionOverview: "FitZone delivers an energetic 3D gym experience featuring dynamic class telemetry, coach biography modals, interactive workout split planning, and VIP free trial lead capture.",
     relatedServiceSlug: "web-development",
-    displayOrder: 4,
+    displayOrder: 10,
   },
 
-  // ── LIVE DEMO 5 ──
-  {
-    id: "novacart",
-    name: "NovaCart",
-    slug: "novacart",
-    category: "E-commerce",
-    shortDescription: "Thoughtfully selected everyday lifestyle products with dynamic filtering, live cart persistence, and checkout demonstration.",
-    targetAudience: "D2C brands, online retailers, lifestyle boutique stores, consumer products",
-    features: ["Dynamic Cart & Wishlist", "Category & Price Filters", "Live Product Search", "Simulated Checkout Flow"],
-    priority: "P1",
-    isFeatured: true,
-    status: "Live Demo",
-    enquiryType: "View Demo",
-    demoUrl: "/demo-projects/ecommerce/novacart",
-    accentColor: "#D8F16A",
-    image: "/images/demo-projects/novacart/hero-lifestyle.jpg",
-    gallery: [
-      "/images/demo-projects/novacart/hero-lifestyle.jpg",
-      "/images/demo-projects/novacart/watch-matte-chrono.jpg",
-      "/images/demo-projects/novacart/backpack-commuter.jpg",
-      "/images/demo-projects/novacart/mechanical-keyboard.jpg",
-    ],
-    techStack: ["Next.js 15", "React Context API", "LocalStorage Persistence", "Tailwind CSS", "Framer Motion"],
-    problemStatement: "D2C lifestyle retailers require sub-second catalog responsiveness, dynamic multi-attribute filtering, persistent cart state across sessions, and simulated checkout flows to maximize conversion.",
-    solutionOverview: "NovaCart is an ultra-fast lifestyle e-commerce demonstration featuring live search, faceted category and price filtering, reactive cart and wishlist drawers, discount coupon logic, and interactive checkout simulation.",
-    relatedServiceSlug: "web-development",
-    displayOrder: 5,
-  },
-
-  // ── LIVE DEMO 6 ──
-  {
-    id: "estatevista",
-    name: "EstateVista",
-    slug: "estatevista",
-    category: "Real Estate",
-    shortDescription: "Curated architectural real estate platform featuring verified listings, CAD floor plans, enclave guides, mortgage calculators, and private viewing workflows.",
-    targetAudience: "Luxury brokerages, property developers, private family offices, institutional investors",
-    features: ["Interactive Multi-Facet Search", "CAD Floor Plan Room Dimensions", "Side-by-Side Comparison", "Dynamic Mortgage Modeler"],
-    priority: "P1",
-    isFeatured: true,
-    status: "Live Demo",
-    enquiryType: "View Demo",
-    demoUrl: "/demo-projects/real-estate/estatevista",
-    accentColor: "#123C32",
-    image: "/images/demo-projects/estatevista/estatevista-hero.jpg",
-    gallery: [
-      "/images/demo-projects/estatevista/estatevista-hero.jpg",
-      "/images/demo-projects/estatevista/estatevista-1.jpg",
-      "/images/demo-projects/estatevista/estatevista-2.jpg",
-      "/images/demo-projects/estatevista/estatevista-3.jpg",
-    ],
-    techStack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Framer Motion", "Vector CAD Blueprints"],
-    problemStatement: "Ultra-luxury real estate brokerages struggle to convey architectural grandeur through generic real estate templates that lack CAD floor plans, enclave context, or dynamic mortgage telemetry.",
-    solutionOverview: "EstateVista delivers an architectural-grade real estate experience featuring verified high-value property dossiers, vector CAD floor plans with room measurements, enclave guides, interactive mortgage calculators, and private VIP tour booking.",
-    relatedServiceSlug: "web-development",
-    displayOrder: 6,
-  },
-
-  // ── LIVE DEMO 7 ──
+  // ── LIVE DEMO 11: Enterprise & Business ──
   {
     id: "corporate-pro",
     name: "CorporatePro",
@@ -263,10 +377,10 @@ export const DEMO_PROJECTS: DemoProject[] = [
     problemStatement: "Multi-practice consulting firms and large B2B enterprises need to project institutional credibility, executive depth, and global service capabilities without suffering from slow legacy CMS architectures.",
     solutionOverview: "CorporatePro delivers an ultra-fast corporate digital flagship featuring interactive service matrices, leadership dossiers, investor governance repositories, and multi-office locator routing.",
     relatedServiceSlug: "web-development",
-    displayOrder: 7,
+    displayOrder: 11,
   },
 
-  // ── LIVE DEMO 8 ──
+  // ── LIVE DEMO 12: B2B SaaS CRM Cockpit ──
   {
     id: "leadpilot",
     name: "LeadPilot",
@@ -291,7 +405,7 @@ export const DEMO_PROJECTS: DemoProject[] = [
     problemStatement: "B2B sales teams frequently struggle with fragmented customer relationship tracking, manual follow-up reminders, and opaque revenue forecast calculations.",
     solutionOverview: "LeadPilot provides a high-efficiency sales pipeline cockpit featuring interactive kanban stage boards, contact activity logs, automated deal scoring, and real-time revenue projection metrics.",
     relatedServiceSlug: "custom-software-development",
-    displayOrder: 8,
+    displayOrder: 12,
   },
 
   // ── CONCEPT 1 ──

@@ -14,13 +14,15 @@ import {
   Wallet, 
   Bell,
   Handshake,
-  X
+  X,
+  FolderGit2
 } from "lucide-react";
 
 const navItems = [
   { name: "Dashboard", href: "/broker/dashboard", icon: LayoutDashboard },
   { name: "My Leads", href: "/broker/leads", icon: Users },
   { name: "Projects", href: "/broker/projects", icon: Briefcase },
+  { name: "Project Library", href: "/broker/project-library", icon: FolderGit2 },
   { name: "Commissions", href: "/broker/commissions", icon: Wallet },
   { name: "Documents", href: "/broker/documents", icon: FileText },
   { name: "Notifications", href: "/broker/notifications", icon: Bell },

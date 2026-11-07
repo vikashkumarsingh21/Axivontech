@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, Building2, Users, Briefcase, 
   ShieldCheck, FileSpreadsheet, ShieldAlert, Settings, LogOut,
-  Activity, TrendingUp, Clock, Award, FileText, Crown, X
+  Activity, TrendingUp, Clock, Award, FileText, Crown, X, FolderGit2
 } from "lucide-react";
 
 export interface ExecutiveSidebarProps {
@@ -26,6 +26,7 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
     { name: "Company Profile", href: "/executive/company", icon: Building2 },
     { name: "People Directory", href: "/executive/people", icon: Users },
     { name: "Projects & Delivery", href: "/executive/projects", icon: Briefcase },
+    { name: "Project Library", href: "/executive/project-library", icon: FolderGit2 },
 
     // Executive CRM Access
     { name: "CRM Overview", href: "/admin/crm/dashboard", icon: Activity, isCrm: true },

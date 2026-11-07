@@ -1,0 +1,47 @@
+{
+  "testedAt": "2026-11-05T16:19:24.119Z",
+  "demoCatalogue": {
+    "httpStatus": 200,
+    "heading": "Explore Website Demos for Your Business",
+    "categories": [
+      "All Projects",
+      "Business & Corporate",
+      "Healthcare",
+      "Education",
+      "Restaurants & Food",
+      "Hotels & Travel",
+      "Furniture & Interiors",
+      "Real Estate",
+      "E-commerce",
+      "Fitness & Wellness",
+      "Dashboards & Portals"
+    ]
+  },
+  "oakfieldDemo": {
+    "httpStatus": 200,
+    "heading": "Where Curiosity Thrives,\nExcellence Becomes Second Nature.",
+    "principalName": "Dr. Gayatri Sundaram",
+    "submissionRef": "Simulated Reference: OIS-2026-ENQ-2710"
+  },
+  "solaraDemo": {
+    "httpStatus": 200,
+    "heading": "Where Mountain Mist Meets\nTimeless Ecological Luxury.",
+    "reservationRef": "Simulated Booking Reference: SOL-2026-RES-8597"
+  },
+  "slugPages": {
+    "oakfield": 200,
+    "solara": 200,
+    "purvarang-family-restaurant": 200,
+    "udaan-furniture": 200,
+    "estatevista": 200,
+    "medicare": 200
+  },
+  "screenshots": [
+    "demo_catalogue_desktop.png",
+    "demo_oakfield_desktop.png",
+    "demo_oakfield_mobile.png",
+    "demo_solara_desktop.png",
+    "demo_solara_mobile.png"
+  ],
+  "errors": []
+}

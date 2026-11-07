@@ -15,6 +15,7 @@ import {
   ArrowRight,
   ShieldCheck,
   Cpu,
+  MapPin,
 } from "lucide-react";
 import {
   getPublishedPortfolioProjectBySlug,
@@ -155,6 +156,12 @@ export default async function PortfolioCaseStudyPage({ params }: PageProps) {
               <span className="text-xs text-gray-500">
                 {project.industry}
               </span>
+              {project.location && (
+                <span className="inline-flex items-center gap-1 text-xs text-gray-400 border border-white/5 bg-white/[0.03] px-2.5 py-0.5 rounded-full">
+                  <MapPin className="w-3 h-3 text-[#e8a064]" />
+                  <span>{project.location}</span>
+                </span>
+              )}
             </div>
 
             {/* Title */}
@@ -176,7 +183,7 @@ export default async function PortfolioCaseStudyPage({ params }: PageProps) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#e8a064] hover:bg-[#d4915c] text-black font-semibold text-sm transition-colors shadow-lg shadow-[#e8a064]/10"
                 >
-                  <span>Visit Live Project</span>
+                  <span>View Live Website</span>
                   <ExternalLink className="w-4 h-4" />
                 </a>
               )}

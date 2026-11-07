@@ -1,0 +1,148 @@
+{
+  "homeSelectedProjects": [
+    {
+      "title": "Axivon Technologies",
+      "category": "Business Website",
+      "description": "Premium software company website built with Next.js, TypeScript, AI-ready architecture, and modern UI/UX.",
+      "liveUrl": "https://axivontech.in",
+      "buttonText": "View Live Website",
+      "hasTargetBlank": true,
+      "hasRelNoopener": true,
+      "imageSrc": "/_next/image?url=%2Fassets%2Fportfolio%2Fprojects%2Fportfolio-web-development.jpg&w=3840&q=75"
+    },
+    {
+      "title": "Purvarang Family Restaurant",
+      "category": "Website Development",
+      "description": "Dedicated restaurant website showcasing authentic North Indian, Tandoori, and Chinese culinary offerings with a digital menu, ambiance showcase, and direct customer contact in Lalganj, Vaishali.",
+      "liveUrl": "https://purvarang-family-restaurant.onrender.com/",
+      "buttonText": "View Live Website",
+      "hasTargetBlank": true,
+      "hasRelNoopener": true,
+      "imageSrc": "/_next/image?url=%2Fassets%2Fimages%2Fportfolio%2Fpurvarang-family-restaurant.jpg&w=3840&q=75"
+    },
+    {
+      "title": "Udaan Furniture",
+      "category": "Website Development",
+      "description": "Showroom website presenting residential and office furniture collections across living, bedroom, dining, and workspace interiors for customers in Rajkot, Gujarat.",
+      "liveUrl": "https://udaan-furniture.onrender.com/",
+      "buttonText": "View Live Website",
+      "hasTargetBlank": true,
+      "hasRelNoopener": true,
+      "imageSrc": "/_next/image?url=%2Fassets%2Fimages%2Fportfolio%2Fudaan-furniture.jpg&w=3840&q=75"
+    },
+    {
+      "title": "Krishi Drishti",
+      "category": "Smart Agriculture",
+      "description": "AI-powered Smart Agriculture platform with IoT sensor monitoring, weather forecasting, automated irrigation, and real-time crop analytics.",
+      "liveUrl": "https://krishi-drishti.onrender.com/",
+      "buttonText": "View Live Website",
+      "hasTargetBlank": true,
+      "hasRelNoopener": true,
+      "imageSrc": "/_next/image?url=%2Fassets%2Fportfolio%2Fprojects%2Fportfolio-smart-agriculture.jpg&w=3840&q=75"
+    },
+    {
+      "title": "JalMitra",
+      "category": "Environmental Technology",
+      "description": "AI-powered autonomous solar water cleaning system for removing floating waste from rivers, lakes, and ponds using IoT and automation.",
+      "liveUrl": "https://jal-mitraafrontend.onrender.com/",
+      "buttonText": "View Live Website",
+      "hasTargetBlank": true,
+      "hasRelNoopener": true,
+      "imageSrc": "/_next/image?url=%2Fassets%2Fportfolio%2Fprojects%2Fportfolio-environmental-technology.jpg&w=3840&q=75"
+    },
+    {
+      "title": "Nani Tathagat",
+      "category": "Business Automation",
+      "description": "Professional business automation and lead generation platform designed to help businesses streamline operations, marketing, customer engagement, and digital growth.",
+      "liveUrl": "https://nanitathagat.in/",
+      "buttonText": "View Live Website",
+      "hasTargetBlank": true,
+      "hasRelNoopener": true,
+      "imageSrc": "/_next/image?url=%2Fassets%2Fportfolio%2Fprojects%2Fportfolio-business-automation.jpg&w=3840&q=75"
+    }
+  ],
+  "portfolioPageListing": [
+    {
+      "title": "Axivon Technologies",
+      "category": "Business Website",
+      "liveUrl": "https://axivontech.in",
+      "caseStudyHref": "/portfolio/axivon-technologies"
+    },
+    {
+      "title": "Purvarang Family Restaurant",
+      "category": "Website Development",
+      "liveUrl": "https://purvarang-family-restaurant.onrender.com/",
+      "caseStudyHref": "/portfolio/purvarang-family-restaurant"
+    },
+    {
+      "title": "Udaan Furniture",
+      "category": "Website Development",
+      "liveUrl": "https://udaan-furniture.onrender.com/",
+      "caseStudyHref": "/portfolio/udaan-furniture"
+    },
+    {
+      "title": "Krishi Drishti",
+      "category": "Smart Agriculture",
+      "liveUrl": "https://krishi-drishti.onrender.com/",
+      "caseStudyHref": "/portfolio/krishi-drishti"
+    },
+    {
+      "title": "JalMitra",
+      "category": "Environmental Technology",
+      "liveUrl": "https://jal-mitraafrontend.onrender.com/",
+      "caseStudyHref": "/portfolio/jalmitra"
+    },
+    {
+      "title": "Nani Tathagat",
+      "category": "Business Automation",
+      "liveUrl": "https://nanitathagat.in/",
+      "caseStudyHref": "/portfolio/nani-tathagat"
+    }
+  ],
+  "filterTest": {
+    "clickedFilter": true,
+    "filteredProjects": [
+      "Purvarang Family Restaurant",
+      "Udaan Furniture"
+    ],
+    "hasPurvarang": true,
+    "hasUdaan": true
+  },
+  "detailPages": [
+    {
+      "slug": "purvarang-family-restaurant",
+      "status": 200,
+      "title": "Purvarang Family Restaurant",
+      "liveUrl": "https://purvarang-family-restaurant.onrender.com/",
+      "buttonText": "View Live Website",
+      "passed": true
+    },
+    {
+      "slug": "udaan-furniture",
+      "status": 200,
+      "title": "Udaan Furniture",
+      "liveUrl": "https://udaan-furniture.onrender.com/",
+      "buttonText": "View Live Website",
+      "passed": true
+    }
+  ],
+  "buttonVerification": [
+    {
+      "name": "Purvarang Live",
+      "url": "https://purvarang-family-restaurant.onrender.com/",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "name": "Udaan Live",
+      "url": "https://udaan-furniture.onrender.com/",
+      "status": 200,
+      "pass": true
+    }
+  ],
+  "duplicateCheck": {
+    "purvarangTotal": 1,
+    "udaanTotal": 1,
+    "pass": true
+  }
+}

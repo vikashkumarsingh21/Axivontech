@@ -1,0 +1,123 @@
+{
+  "scopingProof": [
+    {
+      "route": "/login",
+      "status": 200,
+      "leaksPublicCss": false,
+      "hasSitePublicClass": false,
+      "passed": true
+    },
+    {
+      "route": "/admin/dashboard",
+      "status": 200,
+      "leaksPublicCss": false,
+      "hasSitePublicClass": false,
+      "passed": true
+    },
+    {
+      "route": "/executive/dashboard",
+      "status": 200,
+      "leaksPublicCss": false,
+      "hasSitePublicClass": false,
+      "passed": true
+    },
+    {
+      "route": "/employee/dashboard",
+      "status": 200,
+      "leaksPublicCss": false,
+      "hasSitePublicClass": false,
+      "passed": true
+    },
+    {
+      "route": "/broker/dashboard",
+      "status": 200,
+      "leaksPublicCss": false,
+      "hasSitePublicClass": false,
+      "passed": true
+    },
+    {
+      "route": "/client/dashboard",
+      "status": 200,
+      "leaksPublicCss": false,
+      "hasSitePublicClass": false,
+      "passed": true
+    }
+  ],
+  "portalHtmlBaseline": [
+    {
+      "route": "/login",
+      "status": 200,
+      "expected": true
+    },
+    {
+      "route": "/admin/dashboard",
+      "status": 307,
+      "expected": true
+    },
+    {
+      "route": "/executive/dashboard",
+      "status": 307,
+      "expected": true
+    },
+    {
+      "route": "/employee/dashboard",
+      "status": 307,
+      "expected": true
+    },
+    {
+      "route": "/broker/dashboard",
+      "status": 307,
+      "expected": true
+    },
+    {
+      "route": "/client/dashboard",
+      "status": 307,
+      "expected": true
+    }
+  ],
+  "appModeRouting": [
+    {
+      "test": "Root UA Redirect",
+      "status": 307,
+      "redirectLocation": "/app/login",
+      "passed": true
+    },
+    {
+      "test": "Browser UA Normal Rendering",
+      "status": 200,
+      "passed": true
+    }
+  ],
+  "apiSmokeTests": [
+    {
+      "name": "Health API",
+      "path": "/api/health",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "Ready API",
+      "path": "/api/ready",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "Contact Public API",
+      "path": "/api/contact",
+      "status": 204,
+      "passed": true
+    },
+    {
+      "name": "Chat Config API",
+      "path": "/api/chat/config",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "App Settings Public API",
+      "path": "/api/v1/admin/app/settings",
+      "status": 401,
+      "passed": true
+    }
+  ]
+}

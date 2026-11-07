@@ -23,6 +23,7 @@ import {
   Calendar,
   HelpCircle,
   ListChecks,
+  FolderGit2,
 } from "lucide-react";
 
 interface NavGroup {
@@ -44,6 +45,7 @@ const navGroups: NavGroup[] = [
       { name: "My Tasks", href: "/employee/tasks", icon: CheckSquare },
       { name: "Work Reports", href: "/employee/work-reports", icon: FileText },
       { name: "Projects", href: "/employee/projects", icon: Briefcase },
+      { name: "Project Library", href: "/employee/project-library", icon: FolderGit2 },
     ],
   },
   {

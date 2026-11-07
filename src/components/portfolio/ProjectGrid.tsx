@@ -91,7 +91,7 @@ export default function ProjectGrid({ projects }: ProjectGridProps = {}) {
                           rel="noopener noreferrer" 
                           className="text-[#e8a064] hover:text-[#d4915c] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064] focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414] rounded-sm"
                         >
-                          Visit Live Project
+                          View Live Website
                         </a>
                       )}
                       <Link 

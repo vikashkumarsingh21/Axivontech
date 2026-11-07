@@ -77,7 +77,12 @@ export async function middleware(req: any) {
     pathname.startsWith("/api/v1/automations") ||
     pathname.startsWith("/api/v1/announcements") ||
     pathname.startsWith("/api/v1/portal-ai") ||
+    pathname.startsWith("/api/v1/project-library") ||
     pathname.startsWith("/api/v1/search");
+
+  // Protect unified /project-library route
+  const isProjectLibraryRoute =
+    pathname === "/project-library" || pathname.startsWith("/project-library/");
 
   const isProtectedApiRoute =
     isJobsApiRoute ||
@@ -99,6 +104,7 @@ export async function middleware(req: any) {
     isBrokerRoute ||
     isClientRoute ||
     isCrmRoute ||
+    isProjectLibraryRoute ||
     isChangePasswordRoute;
 
   // IMPORTANT: Prevent header spoofing on public routes

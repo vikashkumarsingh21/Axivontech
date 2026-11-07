@@ -3,7 +3,8 @@
 import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Plus, X, RefreshCw, Briefcase, Edit2, Trash2, CheckCircle2, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { Plus, X, RefreshCw, Briefcase, Edit2, Trash2, CheckCircle2, AlertCircle, FolderGit2 } from "lucide-react";
 
 export default function AdminProjectsPage() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -124,6 +125,7 @@ export default function AdminProjectsPage() {
           <p className="text-gray-400 mt-1 text-sm">Create and manage active company projects & client deliverables.</p>
         </div>
         <div className="flex gap-2">
+          <Link href="/admin/project-library" className="flex items-center gap-2 bg-[#1e2530] hover:bg-[#2a3444] border border-white/10 text-white px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm"><FolderGit2 className="w-4 h-4 text-amber-400" /><span>Project Library Archive</span></Link>
           <button onClick={loadProjects} className="p-2.5 rounded-xl border border-white/10 bg-[#1a1a1a] text-gray-400 hover:text-white">
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>

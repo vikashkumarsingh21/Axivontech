@@ -1,0 +1,98 @@
+{
+  "robotsTxt": {
+    "status": 200,
+    "hasSitemap": true,
+    "disallowsPortals": true
+  },
+  "sitemapXml": {
+    "status": 200,
+    "excludesPortals": true,
+    "excludesDevRoutes": true,
+    "includesHome": true
+  },
+  "homePageSeo": {
+    "h1Count": 1,
+    "h1Text": "<h1 class=\"text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.12] mb-6 text-white font-sans\">Custom Web Apps, Mobile Platforms, and Software Built for Real Business Work.</h1>",
+    "canonicalUrl": "https://axivontech.in",
+    "pageTitle": "Custom Web &amp; Mobile Software Engineering | Axivon Technologies",
+    "pageDesc": "Axivon Technologies designs and builds reliable custom web apps, mobile platforms, and business tools. Work directly with our founding engineers.",
+    "hasJsonLd": true,
+    "hasFaqSchema": true,
+    "hasOrgSchema": true,
+    "pass": true
+  },
+  "forbiddenStringsGrep": [
+    {
+      "pattern": "\\[draft",
+      "found": false
+    },
+    {
+      "pattern": "Rajkot",
+      "found": false
+    },
+    {
+      "pattern": "Gujarat",
+      "found": false
+    },
+    {
+      "pattern": "Ahmedabad",
+      "found": false
+    },
+    {
+      "pattern": "Patna",
+      "found": false
+    },
+    {
+      "pattern": "Bihar",
+      "found": false
+    },
+    {
+      "pattern": "99\\.9",
+      "found": false
+    },
+    {
+      "pattern": "\\bGDPR\\b",
+      "found": false
+    },
+    {
+      "pattern": "\\bSLA\\b",
+      "found": false
+    },
+    {
+      "pattern": "guaranteed",
+      "found": false
+    },
+    {
+      "pattern": "Next\\.js 15",
+      "found": false
+    },
+    {
+      "pattern": "Axivon Solutions",
+      "found": false
+    },
+    {
+      "pattern": "9157226367",
+      "found": false
+    },
+    {
+      "pattern": "contact@axivontech.in",
+      "found": false
+    },
+    {
+      "pattern": "TODO-MEDIA",
+      "found": false
+    },
+    {
+      "pattern": "lorem ipsum",
+      "found": false
+    }
+  ],
+  "consistencyCheck": {
+    "founded2026": true,
+    "remoteFirst": true,
+    "primaryEmail": true,
+    "primaryPhone": true,
+    "founderVikash": true,
+    "founderRokhiya": true
+  }
+}

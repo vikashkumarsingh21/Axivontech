@@ -1,0 +1,75 @@
+{
+  "viewports": [
+    {
+      "viewport": "mobile-xs",
+      "width": 320,
+      "height": 568,
+      "scrollWidth": 320,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "viewport": "mobile-std",
+      "width": 375,
+      "height": 812,
+      "scrollWidth": 375,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "viewport": "tablet",
+      "width": 768,
+      "height": 1024,
+      "scrollWidth": 768,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "viewport": "desktop-sm",
+      "width": 1024,
+      "height": 768,
+      "scrollWidth": 1024,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "viewport": "desktop-std",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "viewport": "desktop-wide",
+      "width": 1920,
+      "height": 1080,
+      "scrollWidth": 1920,
+      "overflow": false,
+      "pass": true
+    }
+  ],
+  "consoleErrors": [],
+  "linksAudit": {
+    "totalLinks": 72,
+    "brokenLinks": 3,
+    "mailtoValid": true,
+    "phoneValid": true,
+    "whatsappValid": true
+  },
+  "formTest": {
+    "formPresent": true,
+    "hasName": true,
+    "hasEmail": false,
+    "hasSubmit": true
+  },
+  "a11yAudit": {
+    "hasHeaderLandmark": true,
+    "hasMainLandmark": true,
+    "hasFooterLandmark": true,
+    "h1Count": 1,
+    "h2Count": 7,
+    "totalImages": 10,
+    "missingAltCount": 0
+  }
+}

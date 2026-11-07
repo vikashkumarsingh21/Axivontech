@@ -13,7 +13,8 @@ import {
   ChevronRight, Building, UserCheck, ShieldCheck,
   CreditCard, UserPlus, Image as ImageIcon, LayoutTemplate,
   GraduationCap, X, Sparkles, Home, Layers, Building2, Info,
-  HelpCircle, BookOpen, Globe, Sliders, BarChart3, LineChart, FileSpreadsheet, Bot, Zap, Scale
+  HelpCircle, BookOpen, Globe, Sliders, BarChart3, LineChart, FileSpreadsheet, Bot, Zap, Scale,
+  FolderGit2
 } from "lucide-react";
 
 type NavItem = {
@@ -109,6 +110,7 @@ function SidebarInner({ pathname, onClose }: SidebarInnerProps) {
         { name: "Leave Approvals", href: "/admin/leave", icon: Coffee },
         { name: "Work Reports", href: "/admin/work-reports", icon: FileText },
         { name: "Projects", href: "/admin/projects", icon: Briefcase },
+        { name: "Project Library", href: "/admin/project-library", icon: FolderGit2, badge: "Archive" },
         { name: "Tasks", href: "/admin/tasks", icon: CheckSquare },
       ]
     },

@@ -129,6 +129,8 @@ model User {
   knowledgeUpdated         KnowledgeDocument[] @relation("KnowledgeUpdater")
   ownedClients             CrmClient[]         @relation("ClientOwner")
   createdPortfolioProjects PortfolioProject[]  @relation("PortfolioCreator")
+  createdLibraryProjects   ProjectLibraryItem[] @relation("ProjectLibraryCreator")
+  updatedLibraryProjects   ProjectLibraryItem[] @relation("ProjectLibraryUpdater")
   leadNotes                LeadNote[]          @relation("LeadNoteAuthor")
   leadMeetings             LeadMeeting[]       @relation("LeadMeetingCreator")
 
@@ -2221,4 +2223,154 @@ model DocumentAcknowledgment {
   @@unique([documentId, userId])
   @@index([userId])
   @@index([documentId])
+}
+
+
+// -----------------------------------------------------------------------------
+// AXIVONTECH PROJECT LIBRARY (Completed Projects Archive & Management System)
+// -----------------------------------------------------------------------------
+
+model ProjectLibraryItem {
+  id                     String    @id @default(cuid())
+  slug                   String    @unique
+  name                   String
+  clientName             String?
+  clientCompany          String?
+  industry               String
+  category               String
+  projectType            String?   // e.g. "Full-Stack Web Application", "Corporate Showcase", "IoT Platform"
+  status                 String    @default("COMPLETED") // COMPLETED, DELIVERED, ARCHIVED, MAINTENANCE
+  startDate              DateTime?
+  completionDate         DateTime?
+  liveUrl                String?
+  demoUrl                String?
+  clientPreviewUrl       String?
+  documentationUrl       String?
+  githubUrl              String?
+
+  // Section B: Overview & Scope
+  shortDescription       String    @db.Text
+  overview               String?   @db.Text
+  businessRequirement    String?   @db.Text
+  problemStatement       String?   @db.Text
+  solutionDelivered      String?   @db.Text
+  objectives             String?   @db.Text
+  scopeOfWork            String?   @db.Text
+  deliverables           String?   @db.Text
+
+  // Section C: Development & Tech Stack
+  frontendTech           String[]  @default([])
+  backendTech            String[]  @default([])
+  databaseTech           String[]  @default([])
+  frameworks             String[]  @default([])
+  languages              String[]  @default([])
+  apisAndIntegrations    String[]  @default([])
+  hostingPlatform        String?
+  devTools               String[]  @default([])
+  additionalTech         String[]  @default([])
+  technologies           String[]  @default([])
+
+  // Section D: Features
+  features               String[]  @default([])
+
+  // Section E: Media
+  thumbnailUrl           String?
+  websiteScreenshots     String[]  @default([])
+  dashboardScreenshots   String[]  @default([])
+  mobileScreenshots      String[]  @default([])
+  galleryImages          String[]  @default([])
+  demoVideoUrl           String?
+
+  // Section F & Presentation Highlights
+  presentationHighlights String[]  @default([])
+  presentationNotes      String?   @db.Text
+  isPresentationReady    Boolean   @default(true)
+
+  // Section G: Internal Information (STRICTLY RESTRICTED TO WRITE ROLES)
+  internalNotes          String?   @db.Text
+  assignedTeam           String?
+  projectOwner           String?
+  developmentDepartment  String?
+  deliveryNotes          String?   @db.Text
+  maintenanceInfo        String?   @db.Text
+  qualityNotes           String?   @db.Text
+  confidentialData       String?   @db.Text
+
+  // Section H: Completion & Review
+  deliveryConfirmation   Boolean   @default(true)
+  reviewStatus           String    @default("APPROVED") // APPROVED, PENDING_REVIEW, UNDER_AUDIT
+  finalApprovedLink      String?
+  isArchived             Boolean   @default(false)
+  archivedAt             DateTime?
+  archivedReason         String?
+
+  // Ownership & Timestamps
+  createdById            String?
+  createdBy              User?     @relation("ProjectLibraryCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedById            String?
+  updatedBy              User?     @relation("ProjectLibraryUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  // Relations
+  assets                 ProjectLibraryAsset[]
+  documents              ProjectLibraryDocument[]
+  auditLogs              ProjectLibraryAuditLog[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([isArchived])
+  @@index([industry])
+  @@index([category])
+  @@index([completionDate])
+}
+
+model ProjectLibraryAsset {
+  id           String             @id @default(cuid())
+  projectId    String
+  project      ProjectLibraryItem @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title        String
+  assetType    String             // THUMBNAIL, SCREENSHOT_DESKTOP, SCREENSHOT_DASHBOARD, SCREENSHOT_MOBILE, GALLERY, VIDEO
+  url          String
+  caption      String?
+  isPublic     Boolean            @default(true)
+  displayOrder Int                @default(0)
+  createdAt    DateTime           @default(now())
+
+  @@index([projectId])
+  @@index([assetType])
+}
+
+model ProjectLibraryDocument {
+  id             String             @id @default(cuid())
+  projectId      String
+  project        ProjectLibraryItem @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title          String
+  fileUrl        String
+  fileSize       Int?
+  fileType       String?
+  isConfidential Boolean            @default(true)
+  uploadedById   String?
+  createdAt      DateTime           @default(now())
+
+  @@index([projectId])
+  @@index([isConfidential])
+}
+
+model ProjectLibraryAuditLog {
+  id        String             @id @default(cuid())
+  projectId String
+  project   ProjectLibraryItem @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String?
+  userName  String?
+  userRole  String?
+  action    String             // PROJECT_CREATED, PROJECT_UPDATED, MEDIA_UPLOADED, PROJECT_ARCHIVED, PROJECT_RESTORED, EXCEL_EXPORTED, PRESENTATION_OPENED
+  details   Json?
+  ipAddress String?
+  createdAt DateTime           @default(now())
+
+  @@index([projectId])
+  @@index([action])
+  @@index([userId])
 }

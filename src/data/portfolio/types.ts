@@ -19,6 +19,8 @@ export interface PortfolioProject {
 
   industry: string;
 
+  location?: string;
+
   // ==========================================
   // Project Description
   // ==========================================

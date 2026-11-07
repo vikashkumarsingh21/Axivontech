@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   ChevronRight,
   User,
+  FolderGit2,
 } from "lucide-react";
 import { MobileShell } from "@/components/mobile/MobileShell";
 import { useAppMode } from "@/features/app-mode/useAppMode";
@@ -61,6 +62,7 @@ export default function ManagerLayout({ children }: ManagerLayoutProps) {
     { name: "Work Reports", href: "/manager/work-reports", icon: FileText },
     { name: "Attendance", href: "/manager/attendance", icon: CalendarCheck },
     { name: "Leave Requests", href: "/manager/leave", icon: Coffee },
+    { name: "Project Library", href: "/manager/project-library", icon: FolderGit2 },
   ];
 
   // Dedicated App-Mode Mobile Shell

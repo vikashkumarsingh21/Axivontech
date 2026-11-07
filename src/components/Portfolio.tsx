@@ -6,10 +6,12 @@ import {
   Sprout,
   Waves,
   Building2,
+  UtensilsCrossed,
+  Armchair,
+  MapPin,
   ExternalLink,
   type LucideIcon,
 } from "lucide-react";
-import { FaGithub } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
 import { SectionHeader } from "@/components/ui";
@@ -19,6 +21,8 @@ interface Project {
   id: string;
   title: string;
   category: string;
+  industry?: string;
+  location?: string;
   description: string;
   status: "Completed" | "Live" | "In Development";
   technologies: string[];
@@ -38,6 +42,7 @@ const PROJECTS: Project[] = [
     id: "axivon-technologies",
     title: "Axivon Technologies Platform",
     category: "Agency Digital Platform",
+    industry: "Digital Engineering & Architecture",
     description:
       "Modern technology agency digital architecture with integrated service exploration, real-time consultation intake, and responsive cross-platform interfaces.",
     status: "Live",
@@ -49,9 +54,42 @@ const PROJECTS: Project[] = [
     imageAlt: "Axivon Technologies modern agency platform and workspace",
   },
   {
+    id: "purvarang-family-restaurant",
+    title: "Purvarang Family Restaurant",
+    category: "Website Development",
+    industry: "Restaurant / Food & Hospitality",
+    location: "Lalganj, Vaishali, Bihar, India",
+    description:
+      "Dedicated restaurant website showcasing authentic North Indian, Tandoori, and Chinese culinary offerings with a digital menu, ambiance showcase, and direct customer contact in Lalganj, Vaishali.",
+    status: "Live",
+    technologies: ["React", "TypeScript", "Vite", "Tailwind CSS", "Digital Menu"],
+    liveUrl: "https://purvarang-family-restaurant.onrender.com/",
+    githubUrl: "https://github.com/vikashkumarsingh21/Axivontech",
+    icon: UtensilsCrossed,
+    image: "/assets/images/portfolio/purvarang-family-restaurant.jpg",
+    imageAlt: "Purvarang Family Restaurant official website and digital menu in Lalganj, Vaishali",
+  },
+  {
+    id: "udaan-furniture",
+    title: "Udaan Furniture",
+    category: "Website Development",
+    industry: "Furniture / Retail / Home Interiors",
+    location: "Rajkot, Gujarat, India",
+    description:
+      "Showroom website presenting residential and office furniture collections across living, bedroom, dining, and workspace interiors for customers in Rajkot, Gujarat.",
+    status: "Live",
+    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Showroom Catalog"],
+    liveUrl: "https://udaan-furniture.onrender.com/",
+    githubUrl: "https://github.com/vikashkumarsingh21/Axivontech",
+    icon: Armchair,
+    image: "/assets/images/portfolio/udaan-furniture.jpg",
+    imageAlt: "Udaan Furniture premium showroom website and collection catalog in Rajkot, Gujarat",
+  },
+  {
     id: "krishi-drishti",
     title: "Krishi Drishti",
     category: "Smart Agriculture & IoT",
+    industry: "Agriculture Technology (AgriTech)",
     description:
       "AI-driven smart irrigation and telemetry platform featuring real-time soil moisture sensor monitoring, agricultural weather analytics, and automated water management.",
     status: "Live",
@@ -66,6 +104,7 @@ const PROJECTS: Project[] = [
     id: "jalmitra",
     title: "JalMitra",
     category: "Environmental Technology",
+    industry: "Environmental IoT & Water Systems",
     description:
       "Automated solar-powered water purification and environmental telemetry system designed to harvest surface debris and monitor municipal water body quality.",
     status: "Live",
@@ -80,6 +119,7 @@ const PROJECTS: Project[] = [
     id: "nani-tathagat",
     title: "Nani Tathagat",
     category: "Business Automation & CRM",
+    industry: "Cultural Archive & Publishing",
     description:
       "Operational workflow automation and lead capture system that streamlines client communication, automated reporting, and customer pipeline management.",
     status: "Live",
@@ -110,12 +150,14 @@ const cardVariants: Variants = {
 export default function Portfolio({ projects }: PortfolioProps = {}) {
   const displayedProjects: Project[] =
     projects && projects.length > 0
-      ? projects.slice(0, 4).map((p) => {
+      ? projects.slice(0, 6).map((p) => {
           const staticMatch = PROJECTS.find((sp) => sp.id === p.id || sp.id === p.slug);
           return {
             id: p.id || p.slug,
             title: p.title,
             category: p.category,
+            industry: p.industry || staticMatch?.industry,
+            location: p.location || staticMatch?.location,
             description: p.shortDescription || staticMatch?.description || "",
             status: (p.status === "Live" ? "Live" : p.status === "In Development" ? "In Development" : "Completed") as any,
             technologies: p.technologies && p.technologies.length > 0 ? p.technologies : staticMatch?.technologies || [],
@@ -199,7 +241,7 @@ export default function Portfolio({ projects }: PortfolioProps = {}) {
 
                   {/* Body Content */}
                   <div className="p-7">
-                    <div className="mb-3 flex items-center gap-2.5">
+                    <div className="mb-2 flex items-center gap-2.5">
                       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2a1f14] text-[#e8a064]">
                         <Icon className="h-4 w-4" />
                       </div>
@@ -207,6 +249,20 @@ export default function Portfolio({ projects }: PortfolioProps = {}) {
                         {project.title}
                       </h3>
                     </div>
+
+                    {/* Industry & Location indicators */}
+                    {(project.industry || project.location) && (
+                      <div className="flex flex-wrap items-center gap-2 mb-3.5 text-xs text-[#8e8e93]">
+                        {project.industry && <span>{project.industry}</span>}
+                        {project.industry && project.location && <span>•</span>}
+                        {project.location && (
+                          <span className="text-[#a1a1aa] flex items-center gap-1">
+                            <MapPin className="h-3 w-3 text-[#e8a064]" />
+                            {project.location}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                     <p className="text-sm leading-6 text-[#a1a1aa] mb-6">
                       {project.description}
@@ -234,19 +290,17 @@ export default function Portfolio({ projects }: PortfolioProps = {}) {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#e8a064] transition-colors hover:text-[#f0b07a]"
                   >
-                    <span>View Live Deployment</span>
+                    <span>View Live Website</span>
                     <ExternalLink className="h-3.5 w-3.5" />
                   </a>
 
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href={`/portfolio/${project.id}`}
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-[#a1a1aa] transition-colors hover:text-[#f4f4f5]"
                   >
-                    <FaGithub className="h-4 w-4" />
-                    <span>Repository</span>
-                  </a>
+                    <span>Case Study</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
               </motion.div>
             );
@@ -256,10 +310,10 @@ export default function Portfolio({ projects }: PortfolioProps = {}) {
         {/* View All Projects CTA */}
         <div className="mt-14 text-center">
           <Link
-            href="/contact#contact-form"
+            href="/portfolio"
             className="inline-flex items-center justify-center gap-2 rounded-full border border-[#2e2e2e] bg-[#141414] px-7 py-3.5 text-sm font-semibold text-[#d4d4d4] transition-all hover:border-[#e8a064]/50 hover:bg-[#1c1c1e] hover:text-[#e8a064]"
           >
-            <span>Have a Custom Project in Mind? Let&apos;s Build It</span>
+            <span>Explore Complete Portfolio (6 Live Projects)</span>
             <ExternalLink className="h-4 w-4" />
           </Link>
         </div>

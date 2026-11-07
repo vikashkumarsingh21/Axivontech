@@ -250,13 +250,25 @@ export default async function DemoProjectDetailPage({ params }: PageProps) {
           {/* Primary Action Button Bar */}
           <div className="mt-8 flex flex-wrap items-center gap-4">
             {isLive && project.demoUrl ? (
-              <Link
-                href={project.demoUrl}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8a064] px-7 py-3.5 text-sm font-semibold text-[#0a0a0b] shadow-[0_4px_20px_rgba(232,160,100,0.25)] transition-all hover:bg-[#f0b07a] hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]"
-              >
-                <span>Launch Interactive Demo</span>
-                <ExternalLink className="h-4 w-4" />
-              </Link>
+              project.demoUrl.startsWith("http") ? (
+                <a
+                  href={project.demoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8a064] px-7 py-3.5 text-sm font-semibold text-[#0a0a0b] shadow-[0_4px_20px_rgba(232,160,100,0.25)] transition-all hover:bg-[#f0b07a] hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]"
+                >
+                  <span>Launch Live Website</span>
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              ) : (
+                <Link
+                  href={project.demoUrl}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8a064] px-7 py-3.5 text-sm font-semibold text-[#0a0a0b] shadow-[0_4px_20px_rgba(232,160,100,0.25)] transition-all hover:bg-[#f0b07a] hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a064]"
+                >
+                  <span>Launch Interactive Demo</span>
+                  <ExternalLink className="h-4 w-4" />
+                </Link>
+              )
             ) : null}
 
             <Link
@@ -299,13 +311,25 @@ export default async function DemoProjectDetailPage({ params }: PageProps) {
               </div>
 
               {isLive && project.demoUrl && (
-                <Link
-                  href={project.demoUrl}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#e8a064] hover:text-[#f0b07a] transition-colors"
-                >
-                  <span>Experience Live in Fullscreen</span>
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </Link>
+                project.demoUrl.startsWith("http") ? (
+                  <a
+                    href={project.demoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#e8a064] hover:text-[#f0b07a] transition-colors"
+                  >
+                    <span>Visit Live Website in New Tab</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                ) : (
+                  <Link
+                    href={project.demoUrl}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#e8a064] hover:text-[#f0b07a] transition-colors"
+                  >
+                    <span>Experience Live in Fullscreen</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Link>
+                )
               )}
             </div>
           </div>
