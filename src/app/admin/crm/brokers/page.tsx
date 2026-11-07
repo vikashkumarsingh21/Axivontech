@@ -3,8 +3,21 @@
 import { getErrorMessage, parseApiResponse } from "@/lib/errors/client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Search, Edit2, ShieldOff, ShieldAlert, Eye, Download, ChevronDown, FileSpreadsheet } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Edit2,
+  ShieldOff,
+  ShieldAlert,
+  Eye,
+  Download,
+  ChevronDown,
+  FileSpreadsheet,
+  Trash2,
+} from "lucide-react";
 import { ExportPartnersModal } from "@/components/admin/export/ExportPartnersModal";
+import { DeleteBrokerModal } from "@/components/admin/partner/DeleteBrokerModal";
+import { BulkBrokerActionModal } from "@/components/admin/partner/BulkBrokerActionModal";
 
 export default function BrokersPage() {
   const [brokers, setBrokers] = useState<any[]>([]);
@@ -16,6 +29,10 @@ export default function BrokersPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportType, setExportType] = useState<"APPLICATIONS" | "CONFIRMED_PARTNERS">("CONFIRMED_PARTNERS");
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+
+  // Deletion & Bulk Modals State
+  const [selectedBrokerForDelete, setSelectedBrokerForDelete] = useState<any | null>(null);
+  const [isBulkBrokerModalOpen, setIsBulkBrokerModalOpen] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -78,17 +95,25 @@ export default function BrokersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      
+
       const data = await res.json();
       if (!res.ok) {
         throw new Error(getErrorMessage(data) || "Failed to create broker");
       }
-      
+
       setIsModalOpen(false);
       setFormData({
-        name: "", email: "", phone: "", whatsapp: "", password: "",
-        companyName: "", designation: "", city: "",
-        state: "", country: "", website: ""
+        name: "",
+        email: "",
+        phone: "",
+        whatsapp: "",
+        password: "",
+        companyName: "",
+        designation: "",
+        city: "",
+        state: "",
+        country: "",
+        website: "",
       });
       fetchBrokers();
     } catch (err: any) {
@@ -168,7 +193,7 @@ export default function BrokersPage() {
             )}
           </div>
 
-          <button 
+          <button
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 flex items-center gap-2 rounded-md transition-colors text-sm"
             onClick={() => setIsModalOpen(true)}
           >
@@ -191,16 +216,25 @@ export default function BrokersPage() {
           </div>
 
           {selectedIds.length > 0 && (
-            <div className="text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded border border-emerald-500/20 flex items-center gap-2">
-              <span>{selectedIds.length} partner(s) selected</span>
+            <div className="flex items-center gap-2">
+              <div className="text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded border border-emerald-500/20 flex items-center gap-2">
+                <span>{selectedIds.length} partner(s) selected</span>
+                <button
+                  onClick={() => {
+                    setExportType("CONFIRMED_PARTNERS");
+                    setIsExportModalOpen(true);
+                  }}
+                  className="underline font-semibold hover:text-white"
+                >
+                  Export Selected
+                </button>
+              </div>
               <button
-                onClick={() => {
-                  setExportType("CONFIRMED_PARTNERS");
-                  setIsExportModalOpen(true);
-                }}
-                className="underline font-semibold hover:text-white"
+                onClick={() => setIsBulkBrokerModalOpen(true)}
+                className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 rounded text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                title="Bulk deactivate or delete selected partners"
               >
-                Export Selected
+                <Trash2 size={13} /> Manage Selected ({selectedIds.length})
               </button>
             </div>
           )}
@@ -279,17 +313,24 @@ export default function BrokersPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
                         <Link
                           href={`/admin/crm/brokers/${broker.id}`}
-                          className="inline-flex p-1 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors align-middle"
+                          className="inline-flex p-1.5 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors align-middle"
                           title="View Dossier"
                         >
-                          <Eye size={16} />
+                          <Eye size={15} />
                         </Link>
                         <button 
-                          className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-red-400 transition-colors align-middle" 
-                          title="Toggle Status"
+                          className="p-1.5 hover:bg-white/10 rounded text-gray-400 hover:text-amber-400 transition-colors align-middle" 
+                          title={broker.status === 'ACTIVE' ? "Quick Deactivate" : "Quick Activate"}
                           onClick={() => toggleStatus(broker.id, broker.status)}
                         >
-                          {broker.status === 'ACTIVE' ? <ShieldOff size={16} /> : <ShieldAlert size={16} />}
+                          {broker.status === 'ACTIVE' ? <ShieldOff size={15} /> : <ShieldAlert size={15} />}
+                        </button>
+                        <button
+                          className="p-1.5 hover:bg-red-500/20 rounded text-red-400 hover:text-red-300 transition-colors align-middle"
+                          title="Deactivate or Delete Broker"
+                          onClick={() => setSelectedBrokerForDelete(broker)}
+                        >
+                          <Trash2 size={15} />
                         </button>
                       </td>
                     </tr>
@@ -305,7 +346,7 @@ export default function BrokersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
           <div className="bg-[#111] border border-white/10 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
             <h2 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Add New Broker</h2>
-            
+
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-md mb-6 text-sm">
                 {error}
@@ -389,6 +430,30 @@ export default function BrokersPage() {
         initialType={exportType}
         selectedRowIds={selectedIds}
         totalTableRowsCount={brokers.length}
+      />
+
+      {/* Delete / Deactivate Broker Modal */}
+      <DeleteBrokerModal
+        isOpen={!!selectedBrokerForDelete}
+        onClose={() => setSelectedBrokerForDelete(null)}
+        broker={selectedBrokerForDelete}
+        onSuccess={() => {
+          setSelectedBrokerForDelete(null);
+          fetchBrokers();
+        }}
+      />
+
+      {/* Bulk Broker Action Modal */}
+      <BulkBrokerActionModal
+        isOpen={isBulkBrokerModalOpen}
+        onClose={() => setIsBulkBrokerModalOpen(false)}
+        selectedIds={selectedIds}
+        brokers={brokers}
+        onSuccess={() => {
+          setIsBulkBrokerModalOpen(false);
+          setSelectedIds([]);
+          fetchBrokers();
+        }}
       />
     </div>
   );

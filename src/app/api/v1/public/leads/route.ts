@@ -70,10 +70,18 @@ export async function POST(req: NextRequest) {
     if (referralCode && typeof referralCode === "string" && referralCode.trim() !== "") {
       const brokerProfile = await db.brokerProfile.findUnique({
         where: { referralCode: referralCode.trim() },
-        select: { userId: true },
+        select: {
+          userId: true,
+          user: {
+            select: { status: true },
+          },
+        },
       });
       if (!brokerProfile) {
         throw new ApiError(400, "Invalid referral code. Please check the link and try again.");
+      }
+      if (brokerProfile.user?.status !== "ACTIVE") {
+        throw new ApiError(400, "This referral code is inactive or no longer valid.");
       }
       ownerId = brokerProfile.userId;
     }

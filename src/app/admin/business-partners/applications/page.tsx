@@ -17,10 +17,13 @@ import {
   ShieldOff,
   UserCheck,
   ShieldCheck,
+  Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ExportPartnersModal } from "@/components/admin/export/ExportPartnersModal";
 import { CreatePartnerLoginModal } from "@/components/admin/partner/CreatePartnerLoginModal";
+import { DeleteApplicationModal } from "@/components/admin/partner/DeleteApplicationModal";
+import { BulkDeleteApplicationsModal } from "@/components/admin/partner/BulkDeleteApplicationsModal";
 
 export default function BusinessPartnerApplicationsPage() {
   const [applications, setApplications] = useState<any[]>([]);
@@ -37,6 +40,10 @@ export default function BusinessPartnerApplicationsPage() {
 
   // Approval & Login Creation Modal State
   const [selectedAppForLogin, setSelectedAppForLogin] = useState<any | null>(null);
+
+  // Deletion Modal State
+  const [selectedAppForDelete, setSelectedAppForDelete] = useState<any | null>(null);
+  const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
 
   const fetchApplications = async () => {
     try {
@@ -188,16 +195,26 @@ export default function BusinessPartnerApplicationsPage() {
         </div>
 
         {selectedIds.length > 0 && (
-          <div className="text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded border border-emerald-500/20 flex items-center gap-2">
-            <span>{selectedIds.length} row(s) selected</span>
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded border border-emerald-500/20 flex items-center gap-2">
+              <span>{selectedIds.length} row(s) selected</span>
+              <button
+                onClick={() => {
+                  setExportType("APPLICATIONS");
+                  setIsExportModalOpen(true);
+                }}
+                className="underline font-semibold hover:text-white"
+              >
+                Export Selected
+              </button>
+            </div>
             <button
-              onClick={() => {
-                setExportType("APPLICATIONS");
-                setIsExportModalOpen(true);
-              }}
-              className="underline font-semibold hover:text-white"
+              onClick={() => setIsBulkDeleteModalOpen(true)}
+              className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 rounded text-xs font-semibold flex items-center gap-1.5 transition-colors"
+              title="Bulk delete selected partner applications"
             >
-              Export Selected
+              <Trash2 className="w-3.5 h-3.5" />
+              Delete Selected ({selectedIds.length})
             </button>
           </div>
         )}
@@ -364,6 +381,13 @@ export default function BusinessPartnerApplicationsPage() {
                           >
                             <Eye className="w-3.5 h-3.5" /> View
                           </Link>
+                          <button
+                            onClick={() => setSelectedAppForDelete(app)}
+                            className="inline-flex items-center gap-1 text-xs font-medium text-red-400 hover:text-white px-2 py-1 rounded-md border border-red-500/20 hover:bg-red-500/20 transition-colors"
+                            title="Delete Partner Application"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" /> Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -391,6 +415,30 @@ export default function BusinessPartnerApplicationsPage() {
         application={selectedAppForLogin}
         onSuccess={() => {
           setSelectedAppForLogin(null);
+          fetchApplications();
+        }}
+      />
+
+      {/* Delete Application Modal */}
+      <DeleteApplicationModal
+        isOpen={!!selectedAppForDelete}
+        onClose={() => setSelectedAppForDelete(null)}
+        application={selectedAppForDelete}
+        onSuccess={() => {
+          setSelectedAppForDelete(null);
+          fetchApplications();
+        }}
+      />
+
+      {/* Bulk Delete Applications Modal */}
+      <BulkDeleteApplicationsModal
+        isOpen={isBulkDeleteModalOpen}
+        onClose={() => setIsBulkDeleteModalOpen(false)}
+        selectedIds={selectedIds}
+        applications={applications}
+        onSuccess={() => {
+          setIsBulkDeleteModalOpen(false);
+          setSelectedIds([]);
           fetchApplications();
         }}
       />

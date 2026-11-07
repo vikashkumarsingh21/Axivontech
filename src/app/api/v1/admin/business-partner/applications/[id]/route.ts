@@ -31,6 +31,11 @@ const updateStatusSchema = z.object({
   reason: z.string().max(2000).optional(),
 });
 
+const deleteApplicationSchema = z.object({
+  reason: z.string().min(5, "Deletion reason must be at least 5 characters"),
+  revokePendingInvite: z.boolean().optional().default(false),
+});
+
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -277,6 +282,108 @@ export async function PUT(
       { message: "Application status updated successfully", application: updatedApp },
       { status: 200 }
     );
+  } catch (err) {
+    return handleApiError(err);
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const userId = req.headers.get("x-user-id");
+    if (!userId) throw new ApiError(401, "Unauthorized");
+    await requirePermission(userId, "users:delete");
+
+    const { id } = await params;
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      // Body might be empty in some HTTP clients
+    }
+    const { reason, revokePendingInvite } = deleteApplicationSchema.parse(body);
+
+    const application = await db.businessPartnerApplication.findFirst({
+      where: {
+        OR: [{ id }, { applicationId: id }],
+      },
+    });
+
+    if (!application) {
+      throw new ApiError(404, "Application not found");
+    }
+
+    // Check if linked to user by email
+    const linkedUser = await db.user.findFirst({
+      where: {
+        email: { equals: application.email, mode: "insensitive" },
+      },
+      include: {
+        brokerProfile: true,
+        userRoles: { include: { role: true } },
+      },
+    });
+
+    let revokedPendingUser = false;
+
+    // Transactional deletion
+    await db.$transaction(async (tx) => {
+      // If applicant has an account that has NOT completed activation, and admin explicitly requested to revoke:
+      if (
+        revokePendingInvite &&
+        linkedUser &&
+        linkedUser.status === "PENDING_ACTIVATION"
+      ) {
+        // Double check no business dependencies exist on this pending user
+        const leadsCount = await tx.lead.count({ where: { ownerId: linkedUser.id } });
+        const projectsCount = linkedUser.brokerProfile
+          ? await tx.partnerProject.count({ where: { brokerProfileId: linkedUser.brokerProfile.id } })
+          : 0;
+
+        if (leadsCount === 0 && projectsCount === 0) {
+          await tx.session.deleteMany({ where: { userId: linkedUser.id } });
+          await tx.userRole.deleteMany({ where: { userId: linkedUser.id } });
+          if (linkedUser.brokerProfile) {
+            await tx.brokerProfile.delete({ where: { id: linkedUser.brokerProfile.id } });
+          }
+          await tx.user.delete({ where: { id: linkedUser.id } });
+          revokedPendingUser = true;
+        }
+      }
+
+      // Delete the application (cascades ApplicationMeeting & ApplicationStatusHistory)
+      await tx.businessPartnerApplication.delete({
+        where: { id: application.id },
+      });
+
+      // Audit Log
+      await tx.auditLog.create({
+        data: {
+          userId,
+          action: "BUSINESS_PARTNER_APPLICATION_DELETED",
+          resource: `BusinessPartnerApplication:${application.applicationId}`,
+          details: {
+            applicationId: application.applicationId,
+            applicantName: application.fullName,
+            email: application.email,
+            status: application.status,
+            reason,
+            linkedBrokerAccountPreserved: !!linkedUser && !revokedPendingUser,
+            linkedBrokerPartnerId: linkedUser?.brokerProfile?.partnerId || null,
+            revokedPendingUser,
+          },
+        },
+      });
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Application ${application.applicationId} for ${application.fullName} has been permanently deleted.`,
+      linkedBrokerPreserved: !!linkedUser && !revokedPendingUser,
+      revokedPendingUser,
+    });
   } catch (err) {
     return handleApiError(err);
   }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { requirePermission } from "@/lib/auth/permissions";
+import { requirePermission, invalidateUserPermissionCache } from "@/lib/auth/permissions";
 import { handleApiError, ApiError } from "@/lib/api-error";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -337,6 +337,150 @@ export async function PATCH(req: Request, props: { params: Promise<{ [key: strin
     });
 
     return NextResponse.json({ success: true, data: updatedBroker });
+  } catch (error: any) {
+    return handleApiError(error);
+  }
+}
+
+const deleteBrokerSchema = z.object({
+  reason: z.string().min(5, "Deletion reason must be at least 5 characters"),
+  confirmationWord: z.string().refine((val) => val === "DELETE", {
+    message: "Confirmation word must be exactly 'DELETE'",
+  }),
+});
+
+export async function DELETE(req: Request, props: { params: Promise<{ [key: string]: string }> }) {
+  const params = await props.params;
+  try {
+    const adminId = req.headers.get("x-user-id");
+    if (!adminId) throw new ApiError(401, "Unauthorized");
+    await requirePermission(adminId, "users:delete");
+
+    const identifier = params.id;
+    const body = await req.json().catch(() => ({}));
+    const { reason } = deleteBrokerSchema.parse(body);
+
+    const brokerUser = await db.user.findFirst({
+      where: {
+        OR: [
+          { id: identifier },
+          { brokerProfile: { id: identifier } },
+          { brokerProfile: { partnerId: identifier } },
+        ],
+        userRoles: { some: { role: { name: { in: ["BUSINESS_PARTNER", "BROKER"] } } } },
+      },
+      include: {
+        brokerProfile: true,
+        userRoles: { include: { role: true } },
+      },
+    });
+
+    if (!brokerUser || !brokerUser.brokerProfile) {
+      throw new ApiError(404, "Broker account not found.");
+    }
+
+    if (adminId === brokerUser.id) {
+      throw new ApiError(400, "You cannot delete your own account.");
+    }
+
+    const isPrivileged = brokerUser.userRoles.some((ur) =>
+      ["FOUNDER", "CO_FOUNDER", "ADMIN"].includes(ur.role.name)
+    );
+    if (isPrivileged) {
+      throw new ApiError(403, "Cannot delete an account with Admin, Founder, or Co-Founder privileges.");
+    }
+
+    const brokerProfile = brokerUser.brokerProfile;
+
+    // Strict dependency check: count all business, project, and financial entities
+    const [leadsCount, projectsCount, contractsCount, commissionsCount, documentsCount, clientCount] =
+      await Promise.all([
+        db.lead.count({ where: { ownerId: brokerUser.id } }),
+        db.partnerProject.count({ where: { brokerProfileId: brokerProfile.id } }),
+        db.partnerContract.count({
+          where: { partnerProject: { brokerProfileId: brokerProfile.id } },
+        }),
+        db.commission.count({ where: { brokerProfileId: brokerProfile.id } }),
+        db.partnerDocument.count({ where: { brokerProfileId: brokerProfile.id } }),
+        db.crmClient.count({ where: { ownerId: brokerUser.id } }),
+      ]);
+
+    const totalDependencies =
+      leadsCount + projectsCount + contractsCount + commissionsCount + documentsCount + clientCount;
+
+    if (totalDependencies > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "CANNOT_DELETE_HAS_DEPENDENCIES",
+          message:
+            "Cannot permanently delete this broker because they have associated business, project, or financial records. To preserve business integrity, reporting, and audit compliance, please use Option A (Deactivate & Keep History) instead.",
+          dependencies: {
+            leads: leadsCount,
+            projects: projectsCount,
+            contracts: contractsCount,
+            commissions: commissionsCount,
+            documents: documentsCount,
+            clients: clientCount,
+            total: totalDependencies,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    // Zero dependencies confirmed -> execute permanent removal in transaction
+    await db.$transaction(async (tx) => {
+      // 1. Delete organization settings for this broker
+      await tx.organizationSetting.deleteMany({
+        where: {
+          key: {
+            in: [`broker_ext:${brokerProfile.id}`, `broker_notes:${brokerUser.id}`],
+          },
+        },
+      });
+
+      // 2. Delete BrokerProfile
+      await tx.brokerProfile.delete({
+        where: { id: brokerProfile.id },
+      });
+
+      // 3. Delete User account (UserRole, Session, UserPreference cascade automatically)
+      await tx.user.delete({
+        where: { id: brokerUser.id },
+      });
+
+      // 4. Record permanent deletion in audit log
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          action: "BROKER_PERMANENTLY_DELETED",
+          resource: `User:${brokerUser.id}`,
+          details: {
+            deletedBrokerId: brokerUser.id,
+            deletedBrokerProfileId: brokerProfile.id,
+            deletedBrokerEmail: brokerUser.email,
+            deletedBrokerName: brokerUser.name,
+            deletedBrokerReferralCode: brokerProfile.referralCode,
+            reason,
+            performedBy: adminId,
+          },
+        },
+      });
+    });
+
+    // Invalidate permission cache
+    invalidateUserPermissionCache(brokerUser.id);
+
+    return NextResponse.json({
+      success: true,
+      message: "Broker account and profile have been permanently deleted.",
+      deletedBroker: {
+        id: brokerUser.id,
+        email: brokerUser.email,
+        name: brokerUser.name,
+      },
+    });
   } catch (error: any) {
     return handleApiError(error);
   }
